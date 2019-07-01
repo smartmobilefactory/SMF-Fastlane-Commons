@@ -40,33 +40,42 @@ end
 
 def smf_setup_ios_fastlane_commons(options = Hash.new)
   # Load the Fastlane config from the disk into memory
-  UI.message(options)
+  UI.message("Inline options: #{options}")
 
+  UI.message("Loading fastlane config")
   smf_load_fastlane_config
 
+
   # Clone the Commons Repo
+  UI.message("Setting commons dir path")
   @fastlane_commons_dir_path = "#{smf_workspace_dir}/.fastlane-smf-commons"
 
   if @should_commons_repo_be_downloaded
     UI.message("Downloading Fastlane Commons Repo as it's not locally available yet")
+    UI.message("cleaning repo")
     smf_remove_fastlane_commons_repo
+    UI.message("Cloning repo")
     smf_clone_fastlane_commons_repo
   else
     UI.message("The Fastlane Commons Repo won't be downloaded as it's already available locally")
   end
 
   # Import the splitted Fastlane classes
+  UI.message("Importing files")
   import_all "#{@fastlane_commons_dir_path}/fastlane/flow"
   import_all "#{@fastlane_commons_dir_path}/fastlane/steps"
   import_all "#{@fastlane_commons_dir_path}/fastlane/utils"
 
   # Setup build type options
+  UI.message("Setup default build types")
   smf_setup_default_build_type_values
 
   # Override build type options by inline
+  UI.message("Overriding build type")
   build_type = options[:build_type]
   smf_override_build_type_options_by_type(build_type)
 
+  UI.message("setting original platform")
   @smf_original_platform = ENV[$FASTLANE_PLATFORM_NAME_ENV_KEY]
   puts "Original Platform #{@smf_original_platform}"
 end
