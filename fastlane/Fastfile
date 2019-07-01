@@ -227,6 +227,7 @@ end
 
 def smf_set_slack_enabled(value)
   newValue = value ? "true" : "false"
+  UI.message("Is slack enabled: #{ENV[$SMF_IS_SLACK_ENABLED]} vs #{newValue}")
   return ENV[$SMF_IS_SLACK_ENABLED] = newValue
 end
 
