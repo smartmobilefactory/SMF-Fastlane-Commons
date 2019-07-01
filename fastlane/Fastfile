@@ -193,6 +193,7 @@ end
 #####################################################
 
 def smf_setup_default_build_type_values
+  UI.message("Setting slack enabled = true")
   smf_set_slack_enabled(true)
   smf_set_keychain_enabled(true)
 end
@@ -226,6 +227,7 @@ def smf_is_jenkins_environment
 end
 
 def smf_set_slack_enabled(value)
+  UI.message("Checking value")
   newValue = value ? "true" : "false"
   UI.message("Is slack enabled: #{ENV[$SMF_IS_SLACK_ENABLED]} vs #{newValue}")
   return ENV[$SMF_IS_SLACK_ENABLED] = newValue
