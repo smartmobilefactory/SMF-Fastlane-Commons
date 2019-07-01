@@ -1,0 +1,10 @@
+//
+// Automatically generated. Do not edit.
+//
+
+@Library('jenkins-pipeline-commons') _
+
+_build_variants = __BUILD_VARIANTS__
+_example_variants = __EXAMPLE_VARIANTS__
+
+iOSPod(_build_variants, _example_variants)

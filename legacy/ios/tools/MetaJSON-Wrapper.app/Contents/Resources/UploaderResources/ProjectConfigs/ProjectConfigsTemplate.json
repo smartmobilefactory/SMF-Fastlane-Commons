@@ -1,0 +1,74 @@
+{
+	"confluence_server" : "https://smartmobilefactory.atlassian.net/wiki",
+	"cache_page_id": "",
+	"overview_pages": [
+
+		{
+			"type"	: "ProjectsOverviewPage",
+			"id"	: ""
+		}
+	],
+
+	"projects": {
+
+		"apps": [
+
+			{
+				"project_name"			: "",
+				"project_short_name"	: "",
+				"branch"				: "^([0-9.]+(?=\/))*\/{0,1}master$",
+				"relative_path"			: ".MetaJSON",
+				"github_repo"			: "",
+				"ios_meta_page_id"		: "",
+				"codebeat_badge"		: "",
+				"codebeat_link"			: "",
+				"is_outdated"			: 
+			}
+		],
+
+		"ui_tests": [
+
+			{
+				"project_name"			: "",
+				"project_short_name"	: "",
+				"branch"				: "^([0-9.]+(?=\/))*\/{0,1}master$",
+				"relative_path"			: ".MetaJSON",
+				"github_repo"			: "",
+				"ios_meta_page_id"		: "",
+				"codebeat_badge"		: "",
+				"codebeat_link"			: "",
+				"is_outdated"			: 
+			}
+		],
+
+		"libraries": [
+			
+			{
+				"project_name"			: "",
+				"project_short_name"	: "",
+				"branch"				: "^([0-9.]+(?=\/))*\/{0,1}master$",
+				"relative_path"			: ".MetaJSON",
+				"github_repo"			: "",
+				"ios_meta_page_id"		: "",
+				"codebeat_badge"		: "",
+				"codebeat_link"			: "",
+				"is_outdated"			: 
+			}
+		],
+		
+		"frameworks": [
+			
+			{
+				"project_name"			: "",
+				"project_short_name"	: "",
+				"branch"				: "^([0-9.]+(?=\/))*\/{0,1}master$",
+				"relative_path"			: ".MetaJSON",
+				"github_repo"			: "",
+				"ios_meta_page_id"		: "",
+				"codebeat_badge"		: "",
+				"codebeat_link"			: "",
+				"is_outdated"			: 
+			}
+		]
+	}
+}

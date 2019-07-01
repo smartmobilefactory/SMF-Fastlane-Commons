@@ -1,0 +1,19 @@
+
+@fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
+@should_commons_repo_be_downloaded = (File.exist?("#{@fastlane_commons_dir_path}/flow") == false || File.exist?("#{@fastlane_commons_dir_path}/steps") == false)
+
+# Run setup for the platform needed platform
+desc "Setup"
+before_all do
+  case @platform
+  when :ios
+    import "#{Dir.pwd}/../legacy/ios/fastlane/Fastfile"
+  when :android
+    UI.message("Setup for android is not implemented yet")
+  when :flutter
+    UI.message("Setup for flutter is not implemented yet")
+  else
+    UI.message("There is no platform \"#{@platform}\", exiting...")
+    raise "Unknown platform"
+  end
+end
