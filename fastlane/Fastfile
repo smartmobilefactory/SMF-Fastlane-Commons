@@ -227,6 +227,7 @@ def smf_is_jenkins_environment
 end
 
 def smf_set_slack_enabled(value)
+  UI.message("Is slack enabled: #{$SMF_IS_SLACK_ENABLED}")
   UI.message("Checking value: #{value}")
   newValue = value.to_s
   UI.message("Is slack enabled: #{$SMF_IS_SLACK_ENABLED} vs #{newValue}")
