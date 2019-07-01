@@ -238,8 +238,8 @@ def smf_is_slack_enabled
 end
 
 def smf_set_keychain_enabled(value)
-  newValue = value ? "true" : "false"
-  return ENV[$SMF_IS_KEYCHAIN_ENABLED] = newValue
+  #newValue = value ? "true" : "false"
+  #return ENV[$SMF_IS_KEYCHAIN_ENABLED] = newValue
 end
 
 def smf_is_keychain_enabled
