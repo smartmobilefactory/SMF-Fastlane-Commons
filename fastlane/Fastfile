@@ -40,6 +40,8 @@ end
 
 def smf_setup_ios_fastlane_commons(options = Hash.new)
   # Load the Fastlane config from the disk into memory
+  UI.message(options)
+
   smf_load_fastlane_config
 
   # Clone the Commons Repo
