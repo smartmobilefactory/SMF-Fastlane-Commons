@@ -7,7 +7,7 @@ desc "Setup"
 before_all do
   case @platform
   when :ios
-    import "#{Dir.pwd}/../legacy/ios/fastlane/Fastfile"
+    import "#{@fastlane_commons_dir_path}/../legacy/ios/fastlane/Fastfile"
   when :android
     UI.message("Setup for android is not implemented yet")
   when :flutter
