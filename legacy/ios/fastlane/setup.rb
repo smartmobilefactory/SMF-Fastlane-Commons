@@ -111,7 +111,9 @@ end
 #####################################################
 
 def smf_setup_default_build_type_values
+  UI.message("Got til 1.1")
   smf_set_slack_enabled(true)
+  UI.message("Got til 1.2")
   smf_set_keychain_enabled(true)
 end
 
@@ -144,7 +146,9 @@ def smf_is_jenkins_environment
 end
 
 def smf_set_slack_enabled(value)
+  UI.message("Got til 1.1.1")
   newValue = value ? "true" : "false"
+  UI.message("Got til 1.1.2")
   return ENV[$SMF_IS_SLACK_ENABLED] = newValue
 end
 
@@ -153,7 +157,9 @@ def smf_is_slack_enabled
 end
 
 def smf_set_keychain_enabled(value)
+  UI.message("Got til 1.2.1")
   newValue = value ? "true" : "false"
+  UI.message("Got til 1.2.2")
   return ENV[$SMF_IS_KEYCHAIN_ENABLED] = newValue
 end
 
