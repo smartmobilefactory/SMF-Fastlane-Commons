@@ -2,15 +2,6 @@
 ### Lifecycle ###
 #################
 
-desc "Called on error"
-error do |lane, exception|
-  if @smf_set_should_send_deploy_notifications == true || @smf_set_should_send_build_job_failure_notifications == true
-    smf_handle_exception(
-      exception: exception,
-      )
-  end
-end
-
 def smf_setup_ios_fastlane_commons(options = Hash.new)
   
   # Import the splitted Fastlane classes
