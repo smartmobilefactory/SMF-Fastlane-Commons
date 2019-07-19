@@ -149,6 +149,7 @@ def smf_set_slack_enabled(value)
   UI.message("Got til 1.1.1")
   newValue = value ? "true" : "false"
   UI.message("Got til 1.1.2")
+  sh("printenv")
   puts "ENV[$SMF_IS_SLACK_ENABLED] = #{sh("echo $SMF_IS_SLACK_ENABLED")}"
   return ENV[$SMF_IS_SLACK_ENABLED] = newValue
 end
