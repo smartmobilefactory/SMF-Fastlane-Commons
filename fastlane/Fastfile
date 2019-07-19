@@ -38,13 +38,13 @@ def smf_load_fastlane_config
 end
 
 # clones the fastlane commons repo
-def smf_clone_fastlane_commons_repo do
+def smf_clone_fastlane_commons_repo
   fastlane_commons_branch = @smf_fastlane_config[:project][:fastlane_commons_branch]
   sh "git clone -b \"" + fastlane_commons_branch + "\" git@github.com:smartmobilefactory/SMF-iOS-Fastlane-Commons.git #{@fastlane_commons_dir_path}"
 end
 
 # removes the fastlane commons repo
-def smf_remove_fastlane_commons_repo do
+def smf_remove_fastlane_commons_repo
   sh "if [ -d #{@fastlane_commons_dir_path} ]; then rm -rf #{@fastlane_commons_dir_path}; fi"
 end
 
