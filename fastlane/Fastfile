@@ -6,7 +6,7 @@ before_all do |lane, options|
   case @platform
   when :ios
     ios_fastfile_dir = "#{root_dir}/legacy/ios/fastlane/Fastfile"
-    sh("cd ..; ls")
+    sh("cd ..; ls -a")
     import ios_fastfile_dir
   when :android
     UI.message("Setup for android is not implemented yet")
