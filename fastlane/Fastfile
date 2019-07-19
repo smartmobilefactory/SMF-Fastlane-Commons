@@ -1,13 +1,12 @@
-root_dir = "#{File.expand_path(File.dirname(__FILE__))}/.."
-
-# Run setup for the platform needed platform
 desc "Setup"
 before_all do |lane, options|
+  puts "Inline options: #{options}"
+  # Import the fastlane-commons repo so its code can be used
+  smf_common_setup
   case @platform
   when :ios
-    ios_fastfile_dir = "#{root_dir}/legacy/ios/fastlane/Fastfile"
-    sh("cd ..; ls -a")
-    import ios_fastfile_dir
+    ios_setup_file = "#{@fastlane_commons_dir_path}/legacy/ios/fastlane/setup.rb"
+    import(ios_setup_file, options: options)
   when :android
     UI.message("Setup for android is not implemented yet")
   when :flutter
@@ -16,4 +15,62 @@ before_all do |lane, options|
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise "Unknown platform"
   end
+
+  smf_remove_fastlane_commons_repo
+end
+
+# Returns the path to the Config.json
+def fastlane_config_path
+  return smf_workspace_setup + "/Config.json"
+end
+
+# loads the config json content into the @smf_fastlane_config env variable
+def smf_load_fastlane_config
+  config_path = fastlane_config_path
+  UI.message("Reading the SMF Fastlane config from \"#{config_path}\"")
+  config_file = File.read(config_path)
+  if config_file
+    @smf_fastlane_config ||= JSON.parse(config_file, :symbolize_names => true)
+    UI.success("Parsed config file into the hash map")
+  else
+    raise "Error: The SMF Fastlane config file doesn't exist at path \"#{config_path}\""
+  end
+end
+
+# clones the fastlane commons repo
+def smf_clone_fastlane_commons_repo do
+  fastlane_commons_branch = @smf_fastlane_config[:project][:fastlane_commons_branch]
+  sh "git clone -b \"" + fastlane_commons_branch + "\" git@github.com:smartmobilefactory/SMF-iOS-Fastlane-Commons.git #{@fastlane_commons_dir_path}"
+end
+
+# removes the fastlane commons repo
+def smf_remove_fastlane_commons_repo do
+  sh "if [ -d #{@fastlane_commons_dir_path} ]; then rm -rf #{@fastlane_commons_dir_path}; fi"
+end
+
+desc "Called on error"
+error do |lane, exception|
+  if @smf_set_should_send_deploy_notifications == true || @smf_set_should_send_build_job_failure_notifications == true
+    smf_handle_exception(
+      exception: exception,
+      )
+  end
+
+  smf_remove_fastlane_commons_repo
+end
+
+# sets the commons dir path and clones the fastlane repo 
+def smf_common_setup(options = Hash.new)
+  @fastlane_commons_dir_path = "#{smf_workspace_dir}/.fastlane-smf-commons"
+  smf_load_fastlane_config
+  UI.message("Downloading Fastlane Commons Repo")
+  smf_clone_fastlane_commons_repo
+end
+
+def smf_workspace_dir
+  path = "#{Dir.pwd}"
+  if path.end_with?("/fastlane")
+    path = path.chomp("/fastlane")
+  end
+  return path
 end

@@ -1,7 +1,3 @@
-
-@fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
-@should_commons_repo_be_downloaded = (File.exist?("#{@fastlane_commons_dir_path}/flow") == false || File.exist?("#{@fastlane_commons_dir_path}/steps") == false)
-
 #################
 ### Lifecycle ###
 #################
@@ -11,13 +7,6 @@ before_all do |lane, options|
   smf_setup_fastlane_commons(options)
 end
 
-desc "Called on success"
-after_all do
-  if @should_commons_repo_be_downloaded
-    smf_remove_fastlane_commons_repo
-  end
-end
-
 desc "Called on error"
 error do |lane, exception|
   if @smf_set_should_send_deploy_notifications == true || @smf_set_should_send_build_job_failure_notifications == true
@@ -25,27 +14,10 @@ error do |lane, exception|
       exception: exception,
       )
   end
-
-  if @should_commons_repo_be_downloaded
-    smf_remove_fastlane_commons_repo
-  end
 end
 
 def smf_setup_fastlane_commons(options = Hash.new)
-  # Load the Fastlane config from the disk into memory
-  smf_load_fastlane_config
-
-  # Clone the Commons Repo
-  @fastlane_commons_dir_path = "#{smf_workspace_dir}/.fastlane-smf-commons"
-
-  if @should_commons_repo_be_downloaded
-    UI.message("Downloading Fastlane Commons Repo as it's not locally available yet")
-    smf_remove_fastlane_commons_repo
-    smf_clone_fastlane_commons_repo
-  else
-    UI.message("The Fastlane Commons Repo won't be downloaded as it's already available locally")
-  end
-
+  
   # Import the splitted Fastlane classes
   import_all "#{@fastlane_commons_dir_path}/fastlane/flow"
   import_all "#{@fastlane_commons_dir_path}/fastlane/steps"
@@ -87,18 +59,6 @@ def smf_value_for_keypath_in_hash_map(hash_map, keypath)
     end
   end
   return value
-end
-
-def smf_load_fastlane_config
-  config_path = fastlane_config_path
-  UI.message("Reading the SMF Fastlane config from \"#{config_path}\"")
-  config_file = File.read(config_path)
-  if config_file
-    @smf_fastlane_config ||= JSON.parse(config_file, :symbolize_names => true)
-    UI.success("Parsed config file into the hash map")
-  else
-    raise "Error: The SMF Fastlane config file doesn't exist at path \"#{config_path}\""
-  end
 end
 
 def smf_set_should_send_deploy_notifications(should_notify)
