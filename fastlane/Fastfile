@@ -40,7 +40,7 @@ end
 # clones the fastlane commons repo
 def smf_clone_fastlane_commons_repo
   fastlane_commons_branch = @smf_fastlane_config[:project][:fastlane_commons_branch]
-  sh "git clone -b \"" + fastlane_commons_branch + "\" git@github.com:smartmobilefactory/SMF-iOS-Fastlane-Commons.git #{@fastlane_commons_dir_path}"
+  sh "git clone -b \"" + fastlane_commons_branch + "\" git@github.com:smartmobilefactory/SMF-Fastlane-Commons.git #{@fastlane_commons_dir_path}"
 end
 
 # removes the fastlane commons repo
