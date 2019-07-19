@@ -21,7 +21,7 @@ end
 
 # Returns the path to the Config.json
 def fastlane_config_path
-  return smf_workspace_setup + "/Config.json"
+  return smf_workspace_dir + "/Config.json"
 end
 
 # loads the config json content into the @smf_fastlane_config env variable
