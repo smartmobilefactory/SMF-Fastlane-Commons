@@ -5,7 +5,9 @@ desc "Setup"
 before_all do |lane, options|
   case @platform
   when :ios
-    import "#{root_dir}/legacy/ios/fastlane/Fastfile"
+    ios_fastfile_dir = "#{root_dir}/legacy/ios/fastlane/Fastfile"
+    UI.message("File exists at #{ios_fastfile_dir} == #{File.exists?(ios_fastfile_dir)}")
+    import ios_fastfile_dir
   when :android
     UI.message("Setup for android is not implemented yet")
   when :flutter
