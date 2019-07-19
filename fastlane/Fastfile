@@ -6,7 +6,8 @@ before_all do |lane, options|
   case @platform
   when :ios
     ios_fastfile_dir = "#{root_dir}/legacy/ios/fastlane/Fastfile"
-    UI.message("File exists at #{ios_fastfile_dir} == #{File.exists?(ios_fastfile_dir)}")
+    puts "#{File.pwd}"
+    sh("ls")
     import ios_fastfile_dir
   when :android
     UI.message("Setup for android is not implemented yet")
