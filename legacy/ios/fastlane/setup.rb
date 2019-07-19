@@ -3,6 +3,7 @@
 #################
 
 def smf_setup_ios_fastlane_commons(options = Hash.new)
+  UI.message("Starting ios fastlane commons setup")
   
   # Import the splitted Fastlane classes
   import_all "#{@fastlane_commons_dir_path}/fastlane/flow"
@@ -103,19 +104,6 @@ def smf_set_git_branch(branch)
   @smf_git_branch = branch
 end
 
-####################
-### Commons Repo ###
-####################
-
-private_lane :smf_clone_fastlane_commons_repo do
-  fastlane_commons_branch = @smf_fastlane_config[:project][:fastlane_commons_branch]
-  sh "git clone -b \"" + fastlane_commons_branch + "\" git@github.com:smartmobilefactory/SMF-iOS-Fastlane-Commons.git #{@fastlane_commons_dir_path}"
-end
-
-private_lane :smf_remove_fastlane_commons_repo do
-  sh "if [ -d #{@fastlane_commons_dir_path} ]; then rm -rf #{@fastlane_commons_dir_path}; fi"
-end
-
 #####################################################
 ### Helper (needed without commons repo available)###
 #####################################################
@@ -169,14 +157,6 @@ end
 
 def smf_is_keychain_enabled
   return ENV[$SMF_IS_KEYCHAIN_ENABLED].nil? ? true : ENV[$SMF_IS_KEYCHAIN_ENABLED] == "true"
-end
-
-def smf_workspace_dir
-  path = "#{Dir.pwd}"
-  if path.end_with?("/fastlane")
-    path = path.chomp("/fastlane")
-  end
-  return path
 end
 
 def ci_ios_error_log
