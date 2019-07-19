@@ -2,11 +2,6 @@
 ### Lifecycle ###
 #################
 
-before_all do |lane, options|
-  puts "Inline options: #{options}"
-  smf_setup_fastlane_commons(options)
-end
-
 desc "Called on error"
 error do |lane, exception|
   if @smf_set_should_send_deploy_notifications == true || @smf_set_should_send_build_job_failure_notifications == true
@@ -16,7 +11,7 @@ error do |lane, exception|
   end
 end
 
-def smf_setup_fastlane_commons(options = Hash.new)
+def smf_setup_ios_fastlane_commons(options = Hash.new)
   
   # Import the splitted Fastlane classes
   import_all "#{@fastlane_commons_dir_path}/fastlane/flow"

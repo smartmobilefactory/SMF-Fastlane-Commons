@@ -7,6 +7,7 @@ before_all do |lane, options|
   when :ios
     ios_setup_file = "#{@fastlane_commons_dir_path}/legacy/ios/fastlane/setup.rb"
     import(ios_setup_file)
+    smf_setup_ios_fastlane_commons(options)
   when :android
     UI.message("Setup for android is not implemented yet")
   when :flutter
