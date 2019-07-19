@@ -4,19 +4,21 @@
 
 def smf_setup_ios_fastlane_commons(options = Hash.new)
   UI.message("Starting ios fastlane commons setup")
-  
+  puts "Fastlane dir: #{@fastlane_commons_dir_path}"
   # Import the splitted Fastlane classes
   import_all "#{@fastlane_commons_dir_path}/fastlane/flow"
   import_all "#{@fastlane_commons_dir_path}/fastlane/steps"
   import_all "#{@fastlane_commons_dir_path}/fastlane/utils"
-
+  UI.message("Got til 1")
   # Setup build type options
   smf_setup_default_build_type_values
+
+  UI.message("Got til 2")
 
   # Override build type options by inline
   build_type = options[:build_type]
   smf_override_build_type_options_by_type(build_type)
-
+  UI.message("got til 3")
   @smf_original_platform = ENV[$FASTLANE_PLATFORM_NAME_ENV_KEY]
   puts "Original Platform #{@smf_original_platform}"
 end
