@@ -6,9 +6,9 @@ def smf_setup_ios_fastlane_commons(options = Hash.new)
   UI.message("Starting ios fastlane commons setup")
 
   # Import the splitted Fastlane classes
-  import_all "#{@fastlane_commons_dir_path}/fastlane/flow"
-  import_all "#{@fastlane_commons_dir_path}/fastlane/steps"
-  import_all "#{@fastlane_commons_dir_path}/fastlane/utils"
+  import_all "#{@fastlane_commons_dir_path}/legacy/ios/fastlane/flow"
+  import_all "#{@fastlane_commons_dir_path}/legacy/ios/fastlane/steps"
+  import_all "#{@fastlane_commons_dir_path}/legacy/ios/fastlane/utils"
   UI.message("Commons path: #{@fastlane_commons_dir_path}")
   puts ENV.keys 
 
