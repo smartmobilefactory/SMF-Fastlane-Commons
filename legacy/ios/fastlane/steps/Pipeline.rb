@@ -59,8 +59,8 @@ private_lane :smf_generate_setup_files do |options|
 	should_generate_Fastfile = @smf_fastlane_config[:project][:use_custom_fastfile] != true
 
 	template_filename = is_pod_repo ? TEMPLATE_JENKINSFILE_POD_FILENAME : TEMPLATE_JENKINSFILE_APP_FILENAME
-  UI.message("Listing all content in #{@fastlane_commons_dir_path}:")
-  sh("ls #{@fastlane_commons_dir_path}")
+  UI.message("Listing all content in #{@fastlane_commons_dir_path.gsub("/legacy/ios", "")}:")
+  sh("ls #{@fastlane_commons_dir_path.gsub("/legacy/ios", "")} -a")
 	jenkinsFileData = File.read("#{@fastlane_commons_dir_path}/pipeline/#{template_filename}")
 
 	build_variants_from_config = []
