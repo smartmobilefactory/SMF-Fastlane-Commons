@@ -7,7 +7,8 @@ before_all do |lane, options|
   smf_common_setup
   case @platform
   when :ios
-    ios_setup_file = "#{@fastlane_commons_dir_path}/legacy/ios/fastlane/setup.rb"
+    @fastlane_commons_dir_path += "/legacy/ios"
+    ios_setup_file = "#{@fastlane_commons_dir_path}/fastlane/setup.rb"
     import(ios_setup_file)
     smf_setup_ios_fastlane_commons(options)
   when :android

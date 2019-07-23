@@ -6,9 +6,9 @@ def smf_setup_ios_fastlane_commons(options = Hash.new)
   UI.message("Starting ios fastlane commons setup")
 
   # Import the splitted Fastlane classes
-  import_all "#{@fastlane_commons_dir_path}/legacy/ios/fastlane/flow"
-  import_all "#{@fastlane_commons_dir_path}/legacy/ios/fastlane/steps"
-  import_all "#{@fastlane_commons_dir_path}/legacy/ios/fastlane/utils"
+  import_all "#{@fastlane_commons_dir_path}/fastlane/flow"
+  import_all "#{@fastlane_commons_dir_path}/fastlane/steps"
+  import_all "#{@fastlane_commons_dir_path}/fastlane/utils"
   UI.message("Commons path: #{@fastlane_commons_dir_path}")
   puts ENV.keys 
 
@@ -147,7 +147,8 @@ def smf_is_jenkins_environment
 end
 
 def smf_set_slack_enabled(value)
-  return ENV["SMF_IS_SLACK_ENABLED"] = value.to_s
+  newValue = value ? "true" : "false"
+  return ENV[$SMF_IS_SLACK_ENABLED] = newValue
 end
 
 def smf_is_slack_enabled
@@ -155,7 +156,8 @@ def smf_is_slack_enabled
 end
 
 def smf_set_keychain_enabled(value)
-  return ENV["SMF_IS_KEYCHAIN_ENABLED"] = value.to_s
+  newValue = value ? "true" : "false"
+  return ENV[$SMF_IS_KEYCHAIN_ENABLED] = newValue
 end
 
 def smf_is_keychain_enabled
