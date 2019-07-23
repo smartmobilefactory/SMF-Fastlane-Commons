@@ -9,17 +9,12 @@ def smf_setup_ios_fastlane_commons(options = Hash.new)
   import_all "#{@fastlane_commons_dir_path}/fastlane/flow"
   import_all "#{@fastlane_commons_dir_path}/fastlane/steps"
   import_all "#{@fastlane_commons_dir_path}/fastlane/utils"
-  import_all "#{@fastlane_commons_dir_path}/pipeline"
-  UI.message("Commons path: #{@fastlane_commons_dir_path}")
-  puts ENV.keys 
-
-  UI.message("Setting default build type values")
+  #import_all "#{@fastlane_commons_dir_path}/pipeline"
+  #UI.message("Commons path: #{@fastlane_commons_dir_path}")
   # Setup build type options
   smf_setup_default_build_type_values
 
-
   # Override build type options by inline
-  UI.message("Overriding certain build type options")
   build_type = options[:build_type]
   smf_override_build_type_options_by_type(build_type)
 
