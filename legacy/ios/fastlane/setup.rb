@@ -13,6 +13,8 @@ def smf_setup_ios_fastlane_commons(options = Hash.new)
   ENV.keys do |key|
     puts key
   end
+
+  UI.message("Setting default build type values")
   # Setup build type options
   smf_setup_default_build_type_values
 
@@ -21,8 +23,8 @@ def smf_setup_ios_fastlane_commons(options = Hash.new)
   build_type = options[:build_type]
   smf_override_build_type_options_by_type(build_type)
 
-  #@smf_original_platform = ENV[$FASTLANE_PLATFORM_NAME_ENV_KEY]
-  #puts "Original Platform #{@smf_original_platform}"
+  @smf_original_platform = ENV[$FASTLANE_PLATFORM_NAME_ENV_KEY]
+  puts "Original Platform #{@smf_original_platform}"
 end
 
 ##############
