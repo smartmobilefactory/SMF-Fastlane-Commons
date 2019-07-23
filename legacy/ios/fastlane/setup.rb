@@ -10,9 +10,7 @@ def smf_setup_ios_fastlane_commons(options = Hash.new)
   import_all "#{@fastlane_commons_dir_path}/fastlane/steps"
   import_all "#{@fastlane_commons_dir_path}/fastlane/utils"
 
-  ENV.keys do |key|
-    puts key
-  end
+  puts ENV.keys 
 
   UI.message("Setting default build type values")
   # Setup build type options
@@ -20,6 +18,7 @@ def smf_setup_ios_fastlane_commons(options = Hash.new)
 
 
   # Override build type options by inline
+  UI.message("Overriding certain build type options")
   build_type = options[:build_type]
   smf_override_build_type_options_by_type(build_type)
 
