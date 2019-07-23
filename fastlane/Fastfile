@@ -20,6 +20,7 @@ before_all do |lane, options|
     raise "Unknown platform"
   end
 
+  @fastlane_commons_dir_path = @fastlane_commons_dir_path.gsub("/legacy/ios", "")
   smf_remove_fastlane_commons_repo
 end
 

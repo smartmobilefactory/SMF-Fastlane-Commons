@@ -9,6 +9,7 @@ def smf_setup_ios_fastlane_commons(options = Hash.new)
   import_all "#{@fastlane_commons_dir_path}/fastlane/flow"
   import_all "#{@fastlane_commons_dir_path}/fastlane/steps"
   import_all "#{@fastlane_commons_dir_path}/fastlane/utils"
+  import_all "#{@fastlane_commons_dir_path}/pipeline"
   UI.message("Commons path: #{@fastlane_commons_dir_path}")
   puts ENV.keys 
 
