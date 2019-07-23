@@ -9,6 +9,10 @@ def smf_setup_ios_fastlane_commons(options = Hash.new)
   import_all "#{@fastlane_commons_dir_path}/fastlane/flow"
   import_all "#{@fastlane_commons_dir_path}/fastlane/steps"
   import_all "#{@fastlane_commons_dir_path}/fastlane/utils"
+
+  ENV.keys do |key|
+    puts key
+  end
   # Setup build type options
   smf_setup_default_build_type_values
 
