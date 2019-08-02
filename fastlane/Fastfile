@@ -48,7 +48,14 @@ def smf_clone_fastlane_commons_repo
     smf_remove_fastlane_commons_repo
   end
 
-  fastlane_commons_branch = @smf_fastlane_config[:project][:fastlane_commons_branch]
+  fastlane_commons_branch = "master"
+
+  if ENV["fastlane_branch"]
+    fastlane_commons_branch = ENV["fastlane_branch"]
+  else
+    fastlane_commons_branch = @smf_fastlane_config[:project][:fastlane_commons_branch]
+  end
+
   sh "git clone -b \"" + fastlane_commons_branch + "\" git@github.com:smartmobilefactory/SMF-Fastlane-Commons.git #{@fastlane_commons_dir_path}"
 end
 
