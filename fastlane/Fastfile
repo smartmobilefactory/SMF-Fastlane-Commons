@@ -12,7 +12,10 @@ before_all do |lane, options|
     import(ios_setup_file)
     smf_setup_ios_fastlane_commons(options)
   when :android
-    UI.message("Setup for android is not implemented yet")
+    @fastlane_commons_dir_path += "/legacy/android"
+    android_setup_file = "#{@fastlane_commons_dir_path}/fastlane/setup.rb"
+    import(android_setup_file)
+    smf_setup_android_fastlane_commons(options)
   when :flutter
     UI.message("Setup for flutter is not implemented yet")
   else
@@ -56,19 +59,44 @@ end
 
 desc "Called on error"
 error do |lane, exception|
-  if @smf_set_should_send_deploy_notifications == true || @smf_set_should_send_build_job_failure_notifications == true
-    smf_handle_exception(
-      exception: exception,
+  case @platform
+  when :ios
+    if @smf_set_should_send_deploy_notifications == true || @smf_set_should_send_build_job_failure_notifications == true
+      smf_handle_exception(
+          exception: exception,
       )
-  end
+    end
+  when :android
+    if lane == :releasing_pr_phase || lane == :deploy
+      smf_collect_changelog(buildVariant: ENV["BUILD_VARIANT"])
 
+      smf_notify_build_failed(
+          exception: exception
+      )
+    end
+  when :flutter
+    UI.message("Error for flutter is not implemented yet")
+  else
+    UI.message("There is no platform \"#{@platform}\", exiting...")
+    raise "Unknown Platform"
+  end
   @fastlane_commons_dir_path = @fastlane_commons_dir_path.slice(0..(@fastlane_commons_dir_path.index('/legacy')))
   smf_remove_fastlane_commons_repo
 end
 
 # sets the commons dir path and clones the fastlane repo 
 def smf_common_setup(options = Hash.new)
-  @fastlane_commons_dir_path = "#{smf_workspace_dir}/.fastlane-smf-commons"
+  case @platform
+  when :ios
+    @fastlane_commons_dir_path = "#{smf_workspace_dir}/.fastlane-smf-commons"
+  when :android
+    @fastlane_commons_dir_path = "#{smf_workspace_dir}/.idea/.fastlane-smf-commons"
+  when :flutter
+    UI.message("Setup for flutter is not implemented yet")
+  else
+    UI.message("There is no platform \"#{@platform}\", exiting...")
+    raise "Unknown Platform"
+  end
   smf_load_fastlane_config
   UI.message("Downloading Fastlane Commons Repo")
   smf_clone_fastlane_commons_repo

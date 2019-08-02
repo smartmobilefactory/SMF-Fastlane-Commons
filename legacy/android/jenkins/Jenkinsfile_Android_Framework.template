@@ -1,0 +1,7 @@
+//
+// Automatically generated. Do not edit.
+//
+
+@Library('jenkins-pipeline-commons') _
+
+androidFramework()
