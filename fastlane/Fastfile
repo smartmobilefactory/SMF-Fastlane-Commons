@@ -108,6 +108,7 @@ def smf_common_setup(options = Hash.new)
   smf_load_fastlane_config
   UI.message("Downloading Fastlane Commons Repo")
   smf_clone_fastlane_commons_repo
+  import("#{@fastlane_commons_dir_path}/smf_git_changelog/smf_git_changelog.rb")
 end
 
 def smf_workspace_dir
