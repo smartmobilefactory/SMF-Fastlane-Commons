@@ -84,13 +84,14 @@ private_lane :smf_send_deploy_success_notifications do |options|
 
   # Parameter
   app_link = (options[:app_link].nil? ? Actions.lane_context[Actions::SharedValues::HOCKEY_DOWNLOAD_LINK] : options[:app_link])
+  build_variant = options[:build_variant]
 
   # Variables
   slack_channel = @smf_fastlane_config[:project][:slack_channel]
 
   if ENV[$SMF_CHANGELOG_ENV_KEY].nil?
     # Collect the changelog (again) in case the build job failed before the former changelog collecting
-    smf_collect_changelog
+    smf_git_changelog(build_variant: build_variant)
   end
 
   title = "Built #{smf_default_notification_release_title} 🎉"
@@ -119,6 +120,7 @@ private_lane :smf_handle_exception do |options|
   # Parameter
   message = options[:message]
   exception = options[:exception]
+  build_variant = options[:build_variant]
 
   # Variables
   slack_channel = @smf_fastlane_config[:project][:slack_channel]
@@ -137,7 +139,7 @@ private_lane :smf_handle_exception do |options|
 
   if ENV[$SMF_CHANGELOG_ENV_KEY].nil?
     # Collect the changelog (again) in case the build job failed before the former changelog collecting
-    smf_collect_changelog
+    smf_git_changelog(build_variant: build_variant)
   end
 
   if smf_is_build_variant_a_decoupled_ui_test == true

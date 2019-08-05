@@ -32,7 +32,7 @@ Parameter:
 
 | Parameter | Required | Note  |
 |---|---|---|
-| buildVariant | true |  |
+| build_variant | true |  |
 | branch | true |   |
 | modulePropertiesFile | false | defaults to  ``` ./app/module.properties ``` (legacy parameter when Config.json is used) |
 
@@ -42,7 +42,7 @@ Increments the buildnumber in the apps property file. It also tags and pushes th
 
 | Parameter | Required | Note  |
 |---|---|---|
-| buildVariant | true |  |
+| build_variant | true |  |
 
 ### Pull keystore ``` smf_pull_keystore ```
 

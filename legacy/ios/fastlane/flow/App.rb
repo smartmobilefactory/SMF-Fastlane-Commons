@@ -19,7 +19,8 @@ private_lane :smf_deploy_app do |options|
 
     begin
       smf_deploy_build_variant(
-        bulk_deploy_params: bulk_deploy_params
+          bulk_deploy_params: bulk_deploy_params,
+          build_variant: build_variant
       )
     rescue => exception
 
@@ -30,7 +31,8 @@ private_lane :smf_deploy_app do |options|
 
       if @smf_set_should_send_deploy_notifications == true || @smf_set_should_send_build_job_failure_notifications == true
         smf_handle_exception(
-          exception: exception,
+            exception: exception,
+            build_variant: build_variant
         )
       end
     end
@@ -52,6 +54,7 @@ private_lane :smf_deploy_build_variant do |options|
 
   # Parameters
   bulk_deploy_params = options[:bulk_deploy_params]
+  build_variant = options[:build_variant]
 
   # Cleanup
 
@@ -78,7 +81,7 @@ private_lane :smf_deploy_build_variant do |options|
 
   has_sentry_project_settings = project_config[:sentry_org_slug] != nil && project_config[:sentry_project_slug] != nil
   has_sentry_variant_settings = build_variant_config[:sentry_org_slug] != nil && build_variant_config[:sentry_project_slug] != nil
-  
+
   use_sentry = has_sentry_project_settings || has_sentry_variant_settings
   UI.message("Will upload to Sentry: #{use_sentry}")
 
@@ -97,7 +100,7 @@ private_lane :smf_deploy_build_variant do |options|
   # Increment the build number only if it should
   if smf_should_build_number_be_incremented
     smf_store_current_build_number
-    smf_increment_build_number
+    smf_increment_build_number(build_variant: build_variant)
     smf_set_should_revert_build_number(true)
   end
 
@@ -114,8 +117,8 @@ private_lane :smf_deploy_build_variant do |options|
 
   # Build and archive the IPA
   smf_archive_ipa(
-    bulk_deploy_params: bulk_deploy_params
-    )
+      bulk_deploy_params: bulk_deploy_params
+  )
 
   # Commit generated code. There can be changes eg. from PhraseApp + R.swift
   if push_generated_code
@@ -150,10 +153,10 @@ private_lane :smf_deploy_build_variant do |options|
       UI.important("Warning: MetaJSON couldn't be created")
 
       smf_send_chat_message(
-        title: "Failed to create MetaJSON for #{smf_default_notification_release_title} 😢",
-        type: "warning",
-        exception: exception,
-        slack_channel: ci_ios_error_log
+          title: "Failed to create MetaJSON for #{smf_default_notification_release_title} 😢",
+          type: "warning",
+          exception: exception,
+          slack_channel: ci_ios_error_log
       )
     end
   end
@@ -170,7 +173,7 @@ private_lane :smf_deploy_build_variant do |options|
   end
 
   # Collect the changelog
-  smf_collect_changelog
+  smf_git_changelog(build_variant: build_variant)
 
   if use_hockey
     # Store the HockeyApp ID to let the handle exception lane know what hockeyapp entry should be deleted. This value is reset during bulk builds to avoid the deletion of a former succesful build.
@@ -181,8 +184,8 @@ private_lane :smf_deploy_build_variant do |options|
 
     # Disable the former HockeyApp entry
     smf_disable_former_hockey_entry(
-      build_variants_contains_whitelist: ["beta"]
-      )
+        build_variants_contains_whitelist: ["beta"]
+    )
 
     # Inform the SMF HockeyApp about the new app version
     begin
@@ -191,10 +194,10 @@ private_lane :smf_deploy_build_variant do |options|
       UI.important("Warning: The APN to the SMF HockeyApp couldn't be sent!")
 
       smf_send_chat_message(
-        title: "Failed to send APN to SMF HockeyApp for #{smf_default_notification_release_title} 😢",
-        type: "warning",
-        exception: exception,
-        slack_channel: ci_ios_error_log
+          title: "Failed to send APN to SMF HockeyApp for #{smf_default_notification_release_title} 😢",
+          type: "warning",
+          exception: exception,
+          slack_channel: ci_ios_error_log
       )
     end
   end
@@ -206,10 +209,10 @@ private_lane :smf_deploy_build_variant do |options|
       UI.important("Warning: Dsyms could not be uploaded to Sentry !")
 
       smf_send_chat_message(
-        title: "Failed to upload dsyms to Sentry for #{smf_default_notification_release_title} 😢",
-        type: "warning",
-        exception: exception,
-        slack_channel: ci_ios_error_log
+          title: "Failed to upload dsyms to Sentry for #{smf_default_notification_release_title} 😢",
+          type: "warning",
+          exception: exception,
+          slack_channel: ci_ios_error_log
       )
     end
   end
@@ -224,7 +227,7 @@ private_lane :smf_deploy_build_variant do |options|
     release_notes_name = "#{build_variant_config["scheme".to_sym]}.html"
     File.write("#{update_dir}#{release_notes_name}", release_notes)
 
-    if ( ! File.exists?(app_path))
+    if (!File.exists?(app_path))
       raise("DMG file #{app_path} does not exit. Nothing to upload.")
     end
 
@@ -251,22 +254,22 @@ private_lane :smf_deploy_build_variant do |options|
   smf_git_pull
 
   push_to_git_remote(
-    remote: 'origin',
-    local_branch: @smf_git_branch,
-    remote_branch: @smf_git_branch,
-    force: false,
-    tags: true
+      remote: 'origin',
+      local_branch: @smf_git_branch,
+      remote_branch: @smf_git_branch,
+      force: false,
+      tags: true
   )
 
   # Create the GitHub release
   version = smf_get_version_number
   build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
   smf_create_github_release(
-    release_name: "#{@smf_build_variant.upcase} #{version} (#{build_number})",
-    tag: tag
+      release_name: "#{@smf_build_variant.upcase} #{version} (#{build_number})",
+      tag: tag
   )
 
-  smf_send_deploy_success_notifications
+  smf_send_deploy_success_notifications(build_variant: build_variant)
 
   # Upload Ipa to Testflight and Download the generated DSYM
   # The testflight upload should happen as last step as the upload often shows an error although the IPA was successfully uploaded. We still want the tag, HockeyApp upload etc in this case.
@@ -322,12 +325,12 @@ private_lane :smf_deploy_build_variant do |options|
       exception = e
     end
 
-      smf_send_chat_message(
+    smf_send_chat_message(
         title: notification_title,
         message: notification_message,
         type: notification_type,
         exception: exception,
         slack_channel: @smf_fastlane_config[:project][:slack_channel]
-      )
+    )
   end
 end

@@ -9,7 +9,7 @@ fastlane_require 'json'
 desc "Post to a Slack room if the build was successful"
 private_lane :smf_notify_build_success do |options|
 
-  buildVariant = ENV["BUILD_VARIANT"]
+  build_variant = ENV["BUILD_VARIANT"]
 
   changelog = ENV["CHANGELOG"]
 
@@ -21,17 +21,17 @@ private_lane :smf_notify_build_success do |options|
 
   smf_send_notification(
     success: true,
-    message:"*🎉 Successfully released #{project_name()} #{buildVariant} (Build #{ENV["next_version_code"]}) 🎉*\n```#{changelog}```"
+    message:"*🎉 Successfully released #{project_name()} #{build_variant} (Build #{ENV["next_version_code"]}) 🎉*\n```#{changelog}```"
   )
 end
 
 desc "Notify that build failed"
 private_lane :smf_notify_build_failed do |options|
   exception = options[:exception]
-  buildVariant = ENV["BUILD_VARIANT"]
+  build_variant = ENV["BUILD_VARIANT"]
   smf_send_notification(
     success: false,
-    message: "*😢 Failed to build and release #{project_name()} #{buildVariant} 😢* \n```#{exception}```"
+    message: "*😢 Failed to build and release #{project_name()} #{build_variant} 😢* \n```#{exception}```"
   )
 end
 
