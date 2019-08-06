@@ -50,9 +50,9 @@ private_lane :smf_git_changelog do |options|
   changelog = cleaned_changelog_messages.uniq.join("\n")
   changelog = "#{changelog[0..20_000]}#{'\\n...'}" if changelog.length > 20_000
   UI.important("test 1")
-  changelog_html = "<ul>#{cleaned_changelog_messages.uniq.map { |x| "<li>#{x.to_s}</li>" }.join("")}</ul>"
+  changelog_html = "<ul>#{cleaned_changelog_messages.uniq.map { |x| "<li>#{x}</li>" }.join("")}</ul>"
   UI.important("test 2")
-  ENV[$SMF_CHANGELOG_ENV_HTML_KEY] = changelog_html
+  ENV[$SMF_CHANGELOG_ENV_HTML_KEY] = changelog_html.to_s
   UI.important("test 3")
   UI.important("SMF_CHANGELOG_ENV_HTML_KEY:\n #{ENV[$SMF_CHANGELOG_ENV_HTML_KEY]}")
   UI.important("test 4")
