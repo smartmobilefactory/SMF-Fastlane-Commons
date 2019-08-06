@@ -22,7 +22,7 @@ before_all do |lane, options|
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise "Unknown platform"
   end
-  import("#{@fastlane_commons_dir_path}/commons/smf_git_changelog/smf_git_changelog.rb")
+  import(File.expand_path('smf_git_changelog.rb'))
 end
 
 # Returns the path to the Config.json
