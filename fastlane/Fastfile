@@ -5,6 +5,7 @@ before_all do |lane, options|
   puts "Inline options: #{options}"
   # Import the fastlane-commons repo so its code can be used
   smf_common_setup
+  fastlane_commons_commons_dir_path = "#{@fastlane_commons_dir_path}/commons"
   case @platform
   when :ios
     @fastlane_commons_dir_path += "/legacy/ios"
@@ -22,7 +23,7 @@ before_all do |lane, options|
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise "Unknown platform"
   end
-  import(File.expand_path('smf_git_changelog.rb'))
+  import("#{fastlane_commons_commons_dir_path}/smf_git_changelog/smf_git_changelog.rb")
 end
 
 # Returns the path to the Config.json
