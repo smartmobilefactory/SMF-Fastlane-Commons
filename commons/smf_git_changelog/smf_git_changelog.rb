@@ -6,7 +6,7 @@ desc 'Collect git commit messages and author mail adresses into a changelog and 
 private_lane :smf_git_changelog do |options|
 
   build_variant = options[:build_variant]
-
+  UI.important("build_variant: #{build_variant}")
   UI.important('Collecting commits back to the last tag')
 
   # Constants
