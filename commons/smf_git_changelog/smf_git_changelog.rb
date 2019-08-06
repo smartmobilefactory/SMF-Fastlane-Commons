@@ -54,7 +54,7 @@ private_lane :smf_git_changelog do |options|
   UI.message("changelog:\n#{changelog}")
   changelog = "#{changelog[0..20_000]}#{'\\n...'}" if changelog.length > 20_000
   cleaned_changelog_messages.uniq().each {|x| UI.message("#{x}\n") }
-  ENV[$SMF_CHANGELOG_ENV_HTML_KEY] = "<ul>#{cleaned_changelog_messages.uniq.map { |x| "<li>#{x}</li>" }.join("")}</ul>"
+  ENV[$SMF_CHANGELOG_ENV_HTML_KEY] = "<ul>#{cleaned_changelog_messages.uniq.map { |x| "<li>#{x.to_s}</li>" }.join("")}</ul>"
   ENV[$SMF_CHANGELOG_ENV_KEY] = changelog
 end
 
