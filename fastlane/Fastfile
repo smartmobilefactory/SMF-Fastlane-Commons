@@ -5,6 +5,7 @@ before_all do |lane, options|
   puts "Inline options: #{options}"
   # Import the fastlane-commons repo so its code can be used
   smf_common_setup
+  fastlane_dir_path = "#{@fastlane_commons_dir_path}/fastlane"
   fastlane_commons_commons_dir_path = "#{@fastlane_commons_dir_path}/commons"
   case @platform
   when :ios
@@ -23,6 +24,7 @@ before_all do |lane, options|
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise "Unknown platform"
   end
+  import_all("#{fastlane_dir_path}/utils")
   import("#{fastlane_commons_commons_dir_path}/smf_git_changelog/smf_git_changelog.rb")
 end
 
