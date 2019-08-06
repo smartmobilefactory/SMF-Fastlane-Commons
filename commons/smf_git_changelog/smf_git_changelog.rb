@@ -37,7 +37,6 @@ private_lane :smf_git_changelog do |options|
 
   cleaned_changelog_messages = []
   changelog_messages.split(/\n+/).each do |commit_message|
-    UI.message("Ignore: #{commit_message}")
     if smf_should_commit_be_ignored_in_changelog(commit_message, [/.*SMFHUDSONCHECKOUT.*/])
       next
     end
@@ -45,16 +44,21 @@ private_lane :smf_git_changelog do |options|
     # Remove the author and use uppercase at line starts for non internal builds
     commit_message = commit_message.sub(/^- \([^\)]*\) /, '')
     commit_message.capitalize
-    UI.message("Add: #{commit_message}")
     cleaned_changelog_messages.push(commit_message)
   end
 
   # Limit the size of changelog as it's crashes if it's too long
   changelog = cleaned_changelog_messages.uniq.join("\n")
-  UI.message("changelog:\n#{changelog}")
-  changelog = "#{changelog[0..20_000]}#{'\\n...'}" if changelog.length > 20_000
+  UI.important("Changelog:\n#{changelog}")
+  if changelog.length > 20_000
+    changelog = "#{changelog[0..20_000]}#{'\\n...'}" if changelog.length > 20_000
+    UI.important("Length of changelog is bigger than 20000")
+  else
+    UI.important("Length of changelog is smaller than 20000")
+  end
   cleaned_changelog_messages.uniq().each {|x| UI.message("#{x}\n") }
   ENV[$SMF_CHANGELOG_ENV_HTML_KEY] = "<ul>#{cleaned_changelog_messages.uniq.map { |x| "<li>#{x.to_s}</li>" }.join("")}</ul>"
+  UI.important("SMF_CHANGELOG_ENV_HTML_KEY:\n #{ENV[$SMF_CHANGELOG_ENV_HTML_KEY]}")
   ENV[$SMF_CHANGELOG_ENV_KEY] = changelog
 end
 
