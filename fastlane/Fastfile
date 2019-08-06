@@ -6,6 +6,7 @@ before_all do |lane, options|
   # Import the fastlane-commons repo so its code can be used
   smf_common_setup
   fastlane_dir_path = "#{@fastlane_commons_dir_path}/fastlane"
+  import_all("#{fastlane_dir_path}/utils")
   fastlane_commons_commons_dir_path = "#{@fastlane_commons_dir_path}/commons"
   case @platform
   when :ios
@@ -24,7 +25,6 @@ before_all do |lane, options|
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise "Unknown platform"
   end
-  import_all("#{fastlane_dir_path}/utils")
   import("#{fastlane_commons_commons_dir_path}/smf_git_changelog/smf_git_changelog.rb")
 end
 
@@ -118,4 +118,14 @@ def smf_workspace_dir
     path = path.chomp("/fastlane")
   end
   return path
+end
+
+##############
+### Helper ###
+##############
+
+def import_all(path)
+  Dir["#{path}/*.rb"].each { |file|
+    import file
+  }
 end

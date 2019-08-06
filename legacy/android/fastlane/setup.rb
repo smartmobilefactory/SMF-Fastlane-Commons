@@ -12,13 +12,3 @@ def smf_setup_android_fastlane_commons(options = Hash.new)
   import_all "#{@fastlane_commons_dir_path}/fastlane/lanes"
 end
 
-##############
-### Helper ###
-##############
-
-def import_all(path)
-  Dir["#{path}/*.rb"].each { |file|
-    import file
-  }
-end
-

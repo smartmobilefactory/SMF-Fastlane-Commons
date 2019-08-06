@@ -22,16 +22,6 @@ def smf_setup_ios_fastlane_commons(options = Hash.new)
 end
 
 ##############
-### Helper ###
-##############
-
-def import_all(path)
-  Dir["#{path}/*.rb"].each { |file|
-    import file
-  }
-end
-
-##############
 ### Config ###
 ##############
 
