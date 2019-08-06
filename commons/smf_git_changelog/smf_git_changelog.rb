@@ -49,15 +49,9 @@ private_lane :smf_git_changelog do |options|
 
   # Limit the size of changelog as it's crashes if it's too long
   changelog = cleaned_changelog_messages.uniq.join("\n")
-  UI.important("Changelog:\n#{changelog}")
-  if changelog.length > 20_000
-    changelog = "#{changelog[0..20_000]}#{'\\n...'}" if changelog.length > 20_000
-    UI.important("Length of changelog is bigger than 20000")
-  else
-    UI.important("Length of changelog is smaller than 20000")
-  end
-  cleaned_changelog_messages.uniq().each {|x| UI.message("#{x}\n") }
-  ENV[$SMF_CHANGELOG_ENV_HTML_KEY] = "<ul>#{cleaned_changelog_messages.uniq.map { |x| "<li>#{x.to_s}</li>" }.join("")}</ul>"
+  changelog = "#{changelog[0..20_000]}#{'\\n...'}" if changelog.length > 20_000
+
+  ENV[$SMF_CHANGELOG_ENV_HTML_KEY] = "<ul>#{cleaned_changelog_messages.uniq.map { |x| "<li>#{x}</li>" }.join("")}</ul>"
   UI.important("SMF_CHANGELOG_ENV_HTML_KEY:\n #{ENV[$SMF_CHANGELOG_ENV_HTML_KEY]}")
   ENV[$SMF_CHANGELOG_ENV_KEY] = changelog
 end
