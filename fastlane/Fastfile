@@ -90,8 +90,6 @@ error do |lane, exception|
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise "Unknown Platform"
   end
-  @fastlane_commons_dir_path = @fastlane_commons_dir_path.slice(0..(@fastlane_commons_dir_path.index('/legacy')))
-  smf_remove_fastlane_commons_repo
 end
 
 # sets the commons dir path and clones the fastlane repo 
