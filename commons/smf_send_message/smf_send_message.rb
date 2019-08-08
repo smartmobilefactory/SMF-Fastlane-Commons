@@ -7,9 +7,7 @@ private_lane :smf_send_message do |options|
   slack_workspace_url = 'https://hooks.slack.com/services/' + ENV[$SMF_SLACK_URL]
   title = "*#{options[:title]}*"
   message = !options[:message].nil? ? options[:message] : ''
-  UI.message("Inital message: #{message}") if message
-  content = ''
-  content << message.length < 4000 ? message : "#{message[0..4000]}... (maximum length reached)"
+  content = message.length < 4000 ? message : "#{message[0..4000]}... (maximum length reached)"
   # Change ci_ios_error_log later to another channel for ios and android
   slack_channel = (!options[:slack_channel].nil? ? options[:slack_channel] : ci_ios_error_log)
   project_name = !ENV["PROJECT_NAME"].nil? ? ENV["PROJECT_NAME"] : @smf_fastlane_config[:project][:project_name]
