@@ -1,4 +1,4 @@
-desc "Sending a message to the given Slack channel"
+desc 'Sending a message to the given Slack channel'
 private_lane :smf_send_message do |options|
 
   # Skip sending if slack is disabled
@@ -9,12 +9,12 @@ private_lane :smf_send_message do |options|
   message = !options[:message].nil? ? options[:message] : ''
   content = message.length < 4000 ? message : "#{message[0..4000]}... (maximum length reached)"
 
-  ci_error_log = '\#ci-error-log'
+  ci_error_log = '#ci-error-log'
   case @platform
   when :ios
     ci_error_log = ci_ios_error_log
   when :android
-    ci_error_log = '\#android'
+    ci_error_log = '#android'
   when :flutter
     UI.message('Slack Notification for flutter is not implemented yet')
   else
@@ -24,10 +24,10 @@ private_lane :smf_send_message do |options|
 
   slack_channel = (!options[:slack_channel].nil? ? options[:slack_channel] : ci_error_log)
 
-  project_name = !ENV["PROJECT_NAME"].nil? ? ENV["PROJECT_NAME"] : @smf_fastlane_config[:project][:project_name]
-  type = !options[:type].nil? ? options[:type] : "warning"
+  project_name = !ENV['PROJECT_NAME'].nil? ? ENV['PROJECT_NAME'] : @smf_fastlane_config[:project][:project_name]
+  type = !options[:type].nil? ? options[:type] : 'warning'
   success = type == 'success' || type == 'message'
-  build_url = options[:build_url]
+  build_url = !options[:build_url].nil? ? options[:build_url] : ENV['BUILD_URL']
   exception = options[:exception]
   additional_html_entries = !options[:additional_html_entries].nil? ? options[:additional_html_entries] : []
   fail_build_job_on_error = (!options[:fail_build_job_on_error].nil? ? options[:additional_html_entries] : false)
@@ -60,7 +60,7 @@ private_lane :smf_send_message do |options|
 
   UI.message("Sending message \"#{content}\" to room \"#{slack_channel}\"")
 
-  if slack_channel && (slack_channel.include? "/") == false
+  if slack_channel && (slack_channel.include? '/') == false
 
     # Send failure messages also to CI to notice them so that we can see if they can be improved
     begin
@@ -101,7 +101,7 @@ private_lane :smf_send_message do |options|
             attachment_properties: {
                 fields: [
                     {
-                        title: "Attachment",
+                        title: 'Attachment',
                         value: attachment_path.to_s
                     }
                 ]

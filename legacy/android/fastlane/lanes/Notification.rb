@@ -13,9 +13,8 @@ private_lane :smf_notify_build_success do |options|
   slack_channel = @smf_fastlane_config[:project][:slack_channel]
 
   smf_send_message(
-      title: "*🎉 Successfully released #{project_name()} #{build_variant} (Build #{ENV["next_version_code"]}) 🎉*",
+      title: "🎉 Successfully released #{project_name()} #{build_variant} (Build #{ENV["next_version_code"]}) 🎉",
       type: "success",
-      success: true,
       message: ENV[$SMF_CHANGELOG_ENV_KEY],
       slack_channel: slack_channel
   )
