@@ -152,7 +152,3 @@ end
 def ci_ios_error_log
   return "#{$SMF_CI_IOS_ERROR_LOG}"
 end
-
-def slack_url
-  return "#{$SMF_SLACK_URL}"
-end

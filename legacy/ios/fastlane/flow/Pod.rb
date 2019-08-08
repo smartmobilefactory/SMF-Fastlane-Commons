@@ -84,7 +84,7 @@ private_lane :smf_publish_pod do |options|
 
       project_name = project_config[:project_name]
 
-      smf_send_chat_message(
+      smf_send_message(
         title: "Failed to create MetaJSON for #{smf_default_notification_release_title} 😢",
         type: "error",
         exception: exception,

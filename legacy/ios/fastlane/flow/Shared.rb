@@ -97,7 +97,7 @@ private_lane :smf_send_deploy_success_notifications do |options|
   title = "Built #{smf_default_notification_release_title} 🎉"
 
   if slack_channel
-    smf_send_chat_message(
+    smf_send_message(
       title: title,
       message: ENV[$SMF_CHANGELOG_ENV_KEY],
       type: "success",
@@ -149,7 +149,7 @@ private_lane :smf_handle_exception do |options|
   end
 
   if slack_channel
-    smf_send_chat_message(
+    smf_send_message(
       title: title,
       message: message,
       exception: exception,
