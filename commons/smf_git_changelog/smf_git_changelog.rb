@@ -2,7 +2,7 @@
 ### smf_git_changelog ###
 #############################
 
-desc 'Collect git commit messages and author mail adresses into a changelog and store them as environmental varibles.'
+desc 'Collect git commit messages into a changelog and store as environment variable.'
 private_lane :smf_git_changelog do |options|
 
   build_variant = options[:build_variant]
