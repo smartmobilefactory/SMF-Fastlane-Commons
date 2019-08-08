@@ -73,7 +73,7 @@ private_lane :smf_send_message do |options|
             channel: ci_error_log,
             username: "#{project_name} CI",
             success: success,
-            playload: {
+            payload: {
                 'Build Job' => build_url,
                 'Build Type' => type,
             },
@@ -95,7 +95,7 @@ private_lane :smf_send_message do |options|
             channel: slack_channel,
             username: "#{project_name} CI",
             success: success,
-            playload: {
+            payload: {
                 'Build Job' => build_url,
                 'Build Type' => type,
             },
@@ -119,7 +119,7 @@ private_lane :smf_send_message do |options|
             channel: slack_channel,
             username: "#{project_name} CI",
             success: success,
-            playload: {
+            payload: {
                 'Build Job' => build_url,
                 'Build Type' => type,
             },
