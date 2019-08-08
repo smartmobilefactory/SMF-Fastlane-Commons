@@ -21,7 +21,9 @@ private_lane :smf_send_message do |options|
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
   end
+
   slack_channel = (!options[:slack_channel].nil? ? options[:slack_channel] : ci_error_log)
+
   project_name = !ENV["PROJECT_NAME"].nil? ? ENV["PROJECT_NAME"] : @smf_fastlane_config[:project][:project_name]
   type = !options[:type].nil? ? options[:type] : "warning"
   success = type == 'success' || type == 'message'
@@ -81,7 +83,7 @@ private_lane :smf_send_message do |options|
         )
       end
     rescue => exception
-      UI.important("Failed to send error message to #{ci_ios_error_log} Slack room. Exception: #{exception}")
+      UI.important("Failed to send error message to #{ci_error_log} Slack room. Exception: #{exception}")
     end
 
     begin
