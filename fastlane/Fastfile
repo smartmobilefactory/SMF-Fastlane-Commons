@@ -117,6 +117,10 @@ def smf_workspace_dir
   path = path.chomp('/fastlane') if path.end_with?('/fastlane')
 end
 
+def smf_is_slack_enabled
+  ENV[$SMF_IS_SLACK_ENABLED].nil? ? true : ENV[$SMF_IS_SLACK_ENABLED] == "true"
+end
+
 ##############
 ### Helper ###
 ##############
