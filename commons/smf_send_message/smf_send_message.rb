@@ -25,7 +25,7 @@ private_lane :smf_send_message do |options|
   slack_channel = (!options[:slack_channel].nil? ? options[:slack_channel] : ci_error_log)
 
   project_name = !ENV['PROJECT_NAME'].nil? ? ENV['PROJECT_NAME'] : @smf_fastlane_config[:project][:project_name]
-  type = !options[:type].nil? ? options[:type].to_s : 'warning'
+  type = !options[:type].nil? ? options[:type] : 'warning'
   success = type == 'success' || type == 'message'
   build_url = !options[:build_url].nil? ? options[:build_url] : ENV['BUILD_URL']
   exception = options[:exception]
@@ -75,7 +75,7 @@ private_lane :smf_send_message do |options|
             success: success,
             payload: {
                 'Build Job' => build_url,
-                'Build Type' => type,
+                'Build Type' => type.to_s,
             },
             default_payloads: [:git_branch],
         )
@@ -95,7 +95,7 @@ private_lane :smf_send_message do |options|
             success: success,
             payload: {
                 'Build Job' => build_url,
-                'Build Type' => type,
+                'Build Type' => type.to_s,
             },
             default_payloads: [:git_branch],
             attachment_properties: {
@@ -117,7 +117,7 @@ private_lane :smf_send_message do |options|
             success: success,
             payload: {
                 'Build Job' => build_url,
-                'Build Type' => type,
+                'Build Type' => type.to_s,
             },
             default_payloads: [:git_branch],
         )
