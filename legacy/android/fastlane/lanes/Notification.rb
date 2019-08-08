@@ -10,7 +10,7 @@ desc "Post to a Slack room if the build was successful"
 private_lane :smf_notify_build_success do |options|
 
   build_variant = ENV["BUILD_VARIANT"]
-  slack_channel = !@smf_fastlane_config[:project][:slack_channel].nil? ? @smf_fastlane_config[:project][:slack_channel] : "\#android"
+  slack_channel = @smf_fastlane_config[:project][:slack_channel]
 
   smf_send_message(
       title: "*🎉 Successfully released #{project_name()} #{build_variant} (Build #{ENV["next_version_code"]}) 🎉*",
@@ -25,7 +25,7 @@ desc "Notify that build failed"
 private_lane :smf_notify_build_failed do |options|
   exception = options[:exception]
   build_variant = ENV["BUILD_VARIANT"]
-  slack_channel = !@smf_fastlane_config[:project][:slack_channel].nil? ? @smf_fastlane_config[:project][:slack_channel] : "\#android"
+  slack_channel = @smf_fastlane_config[:project][:slack_channel]
 
   smf_send_message(
       title: "*😢 Failed to build and release #{project_name()} #{build_variant} 😢*",
