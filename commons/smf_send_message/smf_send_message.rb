@@ -77,9 +77,7 @@ private_lane :smf_send_message do |options|
                 'Build Job' => build_url,
                 'Build Type' => type,
             },
-            default_payloads: [
-                [:git_branch]
-            ],
+            default_payloads: [:git_branch],
         )
       end
     rescue => exception
@@ -99,9 +97,7 @@ private_lane :smf_send_message do |options|
                 'Build Job' => build_url,
                 'Build Type' => type,
             },
-            default_payloads: [
-                [:git_branch]
-            ],
+            default_payloads: [:git_branch],
             attachment_properties: {
                 fields: [
                     {
@@ -123,9 +119,7 @@ private_lane :smf_send_message do |options|
                 'Build Job' => build_url,
                 'Build Type' => type,
             },
-            default_payloads: [
-                [:git_branch]
-            ],
+            default_payloads: [:git_branch],
         )
       end
     rescue => exception
