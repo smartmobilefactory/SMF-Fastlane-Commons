@@ -14,7 +14,7 @@ private_lane :smf_notify_build_success do |options|
 
   smf_send_message(
       title: "🎉 Successfully released #{project_name()} #{build_variant} (Build #{ENV["next_version_code"]}) 🎉",
-      type: "success",
+      type: 'success',
       message: ENV[$SMF_CHANGELOG_ENV_KEY],
       slack_channel: slack_channel
   )
@@ -28,7 +28,7 @@ private_lane :smf_notify_build_failed do |options|
 
   smf_send_message(
       title: "*😢 Failed to build and release #{project_name()} #{build_variant} 😢*",
-      type: "error",
+      type: 'error',
       exception: exception,
       slack_channel: slack_channel
   )

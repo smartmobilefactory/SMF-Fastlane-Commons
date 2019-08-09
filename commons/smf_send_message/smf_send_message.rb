@@ -22,15 +22,14 @@ private_lane :smf_send_message do |options|
     raise 'Unknown platform'
   end
 
-  if options[:slack_channel].nil?
-    UI.message('Slack channel is missing. Using default Slack channel for notification.')
-  else
-    UI.message("Slack channel: #{options[:slack_channel]}")
-  end
-
   slack_channel = !options[:slack_channel].nil? ? options[:slack_channel] : ci_error_log
 
   project_name = !ENV['PROJECT_NAME'].nil? ? ENV['PROJECT_NAME'] : @smf_fastlane_config[:project][:project_name]
+  if options[:type].nil?
+    UI.message('Type is missing.')
+  else
+    UI.message("Type: #{options[:type]}")
+  end
   type = !options[:type].nil? ? options[:type] : 'warning'
   success = type == 'success' || type == 'message'
   build_url = !options[:build_url].nil? ? options[:build_url] : ENV['BUILD_URL']
@@ -63,14 +62,14 @@ private_lane :smf_send_message do |options|
     UI.message("Adding additional_html_entry: #{entry}")
     content << entry.to_s
   end
-
+  UI.message("Build Type: #{type}")
   UI.message("Sending message \"#{content}\" to room \"#{slack_channel}\"")
 
   if slack_channel && (slack_channel.include? '/') == false
 
     # Send failure messages also to CI to notice them so that we can see if they can be improved
     begin
-      if type = 'error' && ((slack_channel.eql? ci_error_log) == false)
+      if type = 'error' && !(slack_channel.eql? ci_error_log)
         slack(
             slack_url: slack_workspace_url,
             icon_url: 'https://avatars2.githubusercontent.com/u/1090089?s=400&v=4',
@@ -81,7 +80,7 @@ private_lane :smf_send_message do |options|
             success: success,
             payload: {
                 'Build Job' => build_url,
-                'Build Type' => type.to_s,
+                'Build Type' => "#{type}",
             },
             default_payloads: [:git_branch],
         )
@@ -101,7 +100,7 @@ private_lane :smf_send_message do |options|
             success: success,
             payload: {
                 'Build Job' => build_url,
-                'Build Type' => type.to_s,
+                'Build Type' => "#{type}",
             },
             default_payloads: [:git_branch],
             attachment_properties: {
@@ -123,7 +122,7 @@ private_lane :smf_send_message do |options|
             success: success,
             payload: {
                 'Build Job' => build_url,
-                'Build Type' => type.to_s,
+                'Build Type' => "#{type}",
             },
             default_payloads: [:git_branch],
         )
