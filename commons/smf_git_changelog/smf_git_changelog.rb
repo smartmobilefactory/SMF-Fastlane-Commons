@@ -43,7 +43,7 @@ private_lane :smf_git_changelog do |options|
     # Remove the author and use uppercase at line starts for non internal builds
     commit_message = commit_message.sub(/^- \([^\)]*\) /, '- ')
     letters = commit_message.split('')
-    letters[3] = letters[3].upcase if letters.length >= 3
+    letters[2] = letters[2].upcase if letters.length >= 2
     commit_message = letters.join('')
     cleaned_changelog_messages.push(commit_message)
   end

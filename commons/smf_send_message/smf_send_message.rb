@@ -22,7 +22,11 @@ private_lane :smf_send_message do |options|
     raise 'Unknown platform'
   end
 
-  slack_channel = (!options[:slack_channel].nil? ? options[:slack_channel] : ci_error_log)
+  if options[:slack_channel].nil?
+    UI.message('Slack channel is missing. Using default Slack channel for notification.')
+  end
+
+  slack_channel = !options[:slack_channel].nil? ? options[:slack_channel] : ci_error_log
 
   project_name = !ENV['PROJECT_NAME'].nil? ? ENV['PROJECT_NAME'] : @smf_fastlane_config[:project][:project_name]
   type = !options[:type].nil? ? options[:type] : 'warning'
