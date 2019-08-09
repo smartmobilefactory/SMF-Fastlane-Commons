@@ -79,12 +79,11 @@ error do |lane, exception|
     end
   when :android
     if lane == :releasing_pr_phase || lane == :deploy
-      smf_git_changelog(build_variant: ENV['BUILD_VARIANT'])
-
-      smf_notify_build_failed(
+      smf_handle_exception(
           build_variant: ENV['BUILD_VARIANT'],
           exception: exception
       )
+
     end
   when :flutter
     UI.message('Error for flutter is not implemented yet')

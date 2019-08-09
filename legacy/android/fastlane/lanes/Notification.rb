@@ -2,20 +2,6 @@ fastlane_require 'net/https'
 fastlane_require 'uri'
 fastlane_require 'json'
 
-desc "Notify that build failed"
-private_lane :smf_notify_build_failed do |options|
-  exception = options[:exception]
-  build_variant = ENV["BUILD_VARIANT"]
-  slack_channel = @smf_fastlane_config[:project][:slack_channel]
-
-  smf_send_message(
-      title: "*😢 Failed to build and release #{project_name()} #{build_variant} 😢*",
-      type: 'error',
-      exception: exception,
-      slack_channel: slack_channel
-  )
-end
-
 ###########################
 ### smf_notify_via_mail ###
 ###########################

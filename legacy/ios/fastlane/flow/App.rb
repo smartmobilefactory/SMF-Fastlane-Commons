@@ -269,7 +269,7 @@ private_lane :smf_deploy_build_variant do |options|
       tag: tag
   )
 
-  smf_send_app_build_success_notification(build_variant: build_variant)
+  smf_send_default_build_success_notification(build_variant: build_variant)
 
   # Upload Ipa to Testflight and Download the generated DSYM
   # The testflight upload should happen as last step as the upload often shows an error although the IPA was successfully uploaded. We still want the tag, HockeyApp upload etc in this case.

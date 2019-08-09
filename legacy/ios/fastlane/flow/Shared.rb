@@ -73,60 +73,6 @@ private_lane :smf_check_pr do |options|
 
 end
 
-############################
-### smf_handle_exception ###
-############################
-
-# options: message (String) [optional], exception (exception)
-
-desc "Handle the exception by sending email to the authors"
-private_lane :smf_handle_exception do |options|
-
-  UI.important("Handling the build job exception")
-
-  # Parameter
-  message = options[:message]
-  exception = options[:exception]
-  build_variant = options[:build_variant]
-
-  # Variables
-  slack_channel = @smf_fastlane_config[:project][:slack_channel]
-
-  apps_hockey_id = ENV[$SMF_APP_HOCKEY_ID_ENV_KEY]
-  if not apps_hockey_id.nil?
-    begin
-      smf_delete_uploaded_hockey_entry(
-        apps_hockey_id: apps_hockey_id
-      )
-      UI.important("The app version which was uploaded to HockeyApp was removed as something else in the build job failed!")
-    rescue
-      UI.message("The app version which was uploaded to HockeyApp wasn't removed. This is fine if it wasn't yet uploaded")
-    end
-  end
-
-  if ENV[$SMF_CHANGELOG_ENV_KEY].nil?
-    # Collect the changelog (again) in case the build job failed before the former changelog collecting
-    smf_git_changelog(build_variant: build_variant)
-  end
-
-  if smf_is_build_variant_a_decoupled_ui_test == true
-    title = "Failed to perform UI-Tests for #{smf_default_notification_release_title} 😢"
-  else
-    title = "Failed to build #{smf_default_notification_release_title} 😢"
-  end
-
-  if slack_channel
-    smf_send_message(
-      title: title,
-      message: message,
-      exception: exception,
-      type: "error",
-      slack_channel: slack_channel
-      )
-  end
-end
-
-
 ##################################
 ### generate_temporary_appfile ###
 ##################################
