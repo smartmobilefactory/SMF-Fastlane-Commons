@@ -12,3 +12,7 @@ def smf_setup_android_fastlane_commons(options = Hash.new)
   import_all "#{@fastlane_commons_dir_path}/fastlane/lanes"
 end
 
+def ci_android_error_log
+  $SMF_CI_ANDROID_ERROR_LOG.to_s
+end
+

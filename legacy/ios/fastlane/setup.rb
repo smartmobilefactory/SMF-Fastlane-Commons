@@ -145,6 +145,6 @@ def smf_is_keychain_enabled
   return ENV[$SMF_IS_KEYCHAIN_ENABLED].nil? ? true : ENV[$SMF_IS_KEYCHAIN_ENABLED] == "true"
 end
 
-def ci_ios_error_log
-  return "#{$SMF_CI_IOS_ERROR_LOG}"
+def ci_ios_error_log 
+  $SMF_CI_IOS_ERROR_LOG.to_s
 end

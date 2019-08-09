@@ -30,7 +30,7 @@ private_lane :smf_send_message do |options|
   else
     UI.message("Type: #{options[:type]}")
   end
-  type = !options[:type].nil? ? options[:type] : 'warning'
+  type = !options[:type].nil? ? options[:type].to_s : 'warning'
   success = type == 'success' || type == 'message'
   build_url = !options[:build_url].nil? ? options[:build_url] : ENV['BUILD_URL']
   exception = options[:exception]
@@ -69,7 +69,7 @@ private_lane :smf_send_message do |options|
 
     # Send failure messages also to CI to notice them so that we can see if they can be improved
     begin
-      if type = 'error' && !(slack_channel.eql? ci_error_log)
+      if type == 'error' && !(slack_channel.eql? ci_error_log)
         slack(
             slack_url: slack_workspace_url,
             icon_url: 'https://avatars2.githubusercontent.com/u/1090089?s=400&v=4',
@@ -80,7 +80,7 @@ private_lane :smf_send_message do |options|
             success: success,
             payload: {
                 'Build Job' => build_url,
-                'Build Type' => "#{type}",
+                'Build Type' => type,
             },
             default_payloads: [:git_branch],
         )
@@ -100,7 +100,7 @@ private_lane :smf_send_message do |options|
             success: success,
             payload: {
                 'Build Job' => build_url,
-                'Build Type' => "#{type}",
+                'Build Type' => type,
             },
             default_payloads: [:git_branch],
             attachment_properties: {
@@ -122,7 +122,7 @@ private_lane :smf_send_message do |options|
             success: success,
             payload: {
                 'Build Job' => build_url,
-                'Build Type' => "#{type}",
+                'Build Type' => type,
             },
             default_payloads: [:git_branch],
         )
