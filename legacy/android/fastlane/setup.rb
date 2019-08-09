@@ -3,7 +3,7 @@
 ###########################
 after_all do |lane|
   if lane == :releasing_pr_phase || lane == :deploy
-    smf_notify_build_success
+    smf_send_app_build_success_notification(build_variant: ENV['BUILD_VARIANT'])
   end
 end
 

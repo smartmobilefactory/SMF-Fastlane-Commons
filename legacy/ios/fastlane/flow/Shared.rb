@@ -73,39 +73,6 @@ private_lane :smf_check_pr do |options|
 
 end
 
-#############################################
-### smf_send_deploy_success_notifications ###
-#############################################
-
-# options: app_link (String) [optional]
-
-desc "Handle the success of a deploy by sending email to the authors and post to the slack channel"
-private_lane :smf_send_deploy_success_notifications do |options|
-
-  # Parameter
-  app_link = (options[:app_link].nil? ? Actions.lane_context[Actions::SharedValues::HOCKEY_DOWNLOAD_LINK] : options[:app_link])
-  build_variant = options[:build_variant]
-
-  # Variables
-  slack_channel = @smf_fastlane_config[:project][:slack_channel]
-
-  if ENV[$SMF_CHANGELOG_ENV_KEY].nil?
-    # Collect the changelog (again) in case the build job failed before the former changelog collecting
-    smf_git_changelog(build_variant: build_variant)
-  end
-
-  title = "Built #{smf_default_notification_release_title} 🎉"
-
-  if slack_channel
-    smf_send_message(
-      title: title,
-      message: ENV[$SMF_CHANGELOG_ENV_KEY],
-      type: "success",
-      slack_channel: slack_channel
-      )
-  end
-end
-
 ############################
 ### smf_handle_exception ###
 ############################
