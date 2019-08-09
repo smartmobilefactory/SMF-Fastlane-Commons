@@ -19,5 +19,5 @@ private_lane :smf_send_app_build_success_notification do |options|
     raise 'Unknown platform'
   end
 
-  smf_default_build_success_notification("🎉🛠 Successfully built #{name} 🛠🎉")
+  smf_default_build_success_notification("🎉🛠 Successfully built #{name} 🛠🎉", build_variant)
 end
