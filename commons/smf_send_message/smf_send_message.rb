@@ -14,7 +14,7 @@ private_lane :smf_send_message do |options|
   when :ios
     ci_error_log = ci_ios_error_log
   when :android
-    ci_error_log = '#android'
+    ci_error_log = '#ci-android-error-log'
   when :flutter
     UI.message('Slack Notification for flutter is not implemented yet')
   else
@@ -24,6 +24,8 @@ private_lane :smf_send_message do |options|
 
   if options[:slack_channel].nil?
     UI.message('Slack channel is missing. Using default Slack channel for notification.')
+  else
+    UI.message("Slack channel: #{options[:slack_channel]}")
   end
 
   slack_channel = !options[:slack_channel].nil? ? options[:slack_channel] : ci_error_log
