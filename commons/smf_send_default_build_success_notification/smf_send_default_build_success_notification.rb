@@ -2,12 +2,19 @@ private_lane :smf_send_default_build_success_notification do |options|
 
   build_variant = options[:build_variant]
   slack_channel = @smf_fastlane_config[:project][:slack_channel]
-
   # Collect the changelog (again) in case the build job failed before the former changelog collecting
   smf_git_changelog(build_variant: build_variant) if ENV[$SMF_CHANGELOG_ENV_KEY].nil?
+
   UI.message("test 1")
-  name = !@smf_fastlane_config[:build_variants][build_variant.to_sym][:podspec_path].nil? ? get_default_name_of_pod : get_default_name_of_app(build_variant)
-  UI.message("test 2")
+  if @smf_fastlane_config.key?("build_variants")
+    UI.message("test 2")
+    name = !@smf_fastlane_config[:build_variants][build_variant.downcase.to_sym][:podspec_path].nil? ? get_default_name_of_pod(build_variant) : get_default_name_of_app(build_variant)
+  else
+    UI.message("test 3")
+    name = get_default_name_of_app(build_variant)
+  end
+  UI.message("test 4")
+  
   smf_send_message(
       title: "*🎉🛠 Successfully built #{name} 🛠🎉*",
       type: 'success',
@@ -34,8 +41,8 @@ def get_default_name_of_app(build_variant)
   end
 end
 
-def get_default_name_of_pod
-  podspec_path = @smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path]
+def get_default_name_of_pod(build_variant)
+  podspec_path = @smf_fastlane_config[:build_variants][build_variant.downcase.to_sym][:podspec_path]
   version = read_podspec(path: podspec_path)["version"]
   pod_name = read_podspec(path: podspec_path)["name"]
   project_name = !@smf_fastlane_config[:project][:project_name].nil? ? @smf_fastlane_config[:project][:project_name] : pod_name
