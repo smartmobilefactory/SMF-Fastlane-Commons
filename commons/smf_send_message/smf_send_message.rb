@@ -4,7 +4,7 @@ private_lane :smf_send_message do |options|
   # Skip sending if slack is disabled
   return unless smf_is_slack_enabled
 
-  slack_workspace_url = 'https://hooks.slack.com/services/' + ENV[$SMF_SLACK_URL]
+  slack_workspace_url = "https://hooks.slack.com/services/#{ENV[$SMF_SLACK_URL]}"
   title = "*#{options[:title]}*"
   message = !options[:message].nil? ? options[:message] : ''
   content = message.length < 4000 ? message : "#{message[0..4000]}... (maximum length reached)"
