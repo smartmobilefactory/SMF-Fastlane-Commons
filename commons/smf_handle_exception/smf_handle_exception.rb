@@ -6,6 +6,8 @@ private_lane :smf_handle_exception do |options|
   exception = options[:exception]
   build_variant = options[:build_variant]
 
+  UI.message('Test 2')
+
   case @platform
   when :ios
     apps_hockey_id = ENV[$SMF_APP_HOCKEY_ID_ENV_KEY]

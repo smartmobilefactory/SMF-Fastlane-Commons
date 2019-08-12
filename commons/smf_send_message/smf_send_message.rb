@@ -1,6 +1,8 @@
 desc 'Sending a message to the given Slack channel'
 private_lane :smf_send_message do |options|
 
+  UI.message('Test 4')
+
   # Skip sending if slack is disabled
   return unless smf_is_slack_enabled
 
@@ -58,6 +60,8 @@ private_lane :smf_send_message do |options|
     content << entry.to_s
   end
   UI.message("Sending message \"#{content}\" to room \"#{slack_channel}\"")
+
+  UI.message('Test 5')
 
   if slack_channel && (slack_channel.include? '/') == false
 

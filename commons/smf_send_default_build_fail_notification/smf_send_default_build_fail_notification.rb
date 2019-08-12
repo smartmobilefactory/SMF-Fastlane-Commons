@@ -12,6 +12,9 @@ private_lane :smf_default_build_fail_notification do |options|
   else
     name = get_default_name_of_app(build_variant)
   end
+
+  UI.message('Test 3')
+
   smf_send_message(
       title: "💥 Failed to build #{name} 💥",
       message: message,
