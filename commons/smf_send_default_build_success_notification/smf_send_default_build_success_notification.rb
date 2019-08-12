@@ -11,9 +11,6 @@ private_lane :smf_send_default_build_success_notification do |options|
     name = get_default_name_of_app(build_variant)
   end
 
-  #test exception, remove after testing
-  raise 'Test exception handling'
-
   smf_send_message(
       title: "🎉🛠 Successfully built #{name} 🛠🎉",
       type: 'success',

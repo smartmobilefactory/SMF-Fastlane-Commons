@@ -19,7 +19,6 @@ private_lane :smf_handle_exception do |options|
         UI.message("The app version which was uploaded to HockeyApp wasn't removed. This is fine if it wasn't yet uploaded.")
       end
     end
-    name = !@smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path].nil? ? get_default_name_of_pod : get_default_name_of_app(build_variant)
 
     smf_default_build_fail_notification(build_variant: build_variant, message: message, exception: exception)
   when :android
