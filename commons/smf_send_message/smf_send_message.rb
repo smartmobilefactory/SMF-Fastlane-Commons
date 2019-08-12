@@ -1,8 +1,6 @@
 desc 'Sending a message to the given Slack channel'
 private_lane :smf_send_message do |options|
 
-  UI.message('Test 4')
-
   # Skip sending if slack is disabled
   return unless smf_is_slack_enabled
 
@@ -25,7 +23,6 @@ private_lane :smf_send_message do |options|
   end
 
   slack_channel = !options[:slack_channel].nil? ? options[:slack_channel] : ci_error_log
-
   project_name = !ENV['PROJECT_NAME'].nil? ? ENV['PROJECT_NAME'] : @smf_fastlane_config[:project][:project_name]
   type = !options[:type].nil? ? options[:type].to_s : 'warning'
   success = type == 'success' || type == 'message'
@@ -35,33 +32,46 @@ private_lane :smf_send_message do |options|
   fail_build_job_on_error = (!options[:fail_build_job_on_error].nil? ? options[:additional_html_entries] : false)
   attachment_path = options[:attachment_path]
 
+  UI.message("test 1")
   # Log the exceptions to find out if there is useful information which can be added to the message
   UI.message("exception.inspect: #{exception.inspect}")
+  UI.message("test 2")
   UI.message("exception.cause: #{exception.cause}") if exception.respond_to?(:cause)
+  UI.message("test 3")
   UI.message("exception.exception: #{exception.exception}") if exception.respond_to?(:exception)
+  UI.message("test 4")
   UI.message("exception.backtrace: #{exception.backtrace}") if exception.respond_to?(:backtrace)
+  UI.message("test 5")
   UI.message("exception.backtrace_locations: #{exception.backtrace_locations}") if exception.respond_to?(:backtrace_locations)
+  UI.message("test 6")
   UI.message("exception.error_info: #{exception.error_info}") if exception.respond_to?(:error_info)
-
+  UI.message("test 7")
   slack_channel = URI.unescape(slack_channel) == slack_channel ? URI.escape(slack_channel) : slack_channel
 
   unless exception.nil?
+    UI.message("test 8")
     error_info = exception.respond_to?(:error_info) ? exception.error_info : nil
     error_info = exception.exception if error_info.nil?
     unless error_info.nil?
-      UI.message("Found error_info: #{error_info}")
+      UI.message("test 9")
+      UI.message("Found error_info: #{error_info.to_s}")
       UI.message("Adding error_info: #{error_info.to_s}")
+      UI.message("test 10")
       content << error_info.to_s.length < 4000 ? error_info.to_s : "#{error_info.to_s[0..4000]}... (maximum length reached)"
+      UI.message("test 11")
     end
   end
 
+  UI.message("test 12")
   additional_html_entries&.each do |entry|
     UI.message("Adding additional_html_entry: #{entry}")
+    UI.message("test 13")
     content << entry.to_s
+    UI.message("test 14")
   end
-  UI.message("Sending message \"#{content}\" to room \"#{slack_channel}\"")
 
-  UI.message('Test 5')
+  UI.message("test 15")
+  UI.message("Sending message \"#{content}\" to room \"#{slack_channel}\"")
 
   if slack_channel && (slack_channel.include? '/') == false
 

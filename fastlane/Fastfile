@@ -79,7 +79,6 @@ error do |lane, exception|
     end
   when :android
     if lane == :releasing_pr_phase || lane == :deploy
-      UI.message('Test 1')
       smf_handle_exception(
           build_variant: ENV['BUILD_VARIANT'],
           exception: exception
