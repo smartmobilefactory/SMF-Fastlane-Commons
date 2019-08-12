@@ -57,7 +57,10 @@ private_lane :smf_send_message do |options|
       UI.message("Found error_info: #{error_info.to_s}")
       UI.message("Adding error_info: #{error_info.to_s}")
       UI.message("test 10")
-      content << error_info.to_s.length < 4000 ? error_info.to_s : "#{error_info.to_s[0..4000]}... (maximum length reached)"
+      content << error_info.to_s
+      if content.length > 4000
+        content = "#{content[0..4000]}... (maximum length reached)"
+      end
       UI.message("test 11")
     end
   end
