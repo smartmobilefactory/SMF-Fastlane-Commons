@@ -15,7 +15,7 @@ private_lane :smf_git_changelog do |options|
   UI.message('Fetching all tags...')
   sh('git fetch --tags --quiet')
 
-  last_tag = sh("git describe --tags --match \".*#{build_variant}.*\" --abbrev=0 HEAD --first-parent || echo #{NO_GIT_TAG_FAILURE}").to_s
+  last_tag = sh("git describe --tags --match \"*#{build_variant}*\" --abbrev=0 HEAD --first-parent || echo #{NO_GIT_TAG_FAILURE}").to_s
 
   # Use the initial commit if there is no matching tag yet
   if last_tag.include? NO_GIT_TAG_FAILURE
