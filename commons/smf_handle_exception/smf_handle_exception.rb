@@ -20,10 +20,10 @@ private_lane :smf_handle_exception do |options|
       end
     end
 
-    smf_default_build_fail_notification(build_variant: build_variant, message: message, exception: exception)
+    smf_send_default_build_fail_notification(build_variant: build_variant, message: message, exception: exception)
   when :android
     UI.message('Delete Hockey App for Android is not implemented yet')
-    smf_default_build_fail_notification(build_variant: build_variant, message: message, exception: exception)
+    smf_send_default_build_fail_notification(build_variant: build_variant, message: message, exception: exception)
   when :flutter
     UI.message('Delete Hockey App for flutter is not implemented yet')
   else

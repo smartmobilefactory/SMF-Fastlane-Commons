@@ -1,4 +1,4 @@
-private_lane :smf_default_build_fail_notification do |options|
+private_lane :smf_send_default_build_fail_notification do |options|
 
   message = options[:message]
   exception = options[:exception]
