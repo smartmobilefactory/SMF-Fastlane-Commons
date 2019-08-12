@@ -6,7 +6,7 @@ private_lane :smf_send_default_build_success_notification do |options|
   # Collect the changelog (again) in case the build job failed before the former changelog collecting
   smf_git_changelog(build_variant: build_variant) if ENV[$SMF_CHANGELOG_ENV_KEY].nil?
   UI.message("test 1")
-  name = !@smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path].nil? ? get_default_name_of_pod : get_default_name_of_app(build_variant)
+  name = !@smf_fastlane_config[:build_variants][build_variant.to_sym][:podspec_path].nil? ? get_default_name_of_pod : get_default_name_of_app(build_variant)
   UI.message("test 2")
   smf_send_message(
       title: "*🎉🛠 Successfully built #{name} 🛠🎉*",
