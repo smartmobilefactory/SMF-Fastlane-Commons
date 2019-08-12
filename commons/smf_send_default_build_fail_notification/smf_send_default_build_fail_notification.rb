@@ -11,7 +11,7 @@ private_lane :smf_default_build_fail_notification do |options|
   name = !@smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path].nil? ? get_default_name_of_pod : get_default_name_of_app(build_variant)
 
   smf_send_message(
-      title: "*💥 Failed to build #{name} 💥*",
+      title: "💥 Failed to build #{name} 💥",
       message: message,
       exception: exception,
       type: 'error',

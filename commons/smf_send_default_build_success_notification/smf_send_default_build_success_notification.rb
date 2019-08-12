@@ -5,18 +5,14 @@ private_lane :smf_send_default_build_success_notification do |options|
   # Collect the changelog (again) in case the build job failed before the former changelog collecting
   smf_git_changelog(build_variant: build_variant) if ENV[$SMF_CHANGELOG_ENV_KEY].nil?
 
-  UI.message("test 1")
   if @smf_fastlane_config.key?("build_variants")
-    UI.message("test 2")
     name = !@smf_fastlane_config[:build_variants][build_variant.downcase.to_sym][:podspec_path].nil? ? get_default_name_of_pod(build_variant) : get_default_name_of_app(build_variant)
   else
-    UI.message("test 3")
     name = get_default_name_of_app(build_variant)
   end
-  UI.message("test 4")
   
   smf_send_message(
-      title: "*🎉🛠 Successfully built #{name} 🛠🎉*",
+      title: "🎉🛠 Successfully built #{name} 🛠🎉",
       type: 'success',
       message: ENV[$SMF_CHANGELOG_ENV_KEY],
       slack_channel: slack_channel
