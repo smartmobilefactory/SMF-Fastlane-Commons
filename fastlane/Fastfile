@@ -70,19 +70,26 @@ end
 
 desc 'Called on error'
 error do |lane, exception|
+  UI.error("Exception: #{exception.to_s} was called from lane #{lane.to_s}.")
   case @platform
   when :ios
     if @smf_set_should_send_deploy_notifications == true || @smf_set_should_send_build_job_failure_notifications == true
+      UI.message('Handling exception for iOS.')
       smf_handle_exception(
           exception: exception,
       )
+    else
+      UI.message('Not handling exception because of lane.')
     end
   when :android
     if lane == :releasing_pr_phase || lane == :deploy
+      UI.message('Handling exception for android.')
       smf_handle_exception(
           build_variant: ENV['BUILD_VARIANT'],
           exception: exception
       )
+    else
+      UI.message('Not handling exception because of lane.')
     end
   when :flutter
     UI.message('Error for flutter is not implemented yet')
