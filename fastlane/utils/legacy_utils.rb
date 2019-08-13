@@ -7,10 +7,10 @@ def get_default_name_of_app(build_variant)
     project_name = @smf_fastlane_config[:project][:project_name]
     build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
     version = smf_get_version_number
-    "#{project_name} #{build_variant.to_s.upcase} #{version} (#{build_number})"
+    "#{project_name} #{build_variant.upcase} #{version} (#{build_number})"
   when :android
     project_name = !@smf_fastlane_config[:project][:name].nil? ? @smf_fastlane_config[:project][:name] : ENV["PROJECT_NAME"]
-    "#{project_name} #{build_variant.to_s} (Build #{ENV["next_version_code"]})"
+    "#{project_name} #{build_variant} (Build #{ENV["next_version_code"]})"
   when :flutter
     UI.message('Notification for flutter is not implemented yet')
   else

@@ -77,9 +77,9 @@ error do |lane, exception|
       UI.message('Handling exception for iOS.')
 
       if @smf_fastlane_config.key?("build_variants")
-        name = !@smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path].nil? ? get_default_name_of_pod(build_variant) : get_default_name_of_app(build_variant)
+        name = !@smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path].nil? ? get_default_name_of_pod(@smf_build_variant) : get_default_name_of_app(@smf_build_variant)
       else
-        name = get_default_name_of_app(build_variant)
+        name = get_default_name_of_app(@smf_build_variant)
       end
 
       smf_handle_exception(
@@ -95,7 +95,7 @@ error do |lane, exception|
       smf_handle_exception(
           build_variant: ENV['BUILD_VARIANT'],
           exception: exception,
-          name: get_default_name_of_app(build_variant)
+          name: get_default_name_of_app(ENV['BUILD_VARIANT'])
       )
     else
       UI.message('Not handling exception because of lane.')

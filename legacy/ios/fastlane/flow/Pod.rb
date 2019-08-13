@@ -151,5 +151,5 @@ private_lane :smf_publish_pod do |options|
       tag: tag
   )
 
-  smf_send_default_build_success_notification(build_variant: build_variant, name: get_default_name_of_pod(build_variant: build_variant))
+  smf_send_default_build_success_notification(build_variant: build_variant, name: get_default_name_of_pod(build_variant))
 end
