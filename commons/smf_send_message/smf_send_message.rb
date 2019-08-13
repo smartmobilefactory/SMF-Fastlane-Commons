@@ -31,6 +31,7 @@ private_lane :smf_send_message do |options|
   additional_html_entries = !options[:additional_html_entries].nil? ? options[:additional_html_entries] : []
   fail_build_job_on_error = (!options[:fail_build_job_on_error].nil? ? options[:additional_html_entries] : false)
   attachment_path = options[:attachment_path]
+  icon_url = 'https://avatars2.githubusercontent.com/u/1090089'
 
   # Log the exceptions to find out if there is useful information which can be added to the message
   UI.message("exception.inspect: #{exception.inspect}")
@@ -68,7 +69,7 @@ private_lane :smf_send_message do |options|
       if type == 'error' && !(slack_channel.eql? ci_error_log)
         slack(
             slack_url: slack_workspace_url,
-            icon_url: 'https://avatars2.githubusercontent.com/u/1090089',
+            icon_url: icon_url,
             pretext: title,
             message: content,
             channel: ci_error_log,
@@ -89,7 +90,7 @@ private_lane :smf_send_message do |options|
       if !attachment_path.nil?
         slack(
             slack_url: slack_workspace_url,
-            icon_url: 'https://avatars2.githubusercontent.com/u/1090089',
+            icon_url: icon_url,
             pretext: title,
             message: content,
             channel: slack_channel,
@@ -112,7 +113,7 @@ private_lane :smf_send_message do |options|
       else
         slack(
             slack_url: slack_workspace_url,
-            icon_url: 'https://avatars2.githubusercontent.com/u/1090089',
+            icon_url: icon_url,
             pretext: title,
             message: content,
             channel: slack_channel,
