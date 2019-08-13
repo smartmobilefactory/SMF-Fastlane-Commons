@@ -6,6 +6,7 @@ This lane sends the default build success notification via smf_send_message. The
 Sending an build success notification.
 ```
 smf_send_default_build_success_notification(
+    name : 'Example App Name',
     build_variant: 'Alpha',
 )
 ```

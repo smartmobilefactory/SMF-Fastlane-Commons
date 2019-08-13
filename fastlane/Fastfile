@@ -8,7 +8,6 @@ before_all do |lane, options|
 
   fastlane_dir_path = "#{@fastlane_commons_dir_path}/fastlane"
   import_all("#{fastlane_dir_path}/utils")
-
   import_all("#{@fastlane_commons_dir_path}/commons")
 
   case @platform
@@ -71,12 +70,21 @@ end
 desc 'Called on error'
 error do |lane, exception|
   UI.error("Exception: #{exception.to_s} was called from lane #{lane.to_s}.")
+
   case @platform
   when :ios
     if @smf_set_should_send_deploy_notifications == true || @smf_set_should_send_build_job_failure_notifications == true
       UI.message('Handling exception for iOS.')
+
+      if @smf_fastlane_config.key?("build_variants")
+        name = !@smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path].nil? ? get_default_name_of_pod(build_variant) : get_default_name_of_app(build_variant)
+      else
+        name = get_default_name_of_app(build_variant)
+      end
+
       smf_handle_exception(
           exception: exception,
+          name: name
       )
     else
       UI.message('Not handling exception because of lane.')
@@ -86,7 +94,8 @@ error do |lane, exception|
       UI.message('Handling exception for android.')
       smf_handle_exception(
           build_variant: ENV['BUILD_VARIANT'],
-          exception: exception
+          exception: exception,
+          name: get_default_name_of_app(build_variant)
       )
     else
       UI.message('Not handling exception because of lane.')

@@ -6,6 +6,7 @@ This lane sends the default build fail notification via smf_send_message.
 Sending an build fail notification.
 ```
 smf_send_default_build_fail_notification(
+    name : 'Example App Name',
     build_variant: 'Alpha',
     exception: Exception('An Exception.'),
     message: '', #Optional
