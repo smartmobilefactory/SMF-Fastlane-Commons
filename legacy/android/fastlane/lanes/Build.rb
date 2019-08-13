@@ -5,10 +5,10 @@
 desc "Increment Build Version Code"
 private_lane :smf_increment_build_number do |options|
 
-  buildVariant = options[:buildVariant]
+  build_variant = options[:build_variant]
   branch = options[:branch]
 
-  smf_collect_changelog(buildVariant: buildVariant)
+  smf_git_changelog(build_variant: build_variant)
   config = load_config()
   new_app_version_code = "0"
   if config
@@ -20,17 +20,17 @@ private_lane :smf_increment_build_number do |options|
   else
     # fallback to legacy module.properties handling
     smf_increment_build_number_properties(
-      buildVariant: buildVariant,
+      build_variant: build_variant,
       branch: branch,
       modulePropertiesFile: options[:modulePropertiesFile]
     )
     new_app_version_code = ENV["next_version_code"]
   end
 
-  if git_tag_exists(tag: "v" + buildVariant + new_app_version_code)
+  if git_tag_exists(tag: "v" + build_variant + new_app_version_code)
     UI.message("Git tag already existed")
   else
-    add_git_tag(tag: 'v' + buildVariant + new_app_version_code)
+    add_git_tag(tag: 'v' + build_variant + new_app_version_code)
   end
 
   push_to_git_remote(
@@ -45,7 +45,7 @@ end
 desc "Increment Build Version Code using the legacy module.properties file"
 private_lane :smf_increment_build_number_properties do |options|
 
-  buildVariant = options[:buildVariant]
+  build_variant = options[:build_variant]
   branch = options[:branch]
 
   modulePropertiesFile = options[:modulePropertiesFile]
@@ -70,20 +70,6 @@ private_lane :smf_increment_build_number_properties do |options|
 
   git_add(path: modulePropertiesFile)
   git_commit(path: modulePropertiesFile, message: "Increment build number to #{ENV["next_version_code"]}")
-end
-
-#############################
-### smf_collect_changelog ###
-#############################
-
-desc "Collect git commit messages and author mail adresses into a changelog and store them as environmental varibles."
-private_lane :smf_collect_changelog do |options|
-
- buildVariant = options[:buildVariant]
-
- ENV["CHANGELOG"] =  changelog_from_git_commits(tag_match_pattern: "*v#{buildVariant}*",include_merges: false, pretty: '- (%an) %s')
- ENV["EMAIL"] =  changelog_from_git_commits(tag_match_pattern: "*v#{buildVariant}*",include_merges: false, pretty: '%ae')
-
 end
 
 ##############################
@@ -188,13 +174,13 @@ end
 desc "Build the project based on the build type and flavor of the environment."
 private_lane :smf_build_apk do |options|
 
-  buildVariant = options[:buildVariant]
+  build_variant = options[:build_variant]
 
-  if !buildVariant
+  if !build_variant
     UI.important("Building all variants")
-    buildVariant = ""
+    build_variant = ""
   else
-    UI.important("Building variant " + buildVariant)
+    UI.important("Building variant " + build_variant)
   end
 
   addition = ""
@@ -209,7 +195,7 @@ private_lane :smf_build_apk do |options|
     addition << " -Pandroid.injected.signing.key.password='#{KEYSTORE_KEY_PASSWORD}'"
   end
 
-  gradle(task: "assemble" + buildVariant + addition)
+  gradle(task: "assemble" + build_variant + addition)
 
 end
 

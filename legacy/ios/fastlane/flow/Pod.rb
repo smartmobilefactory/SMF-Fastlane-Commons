@@ -5,6 +5,8 @@
 desc "Publish the pod. Either to the official specs repo or to the SMF specs repo"
 private_lane :smf_publish_pod do |options|
 
+  build_variant = options[:build_variant]
+
   UI.important("Publishing the Pod")
 
   # Variables
@@ -32,9 +34,9 @@ private_lane :smf_publish_pod do |options|
   # Bump the pods version if needed
   if ["major", "minor", "patch"].include? bump_type
     version_bump_podspec(
-      path: podspec_path,
-      bump_type: bump_type
-      )
+        path: podspec_path,
+        bump_type: bump_type
+    )
   elsif ["breaking", "internal"].include? bump_type
     # The versionning here is major.minor.breaking.internal
     # major & minor are set manually
@@ -42,14 +44,14 @@ private_lane :smf_publish_pod do |options|
     if bump_type == "breaking"
       # Here we need to bump the patch component
       version_bump_podspec(
-       path: podspec_path,
-       bump_type: "patch"
+          path: podspec_path,
+          bump_type: "patch"
       )
 
       # And set back the appendix to 0
       version_bump_podspec(
-        path: podspec_path,
-        version_appendix: "0"
+          path: podspec_path,
+          version_appendix: "0"
       )
     elsif bump_type == "internal"
       appendix = 0
@@ -62,8 +64,8 @@ private_lane :smf_publish_pod do |options|
       appendix = appendix.next
 
       version_bump_podspec(
-        path: podspec_path,
-        version_appendix: appendix.to_s
+          path: podspec_path,
+          version_appendix: appendix.to_s
       )
     end
   end
@@ -82,11 +84,11 @@ private_lane :smf_publish_pod do |options|
 
       project_name = project_config[:project_name]
 
-      smf_send_chat_message(
-        title: "Failed to create MetaJSON for #{smf_default_notification_release_title} 😢",
-        type: "error",
-        exception: exception,
-        slack_channel: ci_ios_error_log
+      smf_send_message(
+          title: "Failed to create MetaJSON for #{smf_default_notification_release_title} 😢",
+          type: "error",
+          exception: exception,
+          slack_channel: ci_ios_error_log
       )
       next
     end
@@ -97,12 +99,12 @@ private_lane :smf_publish_pod do |options|
   # Commit the version bump if needed
   if ["major", "minor", "patch", "breaking", "internal"].include? bump_type
     git_commit(
-      path: podspec_path,
-      message: "Release Pod #{version}"
-      )
+        path: podspec_path,
+        message: "Release Pod #{version}"
+    )
   end
 
-  smf_collect_changelog
+  smf_git_changelog(build_variant: build_variant)
 
   # Add the git tag
   tag = smf_add_git_tag
@@ -111,11 +113,11 @@ private_lane :smf_publish_pod do |options|
 
   # Push the changes to a temporary branch
   push_to_git_remote(
-    remote: 'origin',
-    local_branch: branch,
-    remote_branch: "jenkins_build/#{branch}",
-    force: true,
-    tags: true
+      remote: 'origin',
+      local_branch: branch,
+      remote_branch: "jenkins_build/#{branch}",
+      force: true,
+      tags: true
   )
 
   begin
@@ -133,11 +135,11 @@ private_lane :smf_publish_pod do |options|
 
   # Push the changes to the original branch
   push_to_git_remote(
-    remote: 'origin',
-    local_branch: branch,
-    remote_branch: branch,
-    force: false,
-    tags: true
+      remote: 'origin',
+      local_branch: branch,
+      remote_branch: branch,
+      force: false,
+      tags: true
   )
 
   # Remove the temporary git branch
@@ -145,11 +147,9 @@ private_lane :smf_publish_pod do |options|
 
   # Create the GitHub release
   smf_create_github_release(
-    release_name: version,
-    tag: tag
+      release_name: version,
+      tag: tag
   )
 
-  smf_send_deploy_success_notifications(
-    app_link: ""
-    )
+  smf_send_default_build_success_notification(build_variant: build_variant, name: get_default_name_of_pod(build_variant))
 end

@@ -3,7 +3,7 @@
 ###########################
 after_all do |lane|
   if lane == :releasing_pr_phase || lane == :deploy
-    smf_notify_build_success
+    smf_send_default_build_success_notification(build_variant: ENV['BUILD_VARIANT'], name: get_default_name_of_app(ENV['BUILD_VARIANT']))
   end
 end
 
@@ -12,13 +12,7 @@ def smf_setup_android_fastlane_commons(options = Hash.new)
   import_all "#{@fastlane_commons_dir_path}/fastlane/lanes"
 end
 
-##############
-### Helper ###
-##############
-
-def import_all(path)
-  Dir["#{path}/*.rb"].each { |file|
-    import file
-  }
+def ci_android_error_log
+  $SMF_CI_ANDROID_ERROR_LOG.to_s
 end
 

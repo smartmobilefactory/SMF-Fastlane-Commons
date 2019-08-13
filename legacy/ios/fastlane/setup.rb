@@ -22,16 +22,6 @@ def smf_setup_ios_fastlane_commons(options = Hash.new)
 end
 
 ##############
-### Helper ###
-##############
-
-def import_all(path)
-  Dir["#{path}/*.rb"].each { |file|
-    import file
-  }
-end
-
-##############
 ### Config ###
 ##############
 
@@ -146,10 +136,6 @@ def smf_set_slack_enabled(value)
   return ENV[$SMF_IS_SLACK_ENABLED] = newValue
 end
 
-def smf_is_slack_enabled
-  return ENV[$SMF_IS_SLACK_ENABLED].nil? ? true : ENV[$SMF_IS_SLACK_ENABLED] == "true"
-end
-
 def smf_set_keychain_enabled(value)
   newValue = value ? "true" : "false"
   return ENV[$SMF_IS_KEYCHAIN_ENABLED] = newValue
@@ -159,10 +145,6 @@ def smf_is_keychain_enabled
   return ENV[$SMF_IS_KEYCHAIN_ENABLED].nil? ? true : ENV[$SMF_IS_KEYCHAIN_ENABLED] == "true"
 end
 
-def ci_ios_error_log
-  return "#{$SMF_CI_IOS_ERROR_LOG}"
-end
-
-def slack_url
-  return "#{$SMF_SLACK_URL}"
+def ci_ios_error_log 
+  $SMF_CI_IOS_ERROR_LOG.to_s
 end
