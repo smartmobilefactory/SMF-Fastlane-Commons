@@ -6,6 +6,10 @@ This lane contains also platform specific error handling like deleting an upload
 ### Example
 Handle an exception.
 ```
-smf_handle_exception(message: 'This is just an example', exception: Exception('Example'), build_variant: 'Alpha')
+smf_handle_exception(
+    message: 'This is just an example',
+    exception: Exception('Example'),
+    build_variant: 'Alpha'
+)
 ```
 
