@@ -15,9 +15,9 @@ private_lane :smf_build_number do |options|
   if last_tag.include? NO_GIT_TAG_FAILURE
     incremented_build_number = 1
   else
-    app_matching_pattern = 'build/.*/.*'
-    pod_matching_pattern = 'release/.*'
-    if app_matching_pattern.match?(last_tag) || pod_matching_pattern.match?(last_tag)
+    app_matching_pattern = 'build\/.*\/.*'
+    pod_matching_pattern = 'release\/.*'
+    if last_tag.match?(app_matching_pattern) || last_tag.match?(pod_matching_pattern)
       UI.message('Get the build number from the last tag.')
       parts = last_tag.split('/')
       count = parts.count
