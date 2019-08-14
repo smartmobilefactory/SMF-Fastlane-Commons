@@ -13,7 +13,7 @@ private_lane :smf_build_number do |options|
 
   # Use the initial commit if there is no matching tag yet
   if last_tag.include? NO_GIT_TAG_FAILURE
-    incremented_build_number = 1
+    incremented_build_number = get_build_number_of_project
   else
     app_matching_pattern = 'build\/.*\/.*'
     pod_matching_pattern = 'release\/.*'
@@ -30,14 +30,7 @@ private_lane :smf_build_number do |options|
 
     if build_number.include? '.'
       parts = build_number.split('.')
-      count = parts.count
-      incremented_part = (parts[count - 1].to_i + 1).to_s
-      prefix = ''
-      for i in 0..count - 2
-        prefix += "#{parts[i]}."
-      end
-
-      incremented_build_number = prefix + incremented_part
+      incremented_build_number = (parts[0].to_i + 1).to_s
     else
       incremented_build_number = (build_number.to_i + 1).to_s
     end
