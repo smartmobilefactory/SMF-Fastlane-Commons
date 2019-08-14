@@ -38,7 +38,7 @@ private_lane :smf_build_number do |options|
 
       incremented_build_number = prefix + incremented_part
     else
-      incremented_build_number = build_number + 1
+      incremented_build_number = (build_number.to_i + 1).to_s
     end
   end
 
