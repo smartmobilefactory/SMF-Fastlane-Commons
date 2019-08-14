@@ -61,9 +61,6 @@ private_lane :smf_deploy_build_variant do |options|
   # Reset the HockeyApp ID to avoid that a successful upload is removed if a following build variant is failing in the same build job
   ENV[$SMF_APP_HOCKEY_ID_ENV_KEY] = nil
 
-  # Reset the build incrementation flag to support build jobs which build multiple build variants in a row
-  ENV[$SMF_SHOULD_BUILD_NUMBER_BE_INCREMENTED_ENV_KEY] = nil
-
   # Reset that the unit tests were run to avoid wrong information in Danger
   ENV[$SMF_DID_RUN_UNIT_TESTS_ENV_KEY] = "false"
 
@@ -96,16 +93,7 @@ private_lane :smf_deploy_build_variant do |options|
   end
 
   smf_install_pods_if_project_contains_podfile
-
-  # Increment the build number only if it should
-  if smf_should_build_number_be_incremented
-    smf_store_current_build_number
-    smf_increment_build_number(build_variant: build_variant)
-    smf_set_should_revert_build_number(true)
-  end
-
-  # Check if the New Tag already exists
-  smf_verify_git_tag_is_not_already_existing
+  smf_build_number(build_variant: build_variant)
 
   # Check for commons ITC Upload errors if needed
   if build_variant_config[:upload_itc] == true
@@ -159,12 +147,6 @@ private_lane :smf_deploy_build_variant do |options|
           slack_channel: ci_ios_error_log
       )
     end
-  end
-
-  # Commit the build number if it was incremented
-  if smf_should_build_number_be_incremented
-    smf_commit_build_number
-    smf_set_should_revert_build_number(false)
   end
 
   # Build a Simulator build if wanted

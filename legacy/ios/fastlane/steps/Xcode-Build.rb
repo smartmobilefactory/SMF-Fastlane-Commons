@@ -165,23 +165,6 @@ private_lane :smf_perform_unit_tests do |options|
 end
 
 ##################################
-### smf_increment_build_number ###
-##################################
-
-desc "Increments the build number"
-private_lane :smf_increment_build_number do |options|
-
-  UI.important("increment build number")
-
-  version = smf_current_build_number
-
-  increment_build_number(
-    build_number: smf_get_incremented_build_number(version)
-    )
-
-end
-
-##################################
 ### smf_decrement_build_number ###
 ##################################
 
@@ -197,67 +180,6 @@ private_lane :smf_decrement_build_number do |options|
       )
   end
 
-end
-
-##########################################################
-###   check build number whether it's a int or float   ###
-##########################################################
-
-def smf_get_incremented_build_number(version)
-
-  if version.to_s.include? "."
-    
-   parts = version.to_s.split(".")
-   count = parts.count
-
-   incremented_version = parts[count - 1].to_i + 1
-
-   version_string = ""
-
-    for i in 0..count-2
-     version_string += parts[i].to_s + "."
-    end
-
-   version_string += incremented_version.to_s
-
-  else 
-   version_string = version.to_i + 1
-
-  end    
-
- return version_string.to_s
-
-end
-
-#################################################
-###   smf_should_build_number_be_incremented  ###
-#################################################
-
-def smf_should_build_number_be_incremented
-
-  if not ENV[$SMF_SHOULD_BUILD_NUMBER_BE_INCREMENTED_ENV_KEY].nil?
-    UI.message("The ENV #{$SMF_SHOULD_BUILD_NUMBER_BE_INCREMENTED_ENV_KEY} was already set. Reusing #{ENV[$SMF_SHOULD_BUILD_NUMBER_BE_INCREMENTED_ENV_KEY]}")
-    return ENV[$SMF_SHOULD_BUILD_NUMBER_BE_INCREMENTED_ENV_KEY] == "true"
-  end
-
-  # Check if the former commit was a build of the same build variant 
-  tag_matching_pattern = smf_construct_default_tag_for_current_project(".*")
-  last_commit_tags_string = sh "git tag -l --points-at HEAD"
-  if last_commit_tags_string.match(tag_matching_pattern)
-    UI.message("Increment the build number as the former commit is a build of the same build variant. We have to increase it to avoid duplicate build numbers")
-    ENV[$SMF_SHOULD_BUILD_NUMBER_BE_INCREMENTED_ENV_KEY] = "true"
-    return ENV[$SMF_SHOULD_BUILD_NUMBER_BE_INCREMENTED_ENV_KEY]
-  end
-
-  last_commit = last_git_commit
-  message = last_commit[:message]
-  author = last_commit[:author]
-
-  UI.message("The last commit was \"#{message}\" from #{author}")
-  ENV[$SMF_SHOULD_BUILD_NUMBER_BE_INCREMENTED_ENV_KEY] = "true"
-  UI.message("Will increment the build number ...")
-
-  return ENV[$SMF_SHOULD_BUILD_NUMBER_BE_INCREMENTED_ENV_KEY] == "true"
 end
 
 ##############
@@ -311,35 +233,6 @@ end
 
 def smf_xcode_executable_path_for_version(xcode_version)
   return "#{$XCODE_EXECUTABLE_PATH_PREFIX}" + xcode_version + "#{$XCODE_EXECUTABLE_PATH_POSTFIX}"
-end
-
-def smf_set_should_revert_build_number(value)
-  newValue = value ? "true" : "false"
-  ENV[$SMF_SHOULD_REVERT_BUILD_NUMBER] = newValue
-end
-
-def smf_should_build_number_be_reverted
-  return ENV[$SMF_SHOULD_REVERT_BUILD_NUMBER] == "true"
-end
-
-def smf_current_build_number
-  # Variables
-  project_name = @smf_fastlane_config[:project][:project_name]
-  version = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
-  return version
-end
-
-def smf_store_current_build_number
-  version = smf_current_build_number
-  smf_set_previous_build_number(version)
-end
-
-def smf_set_previous_build_number(version)
-  ENV[$SMF_PREVIOUS_BUILD_NUMBER] = version
-end
-
-def smf_previous_build_number
-  return ENV[$SMF_PREVIOUS_BUILD_NUMBER]
 end
 
 def smf_can_unit_tests_be_performed

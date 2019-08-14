@@ -1,5 +1,3 @@
-
-
 # Uses Config file to access project name. Should be changed in the future.
 def get_default_name_of_app(build_variant)
   case @platform
@@ -26,4 +24,27 @@ def get_default_name_of_pod(build_variant)
   pod_name = read_podspec(path: podspec_path)["name"]
   project_name = !@smf_fastlane_config[:project][:project_name].nil? ? @smf_fastlane_config[:project][:project_name] : pod_name
   "#{project_name} #{version}"
+end
+
+def get_build_number_of_project
+  case @platform
+  when :ios
+    project_name = @smf_fastlane_config[:project][:project_name]
+    build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
+  when :android
+    build_number = @smf_fastlane_config["app_version_code"]
+  when :flutter
+    UI.message('get build number of project for flutter is not implemented yet')
+  else
+    UI.message("There is no platform \"#{@platform}\", exiting...")
+    raise 'Unknown platform'
+  end
+end
+
+def get_tag_of_app(build_variant, build_number)
+  "build/#{build_variant.capitalize}/#{build_number}"
+end
+
+def get_tag_of_pod(build_number)
+  "releases/#{build_number}"
 end
