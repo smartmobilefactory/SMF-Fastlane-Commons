@@ -44,7 +44,7 @@ def get_build_number_of_project
 end
 
 def get_tag_of_app(build_variant, build_number)
-  "build/#{build_variant.capitalize}/#{build_number}"
+  "build/#{build_variant.downcase}/#{build_number}"
 end
 
 def get_tag_of_pod(build_number)
