@@ -72,8 +72,8 @@ def smf_update_build_number_in_project(build_number)
       increment_build_number(build_number: build_number)
     end
   when :android
-    @smf_fastlane_config["app_version_code"] = build_number
-    update_config(config, "Increment build number to #{@smf_fastlane_config["app_version_code"]}")
+    @smf_fastlane_config["app_version_code"] = build_number.to_i
+    update_config(@smf_fastlane_config, "Increment build number to #{@smf_fastlane_config["app_version_code"]}")
     new_app_version_code = @smf_fastlane_config["app_version_code"].to_s
     # keep environment variable to be compatible
     ENV["next_version_code"] = new_app_version_code
