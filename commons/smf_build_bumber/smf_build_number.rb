@@ -25,6 +25,7 @@ private_lane :smf_build_number do |options|
     else
       UI.message('Get the build number from the project.')
       build_number = get_build_number_of_project
+      UI.message('test 1')
     end
 
     if build_number.include? '.'
@@ -42,27 +43,31 @@ private_lane :smf_build_number do |options|
     end
   end
 
+  UI.message('test 2')
   smf_update_build_number_in_project(incremented_build_number)
-
+  UI.message('test 3')
   if @smf_fastlane_config.key?("build_variants")
     tag = !@smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path].nil? ? get_tag_of_pod(incremented_build_number) : get_tag_of_app(build_variant, incremented_build_number)
   else
     tag = get_tag_of_app(build_variant, incremented_build_number)
   end
 
+  UI.message('test 4')
   # check if git tag exists
   smf_git_tag_exists(tag: tag)
 
+  UI.message('test 5')
   smf_add_git_tag(tag: tag)
-
+  UI.message('test 6')
 end
 
 
 def smf_update_build_number_in_project(build_number)
+  UI.message('Update build number.')
   case @platform
   when :ios
     if @smf_fastlane_config.key?("build_variants")
-      name = !@smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path].nil? ? version_bump_podspec(version_number: build_number) : increment_build_number(build_number: build_number)
+      !@smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path].nil? ? version_bump_podspec(version_number: build_number) : increment_build_number(build_number: build_number)
     else
       increment_build_number(build_number: build_number)
     end
