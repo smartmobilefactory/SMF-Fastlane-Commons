@@ -31,7 +31,7 @@ private_lane :smf_publish_pod do |options|
   # Make sure the repo is up to date and clean
   ensure_git_branch(branch: branch)
 
-  smf_version_number(podspec_path: podspec_path, bump_type: bump_type)
+  tag = smf_version_number(podspec_path: podspec_path, bump_type: bump_type)
 
   # Update the MetaJSONS if wanted
   if generateMetaJSON != false
@@ -41,8 +41,6 @@ private_lane :smf_publish_pod do |options|
       smf_commit_meta_json
     rescue => exception
       UI.important("Warning: MetaJSON couldn't be created")
-
-      project_name = project_config[:project_name]
 
       smf_send_message(
           title: "Failed to create MetaJSON for #{smf_default_notification_release_title} 😢",
@@ -89,6 +87,8 @@ private_lane :smf_publish_pod do |options|
 
   # Remove the temporary git branch
   sh "git push origin --delete jenkins_build/#{branch} || true"
+
+  version = read_podspec(path: podspec_path)["version"]
 
   # Create the GitHub release
   smf_create_github_release(

@@ -64,4 +64,5 @@ private_lane :smf_version_number do |options|
 
   smf_add_git_tag(tag: tag)
 
+  tag
 end
