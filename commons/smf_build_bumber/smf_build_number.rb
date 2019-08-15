@@ -28,15 +28,11 @@ private_lane :smf_build_number do |options|
     end
   end
 
-  if build_number.include? '.'
-    parts = build_number.split('.')
-    incremented_build_number = (parts[0].to_i + 1).to_s
-  else
-    incremented_build_number = (build_number.to_i + 1).to_s
-  end
+  incremented_build_number = (build_number.to_i + 1).to_s
   UI.message("Incremented build number: #{incremented_build_number}")
 
   current_build_number = get_build_number_of_project
+
   unless current_build_number.nil?
     if incremented_build_number.to_i < current_build_number.to_i
       incremented_build_number = (current_build_number + 1).to_s
@@ -61,7 +57,7 @@ end
 
 
 def smf_update_build_number_in_project(build_number)
-  UI.message('Update build number.')
+  UI.message("Update build number to: #{build_number}")
   case @platform
   when :ios
     if @smf_fastlane_config.key?("build_variants")
