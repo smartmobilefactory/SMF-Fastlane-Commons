@@ -164,24 +164,6 @@ private_lane :smf_perform_unit_tests do |options|
 
 end
 
-##################################
-### smf_decrement_build_number ###
-##################################
-
-desc "Decrement the build number"
-private_lane :smf_decrement_build_number do |options|
-
-  if smf_should_build_number_be_reverted
-    UI.important("decrement build number")
-    version = smf_previous_build_number
-
-    increment_build_number(
-      build_number: version
-      )
-  end
-
-end
-
 ##############
 ### HELPER ###
 ##############

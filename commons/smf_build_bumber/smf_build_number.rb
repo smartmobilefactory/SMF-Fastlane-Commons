@@ -37,7 +37,6 @@ private_lane :smf_build_number do |options|
   end
 
   current_build_number = get_build_number_of_project
-
   unless current_build_number.nil?
     incremented_build_number = (current_build_number + 1).to_s if incremented_build_number < current_build_number
   end
