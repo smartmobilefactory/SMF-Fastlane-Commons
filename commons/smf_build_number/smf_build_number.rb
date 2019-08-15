@@ -40,7 +40,7 @@ private_lane :smf_build_number do |options|
   end
   smf_update_build_number_in_project(incremented_build_number)
 
-  get_tag_of_app(build_variant, incremented_build_number)
+  tag = get_tag_of_app(build_variant, incremented_build_number)
 
   # check if git tag exists
   smf_git_tag_exists(tag: tag)
