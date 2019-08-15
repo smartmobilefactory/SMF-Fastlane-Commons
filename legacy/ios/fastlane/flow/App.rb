@@ -90,7 +90,7 @@ private_lane :smf_deploy_build_variant do |options|
   end
 
   smf_install_pods_if_project_contains_podfile
-  smf_build_number(build_variant: build_variant)
+  tag = smf_build_number(build_variant: build_variant)
 
   # Check for commons ITC Upload errors if needed
   if build_variant_config[:upload_itc] == true
@@ -227,8 +227,6 @@ private_lane :smf_deploy_build_variant do |options|
     appcast_upload_name = sparkle["xml_name".to_sym]
     sh("scp -i #{ENV["CUSTOM_SPARKLE_PRIVATE_SSH_KEY"]} #{appcast_xml} '#{user_name}'@#{upload_url}:/#{sparkle["dmg_path".to_sym]}#{appcast_upload_name}")
   end
-
-  tag = smf_add_git_tag
 
   smf_git_pull
 

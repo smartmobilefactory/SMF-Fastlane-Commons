@@ -57,6 +57,7 @@ private_lane :smf_build_number do |options|
   UI.message('test 5')
   smf_add_git_tag(tag: tag)
   UI.message('test 6')
+  tag
 end
 
 
