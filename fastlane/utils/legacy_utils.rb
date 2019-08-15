@@ -28,7 +28,7 @@ end
 
 # Uses Config file to access project name. Should be changed in the future.
 def get_build_number_of_project
-  UI.message('Get the build number of project from the config file.')
+  UI.message('Get the build number of project.')
   case @platform
   when :ios
     project_name = @smf_fastlane_config[:project][:project_name]
@@ -41,7 +41,6 @@ def get_build_number_of_project
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
   end
-  UI.message("build number from config: #{build_number}") unless build_number.nil?
   build_number
 end
 
