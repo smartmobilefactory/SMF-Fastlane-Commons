@@ -52,6 +52,8 @@ private_lane :smf_publish_pod do |options|
     end
   end
 
+  smf_git_changelog(build_variant: build_variant)
+
   smf_git_pull
 
   # Push the changes to a temporary branch
