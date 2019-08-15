@@ -61,9 +61,9 @@ def smf_update_build_number_in_project(build_number)
   case @platform
   when :ios
     if @smf_fastlane_config.key?("build_variants")
-      !@smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path].nil? ? version_bump_podspec(version_number: build_number) : increment_build_number(build_number: build_number)
+      !@smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path].nil? ? version_bump_podspec(version_number: build_number.to_s) : increment_build_number(build_number: build_number.to_s)
     else
-      increment_build_number(build_number: build_number)
+      increment_build_number(build_number: build_number.to_s)
     end
   when :android
     @smf_fastlane_config["app_version_code"] = build_number.to_i
