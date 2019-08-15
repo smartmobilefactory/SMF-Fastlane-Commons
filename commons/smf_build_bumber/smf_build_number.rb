@@ -11,21 +11,19 @@ private_lane :smf_build_number do |options|
 
   last_tag = sh("git describe --tags --abbrev=0 HEAD --first-parent || echo #{NO_GIT_TAG_FAILURE}").to_s
 
-  # Use the initial commit if there is no matching tag yet
+  # Use build number of the project if there is no matching tag yet
   if last_tag.include? NO_GIT_TAG_FAILURE
     build_number = get_build_number_of_project
   else
     app_matching_pattern = %r{build/.*/.*}
     pod_matching_pattern = %r{release/.*}
     if last_tag =~ app_matching_pattern || last_tag =~ pod_matching_pattern
-      UI.message('Get the build number from the last tag.')
       parts = last_tag.split('/')
-      count = parts.count
-      build_number = parts[count - 1]
+      build_number = parts[0]
+      UI.message("build number from the last tag: #{build_number}")
     else
-      UI.message('Get the build number from the project.')
       build_number = get_build_number_of_project
-      UI.message('test 1')
+      UI.message("build number from the project: #{build_number}")
     end
   end
 
@@ -35,28 +33,29 @@ private_lane :smf_build_number do |options|
   else
     incremented_build_number = (build_number.to_i + 1).to_s
   end
+  UI.message("Incremented build number: #{incremented_build_number}")
 
   current_build_number = get_build_number_of_project
   unless current_build_number.nil?
-    incremented_build_number = (current_build_number + 1).to_s if incremented_build_number < current_build_number
+    if incremented_build_number < current_build_number
+      incremented_build_number = (current_build_number + 1).to_s
+      UI.message("The project's build number is greater than the build number from last tag. The incremented build number is now: #{incremented_build_number}")
+    end
   end
 
-  UI.message('test 2')
   smf_update_build_number_in_project(incremented_build_number)
-  UI.message('test 3')
+
   if @smf_fastlane_config.key?("build_variants")
     tag = !@smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path].nil? ? get_tag_of_pod(incremented_build_number) : get_tag_of_app(build_variant, incremented_build_number)
   else
     tag = get_tag_of_app(build_variant, incremented_build_number)
   end
 
-  UI.message('test 4')
   # check if git tag exists
   smf_git_tag_exists(tag: tag)
 
-  UI.message('test 5')
   smf_add_git_tag(tag: tag)
-  UI.message('test 6')
+
   tag
 end
 
