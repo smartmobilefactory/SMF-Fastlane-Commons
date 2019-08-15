@@ -13,17 +13,16 @@ private_lane :smf_build_number do |options|
 
   # Use build number of the project if there is no matching tag yet
   if last_tag.include? NO_GIT_TAG_FAILURE
-    build_number = get_build_number_of_project
+    build_number = get_build_number_of_app
   else
-    app_matching_pattern = %r{build/.*/.*}
-    pod_matching_pattern = %r{release/.*}
-    if last_tag =~ app_matching_pattern || last_tag =~ pod_matching_pattern
+    matching_pattern = %r{build/.*/.*}
+    if last_tag =~ matching_pattern
       parts = last_tag.split('/')
       count = parts.count
       build_number = parts[count - 1]
       UI.message("build number from the last tag: #{build_number}")
     else
-      build_number = get_build_number_of_project
+      build_number = get_build_number_of_app
       UI.message("build number from the project: #{build_number}")
     end
   end
@@ -31,7 +30,7 @@ private_lane :smf_build_number do |options|
   incremented_build_number = (build_number.to_i + 1).to_s
   UI.message("Incremented build number: #{incremented_build_number}")
 
-  current_build_number = get_build_number_of_project
+  current_build_number = get_build_number_of_app
 
   unless current_build_number.nil?
     if incremented_build_number.to_i < current_build_number.to_i
@@ -41,11 +40,7 @@ private_lane :smf_build_number do |options|
   end
   smf_update_build_number_in_project(incremented_build_number)
 
-  if @smf_fastlane_config.key?("build_variants")
-    tag = !@smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path].nil? ? get_tag_of_pod(incremented_build_number) : get_tag_of_app(build_variant, incremented_build_number)
-  else
-    tag = get_tag_of_app(build_variant, incremented_build_number)
-  end
+  get_tag_of_app(build_variant, incremented_build_number)
 
   # check if git tag exists
   smf_git_tag_exists(tag: tag)
@@ -60,11 +55,7 @@ def smf_update_build_number_in_project(build_number)
   UI.message("Update build number to: #{build_number}")
   case @platform
   when :ios
-    if @smf_fastlane_config.key?("build_variants")
-      !@smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path].nil? ? version_bump_podspec(version_number: build_number.to_s) : increment_build_number(build_number: build_number.to_s)
-    else
-      increment_build_number(build_number: build_number.to_s)
-    end
+    increment_build_number(build_number: build_number.to_s)
   when :android
     @smf_fastlane_config["app_version_code"] = build_number.to_i
     update_config(@smf_fastlane_config, "Increment build number to #{@smf_fastlane_config["app_version_code"]}")
@@ -79,3 +70,6 @@ def smf_update_build_number_in_project(build_number)
   end
 end
 
+def get_tag_of_app(build_variant, build_number)
+  "build/#{build_variant.downcase}/#{build_number}"
+end

@@ -27,7 +27,7 @@ def get_default_name_of_pod(build_variant)
 end
 
 # Uses Config file to access project name. Should be changed in the future.
-def get_build_number_of_project
+def get_build_number_of_app
   UI.message('Get the build number of project.')
   case @platform
   when :ios
@@ -48,13 +48,8 @@ def get_build_number_of_project
   else
     build_number
   end
-
 end
 
-def get_tag_of_app(build_variant, build_number)
-  "build/#{build_variant.downcase}/#{build_number}"
-end
-
-def get_tag_of_pod(build_number)
-  "releases/#{build_number}"
+def get_tag_of_pod(version_number)
+  "releases/#{version_number}"
 end
