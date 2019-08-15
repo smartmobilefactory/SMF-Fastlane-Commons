@@ -44,7 +44,7 @@ private_lane :smf_version_number do |options|
 
   UI.message("version_get_podspec: #{version_get_podspec(path: podspec_path)}")
 
-  version_number = smf_get_version_number
+  version_number = get_version_number
   UI.message("version_number: #{version_number}")
 
   tag = get_tag_of_pod(version_number)
