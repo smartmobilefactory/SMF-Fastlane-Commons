@@ -19,7 +19,8 @@ private_lane :smf_build_number do |options|
     pod_matching_pattern = %r{release/.*}
     if last_tag =~ app_matching_pattern || last_tag =~ pod_matching_pattern
       parts = last_tag.split('/')
-      build_number = parts[0]
+      count = parts.count
+      build_number = parts[count - 1]
       UI.message("build number from the last tag: #{build_number}")
     else
       build_number = get_build_number_of_project

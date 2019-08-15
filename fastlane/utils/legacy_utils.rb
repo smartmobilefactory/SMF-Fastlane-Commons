@@ -32,15 +32,16 @@ def get_build_number_of_project
   case @platform
   when :ios
     project_name = @smf_fastlane_config[:project][:project_name]
-    get_build_number(xcodeproj: "#{project_name}.xcodeproj")
+    build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
   when :android
-    @smf_fastlane_config["app_version_code"].to_s
+    build_number = @smf_fastlane_config["app_version_code"].to_i
   when :flutter
     UI.message('get build number of project for flutter is not implemented yet')
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
   end
+  UI.message("build number from config: #{build_number}") unless build_number.nil?
 end
 
 def get_tag_of_app(build_variant, build_number)
