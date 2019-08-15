@@ -43,7 +43,6 @@ private_lane :smf_build_number do |options|
       UI.message("The project's build number is greater than the build number from last tag. The incremented build number is now: #{incremented_build_number}")
     end
   end
-  incremented_build_number = 215.to_s
   smf_update_build_number_in_project(incremented_build_number)
 
   if @smf_fastlane_config.key?("build_variants")
