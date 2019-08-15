@@ -9,12 +9,12 @@ private_lane :smf_send_message do |options|
   message = !options[:message].nil? ? options[:message] : ''
   content = message.length < 4000 ? message : "#{message[0..4000]}... (maximum length reached)"
 
-  ci_error_log = '#ci-error-log'
+  ci_error_log = 'ci-error-log'
   case @platform
   when :ios
-    ci_error_log = ci_ios_error_log
+    #ci_error_log = ci_ios_error_log
   when :android
-    ci_error_log = ci_android_error_log
+    #ci_error_log = ci_android_error_log
   when :flutter
     UI.message('Slack Notification for flutter is not implemented yet')
   else
