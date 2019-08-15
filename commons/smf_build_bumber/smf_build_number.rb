@@ -15,7 +15,7 @@ private_lane :smf_build_number do |options|
   if last_tag.include? NO_GIT_TAG_FAILURE
     build_number = get_build_number_of_project
   else
-    app_matching_pattern = %r{builds/.*/.*}
+    app_matching_pattern = %r{build/.*/.*}
     pod_matching_pattern = %r{release/.*}
     if last_tag =~ app_matching_pattern || last_tag =~ pod_matching_pattern
       parts = last_tag.split('/')
