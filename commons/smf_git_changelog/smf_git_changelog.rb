@@ -13,7 +13,7 @@ private_lane :smf_git_changelog do |options|
 
   # Pull all the tags so the change log collector finds the latest tag
   UI.message('Fetching all tags...')
-  sh('git fetch --tags --quiet')
+  sh("git fetch --tags --quiet || echo #{NO_GIT_TAG_FAILURE}")
 
   last_tag = sh("git describe --tags --match \"*#{build_variant}*\" --abbrev=0 HEAD --first-parent || echo #{NO_GIT_TAG_FAILURE}").to_s
 
