@@ -20,10 +20,16 @@ private_lane :smf_build_number do |options|
       parts = last_tag.split('/')
       count = parts.count
       build_number = parts[count - 1]
-      UI.message("build number from the last tag: #{build_number}")
+
+      if build_number.include? '.'
+        parts = build_number.split('.')
+        parts[0]
+      end
+
+      UI.message("build number from last tag: #{build_number}")
     else
       build_number = get_build_number_of_app
-      UI.message("build number from the project: #{build_number}")
+      UI.message("build number from project: #{build_number}")
     end
   end
 
@@ -33,11 +39,12 @@ private_lane :smf_build_number do |options|
   current_build_number = get_build_number_of_app
 
   unless current_build_number.nil?
-    if incremented_build_number.to_i < current_build_number.to_i
+    if incremented_build_number.to_i < (current_build_number.to_i + 1)
       incremented_build_number = (current_build_number + 1).to_s
-      UI.message("The project's build number is greater than the build number from last tag. The incremented build number is now: #{incremented_build_number}")
+      UI.message("The project's build number is greater than the fetched build number. The incremented build number is now: #{incremented_build_number}")
     end
   end
+
   smf_update_build_number_in_project(incremented_build_number)
 
   tag = get_tag_of_app(build_variant, incremented_build_number)
@@ -52,7 +59,6 @@ end
 
 
 def smf_update_build_number_in_project(build_number)
-  UI.message("Update build number to: #{build_number}")
   case @platform
   when :ios
     increment_build_number(build_number: build_number.to_s)
