@@ -31,9 +31,9 @@ private_lane :smf_version_number do |options|
         message: "Release Pod #{version_number}"
     )
   end
-
-  add_git_tag(tag: tag)
-
+  if ["major", "minor", "patch", "breaking", "internal"].include? bump_type
+    add_git_tag(tag: tag)
+  end
   tag
 end
 
