@@ -1,4 +1,4 @@
-private_lane :smf_build_number do |options|
+private_lane :smf_increment_build_number do |options|
 
   UI.important('increment build number')
 

@@ -6,7 +6,7 @@ desc 'Collect git commit messages into a changelog and store as environment vari
 private_lane :smf_git_changelog do |options|
 
   build_variant = options[:build_variant]
-  is_pod = !options[:is_pod].nil? ? options[:is_pod] : false
+  is_library = !options[:is_library].nil? ? options[:is_library] : false
   UI.important('Collecting commits back to the last tag')
 
   # Constants
@@ -16,7 +16,7 @@ private_lane :smf_git_changelog do |options|
   UI.message('Fetching all tags...')
   sh("git fetch --tags --quiet || echo #{NO_GIT_TAG_FAILURE}")
 
-  if is_pod
+  if is_library
     last_tag = sh("git describe --tags --match \"releases/*\" --abbrev=0 HEAD --first-parent || echo #{NO_GIT_TAG_FAILURE}").to_s
   else
     last_tag = sh("git describe --tags --match \"*#{build_variant}*\" --abbrev=0 HEAD --first-parent || echo #{NO_GIT_TAG_FAILURE}").to_s

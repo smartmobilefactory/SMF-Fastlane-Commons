@@ -50,7 +50,7 @@ private_lane :smf_publish_pod do |options|
     end
   end
 
-  smf_git_changelog(is_pod: true)
+  smf_git_changelog(is_library: true)
 
   smf_git_pull
 
@@ -98,6 +98,6 @@ private_lane :smf_publish_pod do |options|
 
   smf_send_default_build_success_notification(
       name: get_default_name_of_pod,
-      is_pod: true
+      is_library: true
   )
 end

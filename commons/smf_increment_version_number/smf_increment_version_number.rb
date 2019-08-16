@@ -1,4 +1,4 @@
-private_lane :smf_version_number do |options|
+private_lane :smf_increment_version_number do |options|
 
   UI.message('Increment version number')
 
