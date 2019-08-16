@@ -14,23 +14,17 @@ private_lane :smf_build_number do |options|
   # Use build number of the project if there is no matching tag yet
   if last_tag.include? NO_GIT_TAG_FAILURE
     build_number = get_build_number_of_app
+    UI.message("build number from project: #{build_number}")
   else
-    matching_pattern = %r{build/.*/.*}
-    if last_tag =~ matching_pattern
-      parts = last_tag.split('/')
-      count = parts.count
-      build_number = parts[count - 1]
+    parts = last_tag.split('/')
+    count = parts.count
+    build_number = parts[count - 1]
 
-      if build_number.include? '.'
-        parts = build_number.split('.')
-        parts[0]
-      end
-
-      UI.message("build number from last tag: #{build_number}")
-    else
-      build_number = get_build_number_of_app
-      UI.message("build number from project: #{build_number}")
+    if build_number.include? '.'
+      parts = build_number.split('.')
+      parts[0]
     end
+    UI.message("build number from last tag: #{build_number}")
   end
 
   incremented_build_number = (build_number.to_i + 1).to_s
