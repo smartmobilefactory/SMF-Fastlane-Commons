@@ -49,8 +49,17 @@ private_lane :smf_build_number do |options|
 
   tag = get_tag_of_app(build_variant, incremented_build_number)
 
-  # check if git tag exists
-  smf_git_tag_exists(tag: tag)
+  count = 0
+  while git_tag_exists(tag: tag)
+    if count == 10
+      raise "The Git tag \"#{tag}\" already exists! The build job will be aborted to avoid builds with the same build number."
+    end
+    UI.message("The Git tag \"#{tag}\" already exists! The build number will be incremented again.")
+    count += 1
+    incremented_build_number = (incremented_build_number.to_i + 1).to_s
+    UI.message("Incremented build number: #{incremented_build_number}")
+    tag = get_tag_of_app(build_variant, incremented_build_number)
+  end
 
   smf_add_git_tag(tag: tag)
 
