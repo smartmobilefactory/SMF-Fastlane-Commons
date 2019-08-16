@@ -15,8 +15,16 @@ private_lane :smf_version_number do |options|
 
   tag = get_tag_of_pod(version_number)
 
-  # Check if the New Tag already exists
-  smf_git_tag_exists(tag: tag)
+  count = 10
+  while git_tag_exists(tag: tag)
+    if count == 10
+      raise "The Git tag \"#{tag}\" already exists! The build job will be aborted to avoid builds with the same version number."
+    end
+    UI.message("The Git tag \"#{tag}\" already exists! The version number will be incremented again.")
+    count += 1
+    bump_pod_verison(podspec_path, bump_type)
+    tag = get_tag_of_pod(version_number)
+  end
 
   version = read_podspec(path: podspec_path)["version"]
   UI.message("version_number: #{version}")
