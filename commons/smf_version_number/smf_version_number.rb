@@ -8,10 +8,7 @@ private_lane :smf_version_number do |options|
   # Bump the pods version if needed
   bump_pod_verison(podspec_path, bump_type)
 
-  UI.message("version_get_podspec: #{version_get_podspec(path: podspec_path)}")
-
-  version_number = get_version_number
-  UI.message("version_number: #{version_number}")
+  version_number = version_get_podspec(path: podspec_path)
 
   tag = get_tag_of_pod(version_number)
 
@@ -26,13 +23,11 @@ private_lane :smf_version_number do |options|
     tag = get_tag_of_pod(version_number)
   end
 
-  version = read_podspec(path: podspec_path)["version"]
-  UI.message("version_number: #{version}")
   # Commit the version bump if needed
   if ["major", "minor", "patch", "breaking", "internal"].include? bump_type
     git_commit(
         path: podspec_path,
-        message: "Release Pod #{version}"
+        message: "Release Pod #{version_number}"
     )
   end
 
