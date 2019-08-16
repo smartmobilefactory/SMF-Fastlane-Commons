@@ -57,6 +57,7 @@ private_lane :smf_build_number do |options|
     UI.message("The Git tag \"#{tag}\" already exists! The build number will be incremented again.")
     count += 1
     incremented_build_number = (incremented_build_number.to_i + 1).to_s
+    smf_update_build_number_in_project(incremented_build_number)
     UI.message("Incremented build number: #{incremented_build_number}")
     tag = get_tag_of_app(build_variant, incremented_build_number)
   end
