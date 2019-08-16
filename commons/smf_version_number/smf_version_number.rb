@@ -36,7 +36,8 @@ private_lane :smf_version_number do |options|
   tag
 end
 
-def bump_pod_verison(podspec_path, bump_type)
+def bump_pod_version(podspec_path, bump_type)
+  UI.message("bump pod version: #{bump_type}")
   if ["major", "minor", "patch"].include? bump_type
     version_bump_podspec(
         path: podspec_path,
