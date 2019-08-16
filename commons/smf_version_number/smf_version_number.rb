@@ -5,6 +5,10 @@ private_lane :smf_version_number do |options|
   podspec_path = options[:podspec_path]
   bump_type = options[:bump_type]
 
+  if !["major", "minor", "patch", "breaking", "internal"].include? bump_type
+    raise "The bump type \"#{bump_type}\" should not be used! The build job will be aborted."
+  end
+
   # Bump library's version if needed
   bump_pod_version(podspec_path, bump_type)
 
@@ -13,7 +17,7 @@ private_lane :smf_version_number do |options|
   tag = get_tag_of_pod(version_number)
 
   #  Bump library's version if needed
-  count = 10
+  count = 0
   while git_tag_exists(tag: tag)
     if count == 10
       raise "The Git tag \"#{tag}\" already exists! The build job will be aborted to avoid builds with the same version number."
