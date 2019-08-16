@@ -6,7 +6,7 @@ private_lane :smf_version_number do |options|
   bump_type = options[:bump_type]
 
   # Bump the pods version if needed
-  bump_pod_verison(podspec_path, bump_type)
+  bump_pod_version(podspec_path, bump_type)
 
   version_number = version_get_podspec(path: podspec_path)
 
@@ -19,7 +19,7 @@ private_lane :smf_version_number do |options|
     end
     UI.message("The Git tag \"#{tag}\" already exists! The version number will be incremented again.")
     count += 1
-    bump_pod_verison(podspec_path, bump_type)
+    bump_pod_version(podspec_path, bump_type)
     tag = get_tag_of_pod(version_number)
   end
 
