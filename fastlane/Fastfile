@@ -93,7 +93,6 @@ error do |lane, exception|
     if lane == :releasing_pr_phase || lane == :deploy
       UI.message('Handling exception for android.')
       smf_handle_exception(
-          build_variant: ENV['BUILD_VARIANT'],
           exception: exception,
           name: get_default_name_of_app(ENV['BUILD_VARIANT'])
       )

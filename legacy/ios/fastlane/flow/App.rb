@@ -27,10 +27,7 @@ private_lane :smf_deploy_app do |options|
       UI.important("Warning: Building variant #{build_variant} failed! Exception #{exception}")
 
       if @smf_set_should_send_deploy_notifications == true || @smf_set_should_send_build_job_failure_notifications == true
-        smf_handle_exception(
-            exception: exception,
-            build_variant: build_variant
-        )
+        smf_handle_exception(exception: exception)
       end
     end
 
@@ -246,7 +243,10 @@ private_lane :smf_deploy_build_variant do |options|
       tag: tag
   )
 
-  smf_send_default_build_success_notification(build_variant: build_variant, name: get_default_name_of_app(build_variant))
+  smf_send_default_build_success_notification(
+      build_variant: build_variant,
+      name: get_default_name_of_app(build_variant)
+  )
 
   # Upload Ipa to Testflight and Download the generated DSYM
   # The testflight upload should happen as last step as the upload often shows an error although the IPA was successfully uploaded. We still want the tag, HockeyApp upload etc in this case.
