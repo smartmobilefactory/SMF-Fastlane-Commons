@@ -8,7 +8,7 @@ private_lane :smf_create_github_release do |options|
 
   # Parameter
   release_name = options[:release_name]
-  tag = options[:tag] != nil ? options[:tag] : ''
+  tag = options[:tag]
 
   git_remote_origin_url = sh "git config --get remote.origin.url"
   github_url_match = git_remote_origin_url.match(/.*github.com:(.*)\.git/)
