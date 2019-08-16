@@ -5,8 +5,6 @@
 desc "Publish the pod. Either to the official specs repo or to the SMF specs repo"
 private_lane :smf_publish_pod do |options|
 
-  build_variant = options[:build_variant]
-
   UI.important("Publishing the Pod")
 
   # Variables
@@ -52,7 +50,7 @@ private_lane :smf_publish_pod do |options|
     end
   end
 
-  smf_git_changelog(build_variant: build_variant)
+  smf_git_changelog
 
   smf_git_pull
 
@@ -98,5 +96,5 @@ private_lane :smf_publish_pod do |options|
       tag: tag
   )
 
-  smf_send_default_build_success_notification(build_variant: build_variant, name: get_default_name_of_pod(build_variant))
+  smf_send_default_build_success_notification(name: get_default_name_of_pod)
 end
