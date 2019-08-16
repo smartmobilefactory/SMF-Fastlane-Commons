@@ -11,26 +11,26 @@ private_lane :smf_version_number do |options|
   version_number = version_get_podspec(path: podspec_path)
 
   tag = get_tag_of_pod(version_number)
-
-  count = 10
-  while git_tag_exists(tag: tag)
-    if count == 10
-      raise "The Git tag \"#{tag}\" already exists! The build job will be aborted to avoid builds with the same version number."
+  if bump_type != ('current')
+    count = 10
+    while git_tag_exists(tag: tag)
+      if count == 10
+        raise "The Git tag \"#{tag}\" already exists! The build job will be aborted to avoid builds with the same version number."
+      end
+      UI.message("The Git tag \"#{tag}\" already exists! The version number will be incremented again.")
+      count += 1
+      bump_pod_version(podspec_path, bump_type)
+      tag = get_tag_of_pod(version_number)
     end
-    UI.message("The Git tag \"#{tag}\" already exists! The version number will be incremented again.")
-    count += 1
-    bump_pod_version(podspec_path, bump_type)
-    tag = get_tag_of_pod(version_number)
-  end
 
-  # Commit the version bump if needed
-  if ["major", "minor", "patch", "breaking", "internal"].include? bump_type
-    git_commit(
-        path: podspec_path,
-        message: "Release Pod #{version_number}"
-    )
+    # Commit the version bump if needed
+    if ["major", "minor", "patch", "breaking", "internal"].include? bump_type
+      git_commit(
+          path: podspec_path,
+          message: "Release Pod #{version_number}"
+      )
+    end
   end
-
   smf_add_git_tag(tag: tag)
 
   tag
