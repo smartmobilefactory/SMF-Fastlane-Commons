@@ -62,7 +62,7 @@ private_lane :smf_build_number do |options|
     tag = get_tag_of_app(build_variant, incremented_build_number)
   end
 
-  smf_add_git_tag(tag: tag)
+  add_git_tag(tag: tag)
 
   tag
 end
