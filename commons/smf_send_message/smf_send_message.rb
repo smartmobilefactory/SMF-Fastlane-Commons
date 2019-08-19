@@ -9,6 +9,7 @@ private_lane :smf_send_message do |options|
   message = !options[:message].nil? ? options[:message] : ''
   content = message.length < 4000 ? message : "#{message[0..4000]}... (maximum length reached)"
 
+  ci_error_log = 'ci-error-log'
   case @platform
   when :ios
     ci_error_log = ci_ios_error_log
@@ -20,8 +21,14 @@ private_lane :smf_send_message do |options|
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
   end
+
+  # Set Slack channel to ci_error_log
   ci_error_log = 'ci-error-log'
   slack_channel = ci_error_log
+
+  # Change to this on master
+  # slack_channel = !options[:slack_channel].nil? ? options[:slack_channel] : ci_error_log
+
   project_name = !ENV['PROJECT_NAME'].nil? ? ENV['PROJECT_NAME'] : @smf_fastlane_config[:project][:project_name]
   type = !options[:type].nil? ? options[:type].to_s : 'warning'
   success = type == 'success' || type == 'message'
