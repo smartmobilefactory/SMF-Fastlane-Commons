@@ -27,7 +27,7 @@ private_lane :smf_deploy_app do |options|
       UI.important("Warning: Building variant #{build_variant} failed! Exception #{exception}")
 
       if @smf_set_should_send_deploy_notifications == true || @smf_set_should_send_build_job_failure_notifications == true
-        smf_handle_exception(exception: exception)
+        smf_handle_exception(name: get_default_name_of_app(build_variant), exception: exception)
       end
     end
 
@@ -63,6 +63,7 @@ private_lane :smf_deploy_build_variant do |options|
   project_config = @smf_fastlane_config[:project]
 
   project_name = project_config[:project_name]
+  UI.message("project_name: #{project_name}")
 
   generate_temporary_appfile
 
