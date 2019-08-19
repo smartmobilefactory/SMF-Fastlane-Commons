@@ -19,28 +19,6 @@ private_lane :smf_verify_git_tag_is_not_already_existing do |options|
 
 end
 
-
-#######################
-### smf_add_git_tag ###
-#######################
-
-desc "Tag the current git commit."
-private_lane :smf_add_git_tag do |options|
-
-  # Check if the tag isn't already existing. The build job will fail here if it already exists
-  smf_verify_git_tag_is_not_already_existing
-
-  tag = smf_construct_default_tag_for_current_project
-
-  UI.important("Adding git tag: #{tag}")
-  add_git_tag(
-    tag: tag
-    )
-
-  # Return the tag
-  tag
-end
-
 #################################
 ### smf_commit_generated_code ###
 #################################
@@ -54,28 +32,6 @@ private_lane :smf_commit_generated_code do |options|
   sh "git reset"
   sh "git ls-files . | grep '\.generated\.' | xargs git add || true"
   sh "git commit -m \"Update generated code\" || true"
-
-end
-
-
-###############################
-### smf_commit_build_number ###
-###############################
-
-desc "Commit the build number."
-private_lane :smf_commit_build_number do |options|
-
-  UI.important("Commiting build number incrementation")
-
-  project_name = @smf_fastlane_config[:project][:project_name]
-
-  version = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
-
-  commit_version_bump(
-    xcodeproj: "#{project_name}.xcodeproj",
-    message: "#{smf_increment_build_number_prefix_string}#{version}",
-    force: true
-    )
 
 end
 
@@ -102,7 +58,7 @@ def smf_construct_tag_for_current_project(tag_prefix, tag_suffix, version = nil)
     version = smf_default_tag_version
   end
 
-  return tag_prefix+version+tag_suffix
+  return tag_prefix + version + tag_suffix
 end
 
 def smf_git_pull
@@ -117,7 +73,7 @@ def smf_default_tag_prefix
 end
 
 def smf_default_tag_version
-  if smf_is_build_variant_a_pod 
+  if smf_is_build_variant_a_pod
     podspec_path = @smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path]
     version = read_podspec(path: podspec_path)["version"]
     return version

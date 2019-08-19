@@ -24,16 +24,10 @@ private_lane :smf_deploy_app do |options|
       )
     rescue => exception
 
-      # Revert build number if needed
-      smf_decrement_build_number
-
       UI.important("Warning: Building variant #{build_variant} failed! Exception #{exception}")
 
       if @smf_set_should_send_deploy_notifications == true || @smf_set_should_send_build_job_failure_notifications == true
-        smf_handle_exception(
-            exception: exception,
-            build_variant: build_variant
-        )
+        smf_handle_exception(name: get_default_name_of_app(build_variant), exception: exception)
       end
     end
 
@@ -61,9 +55,6 @@ private_lane :smf_deploy_build_variant do |options|
   # Reset the HockeyApp ID to avoid that a successful upload is removed if a following build variant is failing in the same build job
   ENV[$SMF_APP_HOCKEY_ID_ENV_KEY] = nil
 
-  # Reset the build incrementation flag to support build jobs which build multiple build variants in a row
-  ENV[$SMF_SHOULD_BUILD_NUMBER_BE_INCREMENTED_ENV_KEY] = nil
-
   # Reset that the unit tests were run to avoid wrong information in Danger
   ENV[$SMF_DID_RUN_UNIT_TESTS_ENV_KEY] = "false"
 
@@ -71,7 +62,6 @@ private_lane :smf_deploy_build_variant do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][@smf_build_variant_sym]
   project_config = @smf_fastlane_config[:project]
 
-  project_name = project_config[:project_name]
 
   generate_temporary_appfile
 
@@ -96,16 +86,7 @@ private_lane :smf_deploy_build_variant do |options|
   end
 
   smf_install_pods_if_project_contains_podfile
-
-  # Increment the build number only if it should
-  if smf_should_build_number_be_incremented
-    smf_store_current_build_number
-    smf_increment_build_number(build_variant: build_variant)
-    smf_set_should_revert_build_number(true)
-  end
-
-  # Check if the New Tag already exists
-  smf_verify_git_tag_is_not_already_existing
+  tag = smf_increment_build_number(build_variant: build_variant)
 
   # Check for commons ITC Upload errors if needed
   if build_variant_config[:upload_itc] == true
@@ -159,12 +140,6 @@ private_lane :smf_deploy_build_variant do |options|
           slack_channel: ci_ios_error_log
       )
     end
-  end
-
-  # Commit the build number if it was incremented
-  if smf_should_build_number_be_incremented
-    smf_commit_build_number
-    smf_set_should_revert_build_number(false)
   end
 
   # Build a Simulator build if wanted
@@ -249,8 +224,6 @@ private_lane :smf_deploy_build_variant do |options|
     sh("scp -i #{ENV["CUSTOM_SPARKLE_PRIVATE_SSH_KEY"]} #{appcast_xml} '#{user_name}'@#{upload_url}:/#{sparkle["dmg_path".to_sym]}#{appcast_upload_name}")
   end
 
-  tag = smf_add_git_tag
-
   smf_git_pull
 
   push_to_git_remote(
@@ -262,14 +235,16 @@ private_lane :smf_deploy_build_variant do |options|
   )
 
   # Create the GitHub release
-  version = smf_get_version_number
-  build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
+  build_number = get_build_number(xcodeproj: "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj")
   smf_create_github_release(
-      release_name: "#{@smf_build_variant.upcase} #{version} (#{build_number})",
+      release_name: "#{@smf_build_variant.upcase} #{build_number}",
       tag: tag
   )
 
-  smf_send_default_build_success_notification(build_variant: build_variant, name: get_default_name_of_app(build_variant))
+  smf_send_default_build_success_notification(
+      build_variant: build_variant,
+      name: get_default_name_of_app(build_variant)
+  )
 
   # Upload Ipa to Testflight and Download the generated DSYM
   # The testflight upload should happen as last step as the upload often shows an error although the IPA was successfully uploaded. We still want the tag, HockeyApp upload etc in this case.

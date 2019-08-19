@@ -6,6 +6,7 @@ desc 'Collect git commit messages into a changelog and store as environment vari
 private_lane :smf_git_changelog do |options|
 
   build_variant = options[:build_variant]
+  is_library = !options[:is_library].nil? ? options[:is_library] : false
   UI.important('Collecting commits back to the last tag')
 
   # Constants
@@ -13,9 +14,13 @@ private_lane :smf_git_changelog do |options|
 
   # Pull all the tags so the change log collector finds the latest tag
   UI.message('Fetching all tags...')
-  sh('git fetch --tags --quiet')
+  sh("git fetch --tags --quiet || echo #{NO_GIT_TAG_FAILURE}")
 
-  last_tag = sh("git describe --tags --match \"*#{build_variant}*\" --abbrev=0 HEAD --first-parent || echo #{NO_GIT_TAG_FAILURE}").to_s
+  if is_library
+    last_tag = sh("git describe --tags --match \"releases/*\" --abbrev=0 HEAD --first-parent || echo #{NO_GIT_TAG_FAILURE}").to_s
+  else
+    last_tag = sh("git describe --tags --match \"*#{build_variant}*\" --abbrev=0 HEAD --first-parent || echo #{NO_GIT_TAG_FAILURE}").to_s
+  end
 
   # Use the initial commit if there is no matching tag yet
   if last_tag.include? NO_GIT_TAG_FAILURE
