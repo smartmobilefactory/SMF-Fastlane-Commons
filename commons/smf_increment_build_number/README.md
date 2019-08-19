@@ -13,7 +13,7 @@ smf_increment_build_number(
 ## Get the current build number
 At the beginning, the current build number will be tried to get by fetching the last tag which matches the pattern *build/\*/\**. If there is a last tag the build number at the end of the tag will be chosen as the current build builder. Otherwise the current build number will be taken from the project itself. Nevertheless, it will be checked which one is greater. The greatest number will be increased and set as new build number.
 
-### Build number containts '.'
+### Build number contains '.'
 If the build number contains one or multiple '.' only the first part of the number will be used.
 
 ## Create new tag

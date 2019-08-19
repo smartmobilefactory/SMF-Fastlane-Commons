@@ -12,12 +12,12 @@ smf_increment_version_number(
 ```
 
 ## bump_type
-There are five possible bump types:
-    "major": Increments the first part of the version number.
-    "minor": Increments the second part of the version number.
-    "patch": Increments the last part if the version number.
-    "breaking": In case the versionning is as following: major.minor.breaking.internal "breaking" will increment the third part and set the last part to 0.
-    "internal": In case the versionning is as following: major.minor.breaking.internal "internal" will set the last part to the incremented the fourth part if there are 4 or more parts.
+There are five possible bump types:<br />
+    "major": Increments the first part of the version number.<br />
+    "minor": Increments the second part of the version number.<br />
+    "patch": Increments the last part if the version number.<br />
+    "breaking": In case the versionning is as following: major.minor.breaking.internal "breaking" will increment the third part and set the last part to 0.<br />
+    "internal": In case the versionning is as following: major.minor.breaking.internal "internal" will set the last part to the incremented fourth part if there are 4 or more parts.<br />
     
 "mayor" and "minor" are usually set manually. "breaking" and "internal" are only incremented via Fastlane.
 
