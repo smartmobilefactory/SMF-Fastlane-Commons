@@ -3,8 +3,8 @@ def get_default_name_of_app(build_variant)
   build_number = get_build_number_of_app
   case @platform
   when :ios
-    version = smf_get_version_number
-    "#{project_name} #{build_variant.upcase} #{version} (#{build_number})"
+    @smf_fastlane_config[:project][:project_name]
+    "#{project_name} #{build_variant.upcase} (#{build_number})"
   when :android
     project_name = !@smf_fastlane_config[:project][:name].nil? ? @smf_fastlane_config[:project][:name] : ENV["PROJECT_NAME"]
     "#{project_name} #{build_variant} (Build #{build_number})"
