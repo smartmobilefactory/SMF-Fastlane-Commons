@@ -63,7 +63,6 @@ private_lane :smf_deploy_build_variant do |options|
   project_config = @smf_fastlane_config[:project]
 
   project_name = project_config[:project_name]
-  UI.message("project_name: #{project_name}")
 
   generate_temporary_appfile
 
@@ -237,10 +236,9 @@ private_lane :smf_deploy_build_variant do |options|
   )
 
   # Create the GitHub release
-  version = smf_get_version_number
   build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
   smf_create_github_release(
-      release_name: "#{@smf_build_variant.upcase} #{version} (#{build_number})",
+      release_name: "#{@smf_build_variant.upcase} #{build_number}",
       tag: tag
   )
 
