@@ -46,7 +46,7 @@ private_lane :smf_increment_build_number do |options|
   count = 0
   while git_tag_exists(tag: tag)
     if count == 10
-      raise "The Git tag \"#{tag}\" already exists! The build job will be aborted to avoid builds with the same build number."
+      raise "The Git tag \"#{tag}\" already exists even after increment it ten times! The build job will be aborted to avoid builds with the same build number. Please check the project!"
     end
     UI.message("The Git tag \"#{tag}\" already exists! The build number will be incremented again.")
     count += 1

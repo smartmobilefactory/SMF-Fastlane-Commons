@@ -29,7 +29,7 @@ private_lane :smf_publish_pod do |options|
   # Make sure the repo is up to date and clean
   ensure_git_branch(branch: branch)
 
-  tag = smf_version_number(podspec_path: podspec_path, bump_type: bump_type)
+  tag = smf_increment_version_number(podspec_path: podspec_path, bump_type: bump_type)
 
   # Update the MetaJSONS if wanted
   if generateMetaJSON != false

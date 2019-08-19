@@ -6,7 +6,7 @@ private_lane :smf_increment_version_number do |options|
   bump_type = options[:bump_type]
 
   if !["major", "minor", "patch", "breaking", "internal"].include? bump_type
-    raise "The bump type \"#{bump_type}\" should not be used! The build job will be aborted."
+    raise "The bump type \"#{bump_type}\" should not be used! The buixd job will be aborted."
   end
 
   # Bump library's version if needed
@@ -20,7 +20,7 @@ private_lane :smf_increment_version_number do |options|
   count = 0
   while git_tag_exists(tag: tag)
     if count == 10
-      raise "The Git tag \"#{tag}\" already exists! The build job will be aborted to avoid builds with the same version number."
+      raise "The Git tag \"#{tag}\" already exists even after increment it ten times! The build job will be aborted to avoid builds with the same version number. Please check the project!"
     end
     UI.message("The Git tag \"#{tag}\" already exists! The version number will be incremented again.")
     count += 1
