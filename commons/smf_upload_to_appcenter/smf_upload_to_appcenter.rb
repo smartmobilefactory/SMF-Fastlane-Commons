@@ -17,7 +17,7 @@ private_lane :smf_upload_to_appcenter do |options|
   response = http.request(request)
   t2 = Time.now
   UI.message("Request took #{t2 - t1} seconds.")
-  if response.code != 200
+  if response.code != "200"
     raise("An error occured while fetching apps from AppCenter: #{response.message}")
   end
   UI.message(response.body)
