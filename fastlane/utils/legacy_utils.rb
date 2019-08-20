@@ -54,7 +54,7 @@ def get_tag_of_pod(version_number)
 end
 
 def get_app_secret(build_variant)
-  build_variant = build_variant.downcase.to_s
+  build_variant = build_variant.downcase
   case @platform
   when :ios
     @smf_fastlane_config[:build_variants][build_variant][:hockeyapp_id]
