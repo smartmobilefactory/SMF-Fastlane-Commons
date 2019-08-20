@@ -3,8 +3,9 @@ private_lane :smf_upload_to_appcenter do |options|
   build_variant = options[:build_variant]
   apkFile = options[:apkFile]
   apkPath = options[:apkPath]
-
+  UI.message("build_variant: #{build_variant}")
   app_secret = get_app_secret(build_variant)
+  UI.message("app_secret: #{app_secret}")
 
   uri = URI.parse('https://api.appcenter.ms/v0.1/apps')
   request = Net::HTTP::Get.new(uri.request_uri)
