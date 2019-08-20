@@ -10,22 +10,22 @@ private_lane :smf_upload_to_appcenter do |options|
   uri = URI.parse('https://api.appcenter.ms/v0.1/apps')
   request = Net::HTTP::Get.new(uri.request_uri)
   request['accept'] = 'application/json'
-  UI.message("test 1")
+  UI.message(ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY])
   request['X-API-Token'] = ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY]
-  UI.message("test 2")
   http = Net::HTTP.new(uri.host, uri.port)
   http.use_ssl = true
   response = http.request(request)
+  if response.code != 200
+    raise("An error occured while fetching apps from AppCenter.")
+  end
   UI.message(response.body)
   data = JSON.parse(response.body)
-  project_app = data.find { |app| app['app_secret'].to_s.gsub!('-', '') == app_secret}
+  project_app = data.find { |app| app['app_secret'].to_s.gsub!('-', '') == app_secret }
   if project_app.nil?
     raise("There is no app with the app secret: #{app_secret}")
   end
-  UI.message("test 3")
   app_name = project_app['name']
   owner_name = project_app['owner']['name']
-UI.message("test 4")
   UI.message("app_name: #{app_name}, owner_name: #{owner_name}")
 
   case @platform
