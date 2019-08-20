@@ -20,7 +20,6 @@ private_lane :smf_upload_to_appcenter do |options|
   if response.code != "200"
     raise("An error occured while fetching apps from AppCenter: #{response.message}")
   end
-  UI.message(response.body)
   data = JSON.parse(response.body)
   project_app = data.find { |app| app['app_secret'].to_s.gsub!('-', '') == app_secret }
   if project_app.nil?
