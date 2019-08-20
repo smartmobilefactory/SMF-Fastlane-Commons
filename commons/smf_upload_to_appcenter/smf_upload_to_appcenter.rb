@@ -16,22 +16,33 @@ private_lane :smf_upload_to_appcenter do |options|
   t1 = Time.now
   response = http.request(request)
   t2 = Time.now
-  UI.message("Request took #{t2 - t1} seconds.")
-  if response.code != "200"
+  UI.message("Fetching apps from AppCenter took #{t2 - t1} seconds.")
+
+  unless response.code == "200"
     raise("An error occured while fetching apps from AppCenter: #{response.message}")
   end
+
   data = JSON.parse(response.body)
   project_app = data.find { |app| app['app_secret'].to_s.gsub!('-', '') == app_secret }
+
   if project_app.nil?
     raise("There is no app with the app secret: #{app_secret}")
   end
+
+  t3 = time.now
+  UI.message("Filter the project's app took #{t3 - t2} seconds.")
+
   app_name = project_app['name']
   owner_name = project_app['owner']['name']
   UI.message("app_name: #{app_name}, owner_name: #{owner_name}")
 
   case @platform
   when :ios
-    dsym_path = Pathname.getwd.dirname.to_s + "/build/#{app_name}.app.dSYM.zip"
+    escaped_filename = get_escaped_filename(build_variant)
+    is_mac_app = is_mac_app(build_variant)
+    build_number = get_build_number_of_app
+    version_number = version_get_podspec(path: get_podspec_path(build_variant))
+    dsym_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.app.dSYM.zip"
     UI.message("Constructed the dsym path \"#{dsym_path}\"")
     unless File.exist?(dsym_path)
       dsym_path = nil
@@ -40,26 +51,43 @@ private_lane :smf_upload_to_appcenter do |options|
 
     NO_APP_FAILURE = "NO_APP_FAILURE"
 
-    app_path = Pathname.getwd.dirname.to_s + "/build/#{app_name}.app.zip"
-    app_path = Pathname.getwd.dirname.to_s + "/build/#{app_name}.app" unless (File.exists?(app_path))
-
-    UI.message("Constructed path \"#{app_path}\" from filename \"#{app_name}\"")
-
-    unless File.exist?(app_path)
-      app_path = lane_context[SharedValues::IPA_OUTPUT_PATH]
-
-      UI.message("Using \"#{app_path}\" as app_path as no file exists at the constructed path.")
+    unless is_mac_app
+      sh "cd ../build; zip -r9 \"#{escaped_filename}.app.zip\" \"#{escaped_filename}.app\" || echo #{NO_APP_FAILURE}"
     end
 
-    appcenter_upload(
-        api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
-        owner_name: owner_name,
-        app_name: app_name,
-        ipa: app_path,
-        dsym: dsym_path,
-        notify_testers: true,
-        release_notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
-    )
+    app_path = get_path_to_ipa_or_app(build_variant)
+
+    if is_mac_app
+      app_path = app_path.sub(".app", ".dmg")
+      unless File.exist?(app_path)
+        raise("DMG file #{app_path} does not exit. Nothing to upload.")
+      end
+    end
+    if is_mac_app
+      # Upload with build_number and version_number
+      appcenter_upload(
+          api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
+          owner_name: owner_name,
+          app_name: app_name,
+          build_number: build_number,
+          version: version_number,
+          ipa: app_path,
+          dsym: dsym_path,
+          notify_testers: false,
+          release_notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
+      )
+    else
+      appcenter_upload(
+          api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
+          owner_name: owner_name,
+          app_name: app_name,
+          ipa: app_path,
+          dsym: dsym_path,
+          notify_testers: false,
+          release_notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
+      )
+    end
+
   when :android
     if apkPath
       found = true
@@ -81,7 +109,7 @@ private_lane :smf_upload_to_appcenter do |options|
         owner_name: owner_name,
         app_name: app_name,
         apk: apk_path,
-        notify_testers: true,
+        notify_testers: false,
         release_notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
     )
   when :flutter
