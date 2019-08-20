@@ -74,7 +74,7 @@ private_lane :smf_upload_to_appcenter do |options|
           version: version_number,
           ipa: app_path,
           dsym: dsym_path,
-          notify_testers: false,
+          notify_testers: true,
           release_notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
       )
     else
@@ -85,7 +85,7 @@ private_lane :smf_upload_to_appcenter do |options|
           app_name: app_name,
           ipa: app_path,
           dsym: dsym_path,
-          notify_testers: false,
+          notify_testers: true,
           release_notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
       )
     end
@@ -110,7 +110,7 @@ private_lane :smf_upload_to_appcenter do |options|
         owner_name: owner_name,
         app_name: app_name,
         apk: apk_path,
-        notify_testers: false,
+        notify_testers: true,
         release_notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
     )
   when :flutter
