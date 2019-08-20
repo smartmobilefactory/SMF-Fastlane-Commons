@@ -3,9 +3,7 @@ private_lane :smf_upload_to_appcenter do |options|
   build_variant = options[:build_variant]
   apkFile = options[:apkFile]
   apkPath = options[:apkPath]
-  UI.message("build_variant: #{build_variant}")
   app_secret = get_app_secret(build_variant)
-  UI.message("app_secret: #{app_secret}")
 
   uri = URI.parse('https://api.appcenter.ms/v0.1/apps')
   request = Net::HTTP::Get.new(uri.request_uri)
@@ -29,7 +27,7 @@ private_lane :smf_upload_to_appcenter do |options|
     raise("There is no app with the app secret: #{app_secret}")
   end
 
-  t3 = time.now
+  t3 = Time.now
   UI.message("Filter the project's app took #{t3 - t2} seconds.")
 
   app_name = project_app['name']
@@ -62,9 +60,8 @@ private_lane :smf_upload_to_appcenter do |options|
       unless File.exist?(app_path)
         raise("DMG file #{app_path} does not exit. Nothing to upload.")
       end
-    end
-    if is_mac_app
-      # Upload with build_number and version_number
+
+      UI.message("Upload mac app to AppCenter.")
       appcenter_upload(
           api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
           owner_name: owner_name,
@@ -77,6 +74,7 @@ private_lane :smf_upload_to_appcenter do |options|
           release_notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
       )
     else
+      UI.message("Upload iOS app to AppCenter.")
       appcenter_upload(
           api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
           owner_name: owner_name,
@@ -102,8 +100,7 @@ private_lane :smf_upload_to_appcenter do |options|
 
     raise("Cannot find the APK #{apkFile}") unless found
 
-    UI.important("Uploading to HockeyApp (id: \"#{hockeyAppId}\") apk: #{apk_path}")
-
+    UI.message("Upload android app to AppCenter.")
     appcenter_upload(
         api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
         owner_name: owner_name,
