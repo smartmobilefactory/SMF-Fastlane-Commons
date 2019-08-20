@@ -38,8 +38,6 @@ private_lane :smf_upload_to_appcenter do |options|
   when :ios
     escaped_filename = get_escaped_filename(build_variant)
     is_mac_app = is_mac_app(build_variant)
-    build_number = get_build_number_of_app
-    version_number = version_get_podspec(path: get_podspec_path(build_variant))
     dsym_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.app.dSYM.zip"
     UI.message("Constructed the dsym path \"#{dsym_path}\"")
     unless File.exist?(dsym_path)
@@ -56,6 +54,9 @@ private_lane :smf_upload_to_appcenter do |options|
     app_path = get_path_to_ipa_or_app(build_variant)
 
     if is_mac_app
+      build_number = get_build_number_of_app
+      version_number = version_get_podspec(path: get_podspec_path(build_variant))
+
       app_path = app_path.sub(".app", ".dmg")
       unless File.exist?(app_path)
         raise("DMG file #{app_path} does not exit. Nothing to upload.")
@@ -87,11 +88,11 @@ private_lane :smf_upload_to_appcenter do |options|
     end
 
   when :android
+    found = false
     if apkPath
       found = true
       apk_path = apkPath
     else
-      found = false
       lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].each do |apk_path|
         found = apk_path.include? apkFile
         break if found
