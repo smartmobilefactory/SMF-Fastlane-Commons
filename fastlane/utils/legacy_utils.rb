@@ -60,7 +60,7 @@ def get_app_secret(build_variant)
   when :ios
     @smf_fastlane_config[:build_variants][build_variant.to_sym][:hockeyapp_id]
   when :android
-    @smf_fastlane_config[:hockey][build_variant.to_sym][:hockeyAppId]
+    @smf_fastlane_config[:hockey][build_variant.to_sym]
   when :flutter
     UI.message('App Secret for flutter is not implemented yet')
   else

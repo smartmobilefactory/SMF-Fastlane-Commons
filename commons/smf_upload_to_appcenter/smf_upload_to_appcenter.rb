@@ -4,11 +4,14 @@ private_lane :smf_upload_to_appcenter do |options|
   apkFile = options[:apkFile]
   apkPath = options[:apkPath]
   app_secret = get_app_secret(build_variant)
-
+  UI.message("Test 1")
   uri = URI.parse('https://api.appcenter.ms/v0.1/apps')
   request = Net::HTTP::Get.new(uri.request_uri)
   request['accept'] = 'application/json'
+  UI.message("Test 2")
+  UI.message("key: #{ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY]}")
   request['X-API-Token'] = ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY]
+  UI.message("Test 3")
   http = Net::HTTP.new(uri.host, uri.port)
   http.use_ssl = true
   t1 = Time.now
