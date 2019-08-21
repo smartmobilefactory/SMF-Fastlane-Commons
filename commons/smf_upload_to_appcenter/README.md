@@ -1,6 +1,6 @@
 # smf_upload_to_appcenter
 
-This lane collects uploads the build to AppCenter by using the *appcenter_upload* lane. 
+This lane uploads the build to AppCenter by using the *appcenter_upload* lane. 
 
 ### Example
 Upload the apk on Android or the ipa to AppCenter.
