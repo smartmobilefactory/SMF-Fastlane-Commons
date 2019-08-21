@@ -10,7 +10,7 @@ private_lane :smf_archive_ipa_if_scheme_is_provided do |options|
   bulk_deploy_params = options[:bulk_deploy_params]
 
   if @smf_fastlane_config[:build_variants][@smf_build_variant_sym][:scheme]
-    smf_archive_ipa(
+    smf_build_app(
       skip_export: skip_export,
       bulk_deploy_params: bulk_deploy_params
       )
@@ -49,6 +49,7 @@ private_lane :smf_archive_ipa do |options|
   
   export_method = (build_variant_config[:export_method].nil? ? nil : build_variant_config[:export_method])
   icloud_environment = (build_variant_config[:icloud_environment].nil? ? "Development" : build_variant_config[:icloud_environment])
+
   # Check if the project defined if the build should be cleaned. Other wise the default behavior is used based on the whether the archiving is a bulk operation.
   should_clean_project = bulk_deploy_params != nil ? (bulk_deploy_params[:index] == 0 && bulk_deploy_params[:count] > 1) : true
   if build_variant_config[:should_clean_project] != nil
