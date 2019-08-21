@@ -190,4 +190,3 @@ end
 def get_podspec_path(build_variant)
   @smf_fastlane_config[:build_variants][build_variant.to_sym][:podspec_path]
 end
->>>>>>> 24237564dd5d7d02c6f6405261d232c8436ec321
