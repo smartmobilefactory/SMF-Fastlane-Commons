@@ -138,11 +138,11 @@ def match_config
 end
 
 def get_match_config_read_only
-  match_config[:read_only]
+  match_config.nil? ? nil : match_config[:read_only]
 end
 
 def get_match_config_type
-  match_config[:type]
+  match_config.nil? ? nil : match_config[:type]
 end
 
 def get_app_secret(build_variant)
