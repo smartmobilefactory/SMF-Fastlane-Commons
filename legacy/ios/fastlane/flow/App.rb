@@ -154,8 +154,8 @@ private_lane :smf_deploy_build_variant do |options|
     # Store the HockeyApp ID to let the handle exception lane know what hockeyapp entry should be deleted. This value is reset during bulk builds to avoid the deletion of a former succesful build.
     ENV[$SMF_APP_HOCKEY_ID_ENV_KEY] = build_variant_config[:hockeyapp_id]
 
-    # Upload the IPA to HockeyApp
-    smf_upload_ipa_to_hockey
+    # Upload the IPA to AppCenter
+    smf_upload_to_appcenter(build_variant: build_variant)
 
     # Disable the former HockeyApp entry
     smf_disable_former_hockey_entry(
