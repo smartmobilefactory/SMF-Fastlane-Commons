@@ -14,10 +14,10 @@ private_lane :smf_upload_to_appcenter do |options|
     UI.message("Constructed the dsym path \"#{dsym_path}\"")
     unless File.exist?(dsym_path)
       dsym_path = nil
-      UI.message("Using nil as dsym_path as no file exists at the constructed path.")
+      UI.message('Using nil as dsym_path as no file exists at the constructed path.')
     end
 
-    NO_APP_FAILURE = "NO_APP_FAILURE"
+    NO_APP_FAILURE = 'NO_APP_FAILURE'
 
     unless is_mac_app
       sh "cd ../build; zip -r9 \"#{escaped_filename}.app.zip\" \"#{escaped_filename}.app\" || echo #{NO_APP_FAILURE}"
@@ -29,12 +29,12 @@ private_lane :smf_upload_to_appcenter do |options|
       build_number = get_build_number_of_app
       version_number = version_get_podspec(path: get_podspec_path(build_variant))
 
-      app_path = app_path.sub(".app", ".dmg")
+      app_path = app_path.sub('.app', '.dmg')
 
       raise("DMG file #{app_path} does not exit. Nothing to upload.") unless File.exist?(app_path)
 
 
-      UI.message("Upload mac app to AppCenter.")
+      UI.message('Upload mac app to AppCenter.')
       appcenter_upload(
           api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
           owner_name: owner_name,
@@ -47,7 +47,7 @@ private_lane :smf_upload_to_appcenter do |options|
           release_notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
       )
     else
-      UI.message("Upload iOS app to AppCenter.")
+      UI.message('Upload iOS app to AppCenter.')
       appcenter_upload(
           api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
           owner_name: owner_name,
@@ -73,7 +73,7 @@ private_lane :smf_upload_to_appcenter do |options|
 
     raise("Cannot find the APK #{apkFile}") unless found
 
-    UI.message("Upload android app to AppCenter.")
+    UI.message('Upload android app to AppCenter.')
     appcenter_upload(
         api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
         owner_name: owner_name,
@@ -100,7 +100,7 @@ def get_app_details(app_secret)
   http.use_ssl = true
   response = http.request(request)
 
-  unless response.code == "200"
+  unless response.code == '200'
     raise("An error occured while fetching apps from AppCenter: #{response.message}")
   end
 
