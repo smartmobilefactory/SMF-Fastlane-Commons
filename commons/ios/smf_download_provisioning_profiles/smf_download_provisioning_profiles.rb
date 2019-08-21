@@ -13,7 +13,7 @@ private_lane :smf_download_provisioning_profiles do |options|
   team_id(get_team_id)
 
   if smf_is_keychain_enabled
-    unlock_keychain(path: "login.keychain", password: ENV[$KEYCHAINLOGIN_LOGIN_ENV_KEY])
+    unlock_keychain(path: "login.keychain", password: ENV[$KEYCHAIN_LOGIN_ENV_KEY])
     unlock_keychain(path: "jenkins.keychain", password: ENV[$KEYCHAIN_JENKINS_ENV_KEY])
   end
 
