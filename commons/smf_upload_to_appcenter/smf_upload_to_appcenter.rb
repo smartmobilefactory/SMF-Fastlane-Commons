@@ -4,34 +4,7 @@ private_lane :smf_upload_to_appcenter do |options|
   apkFile = options[:apkFile]
   apkPath = options[:apkPath]
   app_secret = get_app_secret(build_variant)
-  uri = URI.parse('https://api.appcenter.ms/v0.1/apps')
-  request = Net::HTTP::Get.new(uri.request_uri)
-  request['accept'] = 'application/json'
-  request['X-API-Token'] = ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY]
-  http = Net::HTTP.new(uri.host, uri.port)
-  http.use_ssl = true
-  t1 = Time.now
-  response = http.request(request)
-  t2 = Time.now
-  UI.message("Fetching apps from AppCenter took #{t2 - t1} seconds.")
-
-  unless response.code == "200"
-    raise("An error occured while fetching apps from AppCenter: #{response.message}")
-  end
-
-  data = JSON.parse(response.body)
-  project_app = data.find { |app| app['app_secret'].to_s.gsub!('-', '') == app_secret }
-
-  if project_app.nil?
-    raise("There is no app with the app secret: #{app_secret}")
-  end
-
-  t3 = Time.now
-  UI.message("Filter the project's app took #{t3 - t2} seconds.")
-
-  app_name = project_app['name']
-  owner_name = project_app['owner']['name']
-  UI.message("app_name: #{app_name}, owner_name: #{owner_name}")
+  app_name, owner_name = get_app_details(app_secret)
 
   case @platform
   when :ios
@@ -116,4 +89,30 @@ private_lane :smf_upload_to_appcenter do |options|
     raise 'Unknown platform'
   end
 
+end
+
+def get_app_details(app_secret)
+  uri = URI.parse('https://api.appcenter.ms/v0.1/apps')
+  request = Net::HTTP::Get.new(uri.request_uri)
+  request['accept'] = 'application/json'
+  request['X-API-Token'] = ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY]
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = true
+  response = http.request(request)
+
+  unless response.code == "200"
+    raise("An error occured while fetching apps from AppCenter: #{response.message}")
+  end
+
+  data = JSON.parse(response.body)
+  project_app = data.find { |app| app['app_secret'].to_s.gsub!('-', '') == app_secret }
+
+  if project_app.nil?
+    raise("There is no app with the app secret: #{app_secret}")
+  end
+
+  app_name = project_app['name']
+  owner_name = project_app['owner']['name']
+  UI.message("app_name: #{app_name}, owner_name: #{owner_name}")
+  [app_name, owner_name]
 end
