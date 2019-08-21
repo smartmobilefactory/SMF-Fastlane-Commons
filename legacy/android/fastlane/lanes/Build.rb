@@ -30,69 +30,6 @@ private_lane :smf_generate_meta_json do |options|
   end
 end
 
-################################
-### smf_upload_apk_to_hockey ###
-################################
-
-desc "Clean, build and release the app on HockeyApp"
-private_lane :smf_upload_apk_to_hockey do |options|
-  apkFile = options[:apkFile]
-  apkPath = options[:apkPath]
-  hockeyAppId = options[:hockeyAppId]
-
-  if apkPath
-    found = true
-    apk_path = apkPath
-  else
-    found = false
-    for apk_path in lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS]
-      found = apk_path.include? apkFile
-      if found
-        break
-      end
-    end
-  end
-  UI.crash!("Cannot find the APK " + apkFile) if !found
-
-  UI.important("Uploading to HockeyApp (id: \"#{hockeyAppId}\") apk: #{apk_path}")
-
-  hockey(
-    api_token: ENV["HOCKEYAPP_API_TOKEN"], # configured in jenkins
-    apk: apk_path,
-    public_identifier: hockeyAppId,
-    notify: "0",
-    notes: ENV["CHANGELOG"]
-  )
-
-  if Actions.lane_context[Actions::SharedValues::HOCKEY_BUILD_INFORMATION]['id'] > 1
-    previous_version_id  = Actions.lane_context[Actions::SharedValues::HOCKEY_BUILD_INFORMATION]['id'] - 1
-
-    UI.important("HERE IS THE ID OF THE Current VERSION #{Actions.lane_context[Actions::SharedValues::HOCKEY_BUILD_INFORMATION]['id']}")
-    UI.important("HERE IS THE ID OF THE Previous VERSION #{previous_version_id}")
-
-    begin
-      disable_hockey_download(
-        api_token: ENV["HOCKEYAPP_API_TOKEN"], # configured in jenkins
-        public_identifier: hockeyAppId,
-        version_id: "#{previous_version_id}"
-      )
-    rescue => ex
-      UI.error("Something went wrong: #{ex}")
-    end
-  end
-
-  # Inform the SMF HockeyApp about the new app version
-  begin
-    smf_notify_app_uploaded(
-      hockeyapp_id: hockeyAppId
-    )
-  rescue
-    UI.important("Warning: The APN to the SMF HockeyApp couldn't be sent!")
-    next
-  end
-
-end
-
 #######################
 #### smf_build_apk ####
 #######################
