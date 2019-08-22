@@ -15,13 +15,10 @@ private_lane :smf_build_app do |options|
 
     # Check if the project defined if the build should be cleaned. Other wise the default behavior is used based on the whether the archiving is a bulk operation.
     should_clean_project = bulk_deploy_params != nil ? (bulk_deploy_params[:index] == 0 && bulk_deploy_params[:count] > 1) : true
-    if get_should_clean_project != nil
-      should_clean_project = build_variant_config[:should_clean_project]
-    end
 
-    if smf_is_keychain_enabled
-      unlock_keychain(path: "jenkins.keychain", password: ENV[$KEYCHAIN_JENKINS_ENV_KEY])
-    end
+    should_clean_project = build_variant_config[:should_clean_project] if get_should_clean_project != nil
+
+    unlock_keychain(path: "jenkins.keychain", password: ENV[$KEYCHAIN_JENKINS_ENV_KEY]) if smf_is_keychain_enabled
 
     # Make sure that the correct xcode version is selected when building the app
     required_xcode_version = get_required_xcode_version
