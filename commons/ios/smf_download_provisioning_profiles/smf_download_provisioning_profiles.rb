@@ -20,18 +20,19 @@ private_lane :smf_download_provisioning_profiles do |options|
   app_identifier = (get_use_wildcard_signing == true ? "*" : get_bundle_identifier)
   allowed_types = ["appstore", "adhoc", "development", "enterprise"]
 
-  if (get_match_config_read_only == nil || allowed_types.include?(get_match_config_type) == false)
-    raise "The fastlane match entries in the Config.json file are incomplete. Set `readonly` and `type` for the `match`-Key."
-  end
+  if match_config != nil
+    if (get_match_config_read_only == nil || allowed_types.include?(get_match_config_type) == false)
+      raise "The fastlane match entries in the Config.json file are incomplete. Set `readonly` and `type` for the `match` Key."
+    end
+    smf_download_provisioning_profile_using_match(app_identifier)
 
-  if match_config == nil && (@smf_build_variant.match(/alpha/) != nil || @smf_build_variant.match(/beta/) != nil || @smf_build_variant.match(/example/) != nil)
+  elsif (@smf_build_variant.match(/alpha/) != nil || @smf_build_variant.match(/beta/) != nil || @smf_build_variant.match(/example/) != nil)
     regex = /com\.smartmobilefactory\.enterprise/
     if bundle_identifier.match(regex) != nil
       smf_download_provisioning_profile_using_match(app_identifier, "enterprise")
     end
-  else
-    smf_download_provisioning_profile_using_match(app_identifier)
   end
+
 end
 
 def smf_download_provisioning_profile_using_match(app_identifier, type = nil)
