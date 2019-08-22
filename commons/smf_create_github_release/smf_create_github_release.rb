@@ -75,7 +75,6 @@ def smf_add_app_to_git_tag(build_variant)
         path_to_ipa_or_app = path_to_ipa_or_app.gsub('.zip', '')
       else
         UI.message("Couldn't find .app file, can't attach App to github release")
-        next
       end
     end
 
