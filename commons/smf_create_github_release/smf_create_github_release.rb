@@ -49,7 +49,6 @@ private_lane :smf_create_github_release do |options|
 
   release_id = smf_get_github_release_id_for_tag(tag, repository_path)
 
-  # Publish the release. We do this after the release was created as the assets are uploaded after the release is created on Github which results in release webhooks which doesn't contain the assets!
   github_api(
       server_url: 'https://api.github.com',
       api_token: ENV[$SMF_GITHUB_TOKEN_ENV_KEY],
@@ -93,7 +92,6 @@ def smf_add_app_to_git_tag(build_variant)
 end
 
 def smf_get_github_release_id_for_tag(tag, repository_path)
-
   result = github_api(
       server_url: 'https://api.github.com',
       api_token: ENV[$SMF_GITHUB_TOKEN_ENV_KEY],
