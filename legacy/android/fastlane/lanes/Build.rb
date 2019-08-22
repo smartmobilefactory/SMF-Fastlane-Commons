@@ -30,38 +30,6 @@ private_lane :smf_generate_meta_json do |options|
   end
 end
 
-#######################
-#### smf_build_apk ####
-#######################
-
-desc "Build the project based on the build type and flavor of the environment."
-private_lane :smf_build_apk do |options|
-
-  build_variant = options[:build_variant]
-
-  if !build_variant
-    UI.important("Building all variants")
-    build_variant = ""
-  else
-    UI.important("Building variant " + build_variant)
-  end
-
-  addition = ""
-  if ENV["KEYSTORE_FILE"]
-    KEYSTORE_FILE = ENV["KEYSTORE_FILE"]
-    KEYSTORE_PASSWORD = ENV["KEYSTORE_PASSWORD"]
-    KEYSTORE_KEY_ALIAS = ENV["KEYSTORE_KEY_ALIAS"]
-    KEYSTORE_KEY_PASSWORD = ENV["KEYSTORE_KEY_PASSWORD"]
-    addition = " -Pandroid.injected.signing.store.file='#{KEYSTORE_FILE}'"
-    addition << " -Pandroid.injected.signing.store.password='#{KEYSTORE_PASSWORD}'"
-    addition << " -Pandroid.injected.signing.key.alias='#{KEYSTORE_KEY_ALIAS}'"
-    addition << " -Pandroid.injected.signing.key.password='#{KEYSTORE_KEY_PASSWORD}'"
-  end
-
-  gradle(task: "assemble" + build_variant + addition)
-
-end
-
 ###########################
 #### smf_pull_keystore ####
 ###########################
