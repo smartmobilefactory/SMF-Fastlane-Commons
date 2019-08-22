@@ -1,10 +1,6 @@
 
 private_lane :smf_download_provisioning_profiles do |options|
 
-  if @platform != :ios
-    return
-  end
-
   if ENV[$FASTLANE_PLATFORM_NAME_ENV_KEY] == "mac"
     UI.message("Skipping fastlane match, because it doesn't support mac apps.")
     return

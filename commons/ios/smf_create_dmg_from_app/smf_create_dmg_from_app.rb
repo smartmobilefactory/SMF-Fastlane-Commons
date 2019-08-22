@@ -1,10 +1,6 @@
 
 private_lane :smf_create_dmg_from_app do |options|
 
-  if @platform != :ios
-    return
-  end
-
   if ENV[$FASTLANE_PLATFORM_NAME_ENV_KEY] != "mac"
     raise "Wrong platform configuration: dmg's are only created for macOS apps."
   end
