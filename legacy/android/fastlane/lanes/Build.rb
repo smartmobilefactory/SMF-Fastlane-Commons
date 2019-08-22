@@ -30,32 +30,6 @@ private_lane :smf_generate_meta_json do |options|
   end
 end
 
-###########################
-#### smf_pull_keystore ####
-###########################
-
-desc "Pull Keystore from SMF Keystore Repository"
-private_lane :smf_pull_keystore do |options|
-
-  clone_root_folder = options[:clone_root_folder]
-  if !clone_root_folder
-    clone_root_folder = @fastlane_commons_dir_path
-  end
-  keystoreFolder = options[:folder]
-
-  Dir.chdir(clone_root_folder) do
-      sh("rm -r -f ./Android-Keystores")
-      sh("git clone https://github.com/smartmobilefactory/Android-Keystores.git")
-      sh("cd ./Android-Keystores; sh crypto.sh -decrypt #{keystoreFolder}")
-  end
-
-  properties = load_properties("#{clone_root_folder}/Android-Keystores/keystores/#{keystoreFolder}/keystore.properties")
-  ENV["KEYSTORE_FILE"] = File.absolute_path("#{clone_root_folder}/Android-Keystores/keystores/#{keystoreFolder}/keystore.jks")
-  ENV["KEYSTORE_PASSWORD"] = properties["KEYSTORE_PASSWORD"]
-  ENV["KEYSTORE_KEY_ALIAS"] = properties["KEYSTORE_KEY_ALIAS"]
-  ENV["KEYSTORE_KEY_PASSWORD"] = properties["KEYSTORE_KEY_PASSWORD"]
-end
-
 ###############################
 #### smf_release_playstore ####
 ###############################
