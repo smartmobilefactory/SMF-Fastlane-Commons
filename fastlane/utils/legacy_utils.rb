@@ -145,6 +145,10 @@ def get_match_config_type
   match_config.nil? ? nil : match_config[:type]
 end
 
+def get_should_clean_project
+  build_variant_config[:should_clean_project]
+end
+
 def get_app_secret(build_variant)
   UI.message("build_variant: #{build_variant}")
   build_variant = build_variant.to_s.downcase
