@@ -28,7 +28,7 @@ private_lane :smf_download_provisioning_profiles do |options|
 
   elsif (@smf_build_variant.match(/alpha/) != nil || @smf_build_variant.match(/beta/) != nil || @smf_build_variant.match(/example/) != nil)
     regex = /com\.smartmobilefactory\.enterprise/
-    if bundle_identifier.match(regex) != nil
+    if get_bundle_identifier.match(regex) != nil
       smf_download_provisioning_profile_using_match(app_identifier, "enterprise")
     end
   end
