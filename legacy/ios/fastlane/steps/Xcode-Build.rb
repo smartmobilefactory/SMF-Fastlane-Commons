@@ -17,6 +17,11 @@ private_lane :smf_archive_ipa_if_scheme_is_provided do |options|
       skip_export: skip_export,
       bulk_deploy_params: bulk_deploy_params
       )
+
+    if get_use_sparkle == true
+      smf_create_dmg_from_app
+    end
+
   else
     UI.important("The IPA won't be archived as the build variant doesn't contain a scheme")
   end
