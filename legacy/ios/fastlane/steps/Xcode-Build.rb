@@ -10,6 +10,9 @@ private_lane :smf_archive_ipa_if_scheme_is_provided do |options|
   bulk_deploy_params = options[:bulk_deploy_params]
 
   if @smf_fastlane_config[:build_variants][@smf_build_variant_sym][:scheme]
+
+    smf_download_provisioning_profiles
+
     smf_build_app(
       skip_export: skip_export,
       bulk_deploy_params: bulk_deploy_params

@@ -19,8 +19,6 @@ private_lane :smf_build_app do |options|
       should_clean_project = build_variant_config[:should_clean_project]
     end
 
-    smf_download_provisioning_profiles
-
     if smf_is_keychain_enabled
       unlock_keychain(path: "jenkins.keychain", password: ENV[$KEYCHAIN_JENKINS_ENV_KEY])
     end
@@ -53,7 +51,6 @@ private_lane :smf_build_app do |options|
     )
 
   when :android
-
   end
 end
 

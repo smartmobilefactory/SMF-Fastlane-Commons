@@ -96,6 +96,8 @@ private_lane :smf_deploy_build_variant do |options|
   # Sync Phrase App
   smf_sync_strings_with_phrase_app
 
+  smf_download_provisioning_profiles
+
   # Build and archive the IPA
   smf_build_app(
       bulk_deploy_params: bulk_deploy_params
