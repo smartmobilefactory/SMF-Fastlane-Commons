@@ -80,6 +80,10 @@ def get_build_scheme
   build_variant_config[:scheme]
 end
 
+def get_target
+  build_variant_config[:target]
+end
+
 def get_upload_itc
   build_variant_config[:upload_itc].nil? ? false : build_variant_config[:upload_itc]
 end
@@ -131,6 +135,18 @@ end
 
 def get_is_adhoc_build
   @smf_build_variant.include? "adhoc"
+end
+
+def get_itc_team_id
+  build_variant_config[:itc_team_id]
+end
+
+def get_itc_skip_version_check
+  build_variant_config[:itc_skip_version_check]
+end
+
+def get_itc_apple_id
+  build_variant_config[:itc_apple_id]
 end
 
 def match_config
@@ -193,4 +209,13 @@ end
 
 def get_podspec_path(build_variant)
   @smf_fastlane_config[:build_variants][build_variant.to_sym][:podspec_path]
+end
+
+def smf_get_version_number
+  version_number = get_version_number(
+      xcodeproj: "#{get_project_name}.xcodeproj",
+      target: (get_target != nil ? get_target : get_build_scheme)
+  )
+
+  return version_number
 end
