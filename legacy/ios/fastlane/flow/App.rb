@@ -96,10 +96,16 @@ private_lane :smf_deploy_build_variant do |options|
   # Sync Phrase App
   smf_sync_strings_with_phrase_app
 
+  smf_download_provisioning_profiles
+
   # Build and archive the IPA
-  smf_archive_ipa(
+  smf_build_app(
       bulk_deploy_params: bulk_deploy_params
   )
+
+  if get_use_sparkle == true
+    smf_create_dmg_from_app
+  end
 
   # Commit generated code. There can be changes eg. from PhraseApp + R.swift
   if push_generated_code

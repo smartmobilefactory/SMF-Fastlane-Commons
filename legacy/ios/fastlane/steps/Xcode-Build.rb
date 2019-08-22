@@ -10,83 +10,20 @@ private_lane :smf_archive_ipa_if_scheme_is_provided do |options|
   bulk_deploy_params = options[:bulk_deploy_params]
 
   if @smf_fastlane_config[:build_variants][@smf_build_variant_sym][:scheme]
-    smf_archive_ipa(
+
+    smf_download_provisioning_profiles
+
+    smf_build_app(
       skip_export: skip_export,
       bulk_deploy_params: bulk_deploy_params
       )
+
+    if get_use_sparkle == true
+      smf_create_dmg_from_app
+    end
+
   else
     UI.important("The IPA won't be archived as the build variant doesn't contain a scheme")
-  end
-end
-
-#######################
-### smf_archive_ipa ###
-#######################
-
-desc "Creates an archive of the current build variant."
-private_lane :smf_archive_ipa do |options|
-
-  UI.important("Creating the Xcode archive")
-
-  # Parameter
-  skip_package_ipa = (options[:skip_export].nil? ? false : options[:skip_export])
-  bulk_deploy_params = options[:bulk_deploy_params]
-
-  # Variables
-
-  project_name = @smf_fastlane_config[:project][:project_name]
-  
-  build_variant_config = @smf_fastlane_config[:build_variants][@smf_build_variant_sym]
-
-  scheme = build_variant_config[:scheme]
-
-  upload_itc = (build_variant_config[:upload_itc].nil? ? false : build_variant_config[:upload_itc])
-  upload_bitcode = (build_variant_config[:upload_bitcode].nil? ? true : build_variant_config[:upload_bitcode])
-
-  use_xcconfig = build_variant_config[:xcconfig_name].nil? ? false : true
-  xcconfig_name = use_xcconfig ? build_variant_config[:xcconfig_name][:archive] : "Release"
-  output_name = scheme
-  
-  export_method = (build_variant_config[:export_method].nil? ? nil : build_variant_config[:export_method])
-  icloud_environment = (build_variant_config[:icloud_environment].nil? ? "Development" : build_variant_config[:icloud_environment])
-  # Check if the project defined if the build should be cleaned. Other wise the default behavior is used based on the whether the archiving is a bulk operation.
-  should_clean_project = bulk_deploy_params != nil ? (bulk_deploy_params[:index] == 0 && bulk_deploy_params[:count] > 1) : true
-  if build_variant_config[:should_clean_project] != nil
-    should_clean_project = build_variant_config[:should_clean_project]
-  end
-
-  code_signing_identity = build_variant_config[:code_signing_identity]
-
-  use_sparkle = (build_variant_config[:use_sparkle].nil? ? false : build_variant_config[:use_sparkle])
-
-  smf_download_provisioning_profiles_if_needed
-
-  if smf_is_keychain_enabled
-    unlock_keychain(path: "jenkins.keychain", password: ENV["JENKINS"])
-  end
-
-  smf_setup_correct_xcode_executable_for_build
-
-  gym(
-    clean: should_clean_project,
-    workspace: "#{project_name}.xcworkspace",
-    scheme: scheme,
-    configuration: xcconfig_name,
-    codesigning_identity: code_signing_identity,
-    output_directory: "build",
-    xcargs: smf_xcargs_for_build_system,
-    archive_path:"build/",
-    output_name: output_name,
-    include_symbols: true,
-    include_bitcode: (upload_itc && upload_bitcode),
-    export_method: export_method,
-    export_options: { iCloudContainerEnvironment: icloud_environment },
-    skip_package_ipa: skip_package_ipa,
-    xcpretty_formatter: "/Library/Ruby/Gems/2.3.0/gems/xcpretty-json-formatter-0.1.0/lib/json_formatter.rb"
-    )
-
-  if use_sparkle
-    smf_create_dmg_from_app
   end
 end
 
@@ -201,22 +138,6 @@ def smf_is_using_old_build_system
   end
 end
 
-def smf_setup_correct_xcode_executable_for_build
-  # Make sure that the correct xcode version is selected when building the app
-  required_xcode_version = @smf_fastlane_config[:project][:xcode_version]
-  xcode_executable_path = smf_xcode_executable_path_for_version(required_xcode_version)
-  
-  puts "SELECTED XCODE EXECUTABLE: #{xcode_executable_path}"
-  ENV[$DEVELOPMENT_DIRECTORY_KEY] = xcode_executable_path
-
-  xcode_select(xcode_executable_path)
-  ensure_xcode_version(version: required_xcode_version)
-end
-
-def smf_xcode_executable_path_for_version(xcode_version)
-  return "#{$XCODE_EXECUTABLE_PATH_PREFIX}" + xcode_version + "#{$XCODE_EXECUTABLE_PATH_POSTFIX}"
-end
-
 def smf_can_unit_tests_be_performed
 
   # Variables
@@ -291,45 +212,6 @@ def smf_is_build_variant_a_decoupled_ui_test
   return is_ui_test
 end
 
-def smf_create_dmg_from_app
-
-  if ENV[$FASTLANE_PLATFORM_NAME_ENV_KEY] != "mac"
-    raise "Wrong platform configuration: dmg's are only created for macOS apps."
-  end
-
-  # Variables
-  build_variant_config = @smf_fastlane_config[:build_variants][@smf_build_variant_sym]
-  code_signing_identity = build_variant_config["team_id".to_sym]
-  app_path = smf_path_to_ipa_or_app
-
-  # Create the dmg with the script and store it in the same directory as the app
-  sh "#{@fastlane_commons_dir_path}/tools/create_dmg.sh -p #{app_path} -ci #{code_signing_identity}"
-
-end
-
-def smf_path_to_ipa_or_app
-  
-  # Variables
-  build_variant_config = @smf_fastlane_config[:build_variants][@smf_build_variant_sym]
-  project_name = @smf_fastlane_config[:project][:project_name]
-  escaped_filename = build_variant_config[:scheme].gsub(" ", "\ ")
-
-  app_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.app.zip"
-  if ( ! File.exists?(app_path))
-     app_path =  Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.app"
-  end
-
-  UI.message("Constructed path \"#{app_path}\" from filename \"#{escaped_filename}\"")
-
-  unless File.exist?(app_path)
-      app_path = lane_context[SharedValues::IPA_OUTPUT_PATH]
-
-      UI.message("Using \"#{app_path}\" as app_path as no file exists at the constructed path.")
-  end
-
-  return app_path
-end
-
 def smf_get_version_number
   project_name = @smf_fastlane_config[:project][:project_name]
   scheme = @smf_fastlane_config[:build_variants][@smf_build_variant_sym][:scheme]
@@ -341,138 +223,4 @@ def smf_get_version_number
     )
 
   return version_number
-end
-
-def smf_download_provisioning_profiles_if_needed
-
-  build_variant_config = @smf_fastlane_config[:build_variants][@smf_build_variant_sym]
-
-  use_wildcard_signing = build_variant_config[:use_wildcard_signing]
-  apple_team_id = build_variant_config[:team_id]
-
-  # Set the Apple Team ID
-  team_id(apple_team_id)
-
-  if smf_is_keychain_enabled
-    unlock_keychain(path: "login.keychain", password: ENV["LOGIN"])
-    unlock_keychain(path: "jenkins.keychain", password: ENV["JENKINS"])
-  end
-
-  bundle_identifier = build_variant_config[:bundle_identifier]
-  is_adhoc_build = @smf_build_variant.include? "adhoc"
-  app_identifier = (use_wildcard_signing == true ? "*" : bundle_identifier)
-
-  use_match = should_use_match
-
-  if (use_match == true)
-    smf_download_provisioning_profile_using_match(app_identifier)
-  elsif (use_match == false)
-    if is_enterprise_alpha_beta(bundle_identifier)
-      smf_download_provisioning_profile_using_match(app_identifier, "enterprise")
-    else
-      use_sigh = (build_variant_config[:download_provisioning_profiles].nil? ? true : build_variant_config[:download_provisioning_profiles])
-      if (use_sigh == true)
-        smf_download_provisioning_profile_using_sigh(is_adhoc_build, app_identifier)
-      end
-    end
-  else
-    raise "The fastlane match entries in the Config.json file are incomplete. Set `readonly` and `type` for the `match`-Key."
-  end
-end
-
-def smf_download_provisioning_profile_using_match(app_identifier, type = nil)
-  build_variant_config = @smf_fastlane_config[:build_variants][@smf_build_variant_sym]
-  match_config = build_variant_config[:match]
-  type = type == nil ? match_config[:type] : type
-  read_only = (type == nil ? match_config[:read_only] : false)
-  extensions_suffixes = @smf_fastlane_config[:extensions_suffixes]
-  
-  username = safe_build_variant_config_read(:apple_id)
-  team_id = safe_build_variant_config_read(:team_id)
-  git_url = $FASTLANE_MATCH_REPO_URL
-  identifiers = [app_identifier]
-
-  if extensions_suffixes
-    for extension_suffix in extensions_suffixes do
-      identifiers << "#{app_identifier}.#{extension_suffix}"
-    end
-  end
-
-  match(type: type, readonly: read_only, app_identifier: identifiers, username: username, team_id: team_id, git_url: git_url, git_branch: team_id, keychain_name: "jenkins.keychain", keychain_password: ENV["JENKINS"])
-end
-
-def smf_download_provisioning_profile_using_sigh(is_adhoc_build, app_identifier)
-  build_variant_config = @smf_fastlane_config[:build_variants][@smf_build_variant_sym]
-  bundle_identifier = build_variant_config[:bundle_identifier]
-  extensions_suffixes = @smf_fastlane_config[:extensions_suffixes]
-
-  begin
-    sigh(
-      adhoc: is_adhoc_build,
-      app_identifier: app_identifier,
-      readonly: true
-    )
-  rescue => exception
-    raise "Couldn't download the provisioning profiles. The profile did either expire or there is no matching certificate available locally."
-  end
-
-  if extensions_suffixes
-    for extension_suffix in extensions_suffixes do
-
-      begin
-        sigh(
-          adhoc: is_adhoc_build,
-          app_identifier: "#{bundle_identifier}.#{extension_suffix}",
-          readonly: true
-        )
-      rescue
-        UI.important("Seems like #{bundle_identifier}.#{extension_suffix} is not yet included in this project! Skipping sigh!")
-        next   
-      end
-
-    end
-  end
-end
-
-# returns true if fastlane match should be used and false if not, on error this function returns nil
-def should_use_match
-  build_variant_config = @smf_fastlane_config[:build_variants][@smf_build_variant_sym]
-  match_config = build_variant_config[:match]
-  if match_config == nil
-    return false
-  end
-
-  allowed_types = ["appstore", "adhoc", "development", "enterprise"]
-
-  if (match_config[:read_only] == nil || allowed_types.include?(match_config[:type]) == false) 
-    return nil
-  end
-
-  return true
-end
-
-def is_enterprise_alpha_beta(bundle_identifier)
-  if ENV[$FASTLANE_PLATFORM_NAME_ENV_KEY] == "mac"
-    UI.message("Fastlane Match Download is currently not supported for Mac Apps, Sigh will be used")
-    return false
-  end
-
-  if @smf_build_variant.match(/alpha/) != nil || @smf_build_variant.match(/beta/) != nil || @smf_build_variant.match(/example/) != nil
-    regex = /com\.smartmobilefactory\.enterprise/
-    if bundle_identifier.match(regex) != nil
-      return true
-    end
-  end
-
-  return false
-end
-
-def safe_build_variant_config_read(property)
-  build_variant_config = @smf_fastlane_config[:build_variants][@smf_build_variant_sym]
-  value = build_variant_config[property]
-  if (value == nil)
-    raise "Error #{property.to_s} entry is nil in config.json build_variant."
-  end
-
-  return value
 end
