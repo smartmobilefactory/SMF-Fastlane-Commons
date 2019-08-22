@@ -53,6 +53,102 @@ def get_tag_of_pod(version_number)
   "releases/#{version_number}"
 end
 
+def get_project_name
+  @smf_fastlane_config[:project][:project_name]
+end
+
+def smf_is_keychain_enabled
+  return ENV[$SMF_IS_KEYCHAIN_ENABLED].nil? ? true : ENV[$SMF_IS_KEYCHAIN_ENABLED] == "true"
+end
+
+def get_extension_suffixes
+  @smf_fastlane_config[:extensions_suffixes]
+end
+
+def get_required_xcode_version
+  @smf_fastlane_config[:project][:xcode_version]
+end
+
+##################################
+###  Build variant config      ###
+##################################
+def build_variant_config
+  @smf_fastlane_config[:build_variants][@smf_build_variant_sym]
+end
+
+def get_build_scheme
+  build_variant_config[:scheme]
+end
+
+def get_upload_itc
+  build_variant_config[:upload_itc].nil? ? false : build_variant_config[:upload_itc]
+end
+
+def get_upload_bitcode
+  build_variant_config[:upload_bitcode].nil? ? true : build_variant_config[:upload_bitcode]
+end
+
+def get_use_xcconfig
+  build_variant_config[:xcconfig_name].nil? ? false : true
+end
+
+def get_xcconfig_name
+  use_xcconfig = build_variant_config[:xcconfig_name].nil? ? false : true
+  use_xcconfig ? build_variant_config[:xcconfig_name][:archive] : "Release"
+end
+
+def get_export_method
+  build_variant_config[:export_method]
+end
+
+def get_icloud_environment
+  build_variant_config[:icloud_environment].nil? ? "Development" : build_variant_config[:icloud_environment]
+end
+
+def get_code_signing_identity
+  build_variant_config[:code_signing_identity]
+end
+
+def get_use_sparkle
+  build_variant_config[:use_sparkle].nil? ? false : build_variant_config[:use_sparkle]
+end
+
+def get_use_wildcard_signing
+  build_variant_config[:use_wildcard_signing]
+end
+
+def get_team_id
+  build_variant_config[:team_id]
+end
+
+def get_apple_id
+  build_variant_config[:apple_id]
+end
+
+def get_bundle_identifier
+  build_variant_config[:bundle_identifier]
+end
+
+def get_is_adhoc_build
+  @smf_build_variant.include? "adhoc"
+end
+
+def match_config
+  build_variant_config[:match]
+end
+
+def get_match_config_read_only
+  match_config.nil? ? nil : match_config[:read_only]
+end
+
+def get_match_config_type
+  match_config.nil? ? nil : match_config[:type]
+end
+
+def get_should_clean_project
+  build_variant_config[:should_clean_project]
+end
+
 def get_app_secret(build_variant)
   UI.message("build_variant: #{build_variant}")
   build_variant = build_variant.to_s.downcase
