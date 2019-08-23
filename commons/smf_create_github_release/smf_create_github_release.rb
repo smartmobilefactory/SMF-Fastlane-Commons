@@ -57,7 +57,7 @@ def zipped_path(path)
       zipped_file_path = "#{File.path(path).gsub(%r{\..*}, '')}.zip"
       UI.message("Zipped file path: #{zipped_file_path}")
       UI.message("Folder: #{File.dirname(path)}")
-      sh "cd \"#{File.dirname(path)}\"; zip -r \"#{zipped_file_path}\" \"#{File.basename(path)}\""
+      sh "cd \"#{File.dirname(path)}\"; zip -r \"#{zipped_file_path}\" \"./#{File.basename(path)}\""
       File.path(zipped_file_path)
     else
       File.path(path)
