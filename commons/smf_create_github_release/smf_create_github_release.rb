@@ -59,8 +59,10 @@ def zipped_path(path)
     if File.extname(path) != '.zip'
       zipped_file_path = "#{path}.zip"
       sh "zip -r \"#{zipped_file_path}\" \"#{File.path(path)}\""
+      File.path(zipped_file_path)
+    else
+      File.path(path)
     end
-    File.dirname(path)
   end
 end
 
