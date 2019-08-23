@@ -53,7 +53,9 @@ end
 def zipped_path(path)
   if File.exists?(path)
     if File.extname(path) != '.zip'
-      zipped_file_path = "#{path}.zip"
+      zipped_file_path = "#{File.basename(path, '.*')}.zip"
+      UI.message("Zipped file path: #{zipped_file_path}")
+      UI.message("Folder: #{File.dirname(path)}")
       sh "cd \"#{File.dirname(path)}\"; zip -r \"#{zipped_file_path}\" \"#{File.path(path)}\""
       File.path(zipped_file_path)
     else
