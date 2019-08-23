@@ -19,8 +19,8 @@ private_lane :smf_create_github_release do |options|
 
   UI.message("Found \"#{repository_path}\" as GitHub project.")
 
-  
-  UI.message("test: #{paths}")
+
+  UI.message("Paths: #{paths}")
 
   #Zip paths if needed
   paths = paths.map do |path|
@@ -58,7 +58,7 @@ def zipped_path(path)
   if File.exists?(path)
     if File.extname(path) != '.zip'
       zipped_file_path = "#{path}.zip"
-      sh "zip -r \"#{zipped_file_path}\" \"#{File.dirname(path)}\""
+      sh "zip -r \"#{zipped_file_path}\" \"#{File.path(path)}\""
     end
     File.dirname(path)
   end
