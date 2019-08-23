@@ -173,10 +173,6 @@ def is_mac_app(build_variant)
   @smf_fastlane_config[:build_variants][build_variant.to_sym][:use_sparkle]
 end
 
-def get_platform(build_variant)
-  @smf_fastlane_config[:build_variants][build_variant.to_sym][:platform]
-end
-
 def get_path_to_ipa_or_app(build_variant)
 
   escaped_filename = get_escaped_filename(build_variant)
@@ -197,8 +193,4 @@ end
 
 def get_podspec_path(build_variant)
   @smf_fastlane_config[:build_variants][build_variant.to_sym][:podspec_path]
-end
-
-def should_attach_build_outputs_to_github(build_variant)
-  @smf_fastlane_config[:build_variants][build_variant.to_sym][:attach_build_outputs_to_github] == true
 end
