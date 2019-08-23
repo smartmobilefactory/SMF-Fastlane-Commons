@@ -1,6 +1,5 @@
-# Generate the Appfile based on the apple_id and team_id setting in Config.json for the current build variant
 private_lane :smf_generate_temporary_appfile do |options|
-  
+
   build_variant = options[:build_variant]
 
   apple_id = get_apple_id(build_variant)
