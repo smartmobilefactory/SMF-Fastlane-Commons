@@ -10,7 +10,6 @@ private_lane :smf_publish_pod do |options|
   # Variables
   bump_type = @smf_bump_type
   branch = @smf_git_branch
-  project_config = @smf_fastlane_config[:project]
   build_variant_config = @smf_fastlane_config[:build_variants][@smf_build_variant_sym]
   podspec_path = build_variant_config[:podspec_path]
   generateMetaJSON = (build_variant_config[:generateMetaJSON].nil? ? true : build_variant_config[:generateMetaJSON])
