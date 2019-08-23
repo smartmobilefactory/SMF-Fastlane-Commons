@@ -243,7 +243,7 @@ private_lane :smf_deploy_build_variant do |options|
   # Create the GitHub release
   build_number = get_build_number(xcodeproj: "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj")
   smf_create_github_release(
-      build_variant: build_variant,
+      paths: [get_path_to_ipa_or_app(build_variant)],
       release_name: "#{@smf_build_variant.upcase} #{build_number}",
       tag: tag
   )

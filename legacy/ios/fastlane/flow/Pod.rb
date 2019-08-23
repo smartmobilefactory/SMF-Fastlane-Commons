@@ -91,7 +91,6 @@ private_lane :smf_publish_pod do |options|
 
   # Create the GitHub release
   smf_create_github_release(
-      build_variant: 'framework',
       release_name: version,
       tag: tag
   )
