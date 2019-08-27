@@ -6,7 +6,8 @@ This lane increments the build number of the project if an app is built and retu
 Increment the build number.
 ```
 smf_increment_build_number(
-    build_variant: 'Alpha'
+    build_variant: 'Alpha',
+    current_build_number: <some number>
 )
 ```
 
