@@ -100,7 +100,16 @@ private_lane :smf_deploy_build_variant do |options|
 
   # Build and archive the IPA
   smf_build_app(
-      bulk_deploy_params: bulk_deploy_params
+      bulk_deploy_params: bulk_deploy_params,
+      scheme: get_build_scheme,
+      should_clean_project: get_should_clean_project,
+      required_xcode_version: get_required_xcode_version,
+      project_name: get_project_name,
+      xcconfig_name: get_xcconfig_name,
+      code_signing_identity: get_code_signing_identity,
+      upload_itc: get_upload_itc,
+      upload_bitcode: get_upload_bitcode,
+      export_method: get_export_method
   )
 
   if get_use_sparkle == true
