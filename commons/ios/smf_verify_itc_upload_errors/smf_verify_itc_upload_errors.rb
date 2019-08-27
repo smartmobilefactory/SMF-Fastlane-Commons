@@ -2,27 +2,31 @@ private_lane :smf_verify_itc_upload_errors do |options|
   require 'spaceship'
   require 'credentials_manager'
 
+  # Parameter
+  project_name = options[:project_name]
+  target = options[:target]
+  build_scheme = options[:build_scheme]
+  itc_skip_version_check = options[:itc_skip_verison_check]
+  username = options[:itc_apple_id]
+  itc_team_id = options[:itc_team_id]
+  bundle_identifier = options[:bundle_identifier]
+
   version_number = get_version_number(
-      xcodeproj: "#{get_project_name}.xcodeproj",
-      target: (get_target != nil ? get_target : get_build_scheme)
+      xcodeproj: "#{project_name}.xcodeproj",
+      target: (target != nil ? target : build_scheme)
   )
 
-  build_number = get_build_number(xcodeproj: "#{get_project_name}.xcodeproj")
-  itc_skip_version_check = get_itc_skip_version_check
-
-  # Use the specified Apple ID to login or take the default one (is automatically chosen if the values are nil)
-  build_variant_config.key?(:itc_apple_id) == true ? username = get_itc_apple_id :  username = nil
-
+  build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
 
   credentials = CredentialsManager::AccountManager.new(user: username)
 
   # Setup Spaceship
-  ENV[$SMF_FASTLANE_ITC_TEAM_ID_KEY] = get_itc_team_id
+  ENV[$SMF_FASTLANE_ITC_TEAM_ID_KEY] = itc_team_id
   Spaceship::Tunes.login(credentials.user, credentials.password)
   Spaceship::Tunes.select_team
 
   # Get the currently editable version
-  app = Spaceship::Tunes::Application.find(get_bundle_identifier)
+  app = Spaceship::Tunes::Application.find(bundle_identifier)
 
   # Check if there is already a build with the same build number
   versions = [version_number]
