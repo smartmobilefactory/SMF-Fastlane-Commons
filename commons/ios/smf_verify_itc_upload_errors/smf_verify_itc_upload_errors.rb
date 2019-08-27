@@ -11,7 +11,7 @@ private_lane :smf_verify_itc_upload_errors do |options|
   itc_skip_version_check = get_itc_skip_version_check
 
   # Use the specified Apple ID to login or take the default one (is automatically chosen if the values are nil)
-  build_variant_config.key? == :itc_apple_id ? username = get_itc_apple_id :  username = nil
+  build_variant_config.key?(:itc_apple_id) == true ? username = get_itc_apple_id :  username = nil
 
 
   credentials = CredentialsManager::AccountManager.new(user: username)
