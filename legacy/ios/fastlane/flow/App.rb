@@ -90,7 +90,16 @@ private_lane :smf_deploy_build_variant do |options|
 
   # Check for commons ITC Upload errors if needed
   if build_variant_config[:upload_itc] == true
-    smf_verify_common_itc_upload_errors
+
+    smf_verify_itc_upload_errors(
+        project_name: get_project_name,
+        target: get_target,
+        build_scheme: get_build_scheme,
+        itc_skip_version_check: get_itc_skip_version_check,
+        username: get_itc_apple_id,
+        itc_team_id: get_itc_team_id,
+        bundle_identifier: get_bundle_identifier
+    )
   end
 
   # Sync Phrase App
