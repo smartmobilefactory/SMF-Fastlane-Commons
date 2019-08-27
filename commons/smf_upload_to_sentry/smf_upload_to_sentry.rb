@@ -4,9 +4,9 @@ private_lane :smf_upload_to_sentry do |options|
   project_slug = options[:project_slug]
 
   sentry_upload_dsym(
-      auth_token: $SENTRY_AUTH_TOKEN,
+      auth_token: ENV[$SENTRY_AUTH_TOKEN],
       org_slug: org_slug,
       project_slug: project_slug,
-      url: $SENTRY_URL
+      url: 'https://sentry.solutions.smfhq.com/'
   )
 end
