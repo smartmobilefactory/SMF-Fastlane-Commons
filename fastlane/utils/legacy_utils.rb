@@ -173,6 +173,14 @@ def is_mac_app(build_variant)
   @smf_fastlane_config[:build_variants][build_variant.to_sym][:use_sparkle]
 end
 
+def get_apple_id(build_variant)
+  @smf_fastlane_config[:build_variants][build_variant.to_sym][:apple_id]
+end
+
+def get_team_id(build_variant)
+  @smf_fastlane_config[:build_variants][build_variant.to_sym][:team_id]
+end
+
 def get_path_to_ipa_or_app(build_variant)
 
   escaped_filename = get_escaped_filename(build_variant)

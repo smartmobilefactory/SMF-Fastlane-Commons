@@ -63,7 +63,7 @@ private_lane :smf_deploy_build_variant do |options|
   project_config = @smf_fastlane_config[:project]
 
 
-  generate_temporary_appfile
+  smf_generate_temporary_appfile(build_variant: build_variant)
 
   generateMetaJSON = build_variant_config[:generateMetaJSON]
 
