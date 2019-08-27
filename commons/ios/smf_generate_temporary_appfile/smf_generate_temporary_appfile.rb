@@ -1,9 +1,7 @@
 private_lane :smf_generate_temporary_appfile do |options|
 
-  build_variant = options[:build_variant]
-
-  apple_id = get_apple_id(build_variant)
-  team_id = get_team_id(build_variant)
+  apple_id = get_apple_id
+  team_id = get_team_id
 
   if apple_id.nil?
     UI.important('Could not find the apple_id for this build variant, will use development@smfhq.com. Please update your Config.json.')
