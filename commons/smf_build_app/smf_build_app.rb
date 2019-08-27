@@ -21,7 +21,7 @@ private_lane :smf_build_app do |options|
     output_name = scheme
 
     # Check if the project defined if the build should be cleaned. Other wise the default behavior is used based on the whether the archiving is a bulk operation.
-    clean_project = bulk_deploy_params != nil ? (bulk_deploy_params[:index] == 0 && bulk_deploy_params[:count] > 1) : true
+    clean_project = !bulk_deploy_params.nil? ? (bulk_deploy_params[:index] == 0 && bulk_deploy_params[:count] > 1) : true
 
     clean_project = should_clean_project if should_clean_project != nil
 

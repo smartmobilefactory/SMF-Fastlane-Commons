@@ -10,3 +10,7 @@ NOTE: The smf_download_provisioning_profiles lane has to be called before callin
 
 Builds the android app. 🎉
 
+Example:
+
+smf_build_app(build_variant: <build variant>)
+
