@@ -2,4 +2,11 @@
 
 #### iOS
 
-This lane is called to build the app. Before the call the smf_download_provisioning_profiles lane has to be called. After that xcode_select is called to choose the correct verison for the project. Then the fastlane action gym is used to build the app.
+Builds the iOS app by first ensuring the correct xcode version and then using gym to actually build the app.
+
+NOTE: The smf_download_provisioning_profiles lane has to be called before calling this lane.
+
+#### Android
+
+Builds the android app. 🎉
+
