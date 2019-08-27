@@ -7,18 +7,18 @@ private_lane :smf_verify_itc_upload_errors do |options|
   target = options[:target]
   build_scheme = options[:build_scheme]
   itc_skip_version_check = options[:itc_skip_verison_check]
-  username = options[:itc_apple_id]
+  itc_apple_id = options[:itc_apple_id]
   itc_team_id = options[:itc_team_id]
   bundle_identifier = options[:bundle_identifier]
 
   version_number = get_version_number(
       xcodeproj: "#{project_name}.xcodeproj",
-      target: (target != nil ? target : build_scheme)
+      target: !target.nil? ? target : build_scheme
   )
 
   build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
 
-  credentials = CredentialsManager::AccountManager.new(user: username)
+  credentials = CredentialsManager::AccountManager.new(user: itc_apple_id)
 
   # Setup Spaceship
   ENV[$SMF_FASTLANE_ITC_TEAM_ID_KEY] = itc_team_id
@@ -30,13 +30,8 @@ private_lane :smf_verify_itc_upload_errors do |options|
 
   # Check if there is already a build with the same build number
   versions = [version_number]
-  if app.edit_version
-    versions.push(app.edit_version)
-  end
-
-  if app.live_version
-    versions.push(app.live_version)
-  end
+  versions.push(app.edit_version) if app.edit_version
+  versions.push(app.live_version) if app.live_version
 
   duplicate_build_number_errors = smf_check_if_itc_already_contains_buildnumber(app, versions, build_number)
 
@@ -70,7 +65,7 @@ def smf_check_if_itc_already_contains_buildnumber(app, version_numbers, build_nu
 
     build_trains = app.build_trains[version]
     if build_trains
-      for build_train in build_trains
+      build_trains.each do |build_train|
         if build_train.build_version == build_number
           UI.error("Found matching build #{build_train.build_version}")
           errors.push("There is already a build uploaded with the build number #{build_number}. You need to increment the build number first before uploading to iTunes Connect.")
