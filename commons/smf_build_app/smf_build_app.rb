@@ -47,6 +47,8 @@ private_lane :smf_build_app do |options|
         xcpretty_formatter: "/Library/Ruby/Gems/2.3.0/gems/xcpretty-json-formatter-0.1.0/lib/json_formatter.rb"
     )
 
+  when :android
+
     build_variant = options[:build_variant]
 
     if !build_variant
