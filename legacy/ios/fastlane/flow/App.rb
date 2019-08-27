@@ -281,9 +281,13 @@ private_lane :smf_deploy_build_variant do |options|
     exception = nil
 
     begin
-      smf_upload_ipa_to_testflight
+      smf_upload_to_testflight(
+          username: get_itc_apple_id(build_variant),
+          skip_waiting_for_build_processing: should_skip_waiting_after_itc_upload(build_variant),
+          wait_for_uploaded_build: should_skip_waiting_after_itc_upload(build_variant) == false
+      )
 
-      skip_waiting = should_skip_waiting_after_itc_upload
+      skip_waiting = should_skip_waiting_after_itc_upload(build_variant)
 
       # Construct the HipChat notification content
       notification_title = "Uploaded #{smf_default_notification_release_title} to iTunes Connect 🎉"
