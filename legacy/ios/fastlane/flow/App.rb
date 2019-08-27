@@ -62,9 +62,6 @@ private_lane :smf_deploy_build_variant do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][@smf_build_variant_sym]
   project_config = @smf_fastlane_config[:project]
 
-
-  smf_generate_temporary_appfile(apple_id: get_apple_id, team_id: get_team_id)
-
   generateMetaJSON = build_variant_config[:generateMetaJSON]
 
   use_hockey = (build_variant_config[:use_hockey].nil? ? true : build_variant_config[:use_hockey])
@@ -282,6 +279,7 @@ private_lane :smf_deploy_build_variant do |options|
 
     begin
       smf_upload_to_testflight(
+          team_id: get_itc_apple_id(build_variant),
           username: get_itc_apple_id(build_variant),
           skip_waiting_for_build_processing: should_skip_waiting_after_itc_upload(build_variant)
       )

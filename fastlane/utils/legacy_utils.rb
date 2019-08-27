@@ -195,6 +195,10 @@ def get_itc_apple_id(build_variant)
   @smf_fastlane_config[:build_variants][build_variant.to_sym][:itc_apple_id]
 end
 
+def get_itc_team_id(build_variant)
+  @smf_fastlane_config[:build_variants][build_variant.to_sym][:itc_team_id]
+end
+
 def should_skip_waiting_after_itc_upload(build_variant)
   !@smf_fastlane_config[:build_variants][build_variant.to_sym][:itc_skip_waiting].nil? ? @smf_fastlane_config[:build_variants][build_variant.to_sym][:itc_skip_waiting] : false
 end

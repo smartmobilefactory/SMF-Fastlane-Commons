@@ -6,7 +6,8 @@ This lane uploads the build to Testflight using Pilot's lane *upload_to_testflig
 Upload the build to Testflight.
 ```
 smf_upload_to_testflight(
-    username: '', #Optional, Apple ID Username which is by default automatically determined using the Appfile.
+    team_id: '', #Optional,  ID of your App Store Connect team which is by default 'development@smfhq.com'
+    username: '', #Optional, Apple ID Username which is by default 'development@smfhq.com'.
     skip_waiting_for_build_processing: false #Optional, by default it is false.
 )
 ``` 
