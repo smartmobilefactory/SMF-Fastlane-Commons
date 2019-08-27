@@ -1,6 +1,6 @@
 private_lane :smf_generate_temporary_appfile do |options|
 
-  apple_id = options[:apple_id]
+  apple_id = !options[:apple_id].nil? ? options[:apple_id] : 'development@smfhq.com'
   team_id = options[:team_id]
 
   if apple_id.nil?

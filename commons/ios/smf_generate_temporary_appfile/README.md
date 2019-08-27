@@ -6,7 +6,7 @@ This lane creates a temporary Appfile in the workspace directory.
 Create a temporary Appfile.
 ```
 smf_generate_temporary_appfile(
-    apple_id: '',
+    apple_id: '', #Optional, by default 'development@smfhq.com'
     team_id: ''
 )
 ``` 
