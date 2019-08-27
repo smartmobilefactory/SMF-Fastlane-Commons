@@ -279,7 +279,8 @@ private_lane :smf_deploy_build_variant do |options|
 
     begin
       smf_upload_to_testflight(
-          team_id: get_itc_apple_id(build_variant),
+          apple_id: get_itc_apple_id(build_variant),
+          itc_team_id: get_itc_team_id(build_variant),
           username: get_itc_apple_id(build_variant),
           skip_waiting_for_build_processing: should_skip_waiting_after_itc_upload(build_variant)
       )
