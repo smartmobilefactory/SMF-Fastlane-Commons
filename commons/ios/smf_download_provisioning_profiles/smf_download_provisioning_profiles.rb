@@ -1,45 +1,70 @@
 
 private_lane :smf_download_provisioning_profiles do |options|
 
+  # Parameters
+  team_id = options[:team_id]
+  apple_id = options[:apple_id]
+  use_wildcard_signing = options[:use_wildcard_signing]
+  bundle_identifier = options[:bundle_identifier]
+  match_config_is_nil = options[:match_config].nil?
+  match_read_only = options[:match_read_only]
+  match_type = options[:match_type]
+  extensions_suffixes = options[:extensions_suffixes]
+
   if ENV[$FASTLANE_PLATFORM_NAME_ENV_KEY] == "mac"
     UI.message("Skipping fastlane match, because it doesn't support mac apps.")
     return
   end
 
-  team_id(get_team_id)
+  team_id(team_id)
 
   if smf_is_keychain_enabled
     unlock_keychain(path: "login.keychain", password: ENV[$KEYCHAIN_LOGIN_ENV_KEY])
     unlock_keychain(path: "jenkins.keychain", password: ENV[$KEYCHAIN_JENKINS_ENV_KEY])
   end
 
-  app_identifier = (get_use_wildcard_signing == true ? "*" : get_bundle_identifier)
+  app_identifier = (use_wildcard_signing == true ? "*" : bundle_identifier)
   allowed_types = ["appstore", "adhoc", "development", "enterprise"]
 
-  if match_config != nil
-    if (get_match_config_read_only == nil || allowed_types.include?(get_match_config_type) == false)
+  if match_config_is_nil != true
+    if (match_read_only == nil || allowed_types.include?(match_type) == false)
       raise "The fastlane match entries in the Config.json file are incomplete. Set `readonly` and `type` for the `match` Key."
     end
-    smf_download_provisioning_profile_using_match(app_identifier)
+    smf_download_provisioning_profile_using_match(
+        app_identifier: app_identifier,
+        type: match_type,
+        read_only: (match_type.nil? ? match_read_only : false),
+        extensions_suffixes: extensions_suffixes,
+        apple_id: apple_id,
+        team_id: team_id
+    )
 
   elsif (@smf_build_variant.match(/alpha/) != nil || @smf_build_variant.match(/beta/) != nil || @smf_build_variant.match(/example/) != nil)
     regex = /com\.smartmobilefactory\.enterprise/
-    if get_bundle_identifier.match(regex) != nil
-      smf_download_provisioning_profile_using_match(app_identifier, "enterprise")
+    if bundle_identifier.match(regex) != nil
+      smf_download_provisioning_profile_using_match(
+          app_identifier: app_identifier,
+          type: "enterprise",
+          read_only: (match_type.nil? ? match_read_only : false),
+          extensions_suffixes: extensions_suffixes,
+          apple_id: apple_id,
+          team_id: team_id
+      )
     end
   end
 
 end
 
-def smf_download_provisioning_profile_using_match(app_identifier, type = nil)
-  type = type == nil ? get_match_config_type: type
-  read_only = (type == nil ? get_match_config_read_only : false)
-  extensions_suffixes = get_extension_suffixes
+private_lane :smf_download_provisioning_profile_using_match do |options|
+  app_identifier = options[:app_identifier]
+  type = options[:type]
+  read_only = (type == nil ? options[:read_only] : false)
+  extensions_suffixes = options[:extensions_suffixes]
+  apple_id = options[:apple_id]
+  team_id = options[:team_id]
 
-  username = get_apple_id
-  team_id = get_team_id
-  git_url = $FASTLANE_MATCH_REPO_URL
   identifiers = [app_identifier]
+  git_url = $FASTLANE_MATCH_REPO_URL
 
   if extensions_suffixes
     for extension_suffix in extensions_suffixes do
@@ -47,9 +72,19 @@ def smf_download_provisioning_profile_using_match(app_identifier, type = nil)
     end
   end
 
-  if username.nil? || team_id.nil?
+  if apple_id.nil? || team_id.nil?
     raise "Error username or team id for fastlane match is nil"
   end
 
-  match(type: type, readonly: read_only, app_identifier: identifiers, username: username, team_id: team_id, git_url: git_url, git_branch: team_id, keychain_name: "jenkins.keychain", keychain_password: ENV[$KEYCHAIN_JENKINS_ENV_KEY])
+  match(
+      type: type,
+      readonly: read_only,
+      app_identifier: identifiers,
+      username: apple_id,
+      team_id: team_id,
+      git_url: git_url,
+      git_branch: team_id,
+      keychain_name: "jenkins.keychain",
+      keychain_password: ENV[$KEYCHAIN_JENKINS_ENV_KEY]
+  )
 end

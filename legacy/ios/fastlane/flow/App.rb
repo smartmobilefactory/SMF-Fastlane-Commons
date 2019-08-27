@@ -96,7 +96,16 @@ private_lane :smf_deploy_build_variant do |options|
   # Sync Phrase App
   smf_sync_strings_with_phrase_app
 
-  smf_download_provisioning_profiles
+  smf_download_provisioning_profiles(
+      team_id: get_team_id,
+      apple_id: get_apple_id,
+      use_wildcard_signing: get_use_wildcard_signing,
+      bundle_identifier: get_bundle_identifier,
+      match_config: match_config,
+      match_read_only: get_match_config_read_only,
+      match_type: get_match_config_type,
+      extensions_suffixes: get_extension_suffixes
+  )
 
   # Build and archive the IPA
   smf_build_app(
