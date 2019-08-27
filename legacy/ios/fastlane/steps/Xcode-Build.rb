@@ -37,7 +37,10 @@ private_lane :smf_archive_ipa_if_scheme_is_provided do |options|
     )
 
     if get_use_sparkle == true
-      smf_create_dmg_from_app
+      smf_create_dmg_from_app(
+          team_id: get_team_id,
+          build_scheme: get_build_scheme
+      )
     end
 
   else

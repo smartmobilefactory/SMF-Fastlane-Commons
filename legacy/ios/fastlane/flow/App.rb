@@ -122,7 +122,10 @@ private_lane :smf_deploy_build_variant do |options|
   )
 
   if get_use_sparkle == true
-    smf_create_dmg_from_app
+    smf_create_dmg_from_app(
+        team_id: get_team_id,
+        build_scheme: get_build_scheme
+    )
   end
 
   # Commit generated code. There can be changes eg. from PhraseApp + R.swift
