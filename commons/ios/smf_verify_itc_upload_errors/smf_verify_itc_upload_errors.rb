@@ -34,9 +34,9 @@ private_lane :smf_verify_itc_upload_errors do |options|
     versions.push(app.live_version)
   end
 
-  duplicate_build_number_erros = smf_check_if_itc_already_contains_buildnumber(app, versions, build_number)
+  duplicate_build_number_errors = smf_check_if_itc_already_contains_buildnumber(app, versions, build_number)
 
-  errors = duplicate_build_number_erros
+  errors = duplicate_build_number_errors
 
   # Check if there is a matching editable app version
   if itc_skip_version_check != true
