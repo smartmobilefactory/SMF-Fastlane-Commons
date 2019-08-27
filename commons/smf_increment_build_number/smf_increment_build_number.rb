@@ -9,7 +9,7 @@ private_lane :smf_increment_build_number do |options|
   UI.message('Fetching all tags...')
   sh('git fetch --tags --quiet')
 
-  last_tag = sh("git describe --tags --match \"build/*/*\" --abbrev=0 HEAD || echo #{NO_GIT_TAG_FAILURE}").to_s
+  last_tag = sh("git describe --tags --match \"build/*/*\" `git rev-list --tags --max-count=1` --abbrev=0 || echo #{NO_GIT_TAG_FAILURE}").to_s
 
   # Use build number of the project if there is no matching tag yet
   if last_tag.include? NO_GIT_TAG_FAILURE

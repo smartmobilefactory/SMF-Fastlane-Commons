@@ -77,8 +77,6 @@ def get_sentry_project_slug
   @smf_fastlane_config[:sentry_project_slug]
 end
 
-
-
 ##################################
 ###  Build variant config      ###
 ##################################

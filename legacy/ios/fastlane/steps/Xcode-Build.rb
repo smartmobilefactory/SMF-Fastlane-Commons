@@ -15,8 +15,17 @@ private_lane :smf_archive_ipa_if_scheme_is_provided do |options|
 
     smf_build_app(
       skip_export: skip_export,
-      bulk_deploy_params: bulk_deploy_params
-      )
+      bulk_deploy_params: bulk_deploy_params,
+      scheme: get_build_scheme,
+      should_clean_project: get_should_clean_project,
+      required_xcode_version: get_required_xcode_version,
+      project_name: get_project_name,
+      xcconfig_name: get_xcconfig_name,
+      code_signing_identity: get_code_signing_identity,
+      upload_itc: get_upload_itc,
+      upload_bitcode: get_upload_bitcode,
+      export_method: get_export_method
+    )
 
     if get_use_sparkle == true
       smf_create_dmg_from_app
@@ -104,39 +113,6 @@ end
 ##############
 ### HELPER ###
 ##############
-
-def smf_xcargs_for_build_system
-  return smf_is_using_old_build_system ? "" : "-UseNewBuildSystem=YES"
-end
-
-def smf_is_using_old_build_system
-  project_root = smf_workspace_dir
-
-  if (project_root== nil)
-    return false
-  end
-
-  workspace_file = `cd #{project_root} && ls | grep -E "(.|\s)+\.xcworkspace"`.gsub("\n", "")
-
-  if (workspace_file == "" || workspace_file == nil)
-    return false
-  end
-
-  file_to_search = File.join(project_root, "#{workspace_file}/xcshareddata/WorkspaceSettings.xcsettings")
-
-  if (File.exist?(file_to_search) == false)
-    return false
-  end
-
-  file_to_search_opened = File.open(file_to_search, "r")
-  contents = file_to_search_opened.read
-
-  regex = /<dict>\n\t<key>BuildSystemType<\/key>\n\t<string>Original<\/string>\n<\/dict>/
-
-  if (contents.match(regex) != nil)
-    return true
-  end
-end
 
 def smf_can_unit_tests_be_performed
 
