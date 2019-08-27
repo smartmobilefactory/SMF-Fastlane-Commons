@@ -185,7 +185,7 @@ private_lane :smf_deploy_build_variant do |options|
 
   if use_sentry
     begin
-      smf_upload_dsyms_to_sentry(build_variant: build_variant)
+      smf_upload_to_sentry(build_variant: build_variant)
     rescue => exception
       UI.important("Warning: Dsyms could not be uploaded to Sentry !")
 

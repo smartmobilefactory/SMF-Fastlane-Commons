@@ -1,4 +1,4 @@
-private_lane :smf_upload_dsyms_to_sentry do |options|
+private_lane :smf_upload_to_sentry do |options|
 
   build_variant = options[:build_variant]
 
