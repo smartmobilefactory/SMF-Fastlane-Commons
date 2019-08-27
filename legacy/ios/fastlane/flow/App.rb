@@ -90,7 +90,7 @@ private_lane :smf_deploy_build_variant do |options|
 
   # Check for commons ITC Upload errors if needed
   if build_variant_config[:upload_itc] == true
-    smf_verify_common_itc_upload_errors
+    smf_verify_itc_upload_errors
   end
 
   # Sync Phrase App
