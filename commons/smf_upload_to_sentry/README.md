@@ -6,7 +6,7 @@ This lane uploads symbolication files to Sentry by using the *sentry_upload_dsym
 Upload the files to Sentry.
 ```
 smf_upload_to_sentry(
-    build_variant: 'Alpha',
+    org_slug: '',
+    project_slug: ''
 )
 ```
-The *build_variant* is needed to call some methods like getting the sentry org slug.

@@ -185,7 +185,20 @@ private_lane :smf_deploy_build_variant do |options|
 
   if use_sentry
     begin
-      smf_upload_to_sentry(build_variant: build_variant)
+
+      org_slug = get_sentry_org_slug
+      project_slug = get_sentry_project_slug
+
+      org_slug_variant = get_variant_sentry_org_slug(build_variant)
+      project_slug_variant = get_variant_sentry_project_slug(build_variant)
+
+      # If a build variant overrides the sentry settings, use the variant settings
+      if !org_slug_variant.nil? && !project_slug_variant.nil?
+        org_slug = org_slug_variant
+        project_slug = project_slug_variant
+      end
+
+      smf_upload_to_sentry(org_slug: org_slug, project_slug: project_slug)
     rescue => exception
       UI.important("Warning: Dsyms could not be uploaded to Sentry !")
 
