@@ -32,7 +32,7 @@ private_lane :smf_check_pr do |options|
     build_variant_config = @smf_fastlane_config[:build_variants][@smf_build_variant_sym]
     should_archive_ipa = (build_variant_config["pr.archive_ipa".to_sym].nil? ? (smf_is_build_variant_a_pod == false) : build_variant_config["pr.archive_ipa".to_sym])
 
-    smf_generate_temporary_appfile(build_variant: build_variant)
+    smf_generate_temporary_appfile
 
     if should_archive_ipa
       smf_archive_ipa_if_scheme_is_provided(
