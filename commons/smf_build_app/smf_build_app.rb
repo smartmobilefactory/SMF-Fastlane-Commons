@@ -78,15 +78,13 @@ private_lane :smf_build_app do |options|
 end
 
 def smf_xcargs_for_build_system
-  return smf_is_using_old_build_system ? "" : "-UseNewBuildSystem=YES"
+  smf_is_using_old_build_system ? "" : "-UseNewBuildSystem=YES"
 end
 
 def smf_is_using_old_build_system
   project_root = smf_workspace_dir
 
-  if (project_root== nil)
-    return false
-  end
+  return false if project_root.nil?
 
   workspace_file = `cd #{project_root} && ls | grep -E "(.|\s)+\.xcworkspace"`.gsub("\n", "")
 
@@ -96,17 +94,13 @@ def smf_is_using_old_build_system
 
   file_to_search = File.join(project_root, "#{workspace_file}/xcshareddata/WorkspaceSettings.xcsettings")
 
-  if (File.exist?(file_to_search) == false)
-    return false
-  end
+  return false if (File.exist?(file_to_search) == false)
 
   file_to_search_opened = File.open(file_to_search, "r")
   contents = file_to_search_opened.read
 
   regex = /<dict>\n\t<key>BuildSystemType<\/key>\n\t<string>Original<\/string>\n<\/dict>/
 
-  if (contents.match(regex) != nil)
-    return true
-  end
+  return true if (contents.match(regex) != nil)
 end
 

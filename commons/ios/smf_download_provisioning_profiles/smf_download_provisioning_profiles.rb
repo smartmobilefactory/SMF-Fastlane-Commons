@@ -6,7 +6,7 @@ private_lane :smf_download_provisioning_profiles do |options|
   apple_id = options[:apple_id]
   use_wildcard_signing = options[:use_wildcard_signing]
   bundle_identifier = options[:bundle_identifier]
-  match_config_is_nil = options[:match_config].nil?
+  use_default_match_config = options[:use_default_match_config]
   match_read_only = options[:match_read_only]
   match_type = options[:match_type]
   extensions_suffixes = options[:extensions_suffixes]
@@ -26,7 +26,7 @@ private_lane :smf_download_provisioning_profiles do |options|
   app_identifier = (use_wildcard_signing == true ? "*" : bundle_identifier)
   allowed_types = ["appstore", "adhoc", "development", "enterprise"]
 
-  if match_config_is_nil != true
+  if use_default_match_config == false
     if (match_read_only == nil || allowed_types.include?(match_type) == false)
       raise "The fastlane match entries in the Config.json file are incomplete. Set `readonly` and `type` for the `match` Key."
     end
@@ -58,7 +58,7 @@ end
 private_lane :smf_download_provisioning_profile_using_match do |options|
   app_identifier = options[:app_identifier]
   type = options[:type]
-  read_only = (type == nil ? options[:read_only] : false)
+  read_only = !type.nil? ? false : options[:read_only]
   extensions_suffixes = options[:extensions_suffixes]
   apple_id = options[:apple_id]
   team_id = options[:team_id]
@@ -67,7 +67,7 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
   git_url = $FASTLANE_MATCH_REPO_URL
 
   if extensions_suffixes
-    for extension_suffix in extensions_suffixes do
+    extension_suffixes.each do |extension_suffix|
       identifiers << "#{app_identifier}.#{extension_suffix}"
     end
   end

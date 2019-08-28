@@ -16,7 +16,7 @@ private_lane :smf_archive_ipa_if_scheme_is_provided do |options|
         apple_id: get_apple_id,
         use_wildcard_signing: get_use_wildcard_signing,
         bundle_identifier: get_bundle_identifier,
-        match_config: match_config,
+        use_default_match_config: match_config.nil?,
         match_read_only: get_match_config_read_only,
         match_type: get_match_config_type,
         extensions_suffixes: get_extension_suffixes
