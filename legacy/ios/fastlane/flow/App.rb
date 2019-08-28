@@ -87,7 +87,16 @@ private_lane :smf_deploy_build_variant do |options|
 
   # Check for commons ITC Upload errors if needed
   if build_variant_config[:upload_itc] == true
-    smf_verify_common_itc_upload_errors
+
+    smf_verify_itc_upload_errors(
+        project_name: get_project_name,
+        target: get_target,
+        build_scheme: get_build_scheme,
+        itc_skip_version_check: get_itc_skip_version_check,
+        username: get_itc_apple_id,
+        itc_team_id: get_itc_team_id,
+        bundle_identifier: get_bundle_identifier
+    )
   end
 
   # Sync Phrase App
@@ -97,7 +106,16 @@ private_lane :smf_deploy_build_variant do |options|
 
   # Build and archive the IPA
   smf_build_app(
-      bulk_deploy_params: bulk_deploy_params
+      bulk_deploy_params: bulk_deploy_params,
+      scheme: get_build_scheme,
+      should_clean_project: get_should_clean_project,
+      required_xcode_version: get_required_xcode_version,
+      project_name: get_project_name,
+      xcconfig_name: get_xcconfig_name,
+      code_signing_identity: get_code_signing_identity,
+      upload_itc: get_upload_itc,
+      upload_bitcode: get_upload_bitcode,
+      export_method: get_export_method
   )
 
   if get_use_sparkle == true
