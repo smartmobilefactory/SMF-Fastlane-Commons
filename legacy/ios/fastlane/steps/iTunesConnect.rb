@@ -1,30 +1,3 @@
-####################################
-### smf_upload_ipa_to_testflight ###
-####################################
-
-desc "upload the app on Testflight"
-private_lane :smf_upload_ipa_to_testflight do |options|
-
-  UI.important("Uploading the build to Testflight")
-
-  # Variables
-  build_variant_config = @smf_fastlane_config[:build_variants][@smf_build_variant_sym]
-
-  if build_variant_config.key? :itc_apple_id
-    username = build_variant_config[:itc_apple_id]
-  else
-    username = nil
-  end
-
-  pilot(
-    username: username,
-    skip_waiting_for_build_processing: should_skip_waiting_after_itc_upload,
-    wait_for_uploaded_build: (should_skip_waiting_after_itc_upload == false),
-    changelog: ""
-    )
-
-end
-
 #########################################
 ### smf_download_dsym_from_testflight ###
 #########################################
