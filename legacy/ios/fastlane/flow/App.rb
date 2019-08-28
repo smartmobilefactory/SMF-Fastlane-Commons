@@ -62,6 +62,11 @@ private_lane :smf_deploy_build_variant do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][@smf_build_variant_sym]
   project_config = @smf_fastlane_config[:project]
 
+  smf_generate_temporary_appfile(
+      apple_id: get_apple_id,
+      team_id: get_team_id
+  )
+
   generateMetaJSON = build_variant_config[:generateMetaJSON]
 
   use_hockey = (build_variant_config[:use_hockey].nil? ? true : build_variant_config[:use_hockey])
@@ -105,7 +110,16 @@ private_lane :smf_deploy_build_variant do |options|
   # Sync Phrase App
   smf_sync_strings_with_phrase_app
 
-  smf_download_provisioning_profiles
+  smf_download_provisioning_profiles(
+      team_id: get_team_id,
+      apple_id: get_apple_id,
+      use_wildcard_signing: get_use_wildcard_signing,
+      bundle_identifier: get_bundle_identifier,
+      use_default_match_config: match_config.nil?,
+      match_read_only: get_match_config_read_only,
+      match_type: get_match_config_type,
+      extensions_suffixes: get_extension_suffixes
+  )
 
   # Build and archive the IPA
   smf_build_app(
@@ -122,7 +136,10 @@ private_lane :smf_deploy_build_variant do |options|
   )
 
   if get_use_sparkle == true
-    smf_create_dmg_from_app
+    smf_create_dmg_from_app(
+        team_id: get_team_id,
+        build_scheme: get_build_scheme
+    )
   end
 
   # Commit generated code. There can be changes eg. from PhraseApp + R.swift
