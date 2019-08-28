@@ -1,15 +1,17 @@
 private_lane :smf_upload_to_appcenter do |options|
 
-  build_variant = options[:build_variant]
-  apkFile = options[:apkFile]
-  apkPath = options[:apkPath]
-  app_secret = get_app_secret(build_variant)
+  apk_file = options[:apk_file]
+  apk_path = options[:apk_path]
+  build_number = options[:build_number]
+  app_secret = options[:app_secret]
+  escaped_filename = options[:escaped_filename]
+  path_to_ipa_or_app = options[:path_to_ipa_or_app]
+  is_mac_app = !options[:is_mac_app].nil? ? options[:is_mac_app] : false
+  podspec_path = options[:podspec_path]
   app_name, owner_name = get_app_details(app_secret)
 
   case @platform
   when :ios
-    escaped_filename = get_escaped_filename(build_variant)
-    is_mac_app = is_mac_app(build_variant)
     dsym_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.app.dSYM.zip"
     UI.message("Constructed the dsym path \"#{dsym_path}\"")
     unless File.exist?(dsym_path)
@@ -23,11 +25,10 @@ private_lane :smf_upload_to_appcenter do |options|
       sh "cd ../build; zip -r9 \"#{escaped_filename}.app.zip\" \"#{escaped_filename}.app\" || echo #{NO_APP_FAILURE}"
     end
 
-    app_path = get_path_to_ipa_or_app(build_variant)
+    app_path = path_to_ipa_or_app
 
     if is_mac_app
-      build_number = get_build_number_of_app
-      version_number = version_get_podspec(path: get_podspec_path(build_variant))
+      version_number = version_get_podspec(path: podspec_path)
 
       app_path = app_path.sub('.app', '.dmg')
 
@@ -61,17 +62,17 @@ private_lane :smf_upload_to_appcenter do |options|
 
   when :android
     found = false
-    if apkPath
+    if apk_path
       found = true
-      apk_path = apkPath
+      apk_path = apk_path
     else
       lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].each do |apk_path|
-        found = apk_path.include? apkFile
+        found = apk_path.include? apk_file
         break if found
       end
     end
 
-    raise("Cannot find the APK #{apkFile}") unless found
+    raise("Cannot find the APK #{apk_file}") unless found
 
     UI.message('Upload android app to AppCenter.')
     appcenter_upload(
