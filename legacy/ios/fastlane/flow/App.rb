@@ -176,7 +176,14 @@ private_lane :smf_deploy_build_variant do |options|
     ENV[$SMF_APP_HOCKEY_ID_ENV_KEY] = build_variant_config[:hockeyapp_id]
 
     # Upload the IPA to AppCenter
-    smf_upload_to_appcenter(build_variant: build_variant)
+    smf_upload_to_appcenter(
+        build_number: get_build_number_of_app,
+        app_secret: get_app_secret(build_variant),
+        escaped_filename: get_escaped_filename(build_variant),
+        path_to_ipa_or_app: get_path_to_ipa_or_app(build_variant),
+        is_mac_app: is_mac_app(build_variant),
+        podspec_path: get_podspec_path(build_variant)
+    )
 
     # Disable the former HockeyApp entry
     smf_disable_former_hockey_entry(
