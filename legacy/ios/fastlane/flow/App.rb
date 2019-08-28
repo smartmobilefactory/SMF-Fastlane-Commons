@@ -62,7 +62,6 @@ private_lane :smf_deploy_build_variant do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][@smf_build_variant_sym]
   project_config = @smf_fastlane_config[:project]
 
-
   smf_generate_temporary_appfile(
       apple_id: get_apple_id,
       team_id: get_team_id
@@ -89,11 +88,23 @@ private_lane :smf_deploy_build_variant do |options|
   end
 
   smf_install_pods_if_project_contains_podfile
-  tag = smf_increment_build_number(build_variant: build_variant)
+  tag = smf_increment_build_number(
+      build_variant: build_variant,
+      current_build_number: get_build_number_of_app
+  )
 
   # Check for commons ITC Upload errors if needed
   if build_variant_config[:upload_itc] == true
-    smf_verify_common_itc_upload_errors
+
+    smf_verify_itc_upload_errors(
+        project_name: get_project_name,
+        target: get_target,
+        build_scheme: get_build_scheme,
+        itc_skip_version_check: get_itc_skip_version_check,
+        username: get_itc_apple_id,
+        itc_team_id: get_itc_team_id,
+        bundle_identifier: get_bundle_identifier
+    )
   end
 
   # Sync Phrase App
@@ -305,9 +316,14 @@ private_lane :smf_deploy_build_variant do |options|
     exception = nil
 
     begin
-      smf_upload_ipa_to_testflight
+      smf_upload_to_testflight(
+          apple_id: get_itc_apple_id(build_variant),
+          itc_team_id: get_itc_team_id(build_variant),
+          username: get_itc_apple_id(build_variant),
+          skip_waiting_for_build_processing: should_skip_waiting_after_itc_upload(build_variant)
+      )
 
-      skip_waiting = should_skip_waiting_after_itc_upload
+      skip_waiting = should_skip_waiting_after_itc_upload(build_variant)
 
       # Construct the HipChat notification content
       notification_title = "Uploaded #{smf_default_notification_release_title} to iTunes Connect 🎉"

@@ -102,5 +102,6 @@ def smf_is_using_old_build_system
   regex = /<dict>\n\t<key>BuildSystemType<\/key>\n\t<string>Original<\/string>\n<\/dict>/
 
   return true if (contents.match(regex) != nil)
+
 end
 
