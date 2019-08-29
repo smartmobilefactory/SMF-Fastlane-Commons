@@ -282,13 +282,7 @@ private_lane :smf_deploy_build_variant do |options|
 
   smf_git_pull
 
-  push_to_git_remote(
-      remote: 'origin',
-      local_branch: @smf_git_branch,
-      remote_branch: @smf_git_branch,
-      force: false,
-      tags: true
-  )
+  smf_push_to_git_remote(local_branch: @smf_git_branch)
 
   # Create the GitHub release
   build_number = get_build_number(xcodeproj: "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj")

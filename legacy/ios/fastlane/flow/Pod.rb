@@ -52,12 +52,10 @@ private_lane :smf_publish_pod do |options|
   smf_git_pull
 
   # Push the changes to a temporary branch
-  push_to_git_remote(
-      remote: 'origin',
+  smf_push_to_git_remote(
       local_branch: branch,
       remote_branch: "jenkins_build/#{branch}",
-      force: true,
-      tags: true
+      force: true
   )
 
   begin
@@ -74,13 +72,7 @@ private_lane :smf_publish_pod do |options|
   end
 
   # Push the changes to the original branch
-  push_to_git_remote(
-      remote: 'origin',
-      local_branch: branch,
-      remote_branch: branch,
-      force: false,
-      tags: true
-  )
+  smf_push_to_git_remote(local_branch: branch)
 
   # Remove the temporary git branch
   sh "git push origin --delete jenkins_build/#{branch} || true"

@@ -64,11 +64,8 @@ private_lane :smf_update_android_commons do |options|
     git_add(path: '.')
     git_commit(path: '.', message: "Updated android-commons")
 
-    push_to_git_remote(
-      remote: 'origin',
-      remote_branch: ENV["CHANGE_BRANCH"],
-      force: false
-    )
+    smf_push_to_git_remote(remote_branch: ENV["CHANGE_BRANCH"])
+
     puts "android-commons updated"
 
     # mark pr as failed

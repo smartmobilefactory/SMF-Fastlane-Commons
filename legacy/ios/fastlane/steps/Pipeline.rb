@@ -158,11 +158,7 @@ private_lane :smf_update_generated_setup_file do |options|
 			unlock_keychain(path: "jenkins.keychain", password: ENV["JENKINS"])
 		end
 
-		push_to_git_remote(
-			remote: "origin",
-			remote_branch: ENV["CHANGE_BRANCH"],
-			force: false
-		)
+		smf_push_to_git_remote(remote_branch: ENV["CHANGE_BRANCH"])
 
 		UI.user_error!("Generated Files changed since last build, build will be restarted. This is not a failure.")
 	else
