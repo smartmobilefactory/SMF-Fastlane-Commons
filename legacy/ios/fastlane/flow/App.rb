@@ -191,7 +191,7 @@ private_lane :smf_deploy_build_variant do |options|
     ENV[$SMF_APP_HOCKEY_ID_ENV_KEY] = build_variant_config[:hockeyapp_id]
 
     # Upload the IPA to AppCenter
-    smf_upload_to_appcenter(
+    smf_ios_upload_to_appcenter(
         build_number: get_build_number_of_app,
         app_secret: get_app_secret(build_variant),
         escaped_filename: get_escaped_filename(build_variant),
