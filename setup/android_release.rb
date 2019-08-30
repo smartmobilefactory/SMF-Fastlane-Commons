@@ -1,15 +1,3 @@
-
-# setup Workspace
-
-private_lane :super_setup_workspace do |options|
-  smf_setup_workspace(options)
-end
-
-lane :setup_workspace do |options|
-  super_setup_workspace(options)
-end
-
-
 # setup Dependencies
 
 private_lane :super_setup_dependencies do |options|
