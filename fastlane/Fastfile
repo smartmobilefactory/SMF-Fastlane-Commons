@@ -1,5 +1,7 @@
 @fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
 
+smf_import_commons(options)
+
 private_lane :smf_import_commons do |options|
 
   fastlane_dir_path = "#{@fastlane_commons_dir_path}/fastlane"
@@ -27,8 +29,6 @@ end
 
 desc 'Setup'
 before_all do |lane, options|
-  smf_import_commons(options)
-
   case @platform
   when :ios
     smf_setup_workspace
