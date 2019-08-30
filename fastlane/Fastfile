@@ -1,5 +1,10 @@
 @fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
 
+before_all do
+    UI.message("Setting up SMF-Fastlane-Commons")
+    smf_common_setup
+end
+
 # Returns the path to the Config.json
 def fastlane_config_path
   smf_workspace_dir + '/Config.json'
