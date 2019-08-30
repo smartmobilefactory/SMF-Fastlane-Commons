@@ -91,6 +91,11 @@ def smf_load_fastlane_config
   end
 end
 
+# removes the fastlane commons repo
+def smf_remove_fastlane_commons_repo
+  sh "if [ -d #{@fastlane_commons_dir_path} ]; then rm -rf #{@fastlane_commons_dir_path}; fi"
+end
+
 # clones the fastlane commons repo
 def smf_clone_fastlane_commons_repo
   smf_remove_fastlane_commons_repo if File.exists?(@fastlane_commons_dir_path)
