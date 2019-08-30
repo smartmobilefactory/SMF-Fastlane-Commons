@@ -25,8 +25,11 @@ lane :smf_import_commons do |options|
     raise 'Unknown Platform'
   end
 
-  unless File.directory?(@fastlane_commons_dir_path)
-    UI.user_error!('There fastlane commons directory does not exist.')
+  if !File.directory?(@fastlane_commons_dir_path)
+    UI.message('There fastlane commons directory does not exist.')
+    next
+  else
+    UI.message('Import files from fastlane commons directory.')
   end
 
   fastlane_dir_path = "#{@fastlane_commons_dir_path}/fastlane"
