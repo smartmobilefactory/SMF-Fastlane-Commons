@@ -5,7 +5,7 @@ private_lane :super_setup_workspace do |options|
   smf_setup_workspace
 end
 
-private_lane :setup_workspace do |options|
+lane :setup_workspace do |options|
   super_setup_workspace(options)
 end
 
@@ -15,7 +15,7 @@ end
 private_lane :super_setup_dependencies do |options|
 end
 
-private_lane :setup_dependencies do |options|
+lane :setup_dependencies do |options|
   super_setup_dependencies(options)
 end
 
@@ -25,7 +25,7 @@ end
 private_lane :super_run_unit_tests do |options|
 end
 
-private_lane :run_unit_tests do |options|
+lane :run_unit_tests do |options|
   super_run_unit_tests(options)
 end
 
@@ -39,7 +39,8 @@ private_lane :super_increment_build_number do |options|
   smf_increment_build_number(build_variant: build_variant)
 end
 
-private_lane :increment_build_number do |options|
+lane :increment_build_number do |options|
+  super_increment_build_number(options)
 end
 
 
@@ -52,7 +53,7 @@ private_lane :super_build do |options|
   smf_build_app(build_variant: build_variant)
 end
 
-private_lane :build do |options|
+lane :build do |options|
   super_build(options)
 end
 
@@ -65,7 +66,7 @@ private_lane :super_generate_changelog do |options|
   smf_git_changelog(build_variant: build_variant)
 end
 
-private_lane :generate_changelog do |options|
+lane :generate_changelog do |options|
   super_generate_changelog(options)
 end
 
@@ -84,7 +85,7 @@ private_lane :super_upload_to_appcenter do |options|
   )
 end
 
-private_lane :upload_to_appcenter do |options|
+lane :upload_to_appcenter do |options|
   super_upload_to_appcenter(options)
 end
 
@@ -97,7 +98,7 @@ private_lane :super_push_git_tag_release do |options|
   smf_push_to_git_remote(local_branch: branch)
 end
 
-private_lane :push_git_tag_release do |options|
+lane :push_git_tag_release do |options|
   super_push_git_tag_release(options)
 end
 
@@ -114,6 +115,6 @@ private_lane :super_send_slack_notification do |options|
   )
 end
 
-private_lane :send_slack_notification do |options|
+lane :send_slack_notification do |options|
   super_send_slack_notification(options)
 end
