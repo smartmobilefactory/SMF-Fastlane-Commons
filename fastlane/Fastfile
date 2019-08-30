@@ -79,7 +79,7 @@ error do |lane, exception|
 end
 
 # sets the commons dir path and clones the fastlane repo
-lane :smf_common_setup(options = Hash.new)
+lane :smf_common_setup |options|
 
   smf_set_workspace_dir_for_platform
   smf_load_fastlane_config
