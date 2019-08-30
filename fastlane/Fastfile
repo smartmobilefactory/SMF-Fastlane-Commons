@@ -1,6 +1,6 @@
 @fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
 
-smf_import_commons(options)
+smf_import_commons
 
 private_lane :smf_import_commons do |options|
 
