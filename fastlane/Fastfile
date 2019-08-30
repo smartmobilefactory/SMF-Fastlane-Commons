@@ -1,12 +1,5 @@
 @fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
 
-# removes the fastlane commons repo
-def smf_remove_fastlane_commons_repo
-  sh "if [ -d #{@fastlane_commons_dir_path} ]; then rm -rf #{@fastlane_commons_dir_path}; fi"
-end
-
-smf_remove_fastlane_commons_repo
-
 def import_all(path)
   Dir["#{path}/**/*.rb"].each do |file|
     import(file)
@@ -50,10 +43,10 @@ lane :smf_import_commons do |options|
     import(ios_setup_file)
     smf_setup_ios_fastlane_commons(options)
   when :android
-    @fastlane_commons_dir_path += '/legacy/android'
-    import_all "#{@fastlane_commons_dir_path}/fastlane/lanes"
     android_setup_file = "#{@fastlane_commons_dir_path}/setup/android_release.rb"
     import(android_setup_file)
+    @fastlane_commons_dir_path += '/legacy/android'
+    import_all "#{@fastlane_commons_dir_path}/fastlane/lanes"
   when :flutter
     UI.message('Setup for flutter is not implemented yet')
   else
