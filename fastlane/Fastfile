@@ -43,6 +43,9 @@ lane :smf_import_commons do |options|
     import(ios_setup_file)
     smf_setup_ios_fastlane_commons(options)
   when :android
+    if File.exist?("#{@fastlane_commons_dir_path}/setup/android_release.rb")
+      UI.message("EXISTS!")
+    end
     android_setup_file = "#{@fastlane_commons_dir_path}/setup/android_release.rb"
     import(android_setup_file)
     @fastlane_commons_dir_path += '/legacy/android'
