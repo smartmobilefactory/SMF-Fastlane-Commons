@@ -1,8 +1,9 @@
 @fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
 import(File.expand_path(File(__FILE__)))
-puts "#{File.expand_path(File(__FILE__))}"
+puts "test1"
 smf_import_commons
-
+puts "test2
+"
 lane :smf_import_commons do |options|
 
   fastlane_dir_path = "#{@fastlane_commons_dir_path}/fastlane"
