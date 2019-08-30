@@ -1,5 +1,12 @@
 @fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
 
+# removes the fastlane commons repo
+def smf_remove_fastlane_commons_repo
+  sh "if [ -d #{@fastlane_commons_dir_path} ]; then rm -rf #{@fastlane_commons_dir_path}; fi"
+end
+
+smf_remove_fastlane_commons_repo
+
 def import_all(path)
   Dir["#{path}/**/*.rb"].each do |file|
     import(file)
@@ -25,8 +32,9 @@ lane :smf_import_commons do |options|
     raise 'Unknown Platform'
   end
 
-  if Dir.exist?(@fastlane_commons_dir_path)
-    exit 1
+  if !Dir.exist?(@fastlane_commons_dir_path)
+    UI.message('There fastlane commons directory does not exist.')
+    next
   else
     UI.message('Import files from fastlane commons directory.')
   end
@@ -99,11 +107,6 @@ def smf_clone_fastlane_commons_repo
   fastlane_commons_branch = @smf_fastlane_config[:project][:fastlane_commons_branch]
 
   sh 'git clone -b "' + fastlane_commons_branch + "\" git@github.com:smartmobilefactory/SMF-Fastlane-Commons.git #{@fastlane_commons_dir_path}"
-end
-
-# removes the fastlane commons repo
-def smf_remove_fastlane_commons_repo
-  sh "if [ -d #{@fastlane_commons_dir_path} ]; then rm -rf #{@fastlane_commons_dir_path}; fi"
 end
 
 desc 'Called on error'
