@@ -1,10 +1,6 @@
 @fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
 
-desc 'Setup'
-before_all do |lane, options|
-  puts "Inline options: #{options}"
-  # Import the fastlane-commons repo so its code can be used
-  smf_common_setup
+private_lane :smf_import_commons do |options|
 
   fastlane_dir_path = "#{@fastlane_commons_dir_path}/fastlane"
   import_all("#{fastlane_dir_path}/utils")
@@ -18,9 +14,26 @@ before_all do |lane, options|
     smf_setup_ios_fastlane_commons(options)
   when :android
     @fastlane_commons_dir_path += '/legacy/android'
-    android_setup_file = "#{@fastlane_commons_dir_path}/fastlane/setup.rb"
+    import_all "#{@fastlane_commons_dir_path}/fastlane/lanes"
+    android_setup_file = "#{@fastlane_commons_dir_path}/setup/android_release.rb"
     import(android_setup_file)
-    smf_setup_android_fastlane_commons(options)
+  when :flutter
+    UI.message('Setup for flutter is not implemented yet')
+  else
+    UI.message("There is no platform \"#{@platform}\", exiting...")
+    raise 'Unknown platform'
+  end
+end
+
+desc 'Setup'
+before_all do |lane, options|
+  smf_import_commons(options)
+
+  case @platform
+  when :ios
+    smf_setup_workspace
+  when :android
+    UI.message('Setup for Android is implemented in Pipeline Commons')
   when :flutter
     UI.message('Setup for flutter is not implemented yet')
   else
@@ -51,13 +64,8 @@ end
 def smf_clone_fastlane_commons_repo
   smf_remove_fastlane_commons_repo if File.exists?(@fastlane_commons_dir_path)
 
-  fastlane_commons_branch = 'master'
 
-  if ENV['fastlane_branch']
-    fastlane_commons_branch = ENV['fastlane_branch']
-  else
-    fastlane_commons_branch = @smf_fastlane_config[:project][:fastlane_commons_branch]
-  end
+  fastlane_commons_branch = @smf_fastlane_config[:project][:fastlane_commons_branch]
 
   sh 'git clone -b "' + fastlane_commons_branch + "\" git@github.com:smartmobilefactory/SMF-Fastlane-Commons.git #{@fastlane_commons_dir_path}"
 end
@@ -108,7 +116,7 @@ error do |lane, exception|
 end
 
 # sets the commons dir path and clones the fastlane repo
-def smf_common_setup(options = Hash.new)
+private_lnae :smf_setup_workspace do |options|
   case @platform
   when :ios
     @fastlane_commons_dir_path = "#{smf_workspace_dir}/.fastlane-smf-commons"

@@ -247,3 +247,8 @@ def smf_get_version_number
 
   return version_number
 end
+
+
+def ci_android_error_log
+  $SMF_CI_ANDROID_ERROR_LOG.to_s
+end
