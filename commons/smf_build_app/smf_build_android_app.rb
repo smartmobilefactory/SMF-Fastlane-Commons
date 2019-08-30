@@ -10,7 +10,8 @@ private_lane :smf_build_android_app do |options|
     UI.important("Building variant " + build_variant)
   end
 
-  addition = smf_pull_keystore(folder: keystore_folder)
+  addition = ""
+  addition = smf_pull_keystore(folder: keystore_folder) if !keystore_folder.nil?
 
   gradle(task: "assemble" + build_variant + addition)
 end
