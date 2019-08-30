@@ -1,34 +1,5 @@
 @fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
 
-desc 'Setup'
-before_all do |lane, options|
-  puts "Inline options: #{options}"
-  # Import the fastlane-commons repo so its code can be used
-  smf_common_setup
-
-  fastlane_dir_path = "#{@fastlane_commons_dir_path}/fastlane"
-  import_all("#{fastlane_dir_path}/utils")
-  import_all("#{@fastlane_commons_dir_path}/commons")
-
-  case @platform
-  when :ios
-    @fastlane_commons_dir_path += '/legacy/ios'
-    ios_setup_file = "#{@fastlane_commons_dir_path}/fastlane/setup.rb"
-    import(ios_setup_file)
-    smf_setup_ios_fastlane_commons(options)
-  when :android
-    @fastlane_commons_dir_path += '/legacy/android'
-    android_setup_file = "#{@fastlane_commons_dir_path}/fastlane/setup.rb"
-    import(android_setup_file)
-    smf_setup_android_fastlane_commons(options)
-  when :flutter
-    UI.message('Setup for flutter is not implemented yet')
-  else
-    UI.message("There is no platform \"#{@platform}\", exiting...")
-    raise 'Unknown platform'
-  end
-end
-
 # Returns the path to the Config.json
 def fastlane_config_path
   smf_workspace_dir + '/Config.json'
@@ -108,7 +79,34 @@ error do |lane, exception|
 end
 
 # sets the commons dir path and clones the fastlane repo
-def smf_common_setup(options = Hash.new)
+lane :smf_common_setup(options = Hash.new)
+
+  smf_set_workspace_dir_for_platform
+  smf_load_fastlane_config
+
+  UI.message('Downloading Fastlane Commons Repo')
+  smf_clone_fastlane_commons_repo
+
+  fastlane_dir_path = "#{@fastlane_commons_dir_path}/fastlane"
+  import_all("#{fastlane_dir_path}/utils")
+  import_all("#{@fastlane_commons_dir_path}/commons")
+
+  case @platform
+  when :ios
+    import("#{@fastlane_commons_dir_path}/setup/ios_release.rb")
+  when :android
+    # TODO
+  when :flutter
+    UI.message('Setup for flutter is not implemented yet')
+  else
+    UI.message("There is no platform \"#{@platform}\", exiting...")
+    raise 'Unknown Platform'
+  end
+
+
+end
+
+def smf_set_workspace_dir_for_platform
   case @platform
   when :ios
     @fastlane_commons_dir_path = "#{smf_workspace_dir}/.fastlane-smf-commons"
@@ -120,9 +118,6 @@ def smf_common_setup(options = Hash.new)
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown Platform'
   end
-  smf_load_fastlane_config
-  UI.message('Downloading Fastlane Commons Repo')
-  smf_clone_fastlane_commons_repo
 end
 
 def smf_workspace_dir
