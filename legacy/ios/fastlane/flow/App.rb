@@ -117,7 +117,7 @@ private_lane :smf_deploy_build_variant do |options|
   )
 
   # Build and archive the IPA
-  smf_build_app(
+  smf_build_ios_app(
       bulk_deploy_params: bulk_deploy_params,
       scheme: get_build_scheme,
       should_clean_project: get_should_clean_project,
