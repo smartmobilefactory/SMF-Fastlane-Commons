@@ -22,7 +22,7 @@ private_lane :smf_archive_ipa_if_scheme_is_provided do |options|
         extensions_suffixes: get_extension_suffixes
     )
 
-    smf_build_app(
+    smf_build_ios_app(
       skip_export: skip_export,
       bulk_deploy_params: bulk_deploy_params,
       scheme: get_build_scheme,

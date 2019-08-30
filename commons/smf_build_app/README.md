@@ -1,19 +1,14 @@
-### Build App
-
-#### iOS
+### Build iOS App
 
 Builds the iOS app by first ensuring the correct xcode version and then using gym to actually build the app.
 
 NOTE: The smf_download_provisioning_profiles lane has to be called before calling this lane.
 
-#### Android
 
-Builds the android app. 🎉
-
-Example Call iOS:
+Example Call:
 
 ```
-smf_build_app(
+smf_build_ios_app(
     skip_package_ipa: false,                                # Set to true to skip package ipa
     bulk_deploy_params: {index: 0, count: 4},               # Hashmap which holds how many build variants are build and which one the current one is (index)
     scheme: "DGB Alpha",                                    # The scheme name as you see it in XCode
@@ -28,10 +23,15 @@ smf_build_app(
 )
 
 ```
-Example Call Android:
+
+### Build Android App
+
+Builds the android app. 🎉
+
+Example Call:
 
 ```
-smf_build_app(
+smf_build_android_app(
     build_variant: "Alpha"      # The name of the build variant
 )
 

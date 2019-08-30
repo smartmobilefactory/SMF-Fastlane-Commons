@@ -1,6 +1,6 @@
 ### Fastlane Match Provisioning Profile Handler
 Fastlane match handles the provisioning profiles for each app. This lane is used to download and setup the correct profiles and certificates 
-to be used for building the app with the smf_build_app lane.
+to be used for building the app with the smf_build_ios_app lane.
 
 There are basically two cases for the match call:
 
