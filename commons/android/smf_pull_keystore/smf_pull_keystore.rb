@@ -6,6 +6,10 @@ private_lane :smf_pull_keystore do |options|
 
   keystoreFolder = options[:folder]
 
+  if keystoreFolder.nil?
+    return ""
+  end
+
   Dir.chdir(clone_root_folder) do
     sh("rm -r -f ./Android-Keystores")
     sh("git clone https://github.com/smartmobilefactory/Android-Keystores.git")
