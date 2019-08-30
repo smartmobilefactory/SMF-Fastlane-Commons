@@ -2,7 +2,7 @@
 
 smf_import_commons
 
-private_lane :smf_import_commons do |options|
+lane :smf_import_commons do |options|
 
   fastlane_dir_path = "#{@fastlane_commons_dir_path}/fastlane"
   import_all("#{fastlane_dir_path}/utils")
