@@ -75,7 +75,10 @@ def smf_default_app_notification_release_title
   build_variant = @smf_build_variant
 
   build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
-  version = smf_get_version_number
+  version = get_version_number(
+      xcodeproj: "#{get_project_name}.xcodeproj",
+      target: (get_target != nil ? get_target : get_build_scheme)
+  )
   return "#{project_name} #{build_variant.upcase} #{version} (#{build_number})"
 end
 

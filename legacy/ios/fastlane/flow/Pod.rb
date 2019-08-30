@@ -10,12 +10,9 @@ private_lane :smf_publish_pod do |options|
   # Variables
   bump_type = @smf_bump_type
   branch = @smf_git_branch
-  project_config = @smf_fastlane_config[:project]
   build_variant_config = @smf_fastlane_config[:build_variants][@smf_build_variant_sym]
   podspec_path = build_variant_config[:podspec_path]
   generateMetaJSON = (build_variant_config[:generateMetaJSON].nil? ? true : build_variant_config[:generateMetaJSON])
-
-  generate_temporary_appfile
 
   # Unlock keycahin to enable pull repo with https
   if smf_is_keychain_enabled
@@ -55,12 +52,10 @@ private_lane :smf_publish_pod do |options|
   smf_git_pull
 
   # Push the changes to a temporary branch
-  push_to_git_remote(
-      remote: 'origin',
+  smf_push_to_git_remote(
       local_branch: branch,
       remote_branch: "jenkins_build/#{branch}",
-      force: true,
-      tags: true
+      force: true
   )
 
   begin
@@ -77,13 +72,7 @@ private_lane :smf_publish_pod do |options|
   end
 
   # Push the changes to the original branch
-  push_to_git_remote(
-      remote: 'origin',
-      local_branch: branch,
-      remote_branch: branch,
-      force: false,
-      tags: true
-  )
+  smf_push_to_git_remote(local_branch: branch)
 
   # Remove the temporary git branch
   sh "git push origin --delete jenkins_build/#{branch} || true"

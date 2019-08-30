@@ -62,9 +62,6 @@ private_lane :smf_deploy_build_variant do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][@smf_build_variant_sym]
   project_config = @smf_fastlane_config[:project]
 
-
-  generate_temporary_appfile
-
   generateMetaJSON = build_variant_config[:generateMetaJSON]
 
   use_hockey = (build_variant_config[:use_hockey].nil? ? true : build_variant_config[:use_hockey])
@@ -86,25 +83,58 @@ private_lane :smf_deploy_build_variant do |options|
   end
 
   smf_install_pods_if_project_contains_podfile
-  tag = smf_increment_build_number(build_variant: build_variant)
+  tag = smf_increment_build_number(
+      build_variant: build_variant,
+      current_build_number: get_build_number_of_app
+  )
 
   # Check for commons ITC Upload errors if needed
   if build_variant_config[:upload_itc] == true
-    smf_verify_common_itc_upload_errors
+
+    smf_verify_itc_upload_errors(
+        project_name: get_project_name,
+        target: get_target,
+        build_scheme: get_build_scheme,
+        itc_skip_version_check: get_itc_skip_version_check,
+        username: get_itc_apple_id,
+        itc_team_id: get_itc_team_id,
+        bundle_identifier: get_bundle_identifier
+    )
   end
 
   # Sync Phrase App
   smf_sync_strings_with_phrase_app
 
-  smf_download_provisioning_profiles
+  smf_download_provisioning_profiles(
+      team_id: get_team_id,
+      apple_id: get_apple_id,
+      use_wildcard_signing: get_use_wildcard_signing,
+      bundle_identifier: get_bundle_identifier,
+      use_default_match_config: match_config.nil?,
+      match_read_only: get_match_config_read_only,
+      match_type: get_match_config_type,
+      extensions_suffixes: get_extension_suffixes
+  )
 
   # Build and archive the IPA
-  smf_build_app(
-      bulk_deploy_params: bulk_deploy_params
+  smf_build_ios_app(
+      bulk_deploy_params: bulk_deploy_params,
+      scheme: get_build_scheme,
+      should_clean_project: get_should_clean_project,
+      required_xcode_version: get_required_xcode_version,
+      project_name: get_project_name,
+      xcconfig_name: get_xcconfig_name,
+      code_signing_identity: get_code_signing_identity,
+      upload_itc: get_upload_itc,
+      upload_bitcode: get_upload_bitcode,
+      export_method: get_export_method
   )
 
   if get_use_sparkle == true
-    smf_create_dmg_from_app
+    smf_create_dmg_from_app(
+        team_id: get_team_id,
+        build_scheme: get_build_scheme
+    )
   end
 
   # Commit generated code. There can be changes eg. from PhraseApp + R.swift
@@ -161,7 +191,14 @@ private_lane :smf_deploy_build_variant do |options|
     ENV[$SMF_APP_HOCKEY_ID_ENV_KEY] = build_variant_config[:hockeyapp_id]
 
     # Upload the IPA to AppCenter
-    smf_upload_to_appcenter(build_variant: build_variant)
+    smf_ios_upload_to_appcenter(
+        build_number: get_build_number_of_app,
+        app_secret: get_app_secret(build_variant),
+        escaped_filename: get_escaped_filename(build_variant),
+        path_to_ipa_or_app: get_path_to_ipa_or_app(build_variant),
+        is_mac_app: is_mac_app(build_variant),
+        podspec_path: get_podspec_path(build_variant)
+    )
 
     # Disable the former HockeyApp entry
     smf_disable_former_hockey_entry(
@@ -185,7 +222,20 @@ private_lane :smf_deploy_build_variant do |options|
 
   if use_sentry
     begin
-      smf_upload_dsyms_to_sentry
+
+      org_slug = get_sentry_org_slug
+      project_slug = get_sentry_project_slug
+
+      org_slug_variant = get_variant_sentry_org_slug(build_variant)
+      project_slug_variant = get_variant_sentry_project_slug(build_variant)
+
+      # If a build variant overrides the sentry settings, use the variant settings
+      if !org_slug_variant.nil? && !project_slug_variant.nil?
+        org_slug = org_slug_variant
+        project_slug = project_slug_variant
+      end
+
+      smf_upload_to_sentry(org_slug: org_slug, project_slug: project_slug)
     rescue => exception
       UI.important("Warning: Dsyms could not be uploaded to Sentry !")
 
@@ -232,13 +282,7 @@ private_lane :smf_deploy_build_variant do |options|
 
   smf_git_pull
 
-  push_to_git_remote(
-      remote: 'origin',
-      local_branch: @smf_git_branch,
-      remote_branch: @smf_git_branch,
-      force: false,
-      tags: true
-  )
+  smf_push_to_git_remote(local_branch: @smf_git_branch)
 
   # Create the GitHub release
   build_number = get_build_number(xcodeproj: "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj")
@@ -268,9 +312,14 @@ private_lane :smf_deploy_build_variant do |options|
     exception = nil
 
     begin
-      smf_upload_ipa_to_testflight
+      smf_upload_to_testflight(
+          apple_id: get_itc_apple_id(build_variant),
+          itc_team_id: get_itc_team_id(build_variant),
+          username: get_itc_apple_id(build_variant),
+          skip_waiting_for_build_processing: should_skip_waiting_after_itc_upload(build_variant)
+      )
 
-      skip_waiting = should_skip_waiting_after_itc_upload
+      skip_waiting = should_skip_waiting_after_itc_upload(build_variant)
 
       # Construct the HipChat notification content
       notification_title = "Uploaded #{smf_default_notification_release_title} to iTunes Connect 🎉"

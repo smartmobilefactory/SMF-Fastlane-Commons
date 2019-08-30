@@ -17,16 +17,11 @@ private_lane :smf_generate_meta_json do |options|
   end
 
   something_to_commit = `git status --porcelain`.empty?
-  if !something_to_commit
+  unless something_to_commit
     git_add(path: "#{smf_workspace_dir}/.MetaJSON")
     git_commit(path: "#{smf_workspace_dir}/.MetaJSON", message: "Updated MetaJSON files")
 
-    push_to_git_remote(
-        remote: 'origin',
-        local_branch: branch,
-        remote_branch: branch,
-        force: false
-    )
+    smf_push_to_git_remote(local_branch: branch)
   end
 end
 

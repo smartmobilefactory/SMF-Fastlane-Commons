@@ -2,14 +2,28 @@
 
 This lane uploads the build to AppCenter by using the *appcenter_upload* lane. 
 
-### Example
-Upload the apk on Android or the ipa to AppCenter.
+### Example for iOS
+Upload the ipa to AppCenter.
 ```
-smf_upload_to_appcenter(
-    build_variant: 'Alpha',
+smf_ios_upload_to_appcenter(
+        build_number: 83, #Needed only for mac apps
+        app_secret: "eg21g21-21g1g-12g13b3-2121", #The secret of the app from AppCenter
+        escaped_filename: <escaped filename>, #Needed only for iOS
+        path_to_ipa_or_app: <path to ipa>, #Needed only for iOS
+        is_mac_app: false, #Optional, false by default
+        podspec_path: <podspec path> #Needed for mac apps
 )
 ```
-The *build_variant* is needed to call some methods like getting the app's secret.
+
+### Example for Android
+Upload the apk to AppCenter.
+```
+smf_android_upload_to_appcenter(
+        apk_file: "exampleApp.apk", #Name of the apk file
+        apk_path: <path to exampleApp>, #Optional, by default the path will be get from all grade apk ouput paths from the lane context
+        app_secret: "eg21g21-21g1g-12g13b3-2121", #The secret of the app from AppCenter
+)
+```
 
 ## get_app_details
 This method takes the *app_secret* and requests all apps from the AppCenter API. Further, the app which has the relevant *app_secret* will be searched and the app name and the owner name will be returned. If there is no app which has a matching app secret an exception will be raised.  
@@ -17,5 +31,5 @@ This method takes the *app_secret* and requests all apps from the AppCenter API.
 ### Example
 Get the app name and the owner name of the app which has the app secret *test-app-secret*.
 ```
-get_app_details('test-app-secret')
+get_app_details("eg21g21-21g1g-12g13b3-2121")
 ```
