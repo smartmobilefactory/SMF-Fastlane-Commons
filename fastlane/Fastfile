@@ -1,5 +1,11 @@
 @fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
 
+def import_all(path)
+  Dir["#{path}/**/*.rb"].each do |file|
+    import(file)
+  end
+end
+
 lane :smf_import_commons do |options|
 
   fastlane_dir_path = "#{@fastlane_commons_dir_path}/fastlane"
@@ -142,14 +148,4 @@ end
 
 def smf_is_slack_enabled
   ENV[$SMF_IS_SLACK_ENABLED].nil? ? true : ENV[$SMF_IS_SLACK_ENABLED] == "true"
-end
-
-##############
-### Helper ###
-##############
-
-def import_all(path)
-  Dir["#{path}/**/*.rb"].each do |file|
-    import(file)
-  end
 end
