@@ -79,7 +79,7 @@ error do |lane, exception|
 end
 
 # sets the commons dir path and clones the fastlane repo
-lane :smf_common_setup |options|
+lane :smf_common_setup do |options|
 
   smf_set_workspace_dir_for_platform
   smf_load_fastlane_config
@@ -102,8 +102,6 @@ lane :smf_common_setup |options|
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown Platform'
   end
-
-
 end
 
 def smf_set_workspace_dir_for_platform
