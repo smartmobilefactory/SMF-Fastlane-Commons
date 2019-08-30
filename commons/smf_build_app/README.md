@@ -1,4 +1,4 @@
-### Build App
+### Build iOS App
 
 Builds the iOS app by first ensuring the correct xcode version and then using gym to actually build the app.
 
@@ -20,6 +20,19 @@ smf_build_ios_app(
     upload_itc: false,                                      # If enabled, the .ipa will be uploaded to App Store Connect.
     upload_bitcode: true,                                   # If disabled, Bitcode won't be uploaded.
     export_method: false                                    # The Xcode archive export method to use. This needs to be set for special cases only.
+)
+
+```
+
+### Build Android App
+
+Builds the android app. 🎉
+
+Example Call:
+
+```
+smf_build_android_app(
+    build_variant: "Alpha"      # The name of the build variant
 )
 
 ```
