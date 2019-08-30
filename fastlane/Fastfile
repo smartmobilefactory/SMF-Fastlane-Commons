@@ -26,8 +26,7 @@ lane :smf_import_commons do |options|
   end
 
   if Dir.exist?(@fastlane_commons_dir_path)
-    UI.user_error!('There fastlane commons directory does not exist.')
-    next
+    exit 1
   else
     UI.message('Import files from fastlane commons directory.')
   end
