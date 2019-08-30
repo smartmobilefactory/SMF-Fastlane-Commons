@@ -1,5 +1,5 @@
 @fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
-
+puts("Fastfile called.")
 smf_import_commons
 
 lane :smf_import_commons do |options|
