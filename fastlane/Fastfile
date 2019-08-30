@@ -43,10 +43,9 @@ lane :smf_import_commons do |options|
     import(ios_setup_file)
     smf_setup_ios_fastlane_commons(options)
   when :android
-    android_setup_file = "#{@fastlane_commons_dir_path}/setup/android_release.rb"
-
+    android_setup_file = "#{@fastlane_commons_dir_path}/android_release.rb"
     File.exist?(android_setup_file) ? import(android_setup_file) : next
-
+    UI.message("Imported android release file.")
     @fastlane_commons_dir_path += '/legacy/android'
     import_all "#{@fastlane_commons_dir_path}/fastlane/lanes"
   when :flutter
@@ -57,9 +56,7 @@ lane :smf_import_commons do |options|
   end
 end
 
-puts 'test1'
 smf_import_commons
-puts 'test2'
 
 desc 'Setup'
 before_all do |lane, options|
@@ -97,7 +94,6 @@ end
 # clones the fastlane commons repo
 def smf_clone_fastlane_commons_repo
   smf_remove_fastlane_commons_repo if File.exists?(@fastlane_commons_dir_path)
-
 
   fastlane_commons_branch = @smf_fastlane_config[:project][:fastlane_commons_branch]
 
