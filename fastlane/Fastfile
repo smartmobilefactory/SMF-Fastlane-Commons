@@ -1,5 +1,5 @@
 @fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
-import(File.expand_path(File(__FILE__)))
+import("#{@fastlane_commons_dir_path}/fastlane/Fastfile")
 puts "test1"
 smf_import_commons
 puts "test2
