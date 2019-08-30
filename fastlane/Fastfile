@@ -1,5 +1,5 @@
 @fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
-import("#{@fastlane_commons_dir_path}/Fastfile.rb")
+
 puts "test1"
 smf_import_commons
 puts "test2"
@@ -119,17 +119,6 @@ end
 
 # sets the commons dir path and clones the fastlane repo
 private_lane :smf_setup_workspace do |options|
-  case @platform
-  when :ios
-    @fastlane_commons_dir_path = "#{smf_workspace_dir}/.fastlane-smf-commons"
-  when :android
-    @fastlane_commons_dir_path = "#{smf_workspace_dir}/.idea/.fastlane-smf-commons"
-  when :flutter
-    UI.message('Setup for flutter is not implemented yet')
-  else
-    UI.message("There is no platform \"#{@platform}\", exiting...")
-    raise 'Unknown Platform'
-  end
   smf_load_fastlane_config
   UI.message('Downloading Fastlane Commons Repo')
   smf_clone_fastlane_commons_repo
