@@ -13,10 +13,20 @@ private_lane :smf_pull_keystore do |options|
   end
 
   properties = load_properties("#{clone_root_folder}/Android-Keystores/keystores/#{keystoreFolder}/keystore.properties")
-  ENV[$SMF_KEYSTORE_FILE_KEY] = File.absolute_path("#{clone_root_folder}/Android-Keystores/keystores/#{keystoreFolder}/keystore.jks")
-  ENV[$SMF_KEYSTORE_PASSWORD_KEY] = properties[$SMF_KEYSTORE_PASSWORD_KEY]
-  ENV[$SMF_KEYSTORE_KEY_ALIAS_KEY] = properties[$SMF_KEYSTORE_KEY_ALIAS_KEY]
-  ENV[$SMF_KEYSTORE_KEY_PASSWORD_KEY] = properties[$SMF_KEYSTORE_KEY_PASSWORD_KEY]
+  keystore_file = File.absolute_path("#{clone_root_folder}/Android-Keystores/keystores/#{keystoreFolder}/keystore.jks")
+  keystore_password = properties[$SMF_KEYSTORE_PASSWORD_KEY]
+  keystore_key_alias  = properties[$SMF_KEYSTORE_KEY_ALIAS_KEY]
+  keystore_key_password = properties[$SMF_KEYSTORE_KEY_PASSWORD_KEY]
+
+  addition = ""
+  if keystore_file
+    addition = " -Pandroid.injected.signing.store.file='#{keystore_file}'"
+    addition << " -Pandroid.injected.signing.store.password='#{keystore_password}'"
+    addition << " -Pandroid.injected.signing.key.alias='#{keystore_key_alias}'"
+    addition << " -Pandroid.injected.signing.key.password='#{keystore_key_password}'"
+  end
+
+  addition
 end
 
 def load_properties(properties_filename)
