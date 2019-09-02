@@ -3,7 +3,7 @@
 lane :import_stages do |options|
   case @platform
   when :ios
-    import("#{@fastlane_commons_dir_path}/setup/ios_release.rb")
+    import("#{@fastlane_commons_dir_path}/../setup/ios_release.rb")
   end
 
 end
