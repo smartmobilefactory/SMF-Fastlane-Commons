@@ -1,5 +1,44 @@
 @fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
 
+# loads the config json content into the @smf_fastlane_config env variable
+def smf_load_fastlane_config
+  config_path = fastlane_config_path
+  UI.message("Reading the SMF Fastlane config from \"#{config_path}\"")
+  config_file = File.read(config_path)
+  if config_file
+    @smf_fastlane_config ||= JSON.parse(config_file, :symbolize_names => true)
+    UI.success('Parsed config file into the hash map')
+  else
+    raise "Error: The SMF Fastlane config file doesn't exist at path \"#{config_path}\""
+  end
+end
+
+# imports all ruby files at the given directory and subdirectories
+def import_all(path)
+  Dir["#{path}/**/*.rb"].each do |file|
+    import(file)
+  end
+end
+
+# Returns the path to the Config.json
+def fastlane_config_path
+  smf_workspace_dir + '/Config.json'
+end
+
+def smf_workspace_dir
+  path = "#{Dir.pwd}"
+  path = path.chomp('/fastlane') if path.end_with?('/fastlane')
+end
+
+def smf_is_slack_enabled
+  ENV[$SMF_IS_SLACK_ENABLED].nil? ? true : ENV[$SMF_IS_SLACK_ENABLED] == "true"
+end
+
+# removes the fastlane commons repo
+def smf_remove_fastlane_commons_repo
+  sh "if [ -d #{@fastlane_commons_dir_path} ]; then rm -rf #{@fastlane_commons_dir_path}; fi"
+end
+
 # sets the @fastlane_commons_dir_path depending on the platform
 def smf_set_fastlane_commons_dir_for_platform
   case @platform
@@ -112,43 +151,4 @@ error do |lane, exception|
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown Platform'
   end
-end
-
-# loads the config json content into the @smf_fastlane_config env variable
-def smf_load_fastlane_config
-  config_path = fastlane_config_path
-  UI.message("Reading the SMF Fastlane config from \"#{config_path}\"")
-  config_file = File.read(config_path)
-  if config_file
-    @smf_fastlane_config ||= JSON.parse(config_file, :symbolize_names => true)
-    UI.success('Parsed config file into the hash map')
-  else
-    raise "Error: The SMF Fastlane config file doesn't exist at path \"#{config_path}\""
-  end
-end
-
-# imports all ruby files at the given directory and subdirectories
-def import_all(path)
-  Dir["#{path}/**/*.rb"].each do |file|
-    import(file)
-  end
-end
-
-# Returns the path to the Config.json
-def fastlane_config_path
-  smf_workspace_dir + '/Config.json'
-end
-
-def smf_workspace_dir
-  path = "#{Dir.pwd}"
-  path = path.chomp('/fastlane') if path.end_with?('/fastlane')
-end
-
-def smf_is_slack_enabled
-  ENV[$SMF_IS_SLACK_ENABLED].nil? ? true : ENV[$SMF_IS_SLACK_ENABLED] == "true"
-end
-
-# removes the fastlane commons repo
-def smf_remove_fastlane_commons_repo
-  sh "if [ -d #{@fastlane_commons_dir_path} ]; then rm -rf #{@fastlane_commons_dir_path}; fi"
 end
