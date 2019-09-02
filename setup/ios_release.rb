@@ -1,8 +1,3 @@
-# Setup Workspace (clean, clone, generate)
-
-lane :workspace_setup do |options|
-  UI.message("WORKSPACE SETUP")
-end
 # Setup Dependencies - pod install & `sh generate.sh` (optional: Phrase App)
 # Provisioning
 # run unittests (build test target and run test)
