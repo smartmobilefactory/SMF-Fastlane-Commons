@@ -17,6 +17,7 @@ lane :smf_common_setup do |options|
   fastlane_dir_path = "#{@fastlane_commons_dir_path}/fastlane"
   import_all("#{fastlane_dir_path}/utils")
   import_all("#{@fastlane_commons_dir_path}/commons")
+  import_all("#{@fastlane_commons_dir_path}/setup")
 
   case @platform
   when :ios
