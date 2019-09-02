@@ -1,5 +1,15 @@
 @fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
 
+import_stages
+
+lane :import_stages do |options|
+  case @platform
+  when :ios
+    import("#{@fastlane_commons_dir_path}/setup/ios_release.rb")
+  end
+
+end
+
 # sets the commons dir path and clones the fastlane repo
 lane :smf_common_setup do |options|
 
