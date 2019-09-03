@@ -1,12 +1,11 @@
 # Uses Config file to access project name. Should be changed in the future.
 def get_default_name_of_app(build_variant)
   build_number = get_build_number_of_app
+  project_name = @smf_fastlane_config[:project][:project_name]
   case @platform
   when :ios
-    project_name = @smf_fastlane_config[:project][:project_name]
     "#{project_name} #{build_variant.upcase} (#{build_number})"
   when :android
-    project_name = !@smf_fastlane_config[:project][:name].nil? ? @smf_fastlane_config[:project][:name] : ENV['PROJECT_NAME']
     "#{project_name} #{build_variant} (Build #{build_number})"
   when :flutter
     UI.message('Notification for flutter is not implemented yet')
@@ -180,13 +179,18 @@ def get_app_secret(build_variant)
   when :ios
     @smf_fastlane_config[:build_variants][build_variant.to_sym][:hockeyapp_id]
   when :android
-    @smf_fastlane_config[:hockey][build_variant.to_sym]
+    @smf_fastlane_config[:build_variants][build_variant.to_sym][:appcenter_id]
   when :flutter
     UI.message('App Secret for flutter is not implemented yet')
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
   end
+end
+
+def get_apk_file_name(build_variant)
+  build_variant = build_variant.to_s.downcase
+  @smf_fastlane_config[:build_variants][build_variant.to_sym][:apk_file]
 end
 
 def get_escaped_filename(build_variant)

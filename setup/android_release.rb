@@ -64,8 +64,8 @@ end
 private_lane :super_upload_to_appcenter do |options|
 
   build_variant = options[:build_variant]
-  apk_file_name = options[:apk_file_name] # From Fastfile, maybe now from Config?
-  app_secret = @smf_fastlane_config
+  apk_file_name = get_apk_file_name(build_variant)
+  app_secret = get_app_secret(build_variant)
 
   smf_android_upload_to_appcenter(
       build_variant: build_variant,
