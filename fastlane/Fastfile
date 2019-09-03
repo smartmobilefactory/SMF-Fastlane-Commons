@@ -1,5 +1,21 @@
 @fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
 
+desc 'Setup'
+before_all do |lane, options|
+  case @platform
+  when :ios
+    UI.message("calling smf_setup_workspace inside the before_all block")
+    smf_setup_workspace
+  when :android
+    UI.message('Setup for Android is implemented in Pipeline Commons')
+  when :flutter
+    UI.message('Setup for flutter is not implemented yet')
+  else
+    UI.message("There is no platform \"#{@platform}\", exiting...")
+    raise 'Unknown platform'
+  end
+end
+
 def import_all(path)
   Dir["#{path}/**/*.rb"].each do |file|
     import(file)
@@ -11,7 +27,7 @@ def smf_workspace_dir
   path = path.chomp('/fastlane') if path.end_with?('/fastlane')
 end
 
-def smf_import_commons
+def set_fastlane_commons_dir_path_for_platform
 
   case @platform
   when :ios
@@ -24,9 +40,12 @@ def smf_import_commons
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown Platform'
   end
+end
+
+def smf_import_commons
 
   if !Dir.exist?(@fastlane_commons_dir_path)
-    UI.message('There fastlane commons directory does not exist.')
+    UI.message('The fastlane commons directory does not exist.')
     return
   else
     UI.message('Import files from fastlane commons directory.')
@@ -59,21 +78,6 @@ def smf_import_commons
 end
 
 smf_import_commons
-
-desc 'Setup'
-before_all do |lane, options|
-  case @platform
-  when :ios
-    smf_setup_workspace
-  when :android
-    UI.message('Setup for Android is implemented in Pipeline Commons')
-  when :flutter
-    UI.message('Setup for flutter is not implemented yet')
-  else
-    UI.message("There is no platform \"#{@platform}\", exiting...")
-    raise 'Unknown platform'
-  end
-end
 
 # Returns the path to the Config.json
 def fastlane_config_path
