@@ -16,6 +16,6 @@ def get_build_variant_from_config(build_variant)
   build_variant = build_variant.to_s.downcase
   UI.message("Build variant: #{build_variant}")
   UI.message("Config: #{@smf_fastlane_config}")
-  variant = @smf_fastlane_config[:build_variants][build_variant.to_sym]['variant']
+  variant = @smf_fastlane_config[:build_variants][build_variant.to_sym][:variant]
   UI.message("Variant: #{variant}")
 end
