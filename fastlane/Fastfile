@@ -43,7 +43,7 @@ def smf_import_commons
     import(ios_setup_file)
     smf_setup_ios_fastlane_commons(options)
   when :android
-    android_setup_file = "#{@fastlane_commons_dir_path}/android_release.rb"
+    android_setup_file = "#{@fastlane_commons_dir_path}/setup/android_release.rb"
     File.exist?(android_setup_file) ? import(android_setup_file) : return
     UI.message("Imported android release file.")
     @fastlane_commons_dir_path += '/legacy/android'
