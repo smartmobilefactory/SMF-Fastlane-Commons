@@ -11,7 +11,7 @@ def smf_workspace_dir
   path = path.chomp('/fastlane') if path.end_with?('/fastlane')
 end
 
-def smf_import_commons(options)
+def smf_import_commons(options = nil)
 
   case @platform
   when :ios
