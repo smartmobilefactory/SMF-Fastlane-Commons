@@ -45,7 +45,7 @@ def get_app_details(app_secret)
   end
 
   data = JSON.parse(response.body)
-  project_app = data.find { |app| app['app_secret'].to_s.gsub!('-', '') == app_secret }
+  project_app = data.find { |app| app['app_secret'] == app_secret }
 
   if project_app.nil?
     raise("There is no app with the app secret: #{app_secret}")

@@ -177,7 +177,7 @@ def get_app_secret(build_variant)
   build_variant = build_variant.to_s.downcase
   case @platform
   when :ios
-    @smf_fastlane_config[:build_variants][build_variant.to_sym][:hockeyapp_id]
+    @smf_fastlane_config[:build_variants][build_variant.to_sym][:appcenter_id]
   when :android
     @smf_fastlane_config[:build_variants][build_variant.to_sym][:appcenter_id]
   when :flutter
