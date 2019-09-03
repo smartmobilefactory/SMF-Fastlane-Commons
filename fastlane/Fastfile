@@ -56,6 +56,19 @@ def smf_import_commons
   end
 end
 
+# loads the config json content into the @smf_fastlane_config env variable
+def smf_load_fastlane_config
+  config_path = fastlane_config_path
+  UI.message("Reading the SMF Fastlane config from \"#{config_path}\"")
+  config_file = File.read(config_path)
+  if config_file
+    @smf_fastlane_config ||= JSON.parse(config_file, :symbolize_names => true)
+    UI.success('Parsed config file into the hash map')
+  else
+    raise "Error: The SMF Fastlane config file doesn't exist at path \"#{config_path}\""
+  end
+end
+
 smf_import_commons
 smf_load_fastlane_config
 
@@ -77,19 +90,6 @@ end
 # Returns the path to the Config.json
 def fastlane_config_path
   smf_workspace_dir + '/Config.json'
-end
-
-# loads the config json content into the @smf_fastlane_config env variable
-def smf_load_fastlane_config
-  config_path = fastlane_config_path
-  UI.message("Reading the SMF Fastlane config from \"#{config_path}\"")
-  config_file = File.read(config_path)
-  if config_file
-    @smf_fastlane_config ||= JSON.parse(config_file, :symbolize_names => true)
-    UI.success('Parsed config file into the hash map')
-  else
-    raise "Error: The SMF Fastlane config file doesn't exist at path \"#{config_path}\""
-  end
 end
 
 # removes the fastlane commons repo
