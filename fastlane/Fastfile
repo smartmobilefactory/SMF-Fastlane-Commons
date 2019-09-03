@@ -39,11 +39,11 @@ def smf_import_commons(options = nil)
   case @platform
   when :ios
     ios_setup_file = "#{@fastlane_commons_dir_path}/setup/ios_release.rb"
-    File.exist?(ios_setup_file) ? import(ios_setup_file) : return
-    @fastlane_commons_dir_path += '/legacy/ios'
-    ios_setup_file = "#{@fastlane_commons_dir_path}/fastlane/setup.rb"
-    import(ios_setup_file)
-    smf_setup_ios_fastlane_commons(options)
+    if File.exist?(ios_setup_file)
+      import(ios_setup_file)
+    else
+      UI.message("Can't find ios_release file ar #{ios_setup_file}")
+    end
   when :android
     android_setup_file = "#{@fastlane_commons_dir_path}/android_release.rb"
     File.exist?(android_setup_file) ? import(android_setup_file) : return
