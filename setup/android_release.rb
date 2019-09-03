@@ -41,7 +41,7 @@ private_lane :super_build do |options|
 
   variant = get_build_variant_from_config(build_variant)
 
-  smf_build_app(build_variant: variant)
+  smf_build_android_app(build_variant: variant)
 end
 
 lane :build do |options|
