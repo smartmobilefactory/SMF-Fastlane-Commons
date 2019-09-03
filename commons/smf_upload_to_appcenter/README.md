@@ -19,7 +19,6 @@ smf_ios_upload_to_appcenter(
 Upload the apk to AppCenter.
 ```
 smf_android_upload_to_appcenter(
-        apk_file: "exampleApp.apk", #Name of the apk file
         apk_path: <path to exampleApp>, #Path to apk file
         app_secret: "eg21g21-21g1g-12g13b3-2121", #The secret of the app from AppCenter
 )

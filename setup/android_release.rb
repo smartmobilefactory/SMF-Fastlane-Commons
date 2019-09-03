@@ -71,7 +71,6 @@ private_lane :super_upload_to_appcenter do |options|
 
   smf_android_upload_to_appcenter(
       build_variant: build_variant,
-      apk_file: apk_file_name,
       apk_path: get_apk_path(apk_file_regex),
       app_secret: app_id
   )
