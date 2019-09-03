@@ -1,6 +1,7 @@
 private_lane :smf_build_android_app do |options|
 
   build_variant = options[:build_variant]
+  keystore_folder = options[:keystore_folder]
 
   if !build_variant
     UI.important("Building all variants")
@@ -9,16 +10,14 @@ private_lane :smf_build_android_app do |options|
     UI.important("Building variant " + build_variant)
   end
 
+  keystore_values = smf_pull_keystore(folder: keystore_folder) if !keystore_folder.nil?
+
   addition = ""
-  if ENV[$SMF_KEYSTORE_FILE_KEY]
-    KEYSTORE_FILE = ENV[$SMF_KEYSTORE_FILE_KEY]
-    KEYSTORE_PASSWORD = ENV[$SMF_KEYSTORE_PASSWORD_KEY]
-    KEYSTORE_KEY_ALIAS = ENV[$SMF_KEYSTORE_KEY_ALIAS_KEY]
-    KEYSTORE_KEY_PASSWORD = ENV[$SMF_KEYSTORE_KEY_PASSWORD_KEY]
-    addition = " -Pandroid.injected.signing.store.file='#{KEYSTORE_FILE}'"
-    addition << " -Pandroid.injected.signing.store.password='#{KEYSTORE_PASSWORD}'"
-    addition << " -Pandroid.injected.signing.key.alias='#{KEYSTORE_KEY_ALIAS}'"
-    addition << " -Pandroid.injected.signing.key.password='#{KEYSTORE_KEY_PASSWORD}'"
+  if keystore_values[:keystore_file]
+    addition = " -Pandroid.injected.signing.store.file='#{keystore_values[:keystore_file]}'"
+    addition << " -Pandroid.injected.signing.store.password='#{keystore_values[:keystore_password]}'"
+    addition << " -Pandroid.injected.signing.key.alias='#{keystore_values[:keystore_key_alias]}'"
+    addition << " -Pandroid.injected.signing.key.password='#{keystore_values[:keystore_key_password]}'"
   end
 
   gradle(task: "assemble" + build_variant + addition)
