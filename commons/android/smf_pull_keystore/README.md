@@ -1,6 +1,6 @@
 ### Pull Keystore
-This lane clones the android keystore repository and decrypts the folder which contains the proeprties needed to build the app. 
-The properties are than combined into a string and returned.
+This lane clones the android keystore repository and decrypts the folder which contains the properties needed to build the app. 
+The properties are than combined into a string and will be returned.
 
 Example: 
 

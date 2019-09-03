@@ -1,8 +1,7 @@
 
 private_lane :smf_pull_keystore do |options|
-
-  clone_root_folder = options[:clone_root_folder]
-  clone_root_folder = @fastlane_commons_dir_path if !clone_root_folder
+  
+  clone_root_folder = !options[:clone_root_folder].nil? options[:clone_root_folder] : @fastlane_commons_dir_path
 
   keystoreFolder = options[:folder]
 
