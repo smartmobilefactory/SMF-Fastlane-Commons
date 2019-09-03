@@ -1,14 +1,7 @@
 private_lane :smf_build_android_app do |options|
 
-  build_variant = options[:build_variant]
+  build_variant = !options[:build_variant].nil? ? options[:build_variant].to_s : ''
   keystore_folder = options[:keystore_folder]
-
-  if !build_variant
-    UI.important("Building all variants")
-    build_variant = ""
-  else
-    UI.important("Building variant " + build_variant)
-  end
 
   addition = ''
 
@@ -23,5 +16,5 @@ private_lane :smf_build_android_app do |options|
     end
   end
 
-  gradle(task: "assemble" + build_variant + addition)
+  gradle(task: 'assemble' + build_variant.capitalize + addition)
 end
