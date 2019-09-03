@@ -100,8 +100,10 @@ def smf_import_commons
 
   case @platform
   when :ios
+    UI.message("trying to import setup file for ios")
     ios_setup_file = "#{@fastlane_commons_dir_path}/ios_release.rb"
     File.exist?(ios_setup_file) ? import(ios_setup_file) : return
+    UI.message("setup file for ios not existing, falling back to legacy code")
     @fastlane_commons_dir_path += '/legacy/ios'
     ios_setup_file = "#{@fastlane_commons_dir_path}/fastlane/setup.rb"
     import(ios_setup_file)
