@@ -11,7 +11,7 @@ def smf_workspace_dir
   path = path.chomp('/fastlane') if path.end_with?('/fastlane')
 end
 
-def smf_import_commons
+def smf_import_commons(options)
 
   case @platform
   when :ios
@@ -27,7 +27,7 @@ def smf_import_commons
 
   if !Dir.exist?(@fastlane_commons_dir_path)
     UI.message('There fastlane commons directory does not exist.')
-    return
+    next
   else
     UI.message('Import files from fastlane commons directory.')
   end
@@ -38,6 +38,8 @@ def smf_import_commons
 
   case @platform
   when :ios
+    ios_setup_file = "#{@fastlane_commons_dir_path}/ios_release.rb"
+    File.exist?(ios_setup_file) ? import(ios_setup_file) : return
     @fastlane_commons_dir_path += '/legacy/ios'
     ios_setup_file = "#{@fastlane_commons_dir_path}/fastlane/setup.rb"
     import(ios_setup_file)
