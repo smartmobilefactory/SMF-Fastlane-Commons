@@ -82,7 +82,8 @@ private_lane :smf_deploy_build_variant do |options|
     sh "mkdir #{workspace}/#{$METAJSON_TEMP_FOLDERNAME}"
   end
 
-  smf_install_pods_if_project_contains_podfile
+  smf_pod_install
+
   tag = smf_increment_build_number(
       build_variant: build_variant,
       current_build_number: get_build_number_of_app
