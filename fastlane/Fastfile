@@ -1,6 +1,7 @@
 @fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
 
-=begindesc 'Setup'
+=begin
+desc 'Setup'
 before_all do |lane, options|
   case @platform
   when :ios
