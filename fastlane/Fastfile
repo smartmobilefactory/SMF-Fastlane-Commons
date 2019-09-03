@@ -26,8 +26,8 @@ def smf_import_commons(options)
   end
 
   if !Dir.exist?(@fastlane_commons_dir_path)
-    UI.message('There fastlane commons directory does not exist.')
-    next
+    UI.message('The fastlane commons directory does not exist.')
+    return
   else
     UI.message('Import files from fastlane commons directory.')
   end
