@@ -42,6 +42,38 @@ def set_fastlane_commons_dir_path_for_platform
   end
 end
 
+# Returns the path to the Config.json
+def fastlane_config_path
+  smf_workspace_dir + '/Config.json'
+end
+
+# loads the config json content into the @smf_fastlane_config env variable
+def smf_load_fastlane_config
+  config_path = fastlane_config_path
+  UI.message("Reading the SMF Fastlane config from \"#{config_path}\"")
+  config_file = File.read(config_path)
+  if config_file
+    @smf_fastlane_config ||= JSON.parse(config_file, :symbolize_names => true)
+    UI.success('Parsed config file into the hash map')
+  else
+    raise "Error: The SMF Fastlane config file doesn't exist at path \"#{config_path}\""
+  end
+end
+
+# removes the fastlane commons repo
+def smf_remove_fastlane_commons_repo
+  sh "if [ -d #{@fastlane_commons_dir_path} ]; then rm -rf #{@fastlane_commons_dir_path}; fi"
+end
+
+# clones the fastlane commons repo
+def smf_clone_fastlane_commons_repo
+  smf_remove_fastlane_commons_repo if File.exists?(@fastlane_commons_dir_path)
+
+  fastlane_commons_branch = @smf_fastlane_config[:project][:fastlane_commons_branch]
+
+  sh 'git clone -b "' + fastlane_commons_branch + "\" git@github.com:smartmobilefactory/SMF-Fastlane-Commons.git #{@fastlane_commons_dir_path}"
+end
+
 # sets the commons dir path and clones the fastlane repo
 lane :smf_setup_workspace do |options|
   smf_load_fastlane_config
@@ -87,38 +119,6 @@ def smf_import_commons
 end
 
 smf_import_commons
-
-# Returns the path to the Config.json
-def fastlane_config_path
-  smf_workspace_dir + '/Config.json'
-end
-
-# loads the config json content into the @smf_fastlane_config env variable
-def smf_load_fastlane_config
-  config_path = fastlane_config_path
-  UI.message("Reading the SMF Fastlane config from \"#{config_path}\"")
-  config_file = File.read(config_path)
-  if config_file
-    @smf_fastlane_config ||= JSON.parse(config_file, :symbolize_names => true)
-    UI.success('Parsed config file into the hash map')
-  else
-    raise "Error: The SMF Fastlane config file doesn't exist at path \"#{config_path}\""
-  end
-end
-
-# removes the fastlane commons repo
-def smf_remove_fastlane_commons_repo
-  sh "if [ -d #{@fastlane_commons_dir_path} ]; then rm -rf #{@fastlane_commons_dir_path}; fi"
-end
-
-# clones the fastlane commons repo
-def smf_clone_fastlane_commons_repo
-  smf_remove_fastlane_commons_repo if File.exists?(@fastlane_commons_dir_path)
-
-  fastlane_commons_branch = @smf_fastlane_config[:project][:fastlane_commons_branch]
-
-  sh 'git clone -b "' + fastlane_commons_branch + "\" git@github.com:smartmobilefactory/SMF-Fastlane-Commons.git #{@fastlane_commons_dir_path}"
-end
 
 desc 'Called on error'
 error do |lane, exception|
