@@ -42,6 +42,13 @@ def set_fastlane_commons_dir_path_for_platform
   end
 end
 
+# sets the commons dir path and clones the fastlane repo
+lane :smf_setup_workspace do |options|
+  smf_load_fastlane_config
+  UI.message('Downloading Fastlane Commons Repo')
+  smf_clone_fastlane_commons_repo
+end
+
 def smf_import_commons
 
   set_fastlane_commons_dir_path_for_platform
@@ -151,13 +158,6 @@ error do |lane, exception|
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown Platform'
   end
-end
-
-# sets the commons dir path and clones the fastlane repo
-lane :smf_setup_workspace do |options|
-  smf_load_fastlane_config
-  UI.message('Downloading Fastlane Commons Repo')
-  smf_clone_fastlane_commons_repo
 end
 
 def smf_is_slack_enabled
