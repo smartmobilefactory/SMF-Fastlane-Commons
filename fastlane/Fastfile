@@ -77,7 +77,7 @@ def smf_import_commons
   end
 end
 
-smf_import_commons
+#smf_import_commons
 
 # Returns the path to the Config.json
 def fastlane_config_path
