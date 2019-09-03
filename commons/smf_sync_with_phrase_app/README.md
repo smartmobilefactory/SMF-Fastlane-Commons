@@ -34,7 +34,6 @@ If there are extensions which need to be synced with the phrase app, too, this c
 Here is a template for the "phrase_app" structure:
 
 ```
-	...
 	"phrase_app" : {
 		"format" : "...",
 		"access_token_key" : "...",
@@ -57,12 +56,12 @@ Here is a template for the "phrase_app" structure:
 				"project_id" : "...",
 				"base_directory" : "...",
 				"files" : [
-	`				"...",
+					"...",
 					"..."
 				]
 			}
 		]
 	}
-}`
+}
 
 ```
