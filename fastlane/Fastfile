@@ -88,11 +88,11 @@ def smf_import_commons
   set_fastlane_commons_dir_path_for_platform
 
   if !Dir.exist?(@fastlane_commons_dir_path)
-    UI.message('The fastlane commons directory does not exist. Calling smf_setup_workspace')
-    smf_setup_workspace
+    UI.message('The fastlane commons directory does not exist.')
+    return
+  else
+    UI.message('Import files from fastlane commons directory.')
   end
-
-  UI.message('Import files from fastlane commons directory.')
 
   fastlane_dir_path = "#{@fastlane_commons_dir_path}/fastlane"
   import_all("#{fastlane_dir_path}/utils")
