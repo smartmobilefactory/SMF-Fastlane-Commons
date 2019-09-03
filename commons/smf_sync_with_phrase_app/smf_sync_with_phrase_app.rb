@@ -1,49 +1,47 @@
-########################################
-### smf_sync_strings_with_phrase_app ###
-########################################
+lane :smf_sync_with_phrase_app do |options|
+  case @platform
+  when :ios
+    initialize_env_variable_name_mappings
+    UI.message("Strings are synced with PhraseApp using the values from the fastlane/Config.json")
 
-desc "Snycs the Strings with PhraseApp if the build variant declared a PhraseApp script"
-private_lane :smf_sync_strings_with_phrase_app do |options|
+    raise ("Failed to sync Strings with PhraseApp (using the Config.json): check fastlane/Config.json \"phrase_app\" entries!") if (validate_and_set_phrase_app_env_variables(options) == false)
 
-  initialize_env_variable_name_mappings
-  UI.message("Strings are synced with PhraseApp using the values from the fastlane/Config.json")
+    UI.message("Starting to clone Phraseapp-CI scripts...")
+    phrase_app_scripts_path = clone_phraseapp_ci
+    raise ("PhraseApp scripts path is nil") if phrase_app_scripts_path.nil?
 
-  raise ("Failed to sync Strings with PhraseApp (using the Config.json): check fastlane/Config.json \"phrase_app\" entries!") if (validate_and_set_phrase_app_env_variables(options) == false)
+    UI.message("Successfully downloaded phrase app scripts, running scripts...")
+    sh "if #{phrase_app_scripts_path}/push.sh; then #{phrase_app_scripts_path}/pull.sh || true; fi"
 
-  UI.message("Starting to clone Phraseapp-CI scripts...")
-  phrase_app_scripts_path = clone_phraseapp_ci
-  raise ("PhraseApp scripts path is nil") if phrase_app_scripts_path.nil?
+    UI.message("Ran scripts.. checking for extensions...")
+    extensions = check_for_extensions_and_validate(options)
 
-  UI.message("Successfully downloaded phrase app scripts, running scripts...")
-  sh "if #{phrase_app_scripts_path}/push.sh; then #{phrase_app_scripts_path}/pull.sh || true; fi"
-
-  UI.message("Ran scripts.. checking for extensions...")
-  extensions = check_for_extensions_and_validate(options)
-
-  if (extensions == [])
+    if (extensions == [])
       UI.message("There are no extension entries..")
-  else
-    UI.message("Found extensions...")
-    extensions.each do |extension|
-      if (extension != nil)
-        setup_environment_variables_for_extension(extension)
-        sh "if #{phrase_app_scripts_path}/push.sh; then #{phrase_app_scripts_path}/pull.sh || true; fi"
-      elsif
+    else
+      UI.message("Found extensions...")
+      extensions.each do |extension|
+        if (extension != nil)
+          setup_environment_variables_for_extension(extension)
+          sh "if #{phrase_app_scripts_path}/push.sh; then #{phrase_app_scripts_path}/pull.sh || true; fi"
+        elsif
         UI.message("Skipping invalid extension.. look in the Config.json if all extension have the mandatory entries.")
+        end
       end
     end
+
+    UI.message("Finished executing phrase app scripts for extensions...")
+    UI.message("Deleting phrase app ci scripts...")
+    clean_up_phraseapp_ci(phrase_app_scripts_path)
+  when :android
+    UI.message('Sync string with PhraseApp for android is not implemented yet')
+  when :flutter
+    UI.message('Sync string with PhraseApp for flutter is not implemented yet')
+  else
+    UI.message("There is no platform \"#{@platform}\", exiting...")
+    raise 'Unknown platform'
   end
-
-  UI.message("Finished executing phrase app scripts for extensions...")
-  UI.message("Deleting phrase app ci scripts...")
-  clean_up_phraseapp_ci(phrase_app_scripts_path)
 end
-
-##########################################################################
-############## PHRASEAPP SETUP USING FASTLANE/CONFIG.JSON. ###############
-##########################################################################
-
-###################### GENERAL SETUP ##########################
 
 # Mapps the keys of the fastlane/Config.json to the env. variable names of the phrase app script
 # the boolean value indicates whether the value is optional or not
@@ -51,16 +49,16 @@ end
 
 def initialize_env_variable_name_mappings
   @phrase_app_config_keys_env_variable_mapping = {
-    :access_token_key           => ["phraseappAccessToken", true, "SMF_PHRASEAPP_ACCESS_TOKEN"], # optional
-    :project_id                 => ["phraseappProjectId", false],
-    :source                     => ["phraseappSource", false],
-    :locales                    => ["phraseappLocales", false],
-    :format                     => ["phraseappFormat", false],
-    :base_directory             => ["phraseappBasedir", false],
-    :files                      => ["phraseappFiles", false],
-    :git_branch                 => ["phraseappGitBranch", true, @smf_git_branch],  # optional, defaults to @smf_git_branch
-    :files_prefix               => ["phraseappFilesPrefix", true, ""], # optional
-    :forbid_comments_in_source  => ["phraseappForbidCommentsInSource", true, "1"]  # optional
+      :access_token_key           => ["phraseappAccessToken", true, $SMF_PHRASE_APP_ACCESS_TOKEN_KEY], # optional
+      :project_id                 => ["phraseappProjectId", false],
+      :source                     => ["phraseappSource", false],
+      :locales                    => ["phraseappLocales", false],
+      :format                     => ["phraseappFormat", false],
+      :base_directory             => ["phraseappBasedir", false],
+      :files                      => ["phraseappFiles", false],
+      :git_branch                 => ["phraseappGitBranch", true, @smf_git_branch],  # optional, defaults to @smf_git_branch
+      :files_prefix               => ["phraseappFilesPrefix", true, ""], # optional
+      :forbid_comments_in_source  => ["phraseappForbidCommentsInSource", true, "1"]  # optional
   }
 end
 
@@ -124,7 +122,7 @@ def check_for_extensions_and_validate(options)
     extensions.each do |extension|
       validated_extension = validate_extension(extension)
       validated_extensions.push(validated_extension)
-      
+
       if (validated_extension == nil)
         UI.error("Error validating an extension entry in the fastlane/Config.json for the phrase app script")
       end
@@ -167,8 +165,8 @@ end
 # returns parent directory of the push/pull scripts on success
 # returns nil on error
 def clone_phraseapp_ci
-  url = "git@github.com:smartmobilefactory/Phraseapp-CI.git"
-  branch = "master"
+  url = $SMF_PHRASE_APP_SCRIPTS_REPO_URL
+  branch = $SMF_PHRASE_APP_SCRIPTS_BRANCH
   src_root = File.join(smf_workspace_dir, File.basename(url, File.extname(url)))
   if File.exists?(src_root)
     UI.error("Can't clone into #{src_root}, directory already exists. Can't download Phraseapp-CI scripts..")
@@ -193,10 +191,10 @@ end
 def transform_value_if_necessary(key, value)
   case key
   when :access_token_key
-    if value != "SMF_PHRASEAPP_ACCESS_TOKEN"
-      return ENV["CUSTOM_PHRASE_APP_TOKEN"]
+    if value != $SMF_PHRASE_APP_ACCESS_TOKEN_KEY
+      return ENV[$SMF_PHRASE_APP_CUSTOM_TOKEN_KEY]
     else
-      return ENV["SMF_PHRASEAPP_ACCESS_TOKEN"]
+      return ENV[$SMF_PHRASE_APP_ACCESS_TOKEN_KEY]
     end
   when :locales, :files
     return value.join(" ")
@@ -218,4 +216,3 @@ def export_dict_as_env_variables(dict)
       ENV[key] = value
     end
   end
-end
