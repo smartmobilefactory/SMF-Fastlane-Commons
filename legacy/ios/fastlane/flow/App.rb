@@ -104,7 +104,7 @@ private_lane :smf_deploy_build_variant do |options|
   end
 
   # Sync Phrase App
-  smf_sync_strings_with_phrase_app
+  smf_sync_with_phrase_app(get_phrase_app_properties)
 
   smf_download_provisioning_profiles(
       team_id: get_team_id,
@@ -251,7 +251,7 @@ private_lane :smf_deploy_build_variant do |options|
 
   if (build_variant_config[:use_sparkle])
     # Upload DMG to Strato
-    app_path = smf_path_to_ipa_or_app
+    app_path = smf_path_to_ipa_or_app(build_variant_config[:scheme])
     app_path = app_path.sub(".app", ".dmg")
     update_dir = "#{smf_workspace_dir}/build/"
 
@@ -314,9 +314,9 @@ private_lane :smf_deploy_build_variant do |options|
 
     begin
       smf_upload_to_testflight(
-          apple_id: get_itc_apple_id(build_variant),
-          itc_team_id: get_itc_team_id(build_variant),
-          username: get_itc_apple_id(build_variant),
+          apple_id: get_itc_apple_id,
+          itc_team_id: get_itc_team_id,
+          username: get_itc_apple_id,
           skip_waiting_for_build_processing: should_skip_waiting_after_itc_upload(build_variant)
       )
 
