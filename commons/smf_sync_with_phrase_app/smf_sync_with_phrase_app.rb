@@ -6,7 +6,7 @@ lane :smf_sync_with_phrase_app do |options|
 
     if (validate_and_set_phrase_app_env_variables(options) == false)
       UI.message("Either phrase app is not used in this project or you have to check the fastlane/Config.json \"phrase_app\" entries for completeness!")
-      return
+      next
     end
 
     UI.message("Starting to clone Phraseapp-CI scripts...")
