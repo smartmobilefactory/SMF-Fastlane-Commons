@@ -12,7 +12,7 @@ smf_sync_with_phrase_app(<map_with_necessary_phraseapp_properties>)
 The Phrase-App synchronisation scripts need certain environment variables. The values for theses variables are stored in the nested dictionary `phrase_app`. 
 These entries exist for each build variant that needs to sync with phrase app and are therefore nested inside the given build-variant entry.
 
-#####Disabling PhraseApp Entry Temporarily
+##### Disabling PhraseApp Entry Temporarily
 If a set of phrase app variables has to be disabled, the convention is to rename the `phrase_app` entry to `phrase_app_DISABLED`. 
 This way the phrase app sync scripts will ignore the entry, but the variables and values can be kept in the config.json to be enabled and used at a later time.
 
@@ -34,8 +34,6 @@ If there are extensions which need to be synced with the phrase app, too, this c
 Here is a template for the "phrase_app" structure:
 
 ```
-
-"alpha": {
 	...
 	"phrase_app" : {
 		"format" : "...",
@@ -67,4 +65,4 @@ Here is a template for the "phrase_app" structure:
 	}
 }`
 
-``
+```
