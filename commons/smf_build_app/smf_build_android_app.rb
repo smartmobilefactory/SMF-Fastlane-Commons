@@ -23,5 +23,5 @@ private_lane :smf_build_android_app do |options|
     end
   end
 
-  gradle(task: "assemble" + build_variant + addition)
+  gradle(task: "assemble" + build_variant.to_s + addition)
 end
