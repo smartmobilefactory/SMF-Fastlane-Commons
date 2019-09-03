@@ -188,11 +188,6 @@ def get_app_secret(build_variant)
   end
 end
 
-def get_apk_file_name(build_variant)
-  build_variant = build_variant.to_s.downcase
-  @smf_fastlane_config[:build_variants][build_variant.to_sym][:apk_file]
-end
-
 def get_escaped_filename(build_variant)
   @smf_fastlane_config[:build_variants][build_variant.to_sym][:scheme].gsub(' ', "\ ")
 end

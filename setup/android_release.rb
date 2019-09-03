@@ -39,7 +39,9 @@ private_lane :super_build do |options|
 
   build_variant = options[:build_variant]
 
-  smf_build_app(build_variant: build_variant)
+  variant = get_build_variant_from_config(build_variant)
+
+  smf_build_app(build_variant: variant)
 end
 
 lane :build do |options|
@@ -64,13 +66,14 @@ end
 private_lane :super_upload_to_appcenter do |options|
 
   build_variant = options[:build_variant]
-  apk_file_name = get_apk_file_name(build_variant)
-  app_secret = get_app_secret(build_variant)
+  apk_file_regex = get_apk_file_regex(build_variant)
+  app_id = get_app_secret(build_variant)
 
   smf_android_upload_to_appcenter(
       build_variant: build_variant,
       apk_file: apk_file_name,
-      app_secret: app_secret
+      apk_path: get_apk_path(apk_file_regex),
+      app_secret: app_id
   )
 end
 

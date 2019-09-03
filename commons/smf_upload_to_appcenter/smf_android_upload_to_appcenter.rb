@@ -6,17 +6,6 @@ private_lane :smf_android_upload_to_appcenter do |options|
 
   app_name, owner_name = get_app_details(app_secret)
 
-  found = false
-  if apk_path
-    found = true
-    apk_path = apk_path
-  else
-    lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].each do |apk_path|
-      found = apk_path.include? apk_file
-      break if found
-    end
-  end
-
   raise("Cannot find the APK #{apk_file}") unless found
 
   UI.message('Upload android app to AppCenter.')
