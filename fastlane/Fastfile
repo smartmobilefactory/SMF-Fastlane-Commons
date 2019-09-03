@@ -1,6 +1,6 @@
 @fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
 
-desc 'Setup'
+=begindesc 'Setup'
 before_all do |lane, options|
   case @platform
   when :ios
@@ -15,6 +15,7 @@ before_all do |lane, options|
     raise 'Unknown platform'
   end
 end
+=end
 
 def import_all(path)
   Dir["#{path}/**/*.rb"].each do |file|
@@ -96,6 +97,7 @@ def smf_import_commons
   import_all("#{fastlane_dir_path}/utils")
   import_all("#{@fastlane_commons_dir_path}/commons")
 
+  UI.message('DEBUGGGGG')
   case @platform
   when :ios
     ios_setup_file = "#{@fastlane_commons_dir_path}/ios_release.rb"
