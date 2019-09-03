@@ -27,7 +27,8 @@ private_lane :super_increment_build_number do |options|
   smf_increment_build_number(build_variant: build_variant)
 end
 
-lane :increment_build_number do |options|
+# increment_build_number already exists
+lane :pipeline_increment_build_number do |options|
   super_increment_build_number(options)
 end
 
@@ -73,7 +74,8 @@ private_lane :super_upload_to_appcenter do |options|
   )
 end
 
-lane :upload_to_appcenter do |options|
+# upload_to_appcenter already exists
+lane :pipeline_upload_to_appcenter do |options|
   super_upload_to_appcenter(options)
 end
 
