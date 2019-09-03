@@ -7,7 +7,7 @@ private_lane :smf_build_android_app do |options|
     UI.important("Building all variants")
     build_variant = ""
   else
-    UI.important("Building variant " + build_variant)
+    UI.important("Building variant " + build_variant.to_s)
   end
 
   addition = ''
