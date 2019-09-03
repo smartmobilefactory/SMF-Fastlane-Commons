@@ -67,8 +67,9 @@ def smf_update_build_number_in_project(build_number)
     increment_build_number(build_number: build_number.to_s)
   when :android
     new_config = @smf_fastlane_config
-    UI.message(build_number)
-    UI.message(new_config)
+    UI.message("build_number: #{build_number}")
+    UI.message("Config: #{new_config}")
+    UI.message("Build Number: #{new_config['app_version_code']}")
     new_config['app_version_code'] = build_number.to_i
     update_config(
         new_config,
