@@ -32,7 +32,8 @@ Example Call:
 
 ```
 smf_build_android_app(
-    build_variant: "Alpha"      # The name of the build variant
+    build_variant: "Alpha",                     # The name of the build variant
+    keystore_folder: "keystore_folder_name"     # Name of the keystore folder for this project (in the Keystore Repository)      
 )
 
 ```

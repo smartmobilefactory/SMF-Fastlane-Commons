@@ -127,7 +127,7 @@ lane :smf_perform_all_ui_tests do |options|
   # Variables
   bundle_identifier = @smf_fastlane_config[:build_variants][@smf_build_variant_sym]["ui_test.target.bundle_identifier".to_sym]
 
-  smf_install_pods_if_project_contains_podfile
+  smf_pod_install
 
   # Add the simulators to the destinations and install the app which should be tested
 
