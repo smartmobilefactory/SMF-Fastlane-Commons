@@ -57,6 +57,7 @@ def smf_import_commons
 end
 
 smf_import_commons
+smf_load_fastlane_config
 
 desc 'Setup'
 before_all do |lane, options|
@@ -147,7 +148,6 @@ end
 
 # sets the commons dir path and clones the fastlane repo
 lane :smf_setup_workspace do |options|
-  smf_load_fastlane_config
   UI.message('Downloading Fastlane Commons Repo')
   smf_clone_fastlane_commons_repo
 end
