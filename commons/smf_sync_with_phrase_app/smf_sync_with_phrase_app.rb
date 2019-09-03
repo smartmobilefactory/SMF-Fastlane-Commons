@@ -216,3 +216,4 @@ def export_dict_as_env_variables(dict)
       ENV[key] = value
     end
   end
+end
