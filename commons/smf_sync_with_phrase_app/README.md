@@ -62,6 +62,5 @@ Here is a template for the "phrase_app" structure:
 			}
 		]
 	}
-}
 
 ```
