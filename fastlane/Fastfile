@@ -69,6 +69,11 @@ def smf_load_fastlane_config
   end
 end
 
+# Returns the path to the Config.json
+def fastlane_config_path
+  smf_workspace_dir + '/Config.json'
+end
+
 smf_import_commons
 smf_load_fastlane_config
 
@@ -85,11 +90,6 @@ before_all do |lane, options|
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
   end
-end
-
-# Returns the path to the Config.json
-def fastlane_config_path
-  smf_workspace_dir + '/Config.json'
 end
 
 # removes the fastlane commons repo
