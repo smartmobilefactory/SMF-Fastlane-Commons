@@ -34,7 +34,7 @@ lane :smf_sync_with_phrase_app do |options|
     UI.message("Deleting phrase app ci scripts...")
     clean_up_phraseapp_ci(phrase_app_scripts_path)
   when :android
-    UI.message('Sync string with PhraseApp for android is not implemented yet')
+    UI.message('Sync string with PhraseApp for android is implemented as fastlane action and should be overwritten in the projects fastfile.')
   when :flutter
     UI.message('Sync string with PhraseApp for flutter is not implemented yet')
   else
