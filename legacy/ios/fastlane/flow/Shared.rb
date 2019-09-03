@@ -9,7 +9,7 @@ private_lane :smf_check_pr do |options|
     smf_update_generated_setup_file
   end
 
-  smf_install_pods_if_project_contains_podfile
+  smf_pod_install
 
   # Use the current build variant if no array of build variants to check is provided
   if @smf_build_variants_array.nil? || @smf_build_variants_array.length == 0
