@@ -98,7 +98,6 @@ def smf_import_commons
   import_all("#{fastlane_dir_path}/utils")
   import_all("#{@fastlane_commons_dir_path}/commons")
 
-  UI.message('DEBUGGGGG')
   case @platform
   when :ios
     ios_setup_file = "#{@fastlane_commons_dir_path}/ios_release.rb"
