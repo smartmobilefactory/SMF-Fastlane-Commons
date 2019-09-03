@@ -60,21 +60,6 @@ end
 
 smf_import_commons
 
-desc 'Setup'
-before_all do |lane, options|
-  case @platform
-  when :ios
-    #smf_setup_workspace
-  when :android
-    UI.message('Setup for Android is implemented in Pipeline Commons')
-  when :flutter
-    UI.message('Setup for flutter is not implemented yet')
-  else
-    UI.message("There is no platform \"#{@platform}\", exiting...")
-    raise 'Unknown platform'
-  end
-end
-
 # Returns the path to the Config.json
 def fastlane_config_path
   smf_workspace_dir + '/Config.json'
