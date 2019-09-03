@@ -14,6 +14,7 @@ end
 
 def get_build_variant_from_config(build_variant)
   build_variant = build_variant.to_s.downcase
-  variant = @smf_fastlane_config[:build_variants][build_variant.to_sym][:variant].gsub(/[a-z]/) {|s| s.upcase break }
+  variant = @smf_fastlane_config[:build_variants][build_variant.to_sym][:variant]
+
   variant
 end
