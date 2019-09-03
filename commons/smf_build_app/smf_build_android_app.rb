@@ -7,7 +7,7 @@ private_lane :smf_build_android_app do |options|
     UI.important("Building all variants")
     build_variant = ""
   else
-    UI.important("Building variant " + build_variant.to_s)
+    UI.important("Building variant " + build_variant)
   end
 
   addition = ''
@@ -23,5 +23,5 @@ private_lane :smf_build_android_app do |options|
     end
   end
 
-  gradle(task: "assemble" + build_variant.to_s + addition)
+  gradle(task: "assemble" + build_variant + addition)
 end
