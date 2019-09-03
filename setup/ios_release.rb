@@ -1,6 +1,7 @@
 # Setup Dependencies - pod install & `sh generate.sh` (optional: Phrase App)
 private_lane :super_setup_dependencies do |options|
-  UI.message("Hallo Welt")
+  smf_pod_install
+  smf_sync_with_phrase_app(get_phrase_app_properties)
 end
 
 lane :setup_dependencies do |options|
