@@ -80,11 +80,6 @@ def get_use_xcconfig
   build_variant_config[:xcconfig_name].nil? ? false : true
 end
 
-def get_xcconfig_name
-  use_xcconfig = build_variant_config[:xcconfig_name].nil? ? false : true
-  use_xcconfig ? build_variant_config[:xcconfig_name][:archive] : "Release"
-end
-
 def get_export_method
   build_variant_config[:export_method]
 end
