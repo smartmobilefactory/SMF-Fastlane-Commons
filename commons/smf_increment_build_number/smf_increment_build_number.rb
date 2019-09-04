@@ -66,9 +66,8 @@ def smf_update_build_number_in_project(build_number)
   when :ios
     increment_build_number(build_number: build_number.to_s)
   when :android
-    hash = JSON.parse @smf_fastlane_config
-    hash['app_version_code'] = build_number.to_i
-    new_config = hash.to_json
+    new_config = @smf_fastlane_config
+    new_config['app_version_code'] = build_number.to_i
     update_config(
         new_config,
         "Increment build number to #{build_number}")
