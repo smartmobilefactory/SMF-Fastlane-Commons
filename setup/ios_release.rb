@@ -48,8 +48,8 @@ end
 # build (build to release)
 
 private_lane :super_build do |options|
-  UI.message("Options: #{options}")
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
+  UI.message("debugggg")
   smf_build_ios_app(
       scheme: build_variant_config[:scheme],
       should_clean_project: build_variant_config[:should_clean_project],
