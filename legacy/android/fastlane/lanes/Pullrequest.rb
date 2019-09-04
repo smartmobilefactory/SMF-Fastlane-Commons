@@ -90,7 +90,7 @@ private_lane :smf_update_jenkins_file do |options|
   else
     # generate app Jenkinsfile
     jenkinsFileData = File.read("#{@fastlane_commons_dir_path}/jenkins/Jenkinsfile_Android.template")
-    jenkinsFileData = jenkinsFileData.gsub("__BUILD_VARIANTS__", JSON.dump(config["ci_build_variants"]))
+    jenkinsFileData = jenkinsFileData.gsub("__BUILD_VARIANTS__", JSON.dump(config["build_variants"]))
     File.write("#{smf_workspace_dir}/Jenkinsfile", jenkinsFileData)
   end
 end

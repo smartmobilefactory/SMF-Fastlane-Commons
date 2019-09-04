@@ -77,6 +77,5 @@ def get_build_number_of_app
     build_number = parts[0]
   end
 
-  UI.message("build number: #{build_number}")
   build_number
 end
