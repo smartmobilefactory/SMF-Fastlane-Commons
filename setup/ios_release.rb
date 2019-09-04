@@ -9,7 +9,7 @@ private_lane :super_setup_dependencies do |options|
 end
 
 lane :setup_dependencies do |options|
-  super_setup_dependencies
+  super_setup_dependencies(options)
 end
 # Provisioning
 # run unittests (build test target and run test)
