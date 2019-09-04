@@ -135,7 +135,7 @@ error do |lane, exception|
 end
 
 # sets the commons dir path and clones the fastlane repo
-def smf_setup_workspace
+lane :smf_setup_workspace do
   smf_load_fastlane_config
   UI.message('Downloading Fastlane Commons Repo')
   smf_clone_fastlane_commons_repo
