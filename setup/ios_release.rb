@@ -21,8 +21,6 @@ lane :super_handle_provisioning_profiles do |options|
   config = JSON.parse(File.read("#{smf_workspace_dir}/Config.json"), :symbolize_names => true)
   build_variant_config = config[:build_variants][options[:build_variant].to_sym]
 
-  UI.message("BUild variant config: #{build_variant_config}")
-
   smf_download_provisioning_profiles(
       team_id: build_variant_config[:team_id],
       apple_id: build_variant_config[:apple_id],
@@ -31,7 +29,8 @@ lane :super_handle_provisioning_profiles do |options|
       use_default_match_config: build_variant_config[:match].nil?,
       match_read_only: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:read_only],
       match_type: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:type],
-      extensions_suffixes: config[:extensions_suffixes]
+      extensions_suffixes: config[:extensions_suffixes],
+      build_variant: options[build_variant]
   )
 end
 

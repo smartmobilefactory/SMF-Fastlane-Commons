@@ -22,5 +22,6 @@ smf_download_provisioning_profiles(
   match_read_only: true,                                                            # If enabled match only reads existing profiles and signing certificates and does not create new ones or updates any existing ones.
   match_type: "appstore",                                                           # The type can be one of the following values: "appstore", "adhoc", "development", "enterprise"
   extensions_suffixes: <???>                                                        # Undocumented property??
+  build_variant: "alpha"                                                            # the build variant of the current build
 )
 ```

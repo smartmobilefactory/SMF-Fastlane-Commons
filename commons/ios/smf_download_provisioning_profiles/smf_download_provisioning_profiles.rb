@@ -10,6 +10,7 @@ private_lane :smf_download_provisioning_profiles do |options|
   match_read_only = options[:match_read_only]
   match_type = options[:match_type]
   extensions_suffixes = options[:extensions_suffixes]
+  build_variant = options[:build_variant]
 
   if ENV[$FASTLANE_PLATFORM_NAME_ENV_KEY] == "mac"
     UI.message("Skipping fastlane match, because it doesn't support mac apps.")
@@ -39,7 +40,7 @@ private_lane :smf_download_provisioning_profiles do |options|
         team_id: team_id
     )
 
-  elsif (@smf_build_variant.match(/alpha/) != nil || @smf_build_variant.match(/beta/) != nil || @smf_build_variant.match(/example/) != nil)
+  elsif (build_variant.match(/alpha/) != nil || build_variant.match(/beta/) != nil || build_variant.match(/example/) != nil)
     regex = /com\.smartmobilefactory\.enterprise/
     if bundle_identifier.match(regex) != nil
       smf_download_provisioning_profile_using_match(
