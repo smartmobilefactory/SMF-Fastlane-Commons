@@ -84,10 +84,6 @@ def get_export_method
   build_variant_config[:export_method]
 end
 
-def get_icloud_environment
-  build_variant_config[:icloud_environment].nil? ? "Development" : build_variant_config[:icloud_environment]
-end
-
 def get_code_signing_identity
   build_variant_config[:code_signing_identity]
 end

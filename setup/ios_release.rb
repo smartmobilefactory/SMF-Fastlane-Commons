@@ -58,7 +58,8 @@ private_lane :super_build do |options|
       code_signing_identity: build_variant_config[:code_signing_identity],
       upload_itc: build_variant_config[:upload_itc].nil? ? false : build_variant_config[:upload_itc],
       upload_bitcode: build_variant_config[:upload_bitcode].nil? ? true : build_variant_config[:upload_bitcode],
-      export_method: build_variant_config[:export_method]
+      export_method: build_variant_config[:export_method],
+      icloud_environment: get_icloud_environment(options[:build_variant].to_sym)
   )
 end
 
