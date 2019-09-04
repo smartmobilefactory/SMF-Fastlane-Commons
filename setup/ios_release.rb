@@ -2,12 +2,7 @@
 private_lane :super_setup_dependencies do |options|
 
   smf_pod_install
-
-  UI.message("Reading Config.json at #{smf_workspace_dir}/Config.json")
-  config = JSON.parse(File.read("#{smf_workspace_dir}/Config.json"), :symbolize_names => true)
-  phrase_app_properties = config[:build_variants][options[:build_variant].to_sym][:phrase_app]
-
-  smf_sync_with_phrase_app(phrase_app_properties)
+  smf_sync_with_phrase_app(@smf_fastlane_config[:build_variants][options[:build_variant].to_sym][:phrase_app])
 end
 
 lane :setup_dependencies do |options|
@@ -17,9 +12,7 @@ end
 # Provisioning
 lane :super_handle_provisioning_profiles do |options|
 
-  UI.message("Reading Config.json at #{smf_workspace_dir}/Config.json")
-  config = JSON.parse(File.read("#{smf_workspace_dir}/Config.json"), :symbolize_names => true)
-  build_variant_config = config[:build_variants][options[:build_variant].to_sym]
+  build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
 
   smf_download_provisioning_profiles(
       team_id: build_variant_config[:team_id],
@@ -29,8 +22,8 @@ lane :super_handle_provisioning_profiles do |options|
       use_default_match_config: build_variant_config[:match].nil?,
       match_read_only: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:read_only],
       match_type: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:type],
-      extensions_suffixes: config[:extensions_suffixes],
-      build_variant: options[:build_variant]
+      extensions_suffixes: @smf_fastlane_config[:extensions_suffixes],
+      build_variant: @smf_fastlane_config[:build_variant]
   )
 end
 
@@ -38,15 +31,20 @@ lane :handle_provisioning_profiles do |options|
   super_handle_provisioning_profiles(options)
 end
 
-# run unittests (build test target and run test)
-lane :super_run_unittests do |options|
-
-end
-
-lane :run_unittests do |options|
-
-end
 # increment_buildnumber
+lane :super_increment_build_number do |options|
+
+  smf_increment_build_number(
+      build_variant: options[:build_variant],
+      current_build_number: get_build_number_of_app
+  )
+
+end
+
+lane :increment_build_number do |options|
+  super_increment_build_number(options)
+end
+
 # build (build to release)
 # changelog
 # Upload Dsym

@@ -58,13 +58,6 @@ def smf_import_commons(options = nil)
   end
 end
 
-smf_import_commons
-
-# Returns the path to the Config.json
-def fastlane_config_path
-  smf_workspace_dir + '/Config.json'
-end
-
 # loads the config json content into the @smf_fastlane_config env variable
 def smf_load_fastlane_config
   config_path = fastlane_config_path
@@ -76,6 +69,14 @@ def smf_load_fastlane_config
   else
     raise "Error: The SMF Fastlane config file doesn't exist at path \"#{config_path}\""
   end
+end
+
+smf_import_commons
+smf_load_fastlane_config
+
+# Returns the path to the Config.json
+def fastlane_config_path
+  smf_workspace_dir + '/Config.json'
 end
 
 # removes the fastlane commons repo
@@ -133,7 +134,7 @@ error do |lane, exception|
 end
 
 # sets the commons dir path and clones the fastlane repo
-lane :smf_setup_workspace do |options|
+def smf_setup_workspace
   smf_load_fastlane_config
   UI.message('Downloading Fastlane Commons Repo')
   smf_clone_fastlane_commons_repo
