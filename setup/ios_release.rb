@@ -27,8 +27,8 @@ lane :super_handle_provisioning_profiles do |options|
       use_wildcard_signing: build_variant_config[:use_wildcard_signing],
       bundle_identifier: build_variant_config[:bundle_identifier],
       use_default_match_config: build_variant_config[:match].nil?,
-      match_read_only: build_variant_config[:match][:read_only],
-      match_type: build_variant_config[:match][:type],
+      match_read_only: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:read_only],
+      match_type: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:type],
       extensions_suffixes: config[:extensions_suffixes]
   )
 end
