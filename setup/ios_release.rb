@@ -32,7 +32,7 @@ lane :handle_provisioning_profiles do |options|
 end
 
 # increment_buildnumber
-lane :super_increment_build_number do |options|
+lane :super_pipeline_increment_build_number do |options|
 
   smf_increment_build_number(
       build_variant: options[:build_variant],
@@ -41,7 +41,7 @@ lane :super_increment_build_number do |options|
 
 end
 
-lane :increment_build_number do |options|
+lane :pipeline_increment_build_number do |options|
   super_increment_build_number(options)
 end
 
