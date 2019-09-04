@@ -64,7 +64,7 @@ def get_build_number_of_app
     project_name = @smf_fastlane_config[:project][:project_name]
     build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
   when :android
-    build_number = @smf_fastlane_config['app_version_code'].to_s
+    build_number = @smf_fastlane_config[:app_version_code].to_s
   when :flutter
     UI.message('get build number of project for flutter is not implemented yet')
   else
