@@ -99,7 +99,7 @@ end
 private_lane :super_send_slack_notification do |options|
 
   build_variant = options[:build_variant]
-  project_name = get_project_name
+  project_name = get_default_name_of_app(build_variant)
 
   smf_send_default_build_success_notification(
       build_variant: build_variant,

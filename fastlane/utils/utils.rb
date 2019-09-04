@@ -40,3 +40,19 @@ def get_app_secret(build_variant)
     raise 'Unknown platform'
   end
 end
+
+def get_default_name_of_app(build_variant)
+  build_number = get_build_number_of_app
+  project_name = @smf_fastlane_config[:project][:project_name]
+  case @platform
+  when :ios
+    "#{project_name} #{build_variant.upcase} (#{build_number})"
+  when :android
+    "#{project_name} #{build_variant} (Build #{build_number})"
+  when :flutter
+    UI.message('Notification for flutter is not implemented yet')
+  else
+    UI.message("There is no platform \"#{@platform}\", exiting...")
+    raise 'Unknown platform'
+  end
+end
