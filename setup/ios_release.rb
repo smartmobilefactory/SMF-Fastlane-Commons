@@ -10,7 +10,7 @@ lane :setup_dependencies do |options|
 end
 
 # Provisioning
-lane :super_handle_provisioning_profiles do |options|
+private_lane :super_handle_provisioning_profiles do |options|
 
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
 
@@ -32,7 +32,7 @@ lane :handle_provisioning_profiles do |options|
 end
 
 # increment_buildnumber
-lane :super_pipeline_increment_build_number do |options|
+private_lane :super_pipeline_increment_build_number do |options|
 
   smf_increment_build_number(
       build_variant: options[:build_variant],
@@ -47,8 +47,8 @@ end
 
 # build (build to release)
 
-lane :super_build do |options|
-
+private_lane :super_build do |options|
+  UI.message("Options: #{options}")
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
   smf_build_ios_app(
       scheme: build_variant_config[:scheme],
