@@ -5,7 +5,7 @@
 desc 'Collect git commit messages into a changelog and store as environment variable.'
 private_lane :smf_git_changelog do |options|
 
-  build_variant = options[:build_variant].to_s.downcase
+  build_variant = options[:build_variant].downcase
   is_library = !options[:is_library].nil? ? options[:is_library] : false
   UI.important('Collecting commits back to the last tag')
 

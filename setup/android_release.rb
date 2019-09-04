@@ -67,7 +67,7 @@ private_lane :super_upload_to_appcenter do |options|
 
   build_variant = options[:build_variant]
   apk_file_regex = get_apk_file_regex(build_variant)
-  app_id = get_app_secret(build_variant)
+  app_id = get_app_center_id(build_variant)
 
   smf_android_upload_to_appcenter(
       build_variant: build_variant,

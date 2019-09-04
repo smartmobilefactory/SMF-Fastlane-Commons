@@ -22,7 +22,7 @@ def get_project_name
   @smf_fastlane_config[:project][:project_name]
 end
 
-def get_app_secret(build_variant)
+def get_app_center_id(build_variant)
   build_variant = build_variant.to_s.downcase
   case @platform
   when :ios

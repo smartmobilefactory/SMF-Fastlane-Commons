@@ -115,7 +115,7 @@ error do |lane, exception|
     if @smf_set_should_send_deploy_notifications == true || @smf_set_should_send_build_job_failure_notifications == true
       UI.message('Handling exception for iOS.')
 
-      if @smf_fastlane_config.key?('build_variants')
+      if @smf_fastlane_config.key?(:build_variants)
         name = !@smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path].nil? ? get_default_name_of_pod : get_default_name_of_app(@smf_build_variant)
       else
         name = get_default_name_of_app(@smf_build_variant)
@@ -129,15 +129,11 @@ error do |lane, exception|
       UI.message('Not handling exception because of lane.')
     end
   when :android
-    if lane == :releasing_pr_phase || lane == :deploy
       UI.message('Handling exception for android.')
       smf_handle_exception(
           exception: exception,
-          name: get_default_name_of_app(ENV['BUILD_VARIANT'])
+          name: get_default_name_of_app("")
       )
-    else
-      UI.message('Not handling exception because of lane.')
-    end
   when :flutter
     UI.message('Error for flutter is not implemented yet')
   else

@@ -1,6 +1,6 @@
 private_lane :smf_build_android_app do |options|
 
-  build_variant = !options[:build_variant].nil? ? options[:build_variant].to_s : ''
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : ''
   keystore_folder = options[:keystore_folder]
 
   addition = ''
