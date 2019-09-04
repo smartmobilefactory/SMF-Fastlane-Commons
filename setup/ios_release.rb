@@ -3,7 +3,9 @@ private_lane :super_setup_dependencies do |options|
   UI.message("Reading Config.json at #{smf_workspace_dir}/Config.json")
   sh("cd #{smf_workspace_dir}; ls -a")
   UI.message("Build varinat: #{options[:build_variant]}")
-  phrase_app_properties = JSON.parse(File.read("#{smf_workspace_dir}/Config.json"), :symbolize_names => true)[options[:build_variant].to_sym]
+  config = JSON.parse(File.read("#{smf_workspace_dir}/Config.json"), :symbolize_names => true)
+  build_variant = options[:build_variant].to_sym
+  phrase_app_properties = config[:build_variants][build_variant][:phrase_app]
   UI.message("properties: #{phrase_app_properties}")
   smf_pod_install
   UI.message("properties: #{phrase_app_properties}")
