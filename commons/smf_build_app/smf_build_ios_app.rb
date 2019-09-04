@@ -13,7 +13,7 @@ private_lane :smf_build_ios_app do |options|
   code_signing_identity = options[:code_signing_identity]
   upload_itc = options[:upload_itc]
   upload_bitcode = options[:upload_bitcode]
-  export_method = options[:export_method]
+  export_method = options[:export_method].nil? ? nil : options[:export_method]
   icloud_environment = options[:icloud_environment]
 
   output_name = scheme
