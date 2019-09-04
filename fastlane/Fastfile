@@ -82,6 +82,8 @@ before_all do |lane, options|
   case @platform
   when :ios
     smf_setup_workspace
+    smf_import_commons
+    smf_load_fastlane_config
   when :android
     UI.message('Setup for Android is implemented in Pipeline Commons')
   when :flutter
