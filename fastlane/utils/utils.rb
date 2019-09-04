@@ -29,7 +29,7 @@ def get_xcconfig_name(build_variant)
   use_xcconfig ? build_variant_config[:xcconfig_name][:archive] : "Release"
 end
 
-def get_icloud_environmet(build_variant)
+def get_icloud_environment(build_variant)
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant]
   build_variant_config[:icloud_environment].nil? ? "Development" : build_variant_config[:icloud_environment]
 end
