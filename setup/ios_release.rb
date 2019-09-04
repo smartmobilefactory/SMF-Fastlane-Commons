@@ -42,7 +42,7 @@ lane :super_pipeline_increment_build_number do |options|
 end
 
 lane :pipeline_increment_build_number do |options|
-  super_increment_build_number(options)
+  super_pipeline_increment_build_number(options)
 end
 
 # build (build to release)
