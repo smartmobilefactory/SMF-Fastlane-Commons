@@ -23,8 +23,8 @@ def get_build_number_of_app
   build_number
 end
 
-def get_xcconfig_name
-  build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
+def get_xcconfig_name(build_variant)
+  build_variant_config = @smf_fastlane_config[:build_variants][build_variant]
   use_xcconfig = build_variant_config[:xcconfig_name].nil? ? false : true
   use_xcconfig ? build_variant_config[:xcconfig_name][:archive] : "Release"
 end

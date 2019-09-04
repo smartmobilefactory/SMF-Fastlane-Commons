@@ -49,13 +49,12 @@ end
 
 private_lane :super_build do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
-  UI.message("debugggg")
   smf_build_ios_app(
       scheme: build_variant_config[:scheme],
       should_clean_project: build_variant_config[:should_clean_project],
       required_xcode_version: @smf_fastlane_config[:project][:xcode_version],
       project_name: @smf_fastlane_config[:project][:project_name],
-      xcconfig_name: get_xcconfig_name,
+      xcconfig_name: get_xcconfig_name(options[:build_variant].to_sym),
       code_signing_identity: build_variant_config[:code_signing_identity],
       upload_itc: build_variant_config[:upload_itc].nil? ? false : build_variant_config[:upload_itc],
       upload_bitcode: build_variant_config[:upload_bitcode].nil? ? true : build_variant_config[:upload_bitcode],
