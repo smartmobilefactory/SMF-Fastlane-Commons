@@ -58,6 +58,12 @@ def smf_import_commons(options = nil)
   end
 end
 
+# Returns the path to the Config.json
+def fastlane_config_path
+  smf_workspace_dir + '/Config.json'
+end
+
+
 # loads the config json content into the @smf_fastlane_config env variable
 def smf_load_fastlane_config
   config_path = fastlane_config_path
@@ -73,11 +79,6 @@ end
 
 smf_import_commons
 smf_load_fastlane_config
-
-# Returns the path to the Config.json
-def fastlane_config_path
-  smf_workspace_dir + '/Config.json'
-end
 
 # removes the fastlane commons repo
 def smf_remove_fastlane_commons_repo
