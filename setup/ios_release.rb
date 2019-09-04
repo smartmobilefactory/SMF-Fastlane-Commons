@@ -66,7 +66,16 @@ end
 lane :build do |options|
   super_build(options)
 end
+
 # changelog
+private_lane :super_changelog do |options|
+  smf_git_changelog(build_variant: options[:build_variant])
+end
+
+lane :changelog do |options|
+  super_changelog(options)
+end
+
 # Upload Dsym
 # Upload Appcenter
 # Upload iTunes
