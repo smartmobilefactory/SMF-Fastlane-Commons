@@ -1,6 +1,6 @@
 def get_apk_path(apk_file_regex)
   path = ''
-  Dir['/'].each do |file|
+  Dir['/*'].each do |file|
     UI.message(file.basename)
   end
   Dir["/**/#{apk_file_regex}"].each do |file|
