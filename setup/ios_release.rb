@@ -23,7 +23,7 @@ lane :super_handle_provisioning_profiles do |options|
       match_read_only: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:read_only],
       match_type: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:type],
       extensions_suffixes: @smf_fastlane_config[:extensions_suffixes],
-      build_variant: @smf_fastlane_config[:build_variant]
+      build_variant: options[:build_variant]
   )
 end
 
