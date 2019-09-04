@@ -52,10 +52,6 @@ def get_tag_of_pod(version_number)
   "releases/#{version_number}"
 end
 
-def get_project_name
-  @smf_fastlane_config[:project][:project_name]
-end
-
 def smf_is_keychain_enabled
   return ENV[$SMF_IS_KEYCHAIN_ENABLED].nil? ? true : ENV[$SMF_IS_KEYCHAIN_ENABLED] == "true"
 end
@@ -170,22 +166,6 @@ end
 
 def get_should_clean_project
   build_variant_config[:should_clean_project]
-end
-
-def get_app_secret(build_variant)
-  UI.message("build_variant: #{build_variant}")
-  build_variant = build_variant.to_s.downcase
-  case @platform
-  when :ios
-    @smf_fastlane_config[:build_variants][build_variant.to_sym][:appcenter_id]
-  when :android
-    @smf_fastlane_config[:build_variants][build_variant.to_sym][:appcenter_id]
-  when :flutter
-    UI.message('App Secret for flutter is not implemented yet')
-  else
-    UI.message("There is no platform \"#{@platform}\", exiting...")
-    raise 'Unknown platform'
-  end
 end
 
 def get_escaped_filename(build_variant)

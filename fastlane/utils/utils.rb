@@ -21,3 +21,22 @@ def get_build_variant_from_config(build_variant)
 
   variant
 end
+
+def get_project_name
+  @smf_fastlane_config[:project][:project_name]
+end
+
+def get_app_secret(build_variant)
+  build_variant = build_variant.to_s.downcase
+  case @platform
+  when :ios
+    @smf_fastlane_config[:build_variants][build_variant.to_sym][:appcenter_id]
+  when :android
+    @smf_fastlane_config[:build_variants][build_variant.to_sym][:appcenter_id]
+  when :flutter
+    UI.message('App Secret for flutter is not implemented yet')
+  else
+    UI.message("There is no platform \"#{@platform}\", exiting...")
+    raise 'Unknown platform'
+  end
+end
