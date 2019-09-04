@@ -194,7 +194,7 @@ private_lane :smf_deploy_build_variant do |options|
     # Upload the IPA to AppCenter
     smf_ios_upload_to_appcenter(
         build_number: get_build_number_of_app,
-        app_secret: get_app_secret(build_variant),
+        app_secret: get_app_center_id(build_variant),
         escaped_filename: get_escaped_filename(build_variant),
         path_to_ipa_or_app: get_path_to_ipa_or_app(build_variant),
         is_mac_app: is_mac_app(build_variant),

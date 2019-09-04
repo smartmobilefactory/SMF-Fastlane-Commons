@@ -1,23 +1,10 @@
 private_lane :smf_android_upload_to_appcenter do |options|
 
-  apk_file = options[:apk_file]
   apk_path = options[:apk_path]
   app_secret = options[:app_secret]
 
   app_name, owner_name = get_app_details(app_secret)
-
-  found = false
-  if apk_path
-    found = true
-    apk_path = apk_path
-  else
-    lane_context[SharedValues::GRADLE_ALL_APK_OUTPUT_PATHS].each do |apk_path|
-      found = apk_path.include? apk_file
-      break if found
-    end
-  end
-
-  raise("Cannot find the APK #{apk_file}") unless found
+  raise("Cannot find the APK #{apk_path}") if apk_path.nil?
 
   UI.message('Upload android app to AppCenter.')
   appcenter_upload(
@@ -45,7 +32,7 @@ def get_app_details(app_secret)
   end
 
   data = JSON.parse(response.body)
-  project_app = data.find { |app| app['app_secret'].to_s.gsub!('-', '') == app_secret }
+  project_app = data.find { |app| app['app_secret'] == app_secret }
 
   if project_app.nil?
     raise("There is no app with the app secret: #{app_secret}")

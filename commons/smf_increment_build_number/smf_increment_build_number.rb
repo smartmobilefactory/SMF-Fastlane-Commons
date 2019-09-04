@@ -66,8 +66,11 @@ def smf_update_build_number_in_project(build_number)
   when :ios
     increment_build_number(build_number: build_number.to_s)
   when :android
-    @smf_fastlane_config["app_version_code"] = build_number.to_i
-    update_config(@smf_fastlane_config, "Increment build number to #{@smf_fastlane_config["app_version_code"]}")
+    new_config = @smf_fastlane_config
+    new_config[:app_version_code] = build_number.to_i
+    update_config(
+        new_config,
+        "Increment build number to #{build_number}")
   when :flutter
     UI.message('increment build number for flutter is not implemented yet')
   else
