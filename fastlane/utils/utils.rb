@@ -1,5 +1,6 @@
 def get_apk_path(apk_file_regex)
   search_path = "#{smf_workspace_dir}/**/#{apk_file_regex}"
+  UI.message(search_path)
   Dir[search_path.to_s].each do |file|
     path = File.expand_path(file)
     UI.message("Found apk at: #{path}")
