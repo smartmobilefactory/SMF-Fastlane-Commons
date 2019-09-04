@@ -41,7 +41,7 @@ def smf_import_commons
     @fastlane_commons_dir_path += '/legacy/ios'
     ios_setup_file = "#{@fastlane_commons_dir_path}/fastlane/setup.rb"
     import(ios_setup_file)
-    smf_setup_ios_fastlane_commons(options)
+    smf_setup_ios_fastlane_commons
   when :android
     android_setup_file = "#{@fastlane_commons_dir_path}/setup/android_release.rb"
     File.exist?(android_setup_file) ? import(android_setup_file) : return
@@ -81,7 +81,7 @@ desc 'Setup'
 before_all do |lane, options|
   case @platform
   when :ios
-    smf_setup_workspace(options)
+    smf_setup_workspace
     smf_import_commons
     smf_load_fastlane_config
   when :android
