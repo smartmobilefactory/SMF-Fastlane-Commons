@@ -1,11 +1,10 @@
 def get_apk_path(apk_file_regex)
-  path = ''
   Dir["*/**/#{apk_file_regex}"].each do |file|
     path = File.expand_path(file)
     UI.message("Found apk at: #{path}")
+    path
     break
   end
-  path
 end
 
 def get_apk_file_regex(build_variant)
