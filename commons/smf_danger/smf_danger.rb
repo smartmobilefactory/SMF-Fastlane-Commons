@@ -2,11 +2,11 @@ private_lane :smf_danger do |options|
 
   UI.user_error!("android-commons not present! Can't start danger") unless File.exist?('../android-commons')
 
-  lint_paths = smf_find_paths_of("lint-result.xml")
+  lint_paths = smf_find_paths_of('lint-result.xml')
   junit_result_paths = smf_find_paths_of_files_in_directory('build/test-results', 'xml')
   checkstyle_paths = []
-  checkstyle_paths.append(smf_find_paths_of("klint.xml"))
-  checkstyle_paths.append(smf_find_paths_of("detekt.xml"))
+  checkstyle_paths.append(smf_find_paths_of('klint.xml'))
+  checkstyle_paths.append(smf_find_paths_of('detekt.xml'))
 
   ENV['DANGER_JIRA_KEYS'] = JSON.dump(smf_danger_jira_key_parameter(options[:jira_key]))
   ENV['DANGER_LINT_PATHS'] = JSON.dump(lint_paths)
@@ -15,7 +15,7 @@ private_lane :smf_danger do |options|
 
   danger(
       github_api_token: ENV['DANGER_GITHUB_API_TOKEN'],
-      dangerfile: "#{File.dirname(FILE)}/Dangerfile",
+      dangerfile: smf_find_paths_of('smf_danger.rb')[0].gsub('smf_danger.rb', 'Dangerfile'),
       verbose: true
   )
 end
