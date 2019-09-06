@@ -29,7 +29,7 @@ private_lane :smf_archive_ipa_if_scheme_is_provided do |options|
       should_clean_project: get_should_clean_project,
       required_xcode_version: get_required_xcode_version,
       project_name: get_project_name,
-      xcconfig_name: get_xcconfig_name,
+      xcconfig_name: smf_get_xcconfig_name,
       code_signing_identity: get_code_signing_identity,
       upload_itc: get_upload_itc,
       upload_bitcode: get_upload_bitcode,

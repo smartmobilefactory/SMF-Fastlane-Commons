@@ -36,7 +36,7 @@ private_lane :super_pipeline_increment_build_number do |options|
 
   smf_increment_build_number(
       build_variant: options[:build_variant],
-      current_build_number: get_build_number_of_app
+      current_build_number: smf_get_build_number_of_app
   )
 
 end
@@ -54,12 +54,12 @@ private_lane :super_build do |options|
       should_clean_project: build_variant_config[:should_clean_project],
       required_xcode_version: @smf_fastlane_config[:project][:xcode_version],
       project_name: @smf_fastlane_config[:project][:project_name],
-      xcconfig_name: get_xcconfig_name(options[:build_variant].to_sym),
+      xcconfig_name: smf_get_xcconfig_name(options[:build_variant].to_sym),
       code_signing_identity: build_variant_config[:code_signing_identity],
       upload_itc: build_variant_config[:upload_itc].nil? ? false : build_variant_config[:upload_itc],
       upload_bitcode: build_variant_config[:upload_bitcode].nil? ? true : build_variant_config[:upload_bitcode],
       export_method: build_variant_config[:export_method],
-      icloud_environment: get_icloud_environment(options[:build_variant].to_sym)
+      icloud_environment: smf_get_icloud_environment(options[:build_variant].to_sym)
   )
 end
 
@@ -77,6 +77,23 @@ lane :changelog do |options|
 end
 
 # Upload Dsym
+private_lane :super_upload_dsyms do |options|
+
+  build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
+
+  smf_upload_to_sentry(
+    build_variant: options[:build_variant],
+    org_slug: @smf_fastlane_config[:sentry_org_slug],
+    project_slug: @smf_fastlane_config[:sentry_project_slug],
+    build_variant_org_slug: build_variant_config[:sentry_org_slug],
+    build_variant_project_slug: build_variant_config[:sentry_project_slug]
+  )
+
+end
+
+lane :upload_dsyms do |options|
+  super_upload_dsyms(options)
+end
 # Upload Appcenter
 # Upload iTunes
 # Push git tag / Release

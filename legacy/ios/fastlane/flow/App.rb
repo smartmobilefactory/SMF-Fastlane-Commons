@@ -86,7 +86,7 @@ private_lane :smf_deploy_build_variant do |options|
 
   tag = smf_increment_build_number(
       build_variant: build_variant,
-      current_build_number: get_build_number_of_app
+      current_build_number: smf_get_build_number_of_app
   )
 
   # Check for commons ITC Upload errors if needed
@@ -124,7 +124,7 @@ private_lane :smf_deploy_build_variant do |options|
       should_clean_project: get_should_clean_project,
       required_xcode_version: get_required_xcode_version,
       project_name: get_project_name,
-      xcconfig_name: get_xcconfig_name,
+      xcconfig_name: smf_get_xcconfig_name,
       code_signing_identity: get_code_signing_identity,
       upload_itc: get_upload_itc,
       upload_bitcode: get_upload_bitcode,
@@ -193,7 +193,7 @@ private_lane :smf_deploy_build_variant do |options|
 
     # Upload the IPA to AppCenter
     smf_ios_upload_to_appcenter(
-        build_number: get_build_number_of_app,
+        build_number: smf_get_build_number_of_app,
         app_secret: get_app_secret(build_variant),
         escaped_filename: get_escaped_filename(build_variant),
         path_to_ipa_or_app: get_path_to_ipa_or_app(build_variant),
