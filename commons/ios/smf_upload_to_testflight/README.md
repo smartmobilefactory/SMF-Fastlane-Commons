@@ -12,6 +12,7 @@ smf_upload_to_testflight(
     apple_id: '',                               # Optional, Apple ID property in the App Information section in App Store Connect which is by default 'development@smfhq.com' 
     skip_waiting_for_build_processing: false    # Optional, by default it is false.,
     slack_channel: "ci_error_log",              # Channel name to log errors and warnings to
-    app_identifier: ""                          # The apps idnetifier
+    app_identifier: "",                         # The apps idnetifier
+    upload_itc: true                            # should the app be uploaded to itunes
 )
 ``` 
