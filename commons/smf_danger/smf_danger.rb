@@ -12,10 +12,10 @@ private_lane :smf_danger do |options|
   ENV['DANGER_LINT_PATHS'] = JSON.dump(lint_paths)
   ENV['DANGER_JUNIT_PATHS'] = JSON.dump(junit_result_paths)
   ENV['DANGER_CHECKSTYLE_PATHS'] = JSON.dump(checkstyle_paths.map(&:to_s))
-  UI.message(File.expand_path(File.dirname(__FILE__)))
+  UI.message("#{__dir__}/Dangerfile")
   danger(
       github_api_token: ENV['DANGER_GITHUB_API_TOKEN'],
-      dangerfile: "#{File.expand_path(File.dirname(__FILE__))}/Dangerfile",
+      dangerfile: "#{__dir__}/Dangerfile",
       verbose: true
   )
 end
