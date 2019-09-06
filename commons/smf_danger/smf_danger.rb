@@ -5,13 +5,13 @@ private_lane :smf_danger do |options|
   lint_paths = smf_find_paths_of('lint-result.xml')
   junit_result_paths = smf_find_paths_of_files_in_directory('build/test-results', 'xml')
   checkstyle_paths = []
-  checkstyle_paths.append(smf_find_paths_of('klint.xml'))
-  checkstyle_paths.append(smf_find_paths_of('detekt.xml'))
+  smf_find_paths_of('klint.xml').each { |path| checkstyle_paths.append(path) }
+  smf_find_paths_of('detekt.xml').each { |path| checkstyle_paths.append(path) }
 
   ENV['DANGER_JIRA_KEYS'] = JSON.dump(smf_danger_jira_key_parameter(options[:jira_key]))
   ENV['DANGER_LINT_PATHS'] = JSON.dump(lint_paths)
   ENV['DANGER_JUNIT_PATHS'] = JSON.dump(junit_result_paths)
-  ENV['DANGER_CHECKSTYLE_PATHS'] = JSON.dump(checkstyle_paths.map(&:to_s))
+  ENV['DANGER_CHECKSTYLE_PATHS'] = JSON.dump(checkstyle_paths)
 
   UI.message(ENV['DANGER_JIRA_KEYS'])
   UI.message(ENV['DANGER_LINT_PATHS'])
@@ -19,7 +19,7 @@ private_lane :smf_danger do |options|
   UI.message(ENV['DANGER_CHECKSTYLE_PATHS'])
   danger(
       github_api_token: ENV['DANGER_GITHUB_API_TOKEN'],
-      dangerfile: __dir__,
+      dangerfile: "#{__dir__}",
       verbose: true
   )
 end
