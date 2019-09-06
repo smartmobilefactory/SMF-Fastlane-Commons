@@ -16,7 +16,7 @@ private_lane :smf_build_ios_app do |options|
   export_method = options[:export_method]
   icloud_environment = options[:icloud_environment]
 
-  UI.message("export_mehtod is: #{export_method}")
+  UI.message("export_mehtod is nil: #{export_method.nil?}")
 
   output_name = scheme
 
