@@ -19,7 +19,7 @@ private_lane :smf_danger do |options|
   UI.message(ENV['DANGER_CHECKSTYLE_PATHS'])
   danger(
       github_api_token: ENV['DANGER_GITHUB_API_TOKEN'],
-      dangerfile: "#{__dir__}",
+      dangerfile: "#{__dir__}/Dangerfile",
       verbose: true
   )
 end
