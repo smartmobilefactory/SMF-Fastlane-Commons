@@ -78,7 +78,7 @@ end
 
 def get_path_to_ipa_or_app(build_variant)
 
-  escaped_filename = get_escaped_filename(build_variant)
+  escaped_filename = @smf_fastlane_config[:build_variants][build_variant.to_sym][:scheme].gsub(' ', "\ ")
 
   app_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.app.zip"
   app_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.app" unless File.exist?(app_path)
