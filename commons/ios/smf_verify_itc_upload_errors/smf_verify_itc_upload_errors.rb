@@ -13,7 +13,7 @@ private_lane :smf_verify_itc_upload_errors do |options|
   target = options[:target]
   build_scheme = options[:build_scheme]
   itc_skip_version_check = options[:itc_skip_verison_check]
-  itc_apple_id = options[:itc_apple_id]
+  itc_apple_id = !options[:apple_id].nil? ? options[:apple_id] : 'development@smfhq.com'
   itc_team_id = options[:itc_team_id]
   bundle_identifier = options[:bundle_identifier]
 
