@@ -82,8 +82,6 @@ private_lane :smf_deploy_build_variant do |options|
     sh "mkdir #{workspace}/#{$METAJSON_TEMP_FOLDERNAME}"
   end
 
-  smf_pod_install
-
   tag = smf_increment_build_number(
       build_variant: build_variant,
       current_build_number: smf_get_build_number_of_app
@@ -102,34 +100,6 @@ private_lane :smf_deploy_build_variant do |options|
         bundle_identifier: get_bundle_identifier
     )
   end
-
-  # Sync Phrase App
-  smf_sync_with_phrase_app(get_phrase_app_properties)
-
-  smf_download_provisioning_profiles(
-      team_id: get_team_id,
-      apple_id: get_apple_id,
-      use_wildcard_signing: get_use_wildcard_signing,
-      bundle_identifier: get_bundle_identifier,
-      use_default_match_config: match_config.nil?,
-      match_read_only: get_match_config_read_only,
-      match_type: get_match_config_type,
-      extensions_suffixes: get_extension_suffixes
-  )
-
-  # Build and archive the IPA
-  smf_build_ios_app(
-      bulk_deploy_params: bulk_deploy_params,
-      scheme: get_build_scheme,
-      should_clean_project: get_should_clean_project,
-      required_xcode_version: get_required_xcode_version,
-      project_name: get_project_name,
-      xcconfig_name: smf_get_xcconfig_name,
-      code_signing_identity: get_code_signing_identity,
-      upload_itc: get_upload_itc,
-      upload_bitcode: get_upload_bitcode,
-      export_method: get_export_method
-  )
 
   if get_use_sparkle == true
     smf_create_dmg_from_app(
@@ -184,9 +154,6 @@ private_lane :smf_deploy_build_variant do |options|
     smf_build_simulator_app
   end
 
-  # Collect the changelog
-  smf_git_changelog(build_variant: build_variant)
-
   if use_hockey
     # Store the HockeyApp ID to let the handle exception lane know what hockeyapp entry should be deleted. This value is reset during bulk builds to avoid the deletion of a former succesful build.
     ENV[$SMF_APP_HOCKEY_ID_ENV_KEY] = build_variant_config[:hockeyapp_id]
@@ -214,34 +181,6 @@ private_lane :smf_deploy_build_variant do |options|
 
       smf_send_message(
           title: "Failed to send APN to SMF HockeyApp for #{smf_default_notification_release_title} 😢",
-          type: "warning",
-          exception: exception,
-          slack_channel: ci_ios_error_log
-      )
-    end
-  end
-
-  if use_sentry
-    begin
-
-      org_slug = get_sentry_org_slug
-      project_slug = get_sentry_project_slug
-
-      org_slug_variant = get_variant_sentry_org_slug(build_variant)
-      project_slug_variant = get_variant_sentry_project_slug(build_variant)
-
-      # If a build variant overrides the sentry settings, use the variant settings
-      if !org_slug_variant.nil? && !project_slug_variant.nil?
-        org_slug = org_slug_variant
-        project_slug = project_slug_variant
-      end
-
-      smf_upload_to_sentry(org_slug: org_slug, project_slug: project_slug)
-    rescue => exception
-      UI.important("Warning: Dsyms could not be uploaded to Sentry !")
-
-      smf_send_message(
-          title: "Failed to upload dsyms to Sentry for #{smf_default_notification_release_title} 😢",
           type: "warning",
           exception: exception,
           slack_channel: ci_ios_error_log
