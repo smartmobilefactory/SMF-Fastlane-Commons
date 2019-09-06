@@ -62,6 +62,8 @@ end
 
 private_lane :smf_super_build do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
+
+  smf_super_handle_provisioning_profiles(options)
   smf_build_ios_app(
       scheme: build_variant_config[:scheme],
       should_clean_project: build_variant_config[:should_clean_project],
