@@ -93,3 +93,7 @@ def smf_path_to_ipa_or_app(build_variant)
 
   app_path
 end
+
+def ci_ios_error_log
+  $SMF_CI_IOS_ERROR_LOG.to_s
+end

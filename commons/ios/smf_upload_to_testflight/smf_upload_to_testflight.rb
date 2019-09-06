@@ -10,14 +10,14 @@ private_lane :smf_upload_to_testflight do |options|
   apple_id = !options[:apple_id].nil? ? options[:apple_id] : 'development@smfhq.com'
   skip_waiting_for_build_processing = options[:skip_waiting_for_build_processing]
 
+  ENV["FASTLANE_ITC_TEAM_ID"] = itc_team_id
+
   _smf_itunes_precheck(
       options[:build_variant],
       options[:slack_channel],
       options[:app_identifier],
       username
   )
-
-  ENV["FASTLANE_ITC_TEAM_ID"] = itc_team_id
 
   UI.important("Uploading the build to Testflight.")
   upload_to_testflight(
