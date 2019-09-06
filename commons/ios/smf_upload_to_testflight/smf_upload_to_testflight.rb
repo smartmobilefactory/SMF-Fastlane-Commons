@@ -1,6 +1,6 @@
 private_lane :smf_upload_to_testflight do |options|
 
-  if options[:upload_itc] == false
+  if options[:upload_itc] != true
     UI.message("Upload to iTunes Connect is not enabled for this project.")
     next
   end

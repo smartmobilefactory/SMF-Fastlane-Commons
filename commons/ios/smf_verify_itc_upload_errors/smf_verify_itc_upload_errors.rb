@@ -3,7 +3,7 @@ require 'credentials_manager'
 
 private_lane :smf_verify_itc_upload_errors do |options|
 
-  if options[:upload_itc] == false
+  if options[:upload_itc] != true
     UI.message("Upload to iTunes Connect is not enabled for this project, skipping error checking.")
     next
   end
