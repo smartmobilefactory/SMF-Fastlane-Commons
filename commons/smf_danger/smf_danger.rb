@@ -11,7 +11,7 @@ private_lane :smf_danger do |options|
   ENV['DANGER_JIRA_KEYS'] = JSON.dump(smf_danger_jira_key_parameter(options[:jira_key]))
   ENV['DANGER_LINT_PATHS'] = JSON.dump(lint_paths)
   ENV['DANGER_JUNIT_PATHS'] = JSON.dump(junit_result_paths)
-  ENV['DANGER_CHECKSTYLE_PATHS'] = JSON.dump(checkstyle_paths)
+  ENV['DANGER_CHECKSTYLE_PATHS'] = JSON.dump(checkstyle_paths.map(&:to_s))
 
   danger(
       github_api_token: ENV['DANGER_GITHUB_API_TOKEN'],
