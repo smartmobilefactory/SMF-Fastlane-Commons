@@ -1,16 +1,16 @@
 # Setup Dependencies - pod install & `sh generate.sh` (optional: Phrase App)
-private_lane :super_setup_dependencies do |options|
+private_lane :smf_super_setup_dependencies do |options|
 
   smf_pod_install
   smf_sync_with_phrase_app(@smf_fastlane_config[:build_variants][options[:build_variant].to_sym][:phrase_app])
 end
 
-lane :setup_dependencies do |options|
-  super_setup_dependencies(options)
+lane :smf_setup_dependencies do |options|
+  smf_super_setup_dependencies(options)
 end
 
 # Provisioning
-private_lane :super_handle_provisioning_profiles do |options|
+private_lane :smf_super_handle_provisioning_profiles do |options|
 
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
 
@@ -27,12 +27,12 @@ private_lane :super_handle_provisioning_profiles do |options|
   )
 end
 
-lane :handle_provisioning_profiles do |options|
-  super_handle_provisioning_profiles(options)
+lane :smf_handle_provisioning_profiles do |options|
+  smf_super_handle_provisioning_profiles(options)
 end
 
 # increment_buildnumber
-private_lane :super_pipeline_increment_build_number do |options|
+private_lane :smf_super_pipeline_increment_build_number do |options|
 
   smf_increment_build_number(
       build_variant: options[:build_variant],
@@ -41,13 +41,13 @@ private_lane :super_pipeline_increment_build_number do |options|
 
 end
 
-lane :pipeline_increment_build_number do |options|
-  super_pipeline_increment_build_number(options)
+lane :smf_pipeline_increment_build_number do |options|
+  smf_super_pipeline_increment_build_number(options)
 end
 
 # build (build to release)
 
-private_lane :super_build do |options|
+private_lane :smf_super_build do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
   smf_build_ios_app(
       scheme: build_variant_config[:scheme],
@@ -63,21 +63,21 @@ private_lane :super_build do |options|
   )
 end
 
-lane :build do |options|
+lane :smf_build do |options|
   super_build(options)
 end
 
 # changelog
-private_lane :super_changelog do |options|
+private_lane :smf_super_changelog do |options|
   smf_git_changelog(build_variant: options[:build_variant])
 end
 
-lane :changelog do |options|
-  super_changelog(options)
+lane :smf_changelog do |options|
+  smf_super_changelog(options)
 end
 
 # Upload Dsym
-private_lane :super_upload_dsyms do |options|
+private_lane :smf_super_upload_dsyms do |options|
 
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
 
@@ -91,8 +91,8 @@ private_lane :super_upload_dsyms do |options|
 
 end
 
-lane :upload_dsyms do |options|
-  super_upload_dsyms(options)
+lane :smf_upload_dsyms do |options|
+  smf_super_upload_dsyms(options)
 end
 # Upload Appcenter
 # Upload iTunes
