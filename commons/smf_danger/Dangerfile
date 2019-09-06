@@ -30,6 +30,7 @@ end
 ## CHECKSTYLE:
 JSON.parse(ENV["DANGER_CHECKSTYLE_PATHS"]).each do |checkstyle_path|
   if !checkstyle_path.nil?
+    UI.message(checkstyle_path)
     if File.exist?(checkstyle_path)
       checkstyle_format.base_path = Dir.pwd
       checkstyle_format.report checkstyle_path
