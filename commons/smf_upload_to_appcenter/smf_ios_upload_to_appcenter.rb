@@ -9,7 +9,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
 
   app_name, owner_name = get_app_details(app_secret)
 
-  dsym_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.ipa.dSYM.zip"
+  dsym_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.app.dSYM.zip"
   UI.message("Constructed the dsym path \"#{dsym_path}\"")
   unless File.exist?(dsym_path)
     dsym_path = nil
@@ -19,7 +19,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
   NO_APP_FAILURE = 'NO_APP_FAILURE'
 
   unless is_mac_app
-    sh "cd ../build; zip -r9 \"#{escaped_filename}.app.zip\" \"#{escaped_filename}.app\" || echo #{NO_APP_FAILURE}"
+    sh "cd ../build; zip -r9 \"#{escaped_filename}.ipa.zip\" \"#{escaped_filename}.app\" || echo #{NO_APP_FAILURE}"
   end
 
   app_path = path_to_ipa_or_app
@@ -27,7 +27,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
   if is_mac_app
     version_number = version_get_podspec(path: podspec_path)
 
-    app_path = app_path.sub('.app', '.dmg')
+    app_path = app_path.sub('.ipa', '.dmg')
 
     raise("DMG file #{app_path} does not exit. Nothing to upload.") unless File.exist?(app_path)
 
