@@ -64,7 +64,7 @@ private_lane :smf_super_build do |options|
 end
 
 lane :smf_build do |options|
-  super_build(options)
+  smf_super_build(options)
 end
 
 # changelog
