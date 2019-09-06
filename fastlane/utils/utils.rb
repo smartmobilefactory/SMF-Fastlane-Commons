@@ -37,7 +37,7 @@ def get_app_center_id(build_variant)
   end
 end
 
-def get_default_name_of_app(build_variant)
+def smf_get_default_name_of_app(build_variant)
   build_number = get_build_number_of_app
   project_name = @smf_fastlane_config[:project][:project_name]
   case @platform
@@ -51,6 +51,14 @@ def get_default_name_of_app(build_variant)
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
   end
+end
+
+def smf_get_default_name_of_pod
+  podspec_path = @smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path]
+  version = read_podspec(path: podspec_path)['version']
+  pod_name = read_podspec(path: podspec_path)['name']
+  project_name = !@smf_fastlane_config[:project][:project_name].nil? ? @smf_fastlane_config[:project][:project_name] : pod_name
+  "#{project_name} #{version}"
 end
 
 def get_build_number_of_app
@@ -74,4 +82,11 @@ def get_build_number_of_app
   end
 
   build_number
+end
+
+def update_config(config, message = nil)
+  jsonString = JSON.pretty_generate(config)
+  File.write("#{smf_workspace_dir}/Config.json", jsonString)
+  git_add(path: "#{smf_workspace_dir}/Config.json")
+  git_commit(path: "#{smf_workspace_dir}/Config.json", message: message || "Update Config.json")
 end

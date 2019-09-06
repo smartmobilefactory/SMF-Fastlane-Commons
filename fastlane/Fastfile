@@ -1,6 +1,6 @@
 @fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
 
-def import_all(path)
+def smf_import_all(path)
   Dir["#{path}/**/*.rb"].each do |file|
     import(file)
   end
@@ -33,8 +33,8 @@ def smf_import_commons
   end
 
   fastlane_dir_path = "#{@fastlane_commons_dir_path}/fastlane"
-  import_all("#{fastlane_dir_path}/utils")
-  import_all("#{@fastlane_commons_dir_path}/commons")
+  smf_import_all("#{fastlane_dir_path}/utils")
+  smf_import_all("#{@fastlane_commons_dir_path}/commons")
 
   case @platform
   when :ios
@@ -43,11 +43,11 @@ def smf_import_commons
     import(ios_setup_file)
     smf_setup_ios_fastlane_commons
   when :android
-    android_setup_file = "#{@fastlane_commons_dir_path}/setup/android_release.rb"
+    android_setup_file = "#{@fastlane_commons_dir_path}/setup/android_setup.rb"
     File.exist?(android_setup_file) ? import(android_setup_file) : return
-    UI.message("Imported android release file.")
+    UI.message('Imported android release file.')
     @fastlane_commons_dir_path += '/legacy/android'
-    import_all "#{@fastlane_commons_dir_path}/fastlane/lanes"
+    smf_import_all "#{@fastlane_commons_dir_path}/fastlane/lanes"
   when :flutter
     UI.message('Setup for flutter is not implemented yet')
   else
@@ -118,9 +118,9 @@ error do |lane, exception|
       UI.message('Handling exception for iOS.')
 
       if @smf_fastlane_config.key?(:build_variants)
-        name = !@smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path].nil? ? get_default_name_of_pod : get_default_name_of_app(@smf_build_variant)
+        name = !@smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path].nil? ? smf_get_default_name_of_pod : smf_get_default_name_of_app(@smf_build_variant)
       else
-        name = get_default_name_of_app(@smf_build_variant)
+        name = smf_get_default_name_of_app(@smf_build_variant)
       end
 
       smf_handle_exception(
@@ -131,11 +131,11 @@ error do |lane, exception|
       UI.message('Not handling exception because of lane.')
     end
   when :android
-      UI.message('Handling exception for android.')
-      smf_handle_exception(
-          exception: exception,
-          name: get_default_name_of_app("")
-      )
+    UI.message('Handling exception for android.')
+    smf_handle_exception(
+        exception: exception,
+        name: smf_get_default_name_of_app('')
+    )
   when :flutter
     UI.message('Error for flutter is not implemented yet')
   else

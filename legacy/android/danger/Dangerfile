@@ -12,13 +12,6 @@ warn("This PR cannot be merged yet.", sticky: false) unless can_merge
 todoist.warn_for_todos
 todoist.print_todos_table
 
-## GRADLE ERROR:
-JSON.parse(ENV["DANGER_GRADLE_ERROR_OUTPUT_FILES"]).each do |file|
-  error = File.read(file)
-  File.delete(file)
-  fail(error)
-end
-
 ## LINT:
 
 JSON.parse(ENV["DANGER_LINT_PATHS"]).each do |lint_path|
@@ -42,30 +35,6 @@ JSON.parse(ENV["DANGER_CHECKSTYLE_PATHS"]).each do |checkstyle_path|
       checkstyle_format.report checkstyle_path
     else
       fail("Checkstyle task is set but there is no report file")
-    end
-  end
-end
-
-## KTLINT:
-JSON.parse(ENV["DANGER_KTLINT_PATHS"]).each do |ktlint_path|
-  if !ktlint_path.nil?
-    if File.exist?(ktlint_path)
-      checkstyle_format.base_path = Dir.pwd
-      checkstyle_format.report ktlint_path
-    else
-      fail("KTLint task is set but there is no report file")
-    end
-  end
-end
-
-## DETEKT:
-JSON.parse(ENV["DANGER_DETEKT_PATHS"]).each do |detekt_path|
-  if !detekt_path.nil?
-    if File.exist?(detekt_path)
-      checkstyle_format.base_path = Dir.pwd
-      checkstyle_format.report detekt_path
-    else
-      fail("Detekt task is set but there is no report file")
     end
   end
 end
