@@ -18,9 +18,9 @@ def smf_path_to_ipa_or_app(build_scheme)
 
   escaped_filename = build_scheme.gsub(" ", "\ ")
 
-  app_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.app.zip"
+  app_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.ipa.zip"
   if ( ! File.exists?(app_path))
-    app_path =  Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.app"
+    app_path =  Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.ipa"
   end
 
   UI.message("Constructed path \"#{app_path}\" from filename \"#{escaped_filename}\"")
