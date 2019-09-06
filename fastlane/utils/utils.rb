@@ -90,3 +90,25 @@ def update_config(config, message = nil)
   git_add(path: "#{smf_workspace_dir}/Config.json")
   git_commit(path: "#{smf_workspace_dir}/Config.json", message: message || "Update Config.json")
 end
+
+def smf_danger_module_config(options)
+  module_basepath = !options[:module_basepath].nil? ? options[:module_basepath] : ''
+  run_detekt = !options[:run_detekt].nil? ? options[:run_detekt] : true
+  run_ktlint = !options[:run_ktlint].nil? ? options[:run_ktlint] : true
+  junit_task = options[:junit_task]
+
+  modules = !options[:modules].nil? ? options[:modules] : []
+
+  if modules.empty?
+    modules.push(
+        {
+            'module_name' => module_basepath,
+            'run_detekt' => run_detekt,
+            'run_ktlint' => run_ktlint,
+            'junit_task' => junit_task
+        }
+    )
+  end
+
+  modules
+end

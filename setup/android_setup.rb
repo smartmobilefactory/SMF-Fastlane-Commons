@@ -118,11 +118,11 @@ private_lane :smf_super_linter do |options|
 
   build_variant = options[:build_variant]
 
-  variant = get_build_variant_from_config(build_variant)
+  options[:build_variant] = get_build_variant_from_config(build_variant)
 
   smf_run_klint(options)
   smf_run_detekt(options)
-  smf_run_gradle_lint_task(options, variant)
+  smf_run_gradle_lint_task(options)
 end
 
 lane :smf_linter do |options|
