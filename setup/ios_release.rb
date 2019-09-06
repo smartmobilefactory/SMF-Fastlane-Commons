@@ -151,7 +151,7 @@ private_lane :smf_super_release do |options|
   build_number = get_build_number(xcodeproj: "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj")
   smf_create_github_release(
       release_name: "#{options[:build_variant].upcase} #{build_number}",
-      tag: tag
+      tag: get_tag_of_app(build_variant, build_number)
   )
 end
 # Slack
