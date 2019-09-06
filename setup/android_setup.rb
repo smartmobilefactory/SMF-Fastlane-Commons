@@ -121,7 +121,7 @@ private_lane :smf_super_linter do |options|
   variant = get_build_variant_from_config(build_variant)
 
   smf_run_klint(options)
-  smf_run_detect(options)
+  smf_run_detekt(options)
   smf_run_gradle_lint_task(options, variant)
 end
 
