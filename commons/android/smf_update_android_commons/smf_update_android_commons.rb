@@ -47,8 +47,8 @@ def _smf_update_jenkins_file
   else
     # generate app Jenkinsfile
     jenkins_file_data = File.read("#{@fastlane_commons_dir_path}/jenkins/Jenkinsfile_Android.template")
-    UI.message(@smf_fastlane_config[:build_variants].keys.map(&:to_s))
-    jenkins_file_data = jenkins_file_data.gsub('__BUILD_VARIANTS__', @smf_fastlane_config[:build_variants].keys.map(&:to_s))
+    UI.message(@smf_fastlane_config[:build_variants].keys.map(&:to_s).to_s)
+    jenkins_file_data = jenkins_file_data.gsub('__BUILD_VARIANTS__', @smf_fastlane_config[:build_variants].keys.map(&:to_s).to_s)
   end
   File.write("#{smf_workspace_dir}/Jenkinsfile", jenkins_file_data)
 end
