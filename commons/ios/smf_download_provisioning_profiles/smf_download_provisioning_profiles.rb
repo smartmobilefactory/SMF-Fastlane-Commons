@@ -59,7 +59,7 @@ end
 private_lane :smf_download_provisioning_profile_using_match do |options|
   app_identifier = options[:app_identifier]
   type = options[:type]
-  read_only = !type.nil? ? false : options[:read_only]
+  read_only = type.nil? ? false : options[:read_only]
   extensions_suffixes = options[:extensions_suffixes]
   apple_id = options[:apple_id]
   team_id = options[:team_id]

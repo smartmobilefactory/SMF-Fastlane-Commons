@@ -9,7 +9,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
 
   app_name, owner_name = get_app_details(app_secret)
 
-  dsym_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.app.dSYM.zip"
+  dsym_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.ipa.dSYM.zip"
   UI.message("Constructed the dsym path \"#{dsym_path}\"")
   unless File.exist?(dsym_path)
     dsym_path = nil
