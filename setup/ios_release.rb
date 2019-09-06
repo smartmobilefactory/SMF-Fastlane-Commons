@@ -151,8 +151,24 @@ private_lane :smf_super_release do |options|
   build_number = get_build_number(xcodeproj: "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj")
   smf_create_github_release(
       release_name: "#{options[:build_variant].upcase} #{build_number}",
-      tag: get_tag_of_app(build_variant, build_number)
+      tag: get_tag_of_app(options[:build_variant], build_number)
   )
 end
+
+lane :smf_release do |options|
+  smf_super_release(options)
+end
+
 # Slack
+private_lane :smf_super_slack do |options|
+  smf_send_default_build_success_notification(
+      build_variant: build_variant,
+      name: get_default_name_of_app(build_variant)
+  )
+end
+
+lane :smf_slack do |options|
+  smf_super_slack(options)
+end
+
 # Monitoring (MetaJSON)

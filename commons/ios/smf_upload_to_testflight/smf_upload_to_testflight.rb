@@ -25,7 +25,7 @@ private_lane :smf_upload_to_testflight do |options|
       team_id: itc_team_id,
       username: username,
       skip_waiting_for_build_processing: skip_waiting_for_build_processing,
-      ipa: smf_path_to_ipa_or_app(options[:build_variant])
+      ipa: smf_path_to_ipa_or_app(options[:build_variant]).gsub('.zip', '')
   )
 end
 
