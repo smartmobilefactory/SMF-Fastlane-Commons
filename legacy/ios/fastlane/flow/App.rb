@@ -64,13 +64,6 @@ private_lane :smf_deploy_build_variant do |options|
 
   generateMetaJSON = build_variant_config[:generateMetaJSON]
 
-  use_hockey = (build_variant_config[:use_hockey].nil? ? true : build_variant_config[:use_hockey])
-
-  has_sentry_project_settings = project_config[:sentry_org_slug] != nil && project_config[:sentry_project_slug] != nil
-  has_sentry_variant_settings = build_variant_config[:sentry_org_slug] != nil && build_variant_config[:sentry_project_slug] != nil
-
-  use_sentry = has_sentry_project_settings || has_sentry_variant_settings
-  UI.message("Will upload to Sentry: #{use_sentry}")
 
   # The default value of push_generated_code depends on whether Strings are synced with PhraseApp. If PhraseApp should be synced, the default is true
   push_generated_code = (build_variant_config[:push_generated_code].nil? ? (build_variant_config[:phrase_app_script] != nil) : build_variant_config[:push_generated_code])
@@ -80,25 +73,6 @@ private_lane :smf_deploy_build_variant do |options|
     workspace = smf_workspace_dir
     sh "if [ -d #{workspace}/#{$METAJSON_TEMP_FOLDERNAME} ]; then rm -rf #{workspace}/#{$METAJSON_TEMP_FOLDERNAME}; fi"
     sh "mkdir #{workspace}/#{$METAJSON_TEMP_FOLDERNAME}"
-  end
-
-  tag = smf_increment_build_number(
-      build_variant: build_variant,
-      current_build_number: smf_get_build_number_of_app
-  )
-
-  # Check for commons ITC Upload errors if needed
-  if build_variant_config[:upload_itc] == true
-
-    smf_verify_itc_upload_errors(
-        project_name: get_project_name,
-        target: get_target,
-        build_scheme: get_build_scheme,
-        itc_skip_version_check: get_itc_skip_version_check,
-        username: get_itc_apple_id,
-        itc_team_id: get_itc_team_id,
-        bundle_identifier: get_bundle_identifier
-    )
   end
 
   if get_use_sparkle == true
@@ -154,40 +128,6 @@ private_lane :smf_deploy_build_variant do |options|
     smf_build_simulator_app
   end
 
-  if use_hockey
-    # Store the HockeyApp ID to let the handle exception lane know what hockeyapp entry should be deleted. This value is reset during bulk builds to avoid the deletion of a former succesful build.
-    ENV[$SMF_APP_HOCKEY_ID_ENV_KEY] = build_variant_config[:hockeyapp_id]
-
-    # Upload the IPA to AppCenter
-    smf_ios_upload_to_appcenter(
-        build_number: smf_get_build_number_of_app,
-        app_secret: get_app_secret(build_variant),
-        escaped_filename: get_escaped_filename(build_variant),
-        path_to_ipa_or_app: get_path_to_ipa_or_app(build_variant),
-        is_mac_app: is_mac_app(build_variant),
-        podspec_path: get_podspec_path(build_variant)
-    )
-
-    # Disable the former HockeyApp entry
-    smf_disable_former_hockey_entry(
-        build_variants_contains_whitelist: ["beta"]
-    )
-
-    # Inform the SMF HockeyApp about the new app version
-    begin
-      smf_send_ios_hockey_app_apn
-    rescue => exception
-      UI.important("Warning: The APN to the SMF HockeyApp couldn't be sent!")
-
-      smf_send_message(
-          title: "Failed to send APN to SMF HockeyApp for #{smf_default_notification_release_title} 😢",
-          type: "warning",
-          exception: exception,
-          slack_channel: ci_ios_error_log
-      )
-    end
-  end
-
   if (build_variant_config[:use_sparkle])
     # Upload DMG to Strato
     app_path = smf_path_to_ipa_or_app(build_variant_config[:scheme])
@@ -239,12 +179,6 @@ private_lane :smf_deploy_build_variant do |options|
   # Upload Ipa to Testflight and Download the generated DSYM
   # The testflight upload should happen as last step as the upload often shows an error although the IPA was successfully uploaded. We still want the tag, HockeyApp upload etc in this case.
   if build_variant_config[:upload_itc] == true
-
-    if build_variant_config.key?(:itc_team_id)
-      ENV["FASTLANE_ITC_TEAM_ID"] = build_variant_config[:itc_team_id]
-    end
-
-    smf_itunes_precheck
 
     notification_title = nil
     notification_message = nil
