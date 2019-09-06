@@ -3,6 +3,19 @@ private_lane :smf_super_setup_dependencies do |options|
 
   smf_pod_install
   smf_sync_with_phrase_app(@smf_fastlane_config[:build_variants][options[:build_variant].to_sym][:phrase_app])
+
+  build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
+
+  smf_verify_itc_upload_errors(
+      upload_itc: build_variant_config[:upload_itc],
+      project_name: @smf_fastlane_config[:project][:project_name],
+      target: build_variant_config[:target],
+      build_scheme: build_variant_config[:scheme],
+      itc_skip_version_check: build_variant_config[:itc_skip_version_check],
+      username: build_variant_config[:itc_apple_id],
+      itc_team_id: build_variant_config[:itc_team_id],
+      bundle_identifier: build_variant_config[:bundle_identifier]
+  )
 end
 
 lane :smf_setup_dependencies do |options|
@@ -94,8 +107,46 @@ end
 lane :smf_upload_dsyms do |options|
   smf_super_upload_dsyms(options)
 end
+
 # Upload Appcenter
+private_lane :smf_super_upload_to_appcenter do |options|
+  build_variant = options[:build_variant]
+  build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
+  
+  # Upload the IPA to AppCenter
+  smf_ios_upload_to_appcenter(
+      build_number: smf_get_build_number_of_app,
+      app_secret: smf_get_app_secret(build_variant),
+      escaped_filename: build_variant_config[:scheme].gsub(' ', "\ "),
+      path_to_ipa_or_app: get_path_to_ipa_or_app(build_variant),
+      is_mac_app: build_variant_config[:use_sparkle],
+      podspec_path: build_variant_config[:podspec_path]
+  )
+end
+
+lane :smf_upload_to_appcenter do |options|
+  smf_super_upload_to_appcenter(options)
+end
+
 # Upload iTunes
+private_lane :smf_super_upload_to_itunes do |options|
+
+  build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
+
+  smf_upload_to_testflight(
+      build_variant: options[:build_variant],
+      apple_id: build_variant_config[:itc_apple_id],
+      itc_team_id: build_variant_config[:itc_team_id],
+      username: build_variant_config[:itc_apple_id],
+      skip_waiting_for_build_processing: build_variant_config[:itc_skip_waiting].nil? ? false : build_variant_config[:itc_skip_waiting],
+      slack_channel: @smf_fastlane_config[:slack_channel],
+      app_identifier: build_variant_config[:app_identifier]
+  )
+end
+
+lane :smf_upload_to_itunes do |options|
+  smf_super_upload_to_itunes(options)
+end
 # Push git tag / Release
 # Slack
 # Monitoring (MetaJSON)

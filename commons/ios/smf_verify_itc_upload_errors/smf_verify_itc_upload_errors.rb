@@ -1,6 +1,12 @@
+require 'spaceship'
+require 'credentials_manager'
+
 private_lane :smf_verify_itc_upload_errors do |options|
-  require 'spaceship'
-  require 'credentials_manager'
+
+  if options[:upload_itc] == false
+    UI.message("Upload to iTunes Connect is not enabled for this project, skipping error checking.")
+    next
+  end
 
   # Parameter
   project_name = options[:project_name]
@@ -33,13 +39,13 @@ private_lane :smf_verify_itc_upload_errors do |options|
   versions.push(app.edit_version) if app.edit_version
   versions.push(app.live_version) if app.live_version
 
-  duplicate_build_number_errors = smf_check_if_itc_already_contains_buildnumber(app, versions, build_number)
+  duplicate_build_number_errors = _smf_check_if_itc_already_contains_buildnumber(app, versions, build_number)
 
   errors = duplicate_build_number_errors
 
   # Check if there is a matching editable app version
   if itc_skip_version_check != true
-    no_matching_editable_app_version = smf_check_if_app_version_is_editable_in_itc(app, version_number)
+    no_matching_editable_app_version = _smf_check_if_app_version_is_editable_in_itc(app, version_number)
     errors = errors + no_matching_editable_app_version
   end
 
@@ -50,12 +56,7 @@ private_lane :smf_verify_itc_upload_errors do |options|
   end
 end
 
-
-################
-### HELPER   ###
-################
-
-def smf_check_if_itc_already_contains_buildnumber(app, version_numbers, build_number)
+def _smf_check_if_itc_already_contains_buildnumber(app, version_numbers, build_number)
 
   errors = []
 
@@ -80,7 +81,7 @@ def smf_check_if_itc_already_contains_buildnumber(app, version_numbers, build_nu
   return errors
 end
 
-def smf_check_if_app_version_is_editable_in_itc(app, version_number)
+def _smf_check_if_app_version_is_editable_in_itc(app, version_number)
 
   editable_app = app.edit_version
 

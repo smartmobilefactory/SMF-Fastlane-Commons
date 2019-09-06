@@ -113,26 +113,6 @@ def get_should_clean_project
   build_variant_config[:should_clean_project]
 end
 
-def get_app_secret(build_variant)
-  UI.message("build_variant: #{build_variant}")
-  build_variant = build_variant.to_s.downcase
-  case @platform
-  when :ios
-    @smf_fastlane_config[:build_variants][build_variant.to_sym][:hockeyapp_id]
-  when :android
-    @smf_fastlane_config[:hockey][build_variant.to_sym]
-  when :flutter
-    UI.message('App Secret for flutter is not implemented yet')
-  else
-    UI.message("There is no platform \"#{@platform}\", exiting...")
-    raise 'Unknown platform'
-  end
-end
-
-def get_escaped_filename(build_variant)
-  @smf_fastlane_config[:build_variants][build_variant.to_sym][:scheme].gsub(' ', "\ ")
-end
-
 def is_mac_app(build_variant)
   @smf_fastlane_config[:build_variants][build_variant.to_sym][:use_sparkle]
 end
@@ -147,24 +127,6 @@ end
 
 def should_skip_waiting_after_itc_upload(build_variant)
   !@smf_fastlane_config[:build_variants][build_variant.to_sym][:itc_skip_waiting].nil? ? @smf_fastlane_config[:build_variants][build_variant.to_sym][:itc_skip_waiting] : false
-end
-
-def get_path_to_ipa_or_app(build_variant)
-
-  escaped_filename = get_escaped_filename(build_variant)
-
-  app_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.app.zip"
-  app_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.app" unless File.exist?(app_path)
-
-  UI.message("Constructed path \"#{app_path}\" from filename \"#{escaped_filename}\"")
-
-  unless File.exist?(app_path)
-    app_path = lane_context[SharedValues::IPA_OUTPUT_PATH]
-
-    UI.message("Using \"#{app_path}\" as app_path as no file exists at the constructed path.")
-  end
-
-  app_path
 end
 
 def get_podspec_path(build_variant)
