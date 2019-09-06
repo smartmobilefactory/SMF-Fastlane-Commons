@@ -15,7 +15,7 @@ private_lane :smf_upload_to_testflight do |options|
   _smf_itunes_precheck(
       options[:build_variant],
       options[:slack_channel],
-      options[:app_identifier],
+      options[:bundle_identifier],
       username
   )
 
@@ -28,13 +28,13 @@ private_lane :smf_upload_to_testflight do |options|
   )
 end
 
-def _smf_itunes_precheck(build_variant, slack_channel, app_identifier, username)
+def _smf_itunes_precheck(build_variant, slack_channel, bundle_identifier, username)
 
   begin
 
     precheck(
         username: username.nil? ? nil : username,
-        app_identifier: app_identifier
+        app_identifier: bundle_identifier
     )
 
   rescue => exception

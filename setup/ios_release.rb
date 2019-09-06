@@ -131,7 +131,7 @@ private_lane :smf_super_upload_to_itunes do |options|
       username: build_variant_config[:itc_apple_id],
       skip_waiting_for_build_processing: build_variant_config[:itc_skip_waiting].nil? ? false : build_variant_config[:itc_skip_waiting],
       slack_channel: @smf_fastlane_config[:slack_channel],
-      app_identifier: build_variant_config[:app_identifier],
+      bundle_identifier: build_variant_config[:bundle_identifier],
       upload_itc: build_variant_config[:upload_itc]
   )
 end

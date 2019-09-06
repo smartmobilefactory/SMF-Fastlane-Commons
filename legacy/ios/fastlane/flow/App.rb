@@ -128,6 +128,8 @@ private_lane :smf_deploy_build_variant do |options|
     smf_build_simulator_app
   end
 
+
+
   if (build_variant_config[:use_sparkle])
     # Upload DMG to Strato
     app_path = smf_path_to_ipa_or_app(build_variant_config[:scheme])
@@ -179,6 +181,12 @@ private_lane :smf_deploy_build_variant do |options|
   # Upload Ipa to Testflight and Download the generated DSYM
   # The testflight upload should happen as last step as the upload often shows an error although the IPA was successfully uploaded. We still want the tag, HockeyApp upload etc in this case.
   if build_variant_config[:upload_itc] == true
+
+    if build_variant_config.key?(:itc_team_id)
+      ENV["FASTLANE_ITC_TEAM_ID"] = build_variant_config[:itc_team_id]
+    end
+
+    smf_itunes_precheck
 
     notification_title = nil
     notification_message = nil
