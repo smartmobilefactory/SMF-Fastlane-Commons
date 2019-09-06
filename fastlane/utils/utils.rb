@@ -97,3 +97,9 @@ end
 def ci_ios_error_log
   $SMF_CI_IOS_ERROR_LOG.to_s
 end
+
+def smf_git_pull(branch)
+  branch_name = "#{branch}"
+  branch_name.sub!("origin/", "")
+  sh "git pull origin #{branch_name}"
+end

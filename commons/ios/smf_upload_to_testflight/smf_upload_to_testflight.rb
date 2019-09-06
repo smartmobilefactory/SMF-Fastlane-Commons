@@ -12,12 +12,14 @@ private_lane :smf_upload_to_testflight do |options|
 
   ENV["FASTLANE_ITC_TEAM_ID"] = itc_team_id
 
-  _smf_itunes_precheck(
+  passed_checks = _smf_itunes_precheck(
       options[:build_variant],
       options[:slack_channel],
       options[:bundle_identifier],
       username
   )
+
+  next if !passed_checks
 
   UI.important("Uploading the build to Testflight.")
   upload_to_testflight(
@@ -25,11 +27,12 @@ private_lane :smf_upload_to_testflight do |options|
       team_id: itc_team_id,
       username: username,
       skip_waiting_for_build_processing: skip_waiting_for_build_processing,
+      ipa: smf_path_to_ipa_or_app(options[:build_variant])
   )
 end
 
 def _smf_itunes_precheck(build_variant, slack_channel, bundle_identifier, username)
-
+  passed_checks = true
   begin
 
     precheck(
@@ -49,5 +52,9 @@ def _smf_itunes_precheck(build_variant, slack_channel, bundle_identifier, userna
         exception: exception,
         slack_channel: slack_channel
     )
+
+    passed_checks = false
   end
+
+  passed_checks
 end

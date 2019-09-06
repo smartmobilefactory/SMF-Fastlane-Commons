@@ -139,6 +139,20 @@ end
 lane :smf_upload_to_itunes do |options|
   smf_super_upload_to_itunes(options)
 end
+
+
 # Push git tag / Release
+private_lane :smf_super_release do |options|
+
+  smf_git_pull(options[:local_branch])
+  smf_push_to_git_remote(options[:local_branch])
+
+  # Create the GitHub release
+  build_number = get_build_number(xcodeproj: "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj")
+  smf_create_github_release(
+      release_name: "#{options[:build_variant].upcase} #{build_number}",
+      tag: tag
+  )
+end
 # Slack
 # Monitoring (MetaJSON)
