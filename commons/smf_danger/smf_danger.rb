@@ -15,7 +15,7 @@ private_lane :smf_danger do |options|
 
   danger(
       github_api_token: ENV['DANGER_GITHUB_API_TOKEN'],
-      dangerfile: "#{@fastlane_commons_dir_path}/danger/Dangerfile",
+      dangerfile: "#{File.dirname(FILE)}/Dangerfile",
       verbose: true
   )
 end
