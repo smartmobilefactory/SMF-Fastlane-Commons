@@ -22,28 +22,6 @@ lane :smf_setup_dependencies do |options|
   smf_super_setup_dependencies(options)
 end
 
-# Provisioning
-private_lane :smf_super_handle_provisioning_profiles do |options|
-
-  build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
-
-  smf_download_provisioning_profiles(
-      team_id: build_variant_config[:team_id],
-      apple_id: build_variant_config[:apple_id],
-      use_wildcard_signing: build_variant_config[:use_wildcard_signing],
-      bundle_identifier: build_variant_config[:bundle_identifier],
-      use_default_match_config: build_variant_config[:match].nil?,
-      match_read_only: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:read_only],
-      match_type: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:type],
-      extensions_suffixes: @smf_fastlane_config[:extensions_suffixes],
-      build_variant: options[:build_variant]
-  )
-end
-
-lane :smf_handle_provisioning_profiles do |options|
-  smf_super_handle_provisioning_profiles(options)
-end
-
 # increment_buildnumber
 private_lane :smf_super_pipeline_increment_build_number do |options|
 
@@ -63,7 +41,18 @@ end
 private_lane :smf_super_build do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
 
-  smf_super_handle_provisioning_profiles(options)
+  smf_download_provisioning_profiles(
+      team_id: build_variant_config[:team_id],
+      apple_id: build_variant_config[:apple_id],
+      use_wildcard_signing: build_variant_config[:use_wildcard_signing],
+      bundle_identifier: build_variant_config[:bundle_identifier],
+      use_default_match_config: build_variant_config[:match].nil?,
+      match_read_only: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:read_only],
+      match_type: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:type],
+      extensions_suffixes: @smf_fastlane_config[:extensions_suffixes],
+      build_variant: options[:build_variant]
+  )
+
   smf_build_ios_app(
       scheme: build_variant_config[:scheme],
       should_clean_project: build_variant_config[:should_clean_project],
