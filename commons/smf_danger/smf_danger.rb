@@ -1,5 +1,7 @@
 private_lane :smf_danger do |options|
 
+  jira_keys = options[:jira_key]
+
   UI.user_error!("android-commons not present! Can't start danger") unless File.exist?('../android-commons')
 
   lint_paths = _smf_find_paths_of('lint-result.xml')
@@ -8,7 +10,7 @@ private_lane :smf_danger do |options|
   _smf_find_paths_of('klint.xml').each { |path| checkstyle_paths.append(path) }
   _smf_find_paths_of('detekt.xml').each { |path| checkstyle_paths.append(path) }
 
-  ENV['DANGER_JIRA_KEYS'] = JSON.dump(smf_danger_jira_key_parameter(options[:jira_key]))
+  ENV['DANGER_JIRA_KEYS'] = JSON.dump(_smf_danger_jira_key_parameter(jira_keys))
   ENV['DANGER_LINT_PATHS'] = JSON.dump(lint_paths)
   ENV['DANGER_JUNIT_PATHS'] = JSON.dump(junit_result_paths)
   ENV['DANGER_CHECKSTYLE_PATHS'] = JSON.dump(checkstyle_paths)
@@ -24,9 +26,8 @@ private_lane :smf_danger do |options|
   )
 end
 
-def smf_danger_jira_key_parameter(jira_keys)
-  # Set environment variables for danger if options parameter are present
-  jira_keys = [jira_keys] unless jira_keys.is_a?(Array)
+def _smf_danger_jira_key_parameter(jira_keys_parameter)
+  jira_keys = !jira_keys_parameter.nil? ? jira_keys_parameter : []
 
   keys = []
   jira_keys.each do |key|
