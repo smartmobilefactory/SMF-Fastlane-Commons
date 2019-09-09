@@ -13,9 +13,7 @@ todoist.warn_for_todos
 todoist.print_todos_table
 
 ## LINT:
-UI.message("$SMF_DANGER_LINT_PATHS: #{$SMF_DANGER_LINT_PATHS}")
-UI.message("$SMF_DANGER_LINT_PATHS: #{ENV[$SMF_DANGER_LINT_PATHS]}")
-JSON.parse(ENV[$SMF_DANGER_LINT_PATHS]).each do |lint_path|
+JSON.parse(ENV["DANGER_LINT_PATHS"]).each do |lint_path|
   if !lint_path.nil?
     if File.exist?(lint_path)
       android_lint.report_file = lint_path
@@ -29,7 +27,7 @@ JSON.parse(ENV[$SMF_DANGER_LINT_PATHS]).each do |lint_path|
 end
 
 ## CHECKSTYLE:
-JSON.parse(ENV[$SMF_DANGER_CHECKSTYLE_PATHS]).each do |checkstyle_path|
+JSON.parse(ENV["DANGER_CHECKSTYLE_PATHS"]).each do |checkstyle_path|
   if !checkstyle_path.nil?
     if File.exist?(checkstyle_path)
       checkstyle_format.base_path = Dir.pwd
@@ -41,7 +39,7 @@ JSON.parse(ENV[$SMF_DANGER_CHECKSTYLE_PATHS]).each do |checkstyle_path|
 end
 
 ## JUNIT:
-JSON.parse(ENV[$SMF_DANGER_JUNIT_PATHS]).each do |junit_tests_dir|
+JSON.parse(ENV["DANGER_JUNIT_PATHS"]).each do |junit_tests_dir|
   if !junit_tests_dir.nil?
     test_results = Dir["#{junit_tests_dir}/*.xml"]
     if test_results.empty?
@@ -57,6 +55,6 @@ JSON.parse(ENV[$SMF_DANGER_JUNIT_PATHS]).each do |junit_tests_dir|
 end
 
 ## JIRA:
-JSON.parse(ENV[$SMF_DANGER_JIRA_KEYS]).each do |key|
+JSON.parse(ENV["DANGER_JIRA_KEYS"]).each do |key|
   jira.check(key: key["key"], url: key["url"], search_commits: true)
 end
