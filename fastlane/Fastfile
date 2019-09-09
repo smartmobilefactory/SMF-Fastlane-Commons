@@ -109,8 +109,10 @@ def smf_clone_fastlane_commons_repo
 end
 
 desc 'Called on error'
-error do |lane, exception|
+error do |lane, exception, options|
   UI.error("Exception: #{exception.to_s} was called from lane #{lane.to_s}.")
+
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : '' # TODO: add build_variant to all stages
 
   case @platform
   when :ios
@@ -134,7 +136,7 @@ error do |lane, exception|
     UI.message('Handling exception for android.')
     smf_handle_exception(
         exception: exception,
-        name: smf_get_default_name_of_app('')
+        name: smf_get_default_name_of_app(build_variant)
     )
   when :flutter
     UI.message('Error for flutter is not implemented yet')

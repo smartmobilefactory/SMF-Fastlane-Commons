@@ -10,17 +10,13 @@ private_lane :smf_danger do |options|
   _smf_find_paths_of('klint.xml').each { |path| checkstyle_paths.append(path) }
   _smf_find_paths_of('detekt.xml').each { |path| checkstyle_paths.append(path) }
 
-  ENV['DANGER_JIRA_KEYS'] = JSON.dump(_smf_danger_jira_key_parameter(jira_keys))
-  ENV['DANGER_LINT_PATHS'] = JSON.dump(lint_paths)
-  ENV['DANGER_JUNIT_PATHS'] = JSON.dump(junit_result_paths)
-  ENV['DANGER_CHECKSTYLE_PATHS'] = JSON.dump(checkstyle_paths)
+  ENV[$SMF_DANGER_JIRA_KEYS] = JSON.dump(_smf_danger_jira_key_parameter(jira_keys))
+  ENV[$SMF_DANGER_LINT_PATHS] = JSON.dump(lint_paths)
+  ENV[$SMF_DANGER_JUNIT_PATHS] = JSON.dump(junit_result_paths)
+  ENV[$SMF_DANGER_CHECKSTYLE_PATHS] = JSON.dump(checkstyle_paths)
 
-  UI.message(ENV['DANGER_JIRA_KEYS'])
-  UI.message(ENV['DANGER_LINT_PATHS'])
-  UI.message(ENV['DANGER_JUNIT_PATHS'])
-  UI.message(ENV['DANGER_CHECKSTYLE_PATHS'])
   danger(
-      github_api_token: ENV['DANGER_GITHUB_API_TOKEN'],
+      github_api_token: ENV[$SMF_DANGER_GITHUB_API_TOKEN],
       dangerfile: "#{File.expand_path(File.dirname(__FILE__))}/Dangerfile",
       verbose: true
   )
