@@ -10,7 +10,7 @@ private_lane :smf_send_default_build_success_notification do |options|
   smf_send_message(
       title: "🎉🛠 Successfully built #{name} 🛠🎉",
       type: 'success',
-      message: ENV[$SMF_CHANGELOG_ENV_KEY],
+      message: changelog,
       slack_channel: slack_channel
   )
 end
