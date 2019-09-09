@@ -31,10 +31,10 @@ private_lane :smf_upload_to_sentry do |options|
       UI.important("Warning: Dsyms could not be uploaded to Sentry !")
 
       smf_send_message(
-          title: "Failed to upload dsyms to Sentry for #{get_default_name_of_app(options[:build_variant])} 😢",
+          title: "Failed to upload dsyms to Sentry for #{smf_get_default_name_of_app(options[:build_variant])} 😢",
           type: "warning",
           exception: exception,
-          slack_channel: ci_ios_error_log
+          slack_channel: smf_ci_ios_error_log
       )
     end
   end

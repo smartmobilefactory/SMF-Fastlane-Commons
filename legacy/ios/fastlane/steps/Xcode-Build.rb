@@ -28,7 +28,7 @@ private_lane :smf_archive_ipa_if_scheme_is_provided do |options|
       scheme: get_build_scheme,
       should_clean_project: get_should_clean_project,
       required_xcode_version: get_required_xcode_version,
-      project_name: get_project_name,
+      project_name: smf_get_project_name,
       xcconfig_name: smf_get_xcconfig_name,
       code_signing_identity: get_code_signing_identity,
       upload_itc: get_upload_itc,

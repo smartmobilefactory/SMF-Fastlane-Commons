@@ -12,7 +12,7 @@ private_lane :smf_send_message do |options|
   ci_error_log = 'ci-error-log'
   case @platform
   when :ios
-    ci_error_log = ci_ios_error_log
+    ci_error_log = smf_ci_ios_error_log
   when :android
     ci_error_log = ci_android_error_log
   when :flutter

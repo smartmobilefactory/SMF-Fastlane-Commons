@@ -27,7 +27,7 @@ private_lane :smf_deploy_app do |options|
       UI.important("Warning: Building variant #{build_variant} failed! Exception #{exception}")
 
       if @smf_set_should_send_deploy_notifications == true || @smf_set_should_send_build_job_failure_notifications == true
-        smf_handle_exception(name: get_default_name_of_app(build_variant), exception: exception)
+        smf_handle_exception(name: smf_get_default_name_of_app(build_variant), exception: exception)
       end
     end
 
@@ -118,7 +118,7 @@ private_lane :smf_deploy_build_variant do |options|
           title: "Failed to create MetaJSON for #{smf_default_notification_release_title} 😢",
           type: "warning",
           exception: exception,
-          slack_channel: ci_ios_error_log
+          slack_channel: smf_ci_ios_error_log
       )
     end
   end
@@ -127,7 +127,6 @@ private_lane :smf_deploy_build_variant do |options|
   if build_variant_config[:attach_build_outputs_to_github] == true
     smf_build_simulator_app
   end
-
 
 
   if (build_variant_config[:use_sparkle])
@@ -175,7 +174,7 @@ private_lane :smf_deploy_build_variant do |options|
 
   smf_send_default_build_success_notification(
       build_variant: build_variant,
-      name: get_default_name_of_app(build_variant)
+      name: smf_get_default_name_of_app(build_variant)
   )
 
   # Upload Ipa to Testflight and Download the generated DSYM

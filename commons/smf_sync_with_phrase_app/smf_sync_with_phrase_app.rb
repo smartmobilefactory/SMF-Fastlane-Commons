@@ -169,7 +169,7 @@ end
 # returns nil on error
 def clone_phraseapp_ci
   url = $SMF_PHRASE_APP_SCRIPTS_REPO_URL
-  branch = $SMF_PHRASE_APP_SCRIPTS_BRANCH
+  branch = 'master'
   src_root = File.join(smf_workspace_dir, File.basename(url, File.extname(url)))
   if File.exists?(src_root)
     UI.error("Can't clone into #{src_root}, directory already exists. Can't download Phraseapp-CI scripts..")

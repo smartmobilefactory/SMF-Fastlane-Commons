@@ -1,27 +1,57 @@
-# Uses Config file to access project name. Should be changed in the future.
-def get_default_name_of_app(build_variant)
-  build_number = smf_get_build_number_of_app
+
+def smf_get_apk_path(apk_file_regex)
+  path = ''
+  Dir["#{smf_workspace_dir}/**/#{apk_file_regex}"].each do |file|
+    path = File.expand_path(file)
+    UI.message("Found apk at: #{path}")
+    break
+  end
+  path
+end
+
+def smf_get_apk_file_regex(build_variant)
+  variant = smf_get_build_variant_from_config(build_variant)
+  file_regex = "*-#{variant.gsub(/[A-Z]/) { |s| '-' + s.downcase }}.apk"
+end
+
+def smf_get_build_variant_from_config(build_variant)
+  build_variant = build_variant.to_s.downcase
+  variant = @smf_fastlane_config[:build_variants][build_variant.to_sym][:variant]
+end
+
+def smf_get_project_name
+  @smf_fastlane_config[:project][:project_name]
+end
+
+def smf_get_app_center_id(build_variant)
+  build_variant = build_variant.to_s.downcase
   case @platform
   when :ios
-    project_name = @smf_fastlane_config[:project][:project_name]
-    "#{project_name} #{build_variant.upcase} (#{build_number})"
+    @smf_fastlane_config[:build_variants][build_variant.to_sym][:appcenter_id]
   when :android
-    project_name = !@smf_fastlane_config[:project][:name].nil? ? @smf_fastlane_config[:project][:name] : ENV['PROJECT_NAME']
-    "#{project_name} #{build_variant} (Build #{build_number})"
+    @smf_fastlane_config[:build_variants][build_variant.to_sym][:appcenter_id]
   when :flutter
-    UI.message('Notification for flutter is not implemented yet')
+    UI.message('App Secret for flutter is not implemented yet')
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
   end
 end
 
+def smf_get_default_name_of_app(build_variant)
+  build_number = smf_get_build_number_of_app
+  project_name = @smf_fastlane_config[:project][:project_name]
+
+  "#{project_name} #{build_variant.upcase} (#{build_number})"
+end
+
 # Uses Config file to access project name. Should be changed in the future.
-def get_default_name_of_pod
+def smf_get_default_name_of_pod
   podspec_path = @smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path]
   version = read_podspec(path: podspec_path)['version']
   pod_name = read_podspec(path: podspec_path)['name']
   project_name = !@smf_fastlane_config[:project][:project_name].nil? ? @smf_fastlane_config[:project][:project_name] : pod_name
+
   "#{project_name} #{version}"
 end
 
@@ -94,7 +124,7 @@ def smf_path_to_ipa_or_app(build_variant)
   app_path
 end
 
-def ci_ios_error_log
+def smf_ci_ios_error_log
   $SMF_CI_IOS_ERROR_LOG.to_s
 end
 
@@ -102,4 +132,37 @@ def smf_git_pull(branch)
   branch_name = "#{branch}"
   branch_name.sub!("origin/", "")
   sh "git pull origin #{branch_name}"
+end
+
+def smf_update_config(config, message = nil)
+  jsonString = JSON.pretty_generate(config)
+  File.write("#{smf_workspace_dir}/Config.json", jsonString)
+  git_add(path: "#{smf_workspace_dir}/Config.json")
+  git_commit(path: "#{smf_workspace_dir}/Config.json", message: message || "Update Config.json")
+end
+
+def smf_danger_module_config(options)
+  module_basepath = !options[:module_basepath].nil? ? options[:module_basepath] : ''
+  run_detekt = !options[:run_detekt].nil? ? options[:run_detekt] : true
+  run_ktlint = !options[:run_ktlint].nil? ? options[:run_ktlint] : true
+  junit_task = options[:junit_task]
+
+  modules = !options[:modules].nil? ? options[:modules] : []
+
+  if modules.empty?
+    modules.push(
+        {
+            'module_name' => module_basepath,
+            'run_detekt' => run_detekt,
+            'run_ktlint' => run_ktlint,
+            'junit_task' => junit_task
+        }
+    )
+  end
+
+  modules
+end
+
+def smf_get_tag_of_pod(version_number)
+  "releases/#{version_number}"
 end

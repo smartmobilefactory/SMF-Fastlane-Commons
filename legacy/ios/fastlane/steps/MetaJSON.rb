@@ -100,7 +100,7 @@ def smf_run_linter
     smf_send_message(
         title: "Failed to run Swiftlint for #{smf_default_notification_release_title} 😢",
         type: "error",
-        slack_channel: ci_ios_error_log
+        slack_channel: smf_ci_ios_error_log
       )
   end
 end

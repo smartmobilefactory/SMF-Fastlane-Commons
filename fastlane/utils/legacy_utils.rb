@@ -1,10 +1,3 @@
-def get_tag_of_pod(version_number)
-  "releases/#{version_number}"
-end
-
-def get_project_name
-  @smf_fastlane_config[:project][:project_name]
-end
 
 def smf_is_keychain_enabled
   return ENV[$SMF_IS_KEYCHAIN_ENABLED].nil? ? true : ENV[$SMF_IS_KEYCHAIN_ENABLED] == "true"
@@ -135,11 +128,15 @@ end
 
 def smf_get_version_number
   version_number = get_version_number(
-      xcodeproj: "#{get_project_name}.xcodeproj",
+      xcodeproj: "#{smf_get_project_name}.xcodeproj",
       target: (get_target != nil ? get_target : get_build_scheme)
   )
 
   return version_number
+end
+
+def ci_android_error_log
+  $SMF_CI_ANDROID_ERROR_LOG.to_s
 end
 
 def get_phrase_app_properties

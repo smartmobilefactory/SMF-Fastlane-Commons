@@ -41,7 +41,7 @@ private_lane :smf_publish_pod do |options|
           title: "Failed to create MetaJSON for #{smf_default_notification_release_title} 😢",
           type: "error",
           exception: exception,
-          slack_channel: ci_ios_error_log
+          slack_channel: smf_ci_ios_error_log
       )
       next
     end
@@ -86,7 +86,7 @@ private_lane :smf_publish_pod do |options|
   )
 
   smf_send_default_build_success_notification(
-      name: get_default_name_of_pod,
+      name: smf_get_default_name_of_pod,
       is_library: true
   )
 end
