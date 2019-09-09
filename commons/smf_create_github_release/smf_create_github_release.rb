@@ -4,6 +4,7 @@ private_lane :smf_create_github_release do |options|
   tag = options[:tag]
   paths = !options[:paths].nil? ? options[:paths] : []
   branch = options[:branch]
+  changelog = options[:changelog]
 
   git_remote_origin_url = sh 'git config --get remote.origin.url'
   github_url_match = git_remote_origin_url.match(%r{.*github.com:(.*)\.git})
@@ -27,8 +28,6 @@ private_lane :smf_create_github_release do |options|
   UI.message("Paths to attach: #{paths}")
   UI.message("Tag is: #{tag}")
 
-  changelog = File.read($CHANGELOG_TEMP_FILE)
-
   raise 'Error, couldnt find changelod.' if changelog.nil?
 
   # Create the GitHub release as draft
@@ -43,7 +42,7 @@ private_lane :smf_create_github_release do |options|
       upload_assets: paths
   )
 
-  sh "rm #{$CHANGELOG_TEMP_FILE}" if File.exist?($CHANGELOG_TEMP_FILE)
+  sh "rm #{smf_changelog_temp_path}" if File.exist?(smf_changelog_temp_path)
 
   release_id = release['id']
   UI.message("Found id \"#{release_id}\" for release \"#{tag}\"")

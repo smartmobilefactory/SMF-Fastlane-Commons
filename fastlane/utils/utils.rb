@@ -103,3 +103,7 @@ def smf_git_pull(branch)
   branch_name.sub!("origin/", "")
   sh "git pull origin #{branch_name}"
 end
+
+def smf_changelog_temp_path
+  "#{smf_workspace_dir}/#{$CHANGELOG_TEMP_FILE}"
+end

@@ -59,8 +59,8 @@ private_lane :smf_git_changelog do |options|
 
   ENV[$SMF_CHANGELOG_ENV_HTML_KEY] = "<ul>#{cleaned_changelog_messages.uniq.map { |x| "<li>#{x}</li>" }.join("")}</ul>"
 
-  sh "rm #{$CHANGELOG_TEMP_FILE}" if File.exist?($CHANGELOG_TEMP_FILE)
-  File.write($CHANGELOG_TEMP_FILE, changelog)
+  sh "rm #{smf_changelog_temp_path}" if File.exist?(smf_changelog_temp_path)
+  File.write(smf_changelog_temp_path, changelog)
 
   ENV[$SMF_CHANGELOG_ENV_KEY] = changelog
 end

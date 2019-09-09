@@ -144,6 +144,8 @@ end
 # Push git tag / Release
 private_lane :smf_super_release do |options|
 
+  changelog = File.read(smf_changelog_temp_path)
+
   smf_git_pull(options[:local_branch])
   smf_push_to_git_remote(local_branch: options[:local_branch])
 
@@ -153,7 +155,8 @@ private_lane :smf_super_release do |options|
       release_name: "#{options[:build_variant].upcase} #{build_number}",
       tag: get_tag_of_app(options[:build_variant], build_number),
       branch: options[:local_branch],
-      build_variant: options[:build_variant]
+      build_variant: options[:build_variant],
+      changelog: changelog
   )
 end
 
