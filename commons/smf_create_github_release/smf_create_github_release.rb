@@ -42,8 +42,6 @@ private_lane :smf_create_github_release do |options|
       upload_assets: paths
   )
 
-  sh "rm #{smf_changelog_temp_path}" if File.exist?(smf_changelog_temp_path)
-
   release_id = release['id']
   UI.message("Found id \"#{release_id}\" for release \"#{tag}\"")
 
