@@ -152,7 +152,8 @@ private_lane :smf_super_release do |options|
   smf_create_github_release(
       release_name: "#{options[:build_variant].upcase} #{build_number}",
       tag: get_tag_of_app(options[:build_variant], build_number),
-      branch: options[:local_branch]
+      branch: options[:local_branch],
+      build_variant: options[:build_variant]
   )
 end
 
@@ -163,8 +164,8 @@ end
 # Slack
 private_lane :smf_super_slack do |options|
   smf_send_default_build_success_notification(
-      build_variant: build_variant,
-      name: get_default_name_of_app(build_variant)
+      build_variant: options[:build_variant],
+      name: get_default_name_of_app(options[:build_variant])
   )
 end
 

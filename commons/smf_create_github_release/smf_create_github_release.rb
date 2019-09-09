@@ -34,7 +34,7 @@ private_lane :smf_create_github_release do |options|
       api_token: ENV[$SMF_GITHUB_TOKEN_ENV_KEY],
       name: release_name.to_s,
       tag_name: tag,
-      description: ENV[$SMF_CHANGELOG_ENV_KEY].nil? ? "Release with tag: #{tag}" : ENV[$SMF_CHANGELOG_ENV_KEY], # TODO
+      description: smf_git_changelog(options[:build_variant]),
       commitish: branch,
       upload_assets: paths
   )
@@ -63,26 +63,4 @@ def zipped_path(path)
       File.path(path)
     end
   end
-end
-
-def smf_get_github_release_id_for_tag(tag, repository_path)
-  result = github_api(
-      server_url: 'https://api.github.com',
-      api_token: ENV[$SMF_GITHUB_TOKEN_ENV_KEY],
-      http_method: 'GET',
-      path: "/repos/#{repository_path}/releases"
-  )
-
-  releases = JSON.parse(result[:body])
-  release_id = nil
-  releases.each do |release|
-    if release['tag_name'] == tag
-      release_id = release['id']
-      break
-    end
-  end
-
-  UI.message("Found id \"#{release_id}\" for release \"#{tag}\"")
-
-  release_id
 end
