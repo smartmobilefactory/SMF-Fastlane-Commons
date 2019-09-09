@@ -23,7 +23,7 @@ def smf_get_project_name
   @smf_fastlane_config[:project][:project_name]
 end
 
-def smf_get_app_center_id(build_variant)
+def smf_get_appcenter_id(build_variant)
   build_variant = build_variant.to_s.downcase
 
   @smf_fastlane_config[:build_variants][build_variant.to_sym][:appcenter_id]
