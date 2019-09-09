@@ -2,11 +2,11 @@ private_lane :smf_danger do |options|
 
   UI.user_error!("android-commons not present! Can't start danger") unless File.exist?('../android-commons')
 
-  lint_paths = smf_find_paths_of('lint-result.xml')
-  junit_result_paths = smf_find_paths_of_files_in_directory('build/test-results', 'xml')
+  lint_paths = _smf_find_paths_of('lint-result.xml')
+  junit_result_paths = _smf_find_paths_of_files_in_directory('build/test-results', 'xml')
   checkstyle_paths = []
-  smf_find_paths_of('klint.xml').each { |path| checkstyle_paths.append(path) }
-  smf_find_paths_of('detekt.xml').each { |path| checkstyle_paths.append(path) }
+  _smf_find_paths_of('klint.xml').each { |path| checkstyle_paths.append(path) }
+  _smf_find_paths_of('detekt.xml').each { |path| checkstyle_paths.append(path) }
 
   ENV['DANGER_JIRA_KEYS'] = JSON.dump(smf_danger_jira_key_parameter(options[:jira_key]))
   ENV['DANGER_LINT_PATHS'] = JSON.dump(lint_paths)
@@ -47,20 +47,18 @@ def smf_danger_jira_key_parameter(jira_keys)
   keys
 end
 
-def smf_find_paths_of(filename)
+def _smf_find_paths_of(filename)
   paths = []
   Dir["#{smf_workspace_dir}/**/#{filename}"].each do |file|
-    UI.message("Found file at: #{File.expand_path(file)}")
     paths.append(File.expand_path(file))
   end
   paths
 end
 
-def smf_find_paths_of_files_in_directory(directory, file_type = '')
+def _smf_find_paths_of_files_in_directory(directory, file_type = '')
   paths = []
   file_type = ".#{file_type}" if file_type != ''
   Dir["#{smf_workspace_dir}/**/#{directory}/*#{file_type}"].each do |file|
-    UI.message("Found file at: #{File.expand_path(file)}")
     paths.append(File.expand_path(file))
   end
   paths

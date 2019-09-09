@@ -68,7 +68,7 @@ def smf_update_build_number_in_project(build_number)
   when :android
     new_config = @smf_fastlane_config
     new_config[:app_version_code] = build_number.to_i
-    update_config(
+    smf_update_config(
         new_config,
         "Increment build number to #{build_number}")
   when :flutter

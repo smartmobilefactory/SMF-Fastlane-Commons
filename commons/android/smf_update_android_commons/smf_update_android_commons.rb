@@ -4,7 +4,7 @@ private_lane :smf_update_android_commons do |options|
 
   android_commons_branch = !options[:android_commons_branch].nil? ? options[:android_commons_branch] : 'master'
 
-  puts ('Update Android Commons from branch ' + android_commons_branch)
+  UI.message('Update Android Commons from branch ' + android_commons_branch)
   Dir.chdir("#{smf_workspace_dir}/android-commons") do
     sh('git checkout ' + android_commons_branch)
     sh('git pull')

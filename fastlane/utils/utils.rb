@@ -84,7 +84,7 @@ def get_build_number_of_app
   build_number
 end
 
-def update_config(config, message = nil)
+def smf_update_config(config, message = nil)
   jsonString = JSON.pretty_generate(config)
   File.write("#{smf_workspace_dir}/Config.json", jsonString)
   git_add(path: "#{smf_workspace_dir}/Config.json")
