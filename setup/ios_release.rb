@@ -158,6 +158,8 @@ private_lane :smf_super_release do |options|
       build_variant: options[:build_variant],
       changelog: changelog
   )
+
+  smf_write_chnagelog(changelog: changelog)
 end
 
 lane :smf_release do |options|
