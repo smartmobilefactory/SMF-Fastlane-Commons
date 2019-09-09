@@ -27,7 +27,7 @@ private_lane :smf_create_github_release do |options|
   UI.message("Paths to attach: #{paths}")
 
   # Create the GitHub release as draft
-  set_github_release(
+  release_id = set_github_release(
       is_draft: true,
       repository_name: repository_path,
       api_token: ENV[$SMF_GITHUB_TOKEN_ENV_KEY],
@@ -38,7 +38,8 @@ private_lane :smf_create_github_release do |options|
       upload_assets: paths
   )
 
-  release_id = smf_get_github_release_id_for_tag(tag, repository_path)
+  UI.message("Found id \"#{release_id}\" for release \"#{tag}\"")
+  #release_id = smf_get_github_release_id_for_tag(tag, repository_path)
 
   github_api(
       server_url: 'https://api.github.com',
