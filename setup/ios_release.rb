@@ -144,8 +144,7 @@ end
 # Push git tag / Release
 private_lane :smf_super_release do |options|
 
-  changelog = File.read(smf_changelog_temp_path)
-  sh "rm #{smf_changelog_temp_path}" if File.exist?(smf_changelog_temp_path)
+  changelog = smf_read_changelog(remove_changelog: true)
 
   smf_git_pull(options[:local_branch])
   smf_push_to_git_remote(local_branch: options[:local_branch])

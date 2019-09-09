@@ -28,3 +28,27 @@ If there is no matching tag the initial commit will be used for collecting the c
 ## Changelog is too long
 If the changelog contains more than 20 000 characters it will be shortened.
 
+
+# Global Changelog Availability With a Temporary Changelog File
+### Reading
+The private lane `smf_read_changelog` reads the temporary changelog file and returns the changelog as a string.
+With the option `remove_changelog` set to true, the changelog file will be removed after reading.
+
+Example: 
+
+```
+changelog = smf_read_changelog(
+    remove_changelog: true  # Deletes the temp changelog file after reading it (this is useful if you want to prevent that the file is commited and pushed)
+)
+```
+
+### Writing
+The private lane `smf_write_changelog` writes a given string to the temporary changelog file. The file is complete overwritten.
+
+Exampel:
+
+```
+changelog = smf_write_changelog(
+    changelog: "Some commit messages"  # The changelog which will be written to the file
+)
+```
