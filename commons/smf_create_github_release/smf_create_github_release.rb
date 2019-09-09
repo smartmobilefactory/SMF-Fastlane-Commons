@@ -34,7 +34,7 @@ private_lane :smf_create_github_release do |options|
       api_token: ENV[$SMF_GITHUB_TOKEN_ENV_KEY],
       name: release_name.to_s,
       tag_name: tag,
-      description: ENV[$SMF_CHANGELOG_ENV_KEY].nil? ? "Release with tag: #{tag}" ? ENV[$SMF_CHANGELOG_ENV_KEY],
+      description: ENV[$SMF_CHANGELOG_ENV_KEY].nil? ? "Release with tag: #{tag}" : ENV[$SMF_CHANGELOG_ENV_KEY],
       commitish: branch,
       upload_assets: paths
   )
