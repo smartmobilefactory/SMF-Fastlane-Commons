@@ -13,7 +13,8 @@ todoist.warn_for_todos
 todoist.print_todos_table
 
 ## LINT:
-
+UI.message("$SMF_DANGER_LINT_PATHS: #{$SMF_DANGER_LINT_PATHS}")
+UI.message("$SMF_DANGER_LINT_PATHS: #{ENV[$SMF_DANGER_LINT_PATHS]}")
 JSON.parse(ENV[$SMF_DANGER_LINT_PATHS]).each do |lint_path|
   if !lint_path.nil?
     if File.exist?(lint_path)
