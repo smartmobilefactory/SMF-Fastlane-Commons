@@ -3,6 +3,7 @@ private_lane :smf_create_github_release do |options|
   release_name = options[:release_name]
   tag = options[:tag]
   paths = !options[:paths].nil? ? options[:paths] : []
+  branch = options[:branch]
 
   git_remote_origin_url = sh 'git config --get remote.origin.url'
   github_url_match = git_remote_origin_url.match(%r{.*github.com:(.*)\.git})
@@ -33,7 +34,7 @@ private_lane :smf_create_github_release do |options|
       name: release_name.to_s,
       tag_name: tag,
       description: ENV[$SMF_CHANGELOG_ENV_KEY],
-      commitish: @smf_git_branch,
+      commitish: branch,
       upload_assets: paths
   )
 
