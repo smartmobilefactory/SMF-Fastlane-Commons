@@ -12,7 +12,7 @@ private_lane :smf_create_github_release do |options|
 
   if github_url_match.nil? || (github_url_match.length < 2)
     UI.message("The remote origin doesn't seem to be GitHub. The GitHub Release won't be created.")
-    return
+    next
   end
 
   repository_path = github_url_match[1]
