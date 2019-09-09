@@ -39,8 +39,8 @@ private_lane :smf_create_github_release do |options|
       upload_assets: paths
   )
 
-  UI.message("Found id \"#{release_id}\" for release \"#{tag}\"")
   release_id = release['id']
+  UI.message("Found id \"#{release_id}\" for release \"#{tag}\"")
 
   github_api(
       server_url: 'https://api.github.com',
