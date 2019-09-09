@@ -58,6 +58,10 @@ private_lane :smf_git_changelog do |options|
   changelog = "#{changelog[0..20_000]}#{'\\n...'}" if changelog.length > 20_000
 
   ENV[$SMF_CHANGELOG_ENV_HTML_KEY] = "<ul>#{cleaned_changelog_messages.uniq.map { |x| "<li>#{x}</li>" }.join("")}</ul>"
+
+  sh "rm #{$CHANGELOG_TEMP_FILE}" if File.exist?($CHANGELOG_TEMP_FILE)
+  File.write($CHANGELOG_TEMP_FILE, changelog)
+
   ENV[$SMF_CHANGELOG_ENV_KEY] = changelog
 end
 
