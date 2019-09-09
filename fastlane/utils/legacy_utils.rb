@@ -1,12 +1,3 @@
-# Uses Config file to access project name. Should be changed in the future.
-def get_default_name_of_pod
-  podspec_path = @smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path]
-  version = read_podspec(path: podspec_path)['version']
-  pod_name = read_podspec(path: podspec_path)['name']
-  project_name = !@smf_fastlane_config[:project][:project_name].nil? ? @smf_fastlane_config[:project][:project_name] : pod_name
-  "#{project_name} #{version}"
-end
-
 def get_tag_of_pod(version_number)
   "releases/#{version_number}"
 end
