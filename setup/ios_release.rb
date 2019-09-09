@@ -145,7 +145,7 @@ end
 private_lane :smf_super_release do |options|
 
   smf_git_pull(options[:local_branch])
-  smf_push_to_git_remote(options[:local_branch])
+  smf_push_to_git_remote(local_branch: options[:local_branch])
 
   # Create the GitHub release
   build_number = get_build_number(xcodeproj: "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj")
