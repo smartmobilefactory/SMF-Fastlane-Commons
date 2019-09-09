@@ -38,7 +38,7 @@ def smf_import_commons
 
   case @platform
   when :ios
-    ios_setup_file = "#{@fastlane_commons_dir_path}/setup/ios_release.rb"
+    ios_setup_file = "#{@fastlane_commons_dir_path}/setup/ios_setup.rb"
     if File.exist?(ios_setup_file)
       import(ios_setup_file)
     else
