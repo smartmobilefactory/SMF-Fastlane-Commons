@@ -159,7 +159,7 @@ private_lane :smf_super_release do |options|
       changelog: changelog
   )
 
-  smf_write_chnagelog(changelog: changelog)
+  smf_write_changelog(changelog: changelog)
 end
 
 lane :smf_release do |options|
