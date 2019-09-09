@@ -25,17 +25,8 @@ end
 
 def smf_get_app_center_id(build_variant)
   build_variant = build_variant.to_s.downcase
-  case @platform
-  when :ios
-    @smf_fastlane_config[:build_variants][build_variant.to_sym][:appcenter_id]
-  when :android
-    @smf_fastlane_config[:build_variants][build_variant.to_sym][:appcenter_id]
-  when :flutter
-    UI.message('App Secret for flutter is not implemented yet')
-  else
-    UI.message("There is no platform \"#{@platform}\", exiting...")
-    raise 'Unknown platform'
-  end
+
+  @smf_fastlane_config[:build_variants][build_variant.to_sym][:appcenter_id]
 end
 
 def smf_get_default_name_of_app(build_variant)
@@ -88,22 +79,6 @@ end
 def smf_get_icloud_environment(build_variant)
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant]
   build_variant_config[:icloud_environment].nil? ? "Development" : build_variant_config[:icloud_environment]
-end
-
-def smf_get_app_secret(build_variant)
-  UI.message("build_variant: #{build_variant}")
-  build_variant = build_variant.to_s.downcase
-  case @platform
-  when :ios
-    @smf_fastlane_config[:build_variants][build_variant.to_sym][:hockeyapp_id]
-  when :android
-    @smf_fastlane_config[:hockey][build_variant.to_sym]
-  when :flutter
-    UI.message('App Secret for flutter is not implemented yet')
-  else
-    UI.message("There is no platform \"#{@platform}\", exiting...")
-    raise 'Unknown platform'
-  end
 end
 
 def smf_path_to_ipa_or_app(build_variant)
