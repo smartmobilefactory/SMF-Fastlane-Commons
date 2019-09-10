@@ -156,18 +156,21 @@ end
 
 private_lane :smf_super_push_git_tag_release do |options|
 
-  changelog = smf_read_changelog()
+  local_branch = options[:local_branch]
+  build_variant = options[:build_variant]
 
-  smf_git_pull(options[:local_branch])
-  smf_push_to_git_remote(local_branch: options[:local_branch])
+  changelog = smf_read_changelog
+
+  smf_git_pull(local_branch)
+  smf_push_to_git_remote(local_branch)
 
   # Create the GitHub release
   build_number = get_build_number(xcodeproj: "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj")
   smf_create_github_release(
-      release_name: "#{options[:build_variant].upcase} #{build_number}",
-      tag: get_tag_of_app(options[:build_variant], build_number),
-      branch: options[:local_branch],
-      build_variant: options[:build_variant],
+      release_name: "#{build_variant.upcase} #{build_number}",
+      tag: get_tag_of_app(build_variant, build_number),
+      branch: local_branch,
+      build_variant: build_variant,
       changelog: changelog
   )
 end
