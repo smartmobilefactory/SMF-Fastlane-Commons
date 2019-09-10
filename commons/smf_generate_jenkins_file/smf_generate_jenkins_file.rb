@@ -21,6 +21,8 @@ private_lane :smf_generate_jenkins_file do |options|
   possible_build_variants = _smf_possible_build_variants
   jenkins_file_template_path = _smf_jenkins_file_template_path
 
+  UI.message("Generating Jenkinsfile with template at: #{jenkins_file_template_path}")
+
   jenkinsFileData = File.read(jenkins_file_template_path)
   jenkinsFileData = jenkinsFileData.gsub("#{BUILD_VARIANTS_PATTERN}", JSON.dump(possible_build_variants))
   jenkinsFileData = _smf_insert_custom_credentials(jenkinsFileData)
