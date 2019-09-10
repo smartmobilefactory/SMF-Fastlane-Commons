@@ -107,22 +107,18 @@ error do |lane, exception, options|
 
   case @platform
   when :ios
-    if @smf_set_should_send_deploy_notifications == true || @smf_set_should_send_build_job_failure_notifications == true
-      UI.message('Handling exception for iOS.')
+    UI.message('Handling exception for iOS.')
 
-      if @smf_fastlane_config.key?(:build_variants)
-        name = !@smf_fastlane_config[:build_variants][build_variant][:podspec_path].nil? ? smf_get_default_name_of_pod : smf_get_default_name_of_app(build_variant)
-      else
-        name = smf_get_default_name_of_app(@smf_build_variant)
-      end
-
-      smf_handle_exception(
-          exception: exception,
-          name: name
-      )
+    if @smf_fastlane_config.key?(:build_variants)
+      name = !@smf_fastlane_config[:build_variants][build_variant][:podspec_path].nil? ? smf_get_default_name_of_pod : smf_get_default_name_of_app(build_variant)
     else
-      UI.message('Not handling exception because of lane.')
+      name = smf_get_default_name_of_app(@smf_build_variant)
     end
+
+    smf_handle_exception(
+        exception: exception,
+        name: name
+    )
   when :android
     UI.message('Handling exception for Android.')
     smf_handle_exception(
