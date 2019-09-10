@@ -5,12 +5,12 @@ private_lane :smf_send_default_build_success_notification do |options|
   name = options[:name]
   slack_channel = @smf_fastlane_config[:project][:slack_channel]
   # Collect the changelog (again) in case the build job failed before the former changelog collecting
-  smf_git_changelog(build_variant: build_variant, is_library: is_library) if ENV[$SMF_CHANGELOG_ENV_KEY].nil?
+  changelog = smf_read_changelog()
 
   smf_send_message(
       title: "🎉🛠 Successfully built #{name} 🛠🎉",
       type: 'success',
-      message: ENV[$SMF_CHANGELOG_ENV_KEY],
+      message: changelog,
       slack_channel: slack_channel
   )
 end

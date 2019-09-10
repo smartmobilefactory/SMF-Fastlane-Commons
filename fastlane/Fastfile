@@ -26,7 +26,7 @@ def smf_import_commons
   end
 
   if !Dir.exist?(@fastlane_commons_dir_path)
-    UI.message('There fastlane commons directory does not exist.')
+    UI.message('The fastlane commons directory does not exist.')
     return
   else
     UI.message('Import files from fastlane commons directory.')
@@ -38,22 +38,34 @@ def smf_import_commons
 
   case @platform
   when :ios
-    @fastlane_commons_dir_path += '/legacy/ios'
-    ios_setup_file = "#{@fastlane_commons_dir_path}/fastlane/setup.rb"
-    import(ios_setup_file)
-    smf_setup_ios_fastlane_commons
+    ios_setup_file = "#{@fastlane_commons_dir_path}/setup/ios_setup.rb"
+    if File.exist?(ios_setup_file)
+      import(ios_setup_file)
+    else
+      raise "Can't find ios_release file at #{ios_setup_file}"
+    end
+    UI.message('Imported ios release file.')
+
   when :android
     android_setup_file = "#{@fastlane_commons_dir_path}/setup/android_setup.rb"
-    File.exist?(android_setup_file) ? import(android_setup_file) : return
+    if File.exist?(android_setup_file)
+      import(android_setup_file)
+    else
+      raise "Can't find android_release file at #{android_setup_file}"
+    end
     UI.message('Imported android release file.')
-    @fastlane_commons_dir_path += '/legacy/android'
-    smf_import_all "#{@fastlane_commons_dir_path}/fastlane/lanes"
+
   when :flutter
     UI.message('Setup for flutter is not implemented yet')
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
   end
+end
+
+# Returns the path to the Config.json
+def fastlane_config_path
+  smf_workspace_dir + '/Config.json'
 end
 
 # loads the config json content into the @smf_fastlane_config env variable
@@ -69,31 +81,6 @@ def smf_load_fastlane_config
   end
 end
 
-# Returns the path to the Config.json
-def fastlane_config_path
-  smf_workspace_dir + '/Config.json'
-end
-
-smf_import_commons
-smf_load_fastlane_config
-
-desc 'Setup'
-before_all do |lane, options|
-  case @platform
-  when :ios
-    smf_setup_workspace
-    smf_import_commons
-    smf_load_fastlane_config
-  when :android
-    UI.message('Setup for Android is implemented in Pipeline Commons')
-  when :flutter
-    UI.message('Setup for flutter is not implemented yet')
-  else
-    UI.message("There is no platform \"#{@platform}\", exiting...")
-    raise 'Unknown platform'
-  end
-end
-
 # removes the fastlane commons repo
 def smf_remove_fastlane_commons_repo
   sh "if [ -d #{@fastlane_commons_dir_path} ]; then rm -rf #{@fastlane_commons_dir_path}; fi"
@@ -105,8 +92,12 @@ def smf_clone_fastlane_commons_repo
 
   fastlane_commons_branch = @smf_fastlane_config[:project][:fastlane_commons_branch]
 
+  UI.message('Downloading Fastlane Commons Repository.')
   sh 'git clone -b "' + fastlane_commons_branch + "\" git@github.com:smartmobilefactory/SMF-Fastlane-Commons.git #{@fastlane_commons_dir_path}"
 end
+
+smf_import_commons
+smf_load_fastlane_config
 
 desc 'Called on error'
 error do |lane, exception, options|
@@ -120,7 +111,7 @@ error do |lane, exception, options|
       UI.message('Handling exception for iOS.')
 
       if @smf_fastlane_config.key?(:build_variants)
-        name = !@smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path].nil? ? smf_get_default_name_of_pod : smf_get_default_name_of_app(@smf_build_variant)
+        name = !@smf_fastlane_config[:build_variants][build_variant][:podspec_path].nil? ? smf_get_default_name_of_pod : smf_get_default_name_of_app(build_variant)
       else
         name = smf_get_default_name_of_app(@smf_build_variant)
       end
@@ -133,7 +124,7 @@ error do |lane, exception, options|
       UI.message('Not handling exception because of lane.')
     end
   when :android
-    UI.message('Handling exception for android.')
+    UI.message('Handling exception for Android.')
     smf_handle_exception(
         exception: exception,
         name: smf_get_default_name_of_app(build_variant)
@@ -146,11 +137,10 @@ error do |lane, exception, options|
   end
 end
 
-lane :smf_setup_workspace do |options|
-  UI.message('Downloading Fastlane Commons Repo')
+# sets the commons dir path and clones the fastlane repo
+lane :smf_setup_workspace do
+  smf_load_fastlane_config
   smf_clone_fastlane_commons_repo
 end
 
-def smf_is_slack_enabled
-  ENV[$SMF_IS_SLACK_ENABLED].nil? ? true : ENV[$SMF_IS_SLACK_ENABLED] == 'true'
-end
+

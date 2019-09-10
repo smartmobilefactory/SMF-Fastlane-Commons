@@ -14,6 +14,9 @@ private_lane :smf_build_ios_app do |options|
   upload_itc = options[:upload_itc]
   upload_bitcode = options[:upload_bitcode]
   export_method = options[:export_method]
+  icloud_environment = options[:icloud_environment]
+
+  UI.message("export_mehtod is nil: #{export_method.nil?}")
 
   output_name = scheme
 
@@ -38,8 +41,7 @@ private_lane :smf_build_ios_app do |options|
       output_name: output_name,
       include_symbols: true,
       include_bitcode: (upload_itc && upload_bitcode),
-      export_method: get_export_method,
-      export_options: { iCloudContainerEnvironment: export_method },
+      export_options: { iCloudContainerEnvironment: icloud_environment },
       skip_package_ipa: skip_package_ipa,
       xcpretty_formatter: "/Library/Ruby/Gems/2.3.0/gems/xcpretty-json-formatter-0.1.0/lib/json_formatter.rb"
   )

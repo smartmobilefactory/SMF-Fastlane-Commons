@@ -41,7 +41,7 @@ private_lane :smf_git_changelog do |options|
 
   cleaned_changelog_messages = []
   changelog_messages.split(/\n+/).each do |commit_message|
-    if smf_should_commit_be_ignored_in_changelog(commit_message, [/.*SMFHUDSONCHECKOUT.*/])
+    if _smf_should_commit_be_ignored_in_changelog(commit_message, [/.*SMFHUDSONCHECKOUT.*/])
       next
     end
 
@@ -58,6 +58,7 @@ private_lane :smf_git_changelog do |options|
   changelog = "#{changelog[0..20_000]}#{'\\n...'}" if changelog.length > 20_000
 
   ENV[$SMF_CHANGELOG_ENV_HTML_KEY] = "<ul>#{cleaned_changelog_messages.uniq.map { |x| "<li>#{x}</li>" }.join("")}</ul>"
+  smf_write_changelog(changelog: changelog)
   ENV[$SMF_CHANGELOG_ENV_KEY] = changelog
 end
 
@@ -65,7 +66,7 @@ end
 ### Helper ###
 ##############
 
-def smf_should_commit_be_ignored_in_changelog(commit_message, regexes_to_match)
+def _smf_should_commit_be_ignored_in_changelog(commit_message, regexes_to_match)
   regexes_to_match.each do |regex|
     if commit_message.match(regex)
       UI.message("Ignoring commit: #{commit_message}")
@@ -75,3 +76,8 @@ def smf_should_commit_be_ignored_in_changelog(commit_message, regexes_to_match)
 
   false
 end
+
+def _smf_changelog_temp_path
+  "#{@fastlane_commons_dir_path}/#{$CHANGELOG_TEMP_FILE}"
+end
+

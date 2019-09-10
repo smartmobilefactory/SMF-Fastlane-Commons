@@ -1,4 +1,5 @@
-def get_apk_path(apk_file_regex)
+
+def smf_get_apk_path(apk_file_regex)
   path = ''
   Dir["#{smf_workspace_dir}/**/#{apk_file_regex}"].each do |file|
     path = File.expand_path(file)
@@ -8,60 +9,45 @@ def get_apk_path(apk_file_regex)
   path
 end
 
-def get_apk_file_regex(build_variant)
-  variant = get_build_variant_from_config(build_variant)
+def smf_get_apk_file_regex(build_variant)
+  variant = smf_get_build_variant_from_config(build_variant)
   file_regex = "*-#{variant.gsub(/[A-Z]/) { |s| '-' + s.downcase }}.apk"
 end
 
-def get_build_variant_from_config(build_variant)
+def smf_get_build_variant_from_config(build_variant)
   build_variant = build_variant.to_s.downcase
   variant = @smf_fastlane_config[:build_variants][build_variant.to_sym][:variant]
 end
 
-def get_project_name
+def smf_get_project_name
   @smf_fastlane_config[:project][:project_name]
 end
 
-def get_app_center_id(build_variant)
+def smf_get_appcenter_id(build_variant)
   build_variant = build_variant.to_s.downcase
-  case @platform
-  when :ios
-    @smf_fastlane_config[:build_variants][build_variant.to_sym][:appcenter_id]
-  when :android
-    @smf_fastlane_config[:build_variants][build_variant.to_sym][:appcenter_id]
-  when :flutter
-    UI.message('App Secret for flutter is not implemented yet')
-  else
-    UI.message("There is no platform \"#{@platform}\", exiting...")
-    raise 'Unknown platform'
-  end
+
+  @smf_fastlane_config[:build_variants][build_variant.to_sym][:appcenter_id]
 end
 
 def smf_get_default_name_of_app(build_variant)
-  build_number = get_build_number_of_app
+  build_number = smf_get_build_number_of_app
   project_name = @smf_fastlane_config[:project][:project_name]
-  case @platform
-  when :ios
-    "#{project_name} #{build_variant.upcase} (#{build_number})"
-  when :android
-    "#{project_name} #{build_variant} (Build #{build_number})"
-  when :flutter
-    UI.message('Notification for flutter is not implemented yet')
-  else
-    UI.message("There is no platform \"#{@platform}\", exiting...")
-    raise 'Unknown platform'
-  end
+
+  "#{project_name} #{build_variant.upcase} (#{build_number})"
 end
 
+# Uses Config file to access project name. Should be changed in the future.
 def smf_get_default_name_of_pod
   podspec_path = @smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path]
   version = read_podspec(path: podspec_path)['version']
   pod_name = read_podspec(path: podspec_path)['name']
   project_name = !@smf_fastlane_config[:project][:project_name].nil? ? @smf_fastlane_config[:project][:project_name] : pod_name
+
   "#{project_name} #{version}"
 end
 
-def get_build_number_of_app
+# Uses Config file to access project name. Should be changed in the future.
+def smf_get_build_number_of_app
   UI.message('Get the build number of project.')
   case @platform
   when :ios
@@ -82,6 +68,45 @@ def get_build_number_of_app
   end
 
   build_number
+end
+
+def smf_get_xcconfig_name(build_variant)
+  build_variant_config = @smf_fastlane_config[:build_variants][build_variant]
+  use_xcconfig = build_variant_config[:xcconfig_name].nil? ? false : true
+  use_xcconfig ? build_variant_config[:xcconfig_name][:archive] : "Release"
+end
+
+def smf_get_icloud_environment(build_variant)
+  build_variant_config = @smf_fastlane_config[:build_variants][build_variant]
+  build_variant_config[:icloud_environment].nil? ? "Development" : build_variant_config[:icloud_environment]
+end
+
+def smf_path_to_ipa_or_app(build_variant)
+
+  escaped_filename = @smf_fastlane_config[:build_variants][build_variant.to_sym][:scheme].gsub(' ', "\ ")
+
+  app_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.ipa.zip"
+  app_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.ipa" unless File.exist?(app_path)
+
+  UI.message("Constructed path \"#{app_path}\" from filename \"#{escaped_filename}\"")
+
+  unless File.exist?(app_path)
+    app_path = lane_context[SharedValues::IPA_OUTPUT_PATH]
+
+    UI.message("Using \"#{app_path}\" as app_path as no file exists at the constructed path.")
+  end
+
+  app_path
+end
+
+def smf_ci_ios_error_log
+  $SMF_CI_IOS_ERROR_LOG.to_s
+end
+
+def smf_git_pull(branch)
+  branch_name = "#{branch}"
+  branch_name.sub!("origin/", "")
+  sh "git pull origin #{branch_name}"
 end
 
 def smf_update_config(config, message = nil)
@@ -111,4 +136,8 @@ def smf_danger_module_config(options)
   end
 
   modules
+end
+
+def smf_get_tag_of_pod(version_number)
+  "releases/#{version_number}"
 end

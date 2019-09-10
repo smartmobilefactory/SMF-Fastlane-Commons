@@ -64,13 +64,6 @@ private_lane :smf_deploy_build_variant do |options|
 
   generateMetaJSON = build_variant_config[:generateMetaJSON]
 
-  use_hockey = (build_variant_config[:use_hockey].nil? ? true : build_variant_config[:use_hockey])
-
-  has_sentry_project_settings = project_config[:sentry_org_slug] != nil && project_config[:sentry_project_slug] != nil
-  has_sentry_variant_settings = build_variant_config[:sentry_org_slug] != nil && build_variant_config[:sentry_project_slug] != nil
-
-  use_sentry = has_sentry_project_settings || has_sentry_variant_settings
-  UI.message("Will upload to Sentry: #{use_sentry}")
 
   # The default value of push_generated_code depends on whether Strings are synced with PhraseApp. If PhraseApp should be synced, the default is true
   push_generated_code = (build_variant_config[:push_generated_code].nil? ? (build_variant_config[:phrase_app_script] != nil) : build_variant_config[:push_generated_code])
@@ -81,55 +74,6 @@ private_lane :smf_deploy_build_variant do |options|
     sh "if [ -d #{workspace}/#{$METAJSON_TEMP_FOLDERNAME} ]; then rm -rf #{workspace}/#{$METAJSON_TEMP_FOLDERNAME}; fi"
     sh "mkdir #{workspace}/#{$METAJSON_TEMP_FOLDERNAME}"
   end
-
-  smf_pod_install
-
-  tag = smf_increment_build_number(
-      build_variant: build_variant,
-      current_build_number: get_build_number_of_app
-  )
-
-  # Check for commons ITC Upload errors if needed
-  if build_variant_config[:upload_itc] == true
-
-    smf_verify_itc_upload_errors(
-        project_name: get_project_name,
-        target: get_target,
-        build_scheme: get_build_scheme,
-        itc_skip_version_check: get_itc_skip_version_check,
-        username: get_itc_apple_id,
-        itc_team_id: get_itc_team_id,
-        bundle_identifier: get_bundle_identifier
-    )
-  end
-
-  # Sync Phrase App
-  smf_sync_with_phrase_app(get_phrase_app_properties)
-
-  smf_download_provisioning_profiles(
-      team_id: get_team_id,
-      apple_id: get_apple_id,
-      use_wildcard_signing: get_use_wildcard_signing,
-      bundle_identifier: get_bundle_identifier,
-      use_default_match_config: match_config.nil?,
-      match_read_only: get_match_config_read_only,
-      match_type: get_match_config_type,
-      extensions_suffixes: get_extension_suffixes
-  )
-
-  # Build and archive the IPA
-  smf_build_ios_app(
-      bulk_deploy_params: bulk_deploy_params,
-      scheme: get_build_scheme,
-      should_clean_project: get_should_clean_project,
-      required_xcode_version: get_required_xcode_version,
-      project_name: get_project_name,
-      xcconfig_name: get_xcconfig_name,
-      code_signing_identity: get_code_signing_identity,
-      upload_itc: get_upload_itc,
-      upload_bitcode: get_upload_bitcode,
-      export_method: get_export_method
-  )
 
   if get_use_sparkle == true
     smf_create_dmg_from_app(
@@ -174,7 +118,7 @@ private_lane :smf_deploy_build_variant do |options|
           title: "Failed to create MetaJSON for #{smf_default_notification_release_title} 😢",
           type: "warning",
           exception: exception,
-          slack_channel: ci_ios_error_log
+          slack_channel: smf_ci_ios_error_log
       )
     end
   end
@@ -184,70 +128,6 @@ private_lane :smf_deploy_build_variant do |options|
     smf_build_simulator_app
   end
 
-  # Collect the changelog
-  smf_git_changelog(build_variant: build_variant)
-
-  if use_hockey
-    # Store the HockeyApp ID to let the handle exception lane know what hockeyapp entry should be deleted. This value is reset during bulk builds to avoid the deletion of a former succesful build.
-    ENV[$SMF_APP_HOCKEY_ID_ENV_KEY] = build_variant_config[:hockeyapp_id]
-
-    # Upload the IPA to AppCenter
-    smf_ios_upload_to_appcenter(
-        build_number: get_build_number_of_app,
-        app_secret: get_app_center_id(build_variant),
-        escaped_filename: get_escaped_filename(build_variant),
-        path_to_ipa_or_app: get_path_to_ipa_or_app(build_variant),
-        is_mac_app: is_mac_app(build_variant),
-        podspec_path: get_podspec_path(build_variant)
-    )
-
-    # Disable the former HockeyApp entry
-    smf_disable_former_hockey_entry(
-        build_variants_contains_whitelist: ["beta"]
-    )
-
-    # Inform the SMF HockeyApp about the new app version
-    begin
-      smf_send_ios_hockey_app_apn
-    rescue => exception
-      UI.important("Warning: The APN to the SMF HockeyApp couldn't be sent!")
-
-      smf_send_message(
-          title: "Failed to send APN to SMF HockeyApp for #{smf_default_notification_release_title} 😢",
-          type: "warning",
-          exception: exception,
-          slack_channel: ci_ios_error_log
-      )
-    end
-  end
-
-  if use_sentry
-    begin
-
-      org_slug = get_sentry_org_slug
-      project_slug = get_sentry_project_slug
-
-      org_slug_variant = get_variant_sentry_org_slug(build_variant)
-      project_slug_variant = get_variant_sentry_project_slug(build_variant)
-
-      # If a build variant overrides the sentry settings, use the variant settings
-      if !org_slug_variant.nil? && !project_slug_variant.nil?
-        org_slug = org_slug_variant
-        project_slug = project_slug_variant
-      end
-
-      smf_upload_to_sentry(org_slug: org_slug, project_slug: project_slug)
-    rescue => exception
-      UI.important("Warning: Dsyms could not be uploaded to Sentry !")
-
-      smf_send_message(
-          title: "Failed to upload dsyms to Sentry for #{smf_default_notification_release_title} 😢",
-          type: "warning",
-          exception: exception,
-          slack_channel: ci_ios_error_log
-      )
-    end
-  end
 
   if (build_variant_config[:use_sparkle])
     # Upload DMG to Strato

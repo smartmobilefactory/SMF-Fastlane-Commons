@@ -61,13 +61,6 @@ def smf_construct_tag_for_current_project(tag_prefix, tag_suffix, version = nil)
   return tag_prefix + version + tag_suffix
 end
 
-def smf_git_pull
-  branch = @smf_git_branch
-  branch_name = "#{branch}"
-  branch_name.sub!("origin/", "")
-  sh "git pull origin #{branch_name}"
-end
-
 def smf_default_tag_prefix
   return (smf_is_build_variant_a_pod ? smf_default_pod_tag_prefix : smf_default_app_tag_prefix)
 end

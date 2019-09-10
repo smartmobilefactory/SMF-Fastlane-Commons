@@ -1,6 +1,3 @@
-def get_tag_of_pod(version_number)
-  "releases/#{version_number}"
-end
 
 def smf_is_keychain_enabled
   return ENV[$SMF_IS_KEYCHAIN_ENABLED].nil? ? true : ENV[$SMF_IS_KEYCHAIN_ENABLED] == "true"
@@ -49,17 +46,8 @@ def get_use_xcconfig
   build_variant_config[:xcconfig_name].nil? ? false : true
 end
 
-def get_xcconfig_name
-  use_xcconfig = build_variant_config[:xcconfig_name].nil? ? false : true
-  use_xcconfig ? build_variant_config[:xcconfig_name][:archive] : "Release"
-end
-
 def get_export_method
   build_variant_config[:export_method]
-end
-
-def get_icloud_environment
-  build_variant_config[:icloud_environment].nil? ? "Development" : build_variant_config[:icloud_environment]
 end
 
 def get_code_signing_identity
@@ -118,10 +106,6 @@ def get_should_clean_project
   build_variant_config[:should_clean_project]
 end
 
-def get_escaped_filename(build_variant)
-  @smf_fastlane_config[:build_variants][build_variant.to_sym][:scheme].gsub(' ', "\ ")
-end
-
 def is_mac_app(build_variant)
   @smf_fastlane_config[:build_variants][build_variant.to_sym][:use_sparkle]
 end
@@ -138,31 +122,13 @@ def should_skip_waiting_after_itc_upload(build_variant)
   !@smf_fastlane_config[:build_variants][build_variant.to_sym][:itc_skip_waiting].nil? ? @smf_fastlane_config[:build_variants][build_variant.to_sym][:itc_skip_waiting] : false
 end
 
-def get_path_to_ipa_or_app(build_variant)
-
-  escaped_filename = get_escaped_filename(build_variant)
-
-  app_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.app.zip"
-  app_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.app" unless File.exist?(app_path)
-
-  UI.message("Constructed path \"#{app_path}\" from filename \"#{escaped_filename}\"")
-
-  unless File.exist?(app_path)
-    app_path = lane_context[SharedValues::IPA_OUTPUT_PATH]
-
-    UI.message("Using \"#{app_path}\" as app_path as no file exists at the constructed path.")
-  end
-
-  app_path
-end
-
 def get_podspec_path(build_variant)
   @smf_fastlane_config[:build_variants][build_variant.to_sym][:podspec_path]
 end
 
 def smf_get_version_number
   version_number = get_version_number(
-      xcodeproj: "#{get_project_name}.xcodeproj",
+      xcodeproj: "#{smf_get_project_name}.xcodeproj",
       target: (get_target != nil ? get_target : get_build_scheme)
   )
 

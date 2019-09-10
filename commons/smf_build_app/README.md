@@ -19,7 +19,8 @@ smf_build_ios_app(
     code_signing_identity: "iPhone Distribution: Hidrive",  # The name of the signing certificate attached to the provisioning profile. This can be found in XCode under Build Settings/Code Signing Identity
     upload_itc: false,                                      # If enabled, the .ipa will be uploaded to App Store Connect.
     upload_bitcode: true,                                   # If disabled, Bitcode won't be uploaded.
-    export_method: false                                    # The Xcode archive export method to use. This needs to be set for special cases only.
+    export_method: false,                                   # The Xcode archive export method to use. This needs to be set for special cases only.
+    icloud_environment                                      # ("Development" or "Production"): If the app uses iCloud capabilities, this has to be set accordingly for each target.             
 )
 
 ```

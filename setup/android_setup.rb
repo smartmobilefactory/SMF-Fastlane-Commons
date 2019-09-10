@@ -1,4 +1,4 @@
-# setup Dependencies
+# Setup Dependencies
 
 private_lane :smf_super_setup_dependencies do |options|
 end
@@ -21,26 +21,25 @@ end
 
 # Increment Build Number
 
-private_lane :smf_super_increment_build_number do |options|
+private_lane :smf_super_pipeline_increment_build_number do |options|
 
   build_variant = options[:build_variant]
 
   smf_increment_build_number(build_variant: build_variant)
 end
 
-# increment_build_number already exists
 lane :smf_pipeline_increment_build_number do |options|
-  smf_super_increment_build_number(options)
+  smf_super_pipeline_increment_build_number(options)
 end
 
 
-# Build
+# Build (Build to Release)
 
 private_lane :smf_super_build do |options|
 
   build_variant = options[:build_variant]
 
-  variant = get_build_variant_from_config(build_variant)
+  variant = smf_get_build_variant_from_config(build_variant)
 
   smf_build_android_app(build_variant: variant)
 end
@@ -48,6 +47,7 @@ end
 lane :smf_build do |options|
   smf_super_build(options)
 end
+
 
 # Generate Changelog
 
@@ -62,25 +62,26 @@ lane :smf_generate_changelog do |options|
   smf_super_generate_changelog(options)
 end
 
+
 # Upload to AppCenter
 
 private_lane :smf_super_upload_to_appcenter do |options|
 
   build_variant = options[:build_variant]
-  apk_file_regex = get_apk_file_regex(build_variant)
-  app_id = get_app_center_id(build_variant)
+  apk_file_regex = smf_get_apk_file_regex(build_variant)
+  app_id = smf_get_appcenter_id(build_variant)
 
   smf_android_upload_to_appcenter(
       build_variant: build_variant,
-      apk_path: get_apk_path(apk_file_regex),
+      apk_path: smf_get_apk_path(apk_file_regex),
       app_secret: app_id
   )
 end
 
-# upload_to_appcenter already exists
-lane :smf_pipeline_upload_to_appcenter do |options|
+lane :smf_upload_to_appcenter do |options|
   smf_super_upload_to_appcenter(options)
 end
+
 
 # Push Git Tag / Release
 
@@ -94,6 +95,7 @@ end
 lane :smf_push_git_tag_release do |options|
   smf_super_push_git_tag_release(options)
 end
+
 
 # Send Slack Notification
 
@@ -112,13 +114,14 @@ lane :smf_send_slack_notification do |options|
   smf_super_send_slack_notification(options)
 end
 
+
 # Linter
 
 private_lane :smf_super_linter do |options|
 
   build_variant = options[:build_variant]
 
-  options[:build_variant] = get_build_variant_from_config(build_variant)
+  options[:build_variant] = smf_get_build_variant_from_config(build_variant)
 
   smf_run_klint(options)
   smf_run_detekt(options)
@@ -129,6 +132,7 @@ lane :smf_linter do |options|
   smf_super_linter(options)
 end
 
+
 # Danger
 
 private_lane :smf_super_danger do |options|
@@ -138,6 +142,7 @@ end
 lane :smf_pipeline_danger do |options|
   smf_super_danger(options)
 end
+
 
 # Update Android Commons
 
