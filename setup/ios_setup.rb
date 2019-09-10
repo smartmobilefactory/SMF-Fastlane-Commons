@@ -1,4 +1,5 @@
 # Setup Dependencies - pod install & `sh generate.sh` (optional: Phrase App)
+
 private_lane :smf_super_setup_dependencies do |options|
 
   smf_pod_install
@@ -22,7 +23,9 @@ lane :smf_setup_dependencies do |options|
   smf_super_setup_dependencies(options)
 end
 
-# increment_buildnumber
+
+# Increment Build Number
+
 private_lane :smf_super_pipeline_increment_build_number do |options|
 
   smf_increment_build_number(
@@ -36,7 +39,8 @@ lane :smf_pipeline_increment_build_number do |options|
   smf_super_pipeline_increment_build_number(options)
 end
 
-# build (build to release)
+
+# Build (Build to Release)
 
 private_lane :smf_super_build do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
@@ -71,26 +75,29 @@ lane :smf_build do |options|
   smf_super_build(options)
 end
 
-# changelog
-private_lane :smf_super_changelog do |options|
+
+# Generate Changelog
+private_lane :smf_super_generate_changelog do |options|
   smf_git_changelog(build_variant: options[:build_variant])
 end
 
-lane :smf_changelog do |options|
-  smf_super_changelog(options)
+lane :smf_generate_changelog do |options|
+  smf_super_generate_changelog(options)
 end
 
-# Upload Dsym
+
+# Upload Dsyms
+
 private_lane :smf_super_upload_dsyms do |options|
 
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
 
   smf_upload_to_sentry(
-    build_variant: options[:build_variant],
-    org_slug: @smf_fastlane_config[:sentry_org_slug],
-    project_slug: @smf_fastlane_config[:sentry_project_slug],
-    build_variant_org_slug: build_variant_config[:sentry_org_slug],
-    build_variant_project_slug: build_variant_config[:sentry_project_slug]
+      build_variant: options[:build_variant],
+      org_slug: @smf_fastlane_config[:sentry_org_slug],
+      project_slug: @smf_fastlane_config[:sentry_project_slug],
+      build_variant_org_slug: build_variant_config[:sentry_org_slug],
+      build_variant_project_slug: build_variant_config[:sentry_project_slug]
   )
 
 end
@@ -99,11 +106,13 @@ lane :smf_upload_dsyms do |options|
   smf_super_upload_dsyms(options)
 end
 
-# Upload Appcenter
+
+# Upload to AppCenter
+
 private_lane :smf_super_upload_to_appcenter do |options|
   build_variant = options[:build_variant]
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
-  
+
   # Upload the IPA to AppCenter
   smf_ios_upload_to_appcenter(
       build_number: smf_get_build_number_of_app,
@@ -119,7 +128,9 @@ lane :smf_upload_to_appcenter do |options|
   smf_super_upload_to_appcenter(options)
 end
 
-# Upload iTunes
+
+# Upload to iTunes
+
 private_lane :smf_super_upload_to_itunes do |options|
 
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
@@ -141,8 +152,9 @@ lane :smf_upload_to_itunes do |options|
 end
 
 
-# Push git tag / Release
-private_lane :smf_super_release do |options|
+# Push Git Tag / Release
+
+private_lane :smf_super_push_git_tag_release do |options|
 
   changelog = smf_read_changelog(remove_changelog: true)
 
@@ -162,20 +174,23 @@ private_lane :smf_super_release do |options|
   smf_write_changelog(changelog: changelog)
 end
 
-lane :smf_release do |options|
-  smf_super_release(options)
+lane :smf_push_git_tag_release do |options|
+  smf_super_push_git_tag_release(options)
 end
 
-# Slack
-private_lane :smf_super_slack do |options|
+
+# Send Slack Notification
+
+private_lane :smf_super_send_slack_notification do |options|
   smf_send_default_build_success_notification(
       build_variant: options[:build_variant],
       name: smf_get_default_name_of_app(options[:build_variant])
   )
 end
 
-lane :smf_slack do |options|
-  smf_super_slack(options)
+lane :smf_send_slack_notification do |options|
+  smf_super_send_slack_notification(options)
 end
+
 
 # Monitoring (MetaJSON)
