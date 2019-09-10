@@ -89,7 +89,6 @@ private_lane :smf_super_push_git_tag_release do |options|
 
   branch = options[:branch]
 
-  smf_git_pull(branch)
   smf_push_to_git_remote(local_branch: branch)
 end
 
