@@ -26,9 +26,11 @@ private_lane :smf_create_github_release do |options|
   end
 
   UI.message("Paths to attach: #{paths}")
-  UI.message("Tag is: #{tag}")
 
-  raise 'Error, couldnt find changelod.' if changelog.nil?
+   if changelog.nil?
+     UI.error("Changelog is nil, using default string.")
+     changelog = "No description (changelog) provided."
+   end
 
   # Create the GitHub release as draft
   release = set_github_release(
