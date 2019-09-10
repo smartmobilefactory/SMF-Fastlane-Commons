@@ -27,7 +27,7 @@ private_lane :smf_deploy_app do |options|
       UI.important("Warning: Building variant #{build_variant} failed! Exception #{exception}")
 
       if @smf_set_should_send_deploy_notifications == true || @smf_set_should_send_build_job_failure_notifications == true
-        smf_handle_exception(name: get_default_name_of_app(build_variant), exception: exception)
+        smf_handle_exception(name: smf_get_default_name_of_app(build_variant), exception: exception)
       end
     end
 
@@ -62,18 +62,8 @@ private_lane :smf_deploy_build_variant do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][@smf_build_variant_sym]
   project_config = @smf_fastlane_config[:project]
 
-
-  generate_temporary_appfile
-
   generateMetaJSON = build_variant_config[:generateMetaJSON]
 
-  use_hockey = (build_variant_config[:use_hockey].nil? ? true : build_variant_config[:use_hockey])
-
-  has_sentry_project_settings = project_config[:sentry_org_slug] != nil && project_config[:sentry_project_slug] != nil
-  has_sentry_variant_settings = build_variant_config[:sentry_org_slug] != nil && build_variant_config[:sentry_project_slug] != nil
-
-  use_sentry = has_sentry_project_settings || has_sentry_variant_settings
-  UI.message("Will upload to Sentry: #{use_sentry}")
 
   # The default value of push_generated_code depends on whether Strings are synced with PhraseApp. If PhraseApp should be synced, the default is true
   push_generated_code = (build_variant_config[:push_generated_code].nil? ? (build_variant_config[:phrase_app_script] != nil) : build_variant_config[:push_generated_code])
@@ -85,26 +75,11 @@ private_lane :smf_deploy_build_variant do |options|
     sh "mkdir #{workspace}/#{$METAJSON_TEMP_FOLDERNAME}"
   end
 
-  smf_install_pods_if_project_contains_podfile
-  tag = smf_increment_build_number(build_variant: build_variant)
-
-  # Check for commons ITC Upload errors if needed
-  if build_variant_config[:upload_itc] == true
-    smf_verify_common_itc_upload_errors
-  end
-
-  # Sync Phrase App
-  smf_sync_strings_with_phrase_app
-
-  smf_download_provisioning_profiles
-
-  # Build and archive the IPA
-  smf_build_app(
-      bulk_deploy_params: bulk_deploy_params
-  )
-
   if get_use_sparkle == true
-    smf_create_dmg_from_app
+    smf_create_dmg_from_app(
+        team_id: get_team_id,
+        build_scheme: get_build_scheme
+    )
   end
 
   # Commit generated code. There can be changes eg. from PhraseApp + R.swift
@@ -143,7 +118,7 @@ private_lane :smf_deploy_build_variant do |options|
           title: "Failed to create MetaJSON for #{smf_default_notification_release_title} 😢",
           type: "warning",
           exception: exception,
-          slack_channel: ci_ios_error_log
+          slack_channel: smf_ci_ios_error_log
       )
     end
   end
@@ -153,54 +128,10 @@ private_lane :smf_deploy_build_variant do |options|
     smf_build_simulator_app
   end
 
-  # Collect the changelog
-  smf_git_changelog(build_variant: build_variant)
-
-  if use_hockey
-    # Store the HockeyApp ID to let the handle exception lane know what hockeyapp entry should be deleted. This value is reset during bulk builds to avoid the deletion of a former succesful build.
-    ENV[$SMF_APP_HOCKEY_ID_ENV_KEY] = build_variant_config[:hockeyapp_id]
-
-    # Upload the IPA to AppCenter
-    smf_upload_to_appcenter(build_variant: build_variant)
-
-    # Disable the former HockeyApp entry
-    smf_disable_former_hockey_entry(
-        build_variants_contains_whitelist: ["beta"]
-    )
-
-    # Inform the SMF HockeyApp about the new app version
-    begin
-      smf_send_ios_hockey_app_apn
-    rescue => exception
-      UI.important("Warning: The APN to the SMF HockeyApp couldn't be sent!")
-
-      smf_send_message(
-          title: "Failed to send APN to SMF HockeyApp for #{smf_default_notification_release_title} 😢",
-          type: "warning",
-          exception: exception,
-          slack_channel: ci_ios_error_log
-      )
-    end
-  end
-
-  if use_sentry
-    begin
-      smf_upload_dsyms_to_sentry
-    rescue => exception
-      UI.important("Warning: Dsyms could not be uploaded to Sentry !")
-
-      smf_send_message(
-          title: "Failed to upload dsyms to Sentry for #{smf_default_notification_release_title} 😢",
-          type: "warning",
-          exception: exception,
-          slack_channel: ci_ios_error_log
-      )
-    end
-  end
 
   if (build_variant_config[:use_sparkle])
     # Upload DMG to Strato
-    app_path = smf_path_to_ipa_or_app
+    app_path = smf_path_to_ipa_or_app(build_variant_config[:scheme])
     app_path = app_path.sub(".app", ".dmg")
     update_dir = "#{smf_workspace_dir}/build/"
 
@@ -232,13 +163,7 @@ private_lane :smf_deploy_build_variant do |options|
 
   smf_git_pull
 
-  push_to_git_remote(
-      remote: 'origin',
-      local_branch: @smf_git_branch,
-      remote_branch: @smf_git_branch,
-      force: false,
-      tags: true
-  )
+  smf_push_to_git_remote(local_branch: @smf_git_branch)
 
   # Create the GitHub release
   build_number = get_build_number(xcodeproj: "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj")
@@ -249,7 +174,7 @@ private_lane :smf_deploy_build_variant do |options|
 
   smf_send_default_build_success_notification(
       build_variant: build_variant,
-      name: get_default_name_of_app(build_variant)
+      name: smf_get_default_name_of_app(build_variant)
   )
 
   # Upload Ipa to Testflight and Download the generated DSYM
@@ -268,9 +193,14 @@ private_lane :smf_deploy_build_variant do |options|
     exception = nil
 
     begin
-      smf_upload_ipa_to_testflight
+      smf_upload_to_testflight(
+          apple_id: get_itc_apple_id,
+          itc_team_id: get_itc_team_id,
+          username: get_itc_apple_id,
+          skip_waiting_for_build_processing: should_skip_waiting_after_itc_upload(build_variant)
+      )
 
-      skip_waiting = should_skip_waiting_after_itc_upload
+      skip_waiting = should_skip_waiting_after_itc_upload(build_variant)
 
       # Construct the HipChat notification content
       notification_title = "Uploaded #{smf_default_notification_release_title} to iTunes Connect 🎉"

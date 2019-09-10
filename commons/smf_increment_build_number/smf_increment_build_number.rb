@@ -3,17 +3,18 @@ private_lane :smf_increment_build_number do |options|
   UI.important('increment build number')
 
   build_variant = options[:build_variant]
+  current_build_number = options[:build_number]
   NO_GIT_TAG_FAILURE = 'NO_GIT_TAG_FAILURE'
 
   # Pull all the tags so the change log collector finds the latest tag
   UI.message('Fetching all tags...')
   sh('git fetch --tags --quiet')
 
-  last_tag = sh("git describe --tags --match \"build/*/*\" --abbrev=0 HEAD || echo #{NO_GIT_TAG_FAILURE}").to_s
+  last_tag = sh("git describe --tags --match \"build/*/*\" `git rev-list --tags --max-count=1` --abbrev=0 || echo #{NO_GIT_TAG_FAILURE}").to_s
 
   # Use build number of the project if there is no matching tag yet
   if last_tag.include? NO_GIT_TAG_FAILURE
-    build_number = get_build_number_of_app
+    build_number = current_build_number
     UI.message("build number from project: #{build_number}")
   else
     parts = last_tag.split('/')
@@ -29,8 +30,6 @@ private_lane :smf_increment_build_number do |options|
 
   incremented_build_number = (build_number.to_i + 1).to_s
   UI.message("Incremented build number: #{incremented_build_number}")
-
-  current_build_number = get_build_number_of_app
 
   unless current_build_number.nil?
     if incremented_build_number.to_i < (current_build_number.to_i + 1)
@@ -67,8 +66,11 @@ def smf_update_build_number_in_project(build_number)
   when :ios
     increment_build_number(build_number: build_number.to_s)
   when :android
-    @smf_fastlane_config["app_version_code"] = build_number.to_i
-    update_config(@smf_fastlane_config, "Increment build number to #{@smf_fastlane_config["app_version_code"]}")
+    new_config = @smf_fastlane_config
+    new_config[:app_version_code] = build_number.to_i
+    smf_update_config(
+        new_config,
+        "Increment build number to #{build_number}")
   when :flutter
     UI.message('increment build number for flutter is not implemented yet')
   else

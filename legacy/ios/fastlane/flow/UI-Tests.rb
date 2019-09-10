@@ -86,7 +86,16 @@ lane :smf_perform_ui_tests_with_assets do |options|
   end 
 
   # First download the provisioning profiles. We don't nee to continue if they aren't valid
-  smf_download_provisioning_profiles
+  smf_download_provisioning_profiles(
+      team_id: get_team_id,
+      apple_id: get_apple_id,
+      use_wildcard_signing: get_use_wildcard_signing,
+      bundle_identifier: get_bundle_identifier,
+      use_default_match_config: match_config.nil?,
+      match_read_only: get_match_config_read_only,
+      match_type: get_match_config_type,
+      extensions_suffixes: get_extension_suffixes
+  )
 
   simulator_build_asset_path = smf_download_asset($SMF_SIMULATOR_RELEASE_APP_ZIP_FILENAME, assets, github_token)
 
@@ -118,7 +127,7 @@ lane :smf_perform_all_ui_tests do |options|
   # Variables
   bundle_identifier = @smf_fastlane_config[:build_variants][@smf_build_variant_sym]["ui_test.target.bundle_identifier".to_sym]
 
-  smf_install_pods_if_project_contains_podfile
+  smf_pod_install
 
   # Add the simulators to the destinations and install the app which should be tested
 

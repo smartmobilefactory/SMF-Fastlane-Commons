@@ -1,9 +1,6 @@
 desc 'Sending a message to the given Slack channel'
 private_lane :smf_send_message do |options|
 
-  # Skip sending if slack is disabled
-  return unless smf_is_slack_enabled
-
   slack_workspace_url = "https://hooks.slack.com/services/#{ENV[$SMF_SLACK_URL]}"
   title = "*#{options[:title]}*"
   message = !options[:message].nil? ? options[:message] : ''
@@ -12,7 +9,7 @@ private_lane :smf_send_message do |options|
   ci_error_log = 'ci-error-log'
   case @platform
   when :ios
-    ci_error_log = ci_ios_error_log
+    ci_error_log = smf_ci_ios_error_log
   when :android
     ci_error_log = ci_android_error_log
   when :flutter

@@ -11,15 +11,36 @@ private_lane :smf_archive_ipa_if_scheme_is_provided do |options|
 
   if @smf_fastlane_config[:build_variants][@smf_build_variant_sym][:scheme]
 
-    smf_download_provisioning_profiles
+    smf_download_provisioning_profiles(
+        team_id: get_team_id,
+        apple_id: get_apple_id,
+        use_wildcard_signing: get_use_wildcard_signing,
+        bundle_identifier: get_bundle_identifier,
+        use_default_match_config: match_config.nil?,
+        match_read_only: get_match_config_read_only,
+        match_type: get_match_config_type,
+        extensions_suffixes: get_extension_suffixes
+    )
 
-    smf_build_app(
+    smf_build_ios_app(
       skip_export: skip_export,
-      bulk_deploy_params: bulk_deploy_params
-      )
+      bulk_deploy_params: bulk_deploy_params,
+      scheme: get_build_scheme,
+      should_clean_project: get_should_clean_project,
+      required_xcode_version: get_required_xcode_version,
+      project_name: smf_get_project_name,
+      xcconfig_name: smf_get_xcconfig_name,
+      code_signing_identity: get_code_signing_identity,
+      upload_itc: get_upload_itc,
+      upload_bitcode: get_upload_bitcode,
+      export_method: get_export_method
+    )
 
     if get_use_sparkle == true
-      smf_create_dmg_from_app
+      smf_create_dmg_from_app(
+          team_id: get_team_id,
+          build_scheme: get_build_scheme
+      )
     end
 
   else
@@ -105,39 +126,6 @@ end
 ### HELPER ###
 ##############
 
-def smf_xcargs_for_build_system
-  return smf_is_using_old_build_system ? "" : "-UseNewBuildSystem=YES"
-end
-
-def smf_is_using_old_build_system
-  project_root = smf_workspace_dir
-
-  if (project_root== nil)
-    return false
-  end
-
-  workspace_file = `cd #{project_root} && ls | grep -E "(.|\s)+\.xcworkspace"`.gsub("\n", "")
-
-  if (workspace_file == "" || workspace_file == nil)
-    return false
-  end
-
-  file_to_search = File.join(project_root, "#{workspace_file}/xcshareddata/WorkspaceSettings.xcsettings")
-
-  if (File.exist?(file_to_search) == false)
-    return false
-  end
-
-  file_to_search_opened = File.open(file_to_search, "r")
-  contents = file_to_search_opened.read
-
-  regex = /<dict>\n\t<key>BuildSystemType<\/key>\n\t<string>Original<\/string>\n<\/dict>/
-
-  if (contents.match(regex) != nil)
-    return true
-  end
-end
-
 def smf_can_unit_tests_be_performed
 
   # Variables
@@ -210,17 +198,4 @@ def smf_is_build_variant_a_decoupled_ui_test
   UI.message("Build variant is a is_ui_test: #{is_ui_test}, as the config is #{@smf_fastlane_config[:build_variants][@smf_build_variant_sym]}")
 
   return is_ui_test
-end
-
-def smf_get_version_number
-  project_name = @smf_fastlane_config[:project][:project_name]
-  scheme = @smf_fastlane_config[:build_variants][@smf_build_variant_sym][:scheme]
-  target = @smf_fastlane_config[:build_variants][@smf_build_variant_sym][:target]
-
-  version_number = get_version_number(
-    xcodeproj: "#{project_name}.xcodeproj",
-    target: (target != nil ? target : scheme)
-    )
-
-  return version_number
 end

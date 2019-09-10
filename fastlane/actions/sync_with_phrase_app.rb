@@ -116,7 +116,7 @@ module Fastlane
               pathToCommit = "../" + path
               other_action.git_add(path: pathToCommit)
               other_action.git_commit(path: pathToCommit, message: "Updated strings from PhraseApp")
-              other_action.push_to_git_remote(remote: 'origin', local_branch: branch, remote_branch: branch, force: false, tags: true)
+              other_action.smf_push_to_git_remote(local_branch: branch)
           end
       end
 

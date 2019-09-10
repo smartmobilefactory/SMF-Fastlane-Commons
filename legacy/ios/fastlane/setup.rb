@@ -6,9 +6,9 @@ def smf_setup_ios_fastlane_commons(options = Hash.new)
   UI.message("Starting ios fastlane commons setup")
 
   # Import the splitted Fastlane classes
-  import_all "#{@fastlane_commons_dir_path}/fastlane/flow"
-  import_all "#{@fastlane_commons_dir_path}/fastlane/steps"
-  import_all "#{@fastlane_commons_dir_path}/fastlane/utils"
+  smf_import_all "#{@fastlane_commons_dir_path}/fastlane/flow"
+  smf_import_all "#{@fastlane_commons_dir_path}/fastlane/steps"
+  smf_import_all "#{@fastlane_commons_dir_path}/fastlane/utils"
 
   # Setup build type options
   smf_setup_default_build_type_values
@@ -143,8 +143,4 @@ end
 
 def smf_is_keychain_enabled
   return ENV[$SMF_IS_KEYCHAIN_ENABLED].nil? ? true : ENV[$SMF_IS_KEYCHAIN_ENABLED] == "true"
-end
-
-def ci_ios_error_log 
-  $SMF_CI_IOS_ERROR_LOG.to_s
 end
