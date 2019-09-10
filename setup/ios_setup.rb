@@ -162,7 +162,7 @@ private_lane :smf_super_push_git_tag_release do |options|
   changelog = smf_read_changelog
 
   smf_git_pull(local_branch)
-  smf_push_to_git_remote(local_branch)
+  smf_push_to_git_remote(local_branch: local_branch)
 
   # Create the GitHub release
   build_number = get_build_number(xcodeproj: "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj")
