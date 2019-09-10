@@ -37,9 +37,7 @@ With the option `remove_changelog` set to true, the changelog file will be remov
 Example: 
 
 ```
-changelog = smf_read_changelog(
-    remove_changelog: true  # Deletes the temp changelog file after reading it (this is useful if you want to prevent that the file is commited and pushed)
-)
+changelog = smf_read_changelog()
 ```
 
 ### Writing

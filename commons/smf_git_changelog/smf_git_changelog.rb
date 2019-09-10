@@ -78,6 +78,6 @@ def _smf_should_commit_be_ignored_in_changelog(commit_message, regexes_to_match)
 end
 
 def _smf_changelog_temp_path
-  "#{smf_workspace_dir}/#{$CHANGELOG_TEMP_FILE}"
+  "#{@fastlane_commons_dir_path}/#{$CHANGELOG_TEMP_FILE}"
 end
 

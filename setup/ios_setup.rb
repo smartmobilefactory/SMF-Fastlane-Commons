@@ -156,7 +156,7 @@ end
 
 private_lane :smf_super_push_git_tag_release do |options|
 
-  changelog = smf_read_changelog(remove_changelog: true)
+  changelog = smf_read_changelog()
 
   smf_git_pull(options[:local_branch])
   smf_push_to_git_remote(local_branch: options[:local_branch])
@@ -170,8 +170,6 @@ private_lane :smf_super_push_git_tag_release do |options|
       build_variant: options[:build_variant],
       changelog: changelog
   )
-
-  smf_write_changelog(changelog: changelog)
 end
 
 lane :smf_push_git_tag_release do |options|
