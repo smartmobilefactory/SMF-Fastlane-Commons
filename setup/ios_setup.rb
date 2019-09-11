@@ -226,7 +226,7 @@ private_lane :smf_super_unit_tests do |options|
       project_name: @smf_fastlane_config[:project][:project_name],
       unit_test_scheme: build_variant_config[:unit_test_scheme],
       scheme: build_variant_config[:scheme],
-      unit_test_xcconfig_name: build_variant_config[:xcconfig_name].nil? ? build_variant_config[:xcconfig_name][:unittests] : nil,
+      unit_test_xcconfig_name: !build_variant_config[:xcconfig_name].nil? ? build_variant_config[:xcconfig_name][:unittests] : nil,
       device: build_variant_config["tests.device_to_test_against".to_sym]
   )
 
