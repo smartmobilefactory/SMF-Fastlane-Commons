@@ -136,7 +136,7 @@ end
 # Danger
 
 private_lane :smf_super_danger do |options|
-  smf_danger
+  smf_danger_android
 end
 
 lane :smf_pipeline_danger do |options|
