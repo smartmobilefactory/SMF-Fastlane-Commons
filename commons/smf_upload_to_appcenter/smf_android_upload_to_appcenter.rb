@@ -32,10 +32,10 @@ def get_app_details(app_id)
   end
 
   data = JSON.parse(response.body)
-  project_app = data.find { |app| app['app_id'] == app_id }
+  project_app = data.find { |app| app['app_secret'] == app_id }
 
   if project_app.nil?
-    raise("There is no app with the app secret: #{app_id}")
+    raise("There is no app with the app id: #{app_id}")
   end
 
   app_name = project_app['name']
