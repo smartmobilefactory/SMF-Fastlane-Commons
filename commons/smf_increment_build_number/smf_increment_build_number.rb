@@ -38,7 +38,7 @@ private_lane :smf_increment_build_number do |options|
     end
   end
 
-  smf_update_build_number_in_project(incremented_build_number)
+  _smf_update_build_number_in_project(incremented_build_number)
 
   tag = get_tag_of_app(build_variant, incremented_build_number)
 
@@ -50,7 +50,7 @@ private_lane :smf_increment_build_number do |options|
     UI.message("The Git tag \"#{tag}\" already exists! The build number will be incremented again.")
     count += 1
     incremented_build_number = (incremented_build_number.to_i + 1).to_s
-    smf_update_build_number_in_project(incremented_build_number)
+    _smf_update_build_number_in_project(incremented_build_number)
     UI.message("Incremented build number: #{incremented_build_number}")
     tag = get_tag_of_app(build_variant, incremented_build_number)
   end
@@ -61,10 +61,15 @@ private_lane :smf_increment_build_number do |options|
 end
 
 
-def smf_update_build_number_in_project(build_number)
+def _smf_update_build_number_in_project(build_number)
   case @platform
   when :ios
     increment_build_number(build_number: build_number.to_s)
+    commit_version_bump(
+        xcodeproj: "#{smf_get_project_name}.xcodeproj",
+        message: "Increment build number to #{build_number}",
+        force: true
+    )
   when :android
     new_config = @smf_fastlane_config
     new_config[:app_version_code] = build_number.to_i
