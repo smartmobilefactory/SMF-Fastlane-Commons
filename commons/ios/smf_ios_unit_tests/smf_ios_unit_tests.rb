@@ -5,8 +5,11 @@ private_lane :smf_ios_unit_tests do |options|
   scheme = options[:scheme]
   unit_test_xcconfig_name = options[:unit_test_xcconfig_name]
   device = options[:device]
+  get_required_xcode_version = options[:required_xcode_version]
 
   scheme_to_use = unit_test_scheme.nil? ? scheme : unit_test_scheme
+
+  smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
 
   can_preform_unit_tests = _smf_can_unit_tests_be_preformed(
                                project_name,
