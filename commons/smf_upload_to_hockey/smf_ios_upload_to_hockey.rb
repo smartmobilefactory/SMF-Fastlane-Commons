@@ -1,4 +1,4 @@
-private_lane :smf_ios_upload_to_appcenter do |options|
+private_lane :smf_ios_upload_to_hockey do |options|
 
   build_number = options[:build_number]
   app_id = options[:app_id]
@@ -6,8 +6,6 @@ private_lane :smf_ios_upload_to_appcenter do |options|
   path_to_ipa_or_app = options[:path_to_ipa_or_app]
   is_mac_app = !options[:is_mac_app].nil? ? options[:is_mac_app] : false
   podspec_path = options[:podspec_path]
-
-  app_name, owner_name = get_app_details(app_id)
 
   dsym_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.app.dSYM.zip"
   UI.message("Constructed the dsym path \"#{dsym_path}\"")
@@ -32,11 +30,10 @@ private_lane :smf_ios_upload_to_appcenter do |options|
     raise("DMG file #{app_path} does not exit. Nothing to upload.") unless File.exist?(app_path)
 
 
-    UI.message('Upload mac app to AppCenter.')
-    appcenter_upload(
-        api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
-        owner_name: owner_name,
-        app_name: app_name,
+    UI.message('Upload mac app to Hockey.')
+    hockey(
+        api_token: ENV[$SMF_HOCKEYAPP_API_TOKEN_ENV_KEY],
+        public_identifier: app_id,
         build_number: build_number,
         version: version_number,
         ipa: app_path,
@@ -45,11 +42,10 @@ private_lane :smf_ios_upload_to_appcenter do |options|
         release_notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
     )
   else
-    UI.message('Upload iOS app to AppCenter.')
-    appcenter_upload(
-        api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
-        owner_name: owner_name,
-        app_name: app_name,
+    UI.message('Upload iOS app to Hockey.')
+    hockey(
+        api_token: ENV[$SMF_HOCKEYAPP_API_TOKEN_ENV_KEY],
+        public_identifier: app_id,
         ipa: app_path,
         dsym: dsym_path,
         notify_testers: true,
