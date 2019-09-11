@@ -88,7 +88,7 @@ end
 private_lane :smf_super_push_git_tag_release do |options|
 
   branch = options[:branch]
-
+  sh("git fetch --tags --quiet || echo \"NO_GIT_TAG_FAILURE\"")
   smf_push_to_git_remote(local_branch: branch)
 end
 
