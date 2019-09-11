@@ -6,7 +6,6 @@ private_lane :smf_danger_ios do |options|
     ENV["BUILD_VARIANT"] = options[:build_variant]
     ENV["FASTLANE_CONFIG_PATH"] = "#{@fastlane_commons_dir_path}/../Config.json"
     ENV["FASTLANE_COMMONS_FOLDER"] = @fastlane_commons_dir_path
-    ENV["DID_RUN_UNIT_TESTS"] = ENV[$SMF_DID_RUN_UNIT_TESTS_ENV_KEY]
 
     danger(
         danger_id: options[:build_variant],
