@@ -194,6 +194,17 @@ end
 
 # Monitoring (MetaJSON)
 
+# Update File
+private_lane :smf_super_generate_files do |options|
+  smf_update_generated_files(
+    branch: options[:local_branch],
+    build_variant: options[:build_variant]
+  )
+end
+
+lane :smf_generate_files do |options|
+  smf_super_generate_files(options)
+end
 
 # Danger
 private_lane :smf_super_danger do |options|

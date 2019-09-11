@@ -26,4 +26,4 @@ private_lane :smf_update_generated_files do |options|
     else
       UI.success('Generated Jenkinsfile is up to date. Nothing to do.')
     end
-  end
+end
