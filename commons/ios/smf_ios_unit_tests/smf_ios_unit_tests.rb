@@ -5,7 +5,7 @@ private_lane :smf_ios_unit_tests do |options|
   scheme = options[:scheme]
   unit_test_xcconfig_name = options[:unit_test_xcconfig_name]
   device = options[:device]
-  get_required_xcode_version = options[:required_xcode_version]
+  required_xcode_version = options[:required_xcode_version]
 
   scheme_to_use = unit_test_scheme.nil? ? scheme : unit_test_scheme
 
