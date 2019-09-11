@@ -38,8 +38,8 @@ private_lane :smf_ios_upload_to_hockey do |options|
         version: version_number,
         ipa: app_path,
         dsym: dsym_path,
-        notify_testers: true,
-        release_notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
+        notify: true,
+        notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
     )
   else
     UI.message('Upload iOS app to Hockey.')
@@ -48,8 +48,8 @@ private_lane :smf_ios_upload_to_hockey do |options|
         public_identifier: app_id,
         ipa: app_path,
         dsym: dsym_path,
-        notify_testers: true,
-        release_notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
+        notify: true,
+        notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
     )
   end
 
