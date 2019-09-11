@@ -26,8 +26,8 @@ else
   fail "Error: SMF Fastlane config couldn't be found in #{ENV['FASTLANE_CONFIG_PATH']}"
 end
 
-if File.file?("#{ENV['FASTLANE_COMMONS_FOLDER']}/danger/danger_defaults.json")
-  @commons_danger_config = JSON.parse(File.read("#{ENV['FASTLANE_COMMONS_FOLDER']}/danger/danger_defaults.json"), :symbolize_names => true)
+if File.file?(“#{ENV[‘FASTLANE_COMMONS_FOLDER’]}/commons/ios/smf_danger_ios/danger_defaults.json”)
+  @commons_danger_config = JSON.parse(File.read(“#{ENV[‘FASTLANE_COMMONS_FOLDER’]}/commons/ios/smf_danger_ios/danger_defaults.json”), :symbolize_names => true)
   if @commons_danger_config.nil?
       fail "The default Danger config is nil"
   end
