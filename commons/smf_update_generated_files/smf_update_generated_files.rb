@@ -1,7 +1,7 @@
 desc "Generates a Jenkinsfile and commits it if there are changes"
 private_lane :smf_update_generated_files do |options|
 
-    branch = options[:branch]
+    branch = git_branch
 
     smf_generate_jenkins_file
 
