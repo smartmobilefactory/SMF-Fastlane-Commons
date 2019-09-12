@@ -3,133 +3,48 @@
 ############################
 
 ENV['BUILD_VARIANT'] == nil ? build_variant = "" : build_variant = ENV['BUILD_VARIANT']
-ENV['FASTLANE_CONFIG_PATH'] == nil ? fastlane_config_path = "fastlane/Config.json" : fastlane_config_path = ENV['FASTLANE_CONFIG_PATH']
 ENV['DID_RUN_UNIT_TESTS'] == nil ? did_run_unit_tests = "false" : did_run_unit_tests = ENV['DID_RUN_UNIT_TESTS']
 
-@project_danger_config = nil
-@commons_danger_config = nil
-
 message("Analysing build variant <b>#{build_variant}</b>")
-
 configuration_message = ""
-
-if File.file?(fastlane_config_path)
-  fastlane_config = JSON.parse(File.read(fastlane_config_path), :symbolize_names => true)
-  build_variant_config = fastlane_config[:build_variants][build_variant.to_sym]
-  target_depended_config = build_variant_config[:danger_config_name]
-  if target_depended_config
-    @project_danger_config = fastlane_config[target_depended_config.to_sym]
-  else
-    @project_danger_config = fastlane_config[:danger_config]
-  end
-else
-  fail "Error: SMF Fastlane config couldn't be found in #{ENV['FASTLANE_CONFIG_PATH']}"
-end
-
-if File.file?(“#{ENV[‘FASTLANE_COMMONS_FOLDER’]}/commons/ios/smf_danger_ios/danger_defaults.json”)
-  @commons_danger_config = JSON.parse(File.read(“#{ENV[‘FASTLANE_COMMONS_FOLDER’]}/commons/ios/smf_danger_ios/danger_defaults.json”), :symbolize_names => true)
-  if @commons_danger_config.nil?
-      fail "The default Danger config is nil"
-  end
-else
-  fail "The Fastlane commons repo doesn't contain danger/danger_defaults.json"
-end
-
-###################
-##### Helpers #####
-###################
-
-def get_config_value(key)
-  if @project_danger_config != nil && @project_danger_config[key.to_sym] != nil
-    return @project_danger_config[key.to_sym]
-  else
-    if @commons_danger_config == nil
-      return nil
-    else
-      return @commons_danger_config[key.to_sym]
-    end
-  end
-end
-
-#####################
-###### General ######
-#####################
-
-if get_config_value("github.pr.big_length.use_feature")
-  if git.lines_of_code > get_config_value("github.pr.big_length.lines_of_code")
-    warn("There amount of changed code is huge (#{git.lines_of_code} lines). Please try to create many small pull requests instead of a few big ones!")
-  end
-  configuration_message += "<br />GitHub PR length is <b>enabled</b><br />- lines_of_code: <b>#{get_config_value("github.pr.big_length.lines_of_code")}</b>"
-else
-  configuration_message += "<br />GitHub PR length is <b>disabled</b>"
-end
 
 ###################
 ###### Xcode ######
 ###################
 
-if get_config_value("xcode_build_warnings.use_feature")
-  if File.file?("build/reports/errors.json")
+if File.file?("build/reports/errors.json")
     xcode_summary.report 'build/reports/errors.json'
     configuration_message += "<br /><br />Xcode warnings are <b>enabled</b>"
-  else
-    configuration_message += "<br /><br />Xcode warnings are <b>disabled</b> as the build output couldn't be found"
-  end
 else
-  configuration_message += "<br /><br />Xcode warnings are <b>disabled</b>"
+    configuration_message += "<br /><br />Xcode warnings are <b>disabled</b> as the build output couldn't be found"
 end
 
 #######################
 ###### Swiftlint ######
 #######################
 
-if get_config_value("swiftlint.use_feature")
-  # Use the SwiftLint from SMF-iOS-CommonProjectSetupFiles if available. Otherwise the SwiftLint version from the Danger plugin is used.
-  fail_on_error = get_config_value("swiftlint.fail_on_error")
-  smf_common_swiftlint_binary = Dir["./**/SwiftLint/portable_swiftlint/swiftlint"].first
-  if !smf_common_swiftlint_binary.nil? && File.file?(smf_common_swiftlint_binary)
+
+# Use the SwiftLint from SMF-iOS-CommonProjectSetupFiles if available. Otherwise the SwiftLint version from the Danger plugin is used.
+smf_common_swiftlint_binary = Dir["./**/SwiftLint/portable_swiftlint/swiftlint"].first
+
+if !smf_common_swiftlint_binary.nil? && File.file?(smf_common_swiftlint_binary)
     expanded_binary_path = File.expand_path(smf_common_swiftlint_binary)
     swiftlint.binary_path = expanded_binary_path
-  end
+end
 
-  swiftlint_config_message = "Exists in project"
-  if File.file?(".swiftlint.yml")
+swiftlint_config_message = "Exists in project"
+if File.file?(".swiftlint.yml")
     swiftlint.config_file = File.expand_path(".swiftlint.yml")
-  end
-
-  # Run SwiftLint 
-  if fail_on_error
-    swiftlint.lint_files fail_on_error: true
-  else
-    swiftlint.lint_files
-  end
-
-  swiftlint.verbose = true
-
-  configuration_message += "<br /><br />SwiftLint is <b>enabled</b> (modified files only)<br />- binary: <b>#{swiftlint.binary_path}</b>,<br />- fail_on_error: <b>#{fail_on_error}</b>,<br />- SwiftLint configuration: <b>#{swiftlint.config_file}</b>"
-else
-  configuration_message += "<br /><br />SwiftLint is <b>disabled</b>"
 end
 
-####################
-###### Slack #######
-####################
+swiftlint.lint_files
+swiftlint.verbose = true
 
-if get_config_value("hipchat.migration_to_slack.use_feature")
-  configuration_message += "<br/><br/>HipChat migration is <b>enabled</b>."
-  hipchat_channel = fastlane_config[:project][:hipchat_channel]
-  slack_channel = fastlane_config[:project][:slack_channel]
-  if hipchat_channel.nil? == false && slack_channel.nil?
-    fail("<br/><br/>Please update your Fastlane configuration (Config.json) to use <b>Slack</b> (<b>slack_channel</b>) instead of HipChat (hipchat_channel). Please also check your spelling if you think you've done everything right.")
-  end
-  if slack_channel.nil? == false
-    if slack_channel.include? "#"
-      fail("<br/><br/>Your slack_channel entry <b>must not</b> contain the '#' character. Please remove it and try again.")
-    end
-  end 
-else
-  configuration_message += "<br/><br/>HipChat migration is <b>disabled</b>."
-end
+configuration_message += "<br /><br />SwiftLint is <b>enabled</b> (modified files only)<br />- binary: <b>#{swiftlint.binary_path}</b>,<br />- SwiftLint configuration: <b>#{swiftlint.config_file}</b>"
+
+##########################
+###### Push Message ######
+##########################
 
 message(configuration_message)
 
