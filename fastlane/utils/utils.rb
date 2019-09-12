@@ -29,6 +29,12 @@ def smf_get_appcenter_id(build_variant)
   @smf_fastlane_config[:build_variants][build_variant.to_sym][:appcenter_id]
 end
 
+def smf_get_hockey_id(build_variant)
+  build_variant = build_variant.to_s.downcase
+
+  @smf_fastlane_config[:build_variants][build_variant.to_sym][:hockey_id]
+end
+
 def smf_get_default_name_of_app(build_variant)
   build_number = smf_get_build_number_of_app
   project_name = @smf_fastlane_config[:project][:project_name]
