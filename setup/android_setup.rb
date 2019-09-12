@@ -24,7 +24,7 @@ end
 private_lane :smf_super_pipeline_increment_build_number do |options|
 
   build_variant = options[:build_variant]
-
+  smf_git_pull("")
   smf_increment_build_number(build_variant: build_variant)
 end
 
