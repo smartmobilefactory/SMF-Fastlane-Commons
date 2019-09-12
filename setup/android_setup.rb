@@ -69,13 +69,23 @@ private_lane :smf_super_upload_to_appcenter do |options|
 
   build_variant = options[:build_variant]
   apk_file_regex = smf_get_apk_file_regex(build_variant)
-  app_id = smf_get_appcenter_id(build_variant)
+  appcenter_app_id = smf_get_appcenter_id(build_variant)
+  hockey_app_id = smf_get_hockey_id(build_variant)
 
+  # Upload to AppCenter
   smf_android_upload_to_appcenter(
       build_variant: build_variant,
       apk_path: smf_get_apk_path(apk_file_regex),
-      app_secret: app_id
-  )
+      app_id: appcenter_app_id
+  ) if !appcenter_app_id.nil?
+
+  # Upload to Hockey
+  smf_android_upload_to_hockey(
+      build_variant: build_variant,
+      apk_path: smf_get_apk_path(apk_file_regex),
+      app_id: hockey_app_id
+  ) if !hockey_app_id.nil?
+
 end
 
 lane :smf_upload_to_appcenter do |options|
