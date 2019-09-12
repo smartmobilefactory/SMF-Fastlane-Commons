@@ -113,16 +113,29 @@ end
 private_lane :smf_super_upload_to_appcenter do |options|
   build_variant = options[:build_variant]
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
+  appcenter_app_id = smf_get_appcenter_id(build_variant)
+  hockey_app_id = smf_get_hockey_id(build_variant)
 
   # Upload the IPA to AppCenter
   smf_ios_upload_to_appcenter(
       build_number: smf_get_build_number_of_app,
-      app_secret: smf_get_appcenter_id(build_variant),
+      app_id: appcenter_app_id,
       escaped_filename: build_variant_config[:scheme].gsub(' ', "\ "),
       path_to_ipa_or_app: smf_path_to_ipa_or_app(build_variant),
       is_mac_app: build_variant_config[:use_sparkle],
       podspec_path: build_variant_config[:podspec_path]
-  )
+  ) if !appcenter_app_id.nil?
+
+  # Upload the IPA to Hockey
+  smf_ios_upload_to_hockey(
+      build_number: smf_get_build_number_of_app,
+      app_id: hockey_app_id,
+      escaped_filename: build_variant_config[:scheme].gsub(' ', "\ "),
+      path_to_ipa_or_app: smf_path_to_ipa_or_app(build_variant),
+      is_mac_app: build_variant_config[:use_sparkle],
+      podspec_path: build_variant_config[:podspec_path]
+  ) if !hockey_app_id.nil?
+
 end
 
 lane :smf_upload_to_appcenter do |options|
