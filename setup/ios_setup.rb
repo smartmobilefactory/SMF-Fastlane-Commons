@@ -210,7 +210,7 @@ end
 # Update File
 private_lane :smf_super_generate_files do |options|
   smf_update_generated_files(
-    branch: options[:local_branch],
+    branch: options[:branch],
     build_variant: options[:build_variant]
   )
 end
