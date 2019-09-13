@@ -3,10 +3,10 @@ private_lane :smf_danger do |options|
   checkstyle_paths = []
   case @platform
   when :ios
-    if File.exist?(smf_swift_lint_ouput_path)
-      checkstyle_paths.append(smf_swift_lint_ouput_path)
+    if File.exist?(smf_swift_lint_output_path)
+      checkstyle_paths.push(smf_swift_lint_output_path)
     else
-      UI.warning("There is not SwiftLint output file at #{smf_swift_lint_ouput_path}. Is SwiftLint enabled?")
+      UI.warning("There is not SwiftLint output file at #{smf_swift_lint_output_path}. Is SwiftLint enabled?")
     end
   when :android
     jira_keys = options[:jira_key]
@@ -16,8 +16,8 @@ private_lane :smf_danger do |options|
     lint_paths = _smf_find_paths_of('lint-result.xml')
     junit_result_paths = _smf_find_paths_of_files_in_directory('build/test-results', 'xml')
 
-    _smf_find_paths_of('klint.xml').each { |path| checkstyle_paths.append(path) }
-    _smf_find_paths_of('detekt.xml').each { |path| checkstyle_paths.append(path) }
+    _smf_find_paths_of('klint.xml').each { |path| checkstyle_paths.push(path) }
+    _smf_find_paths_of('detekt.xml').each { |path| checkstyle_paths.push(path) }
 
     ENV["DANGER_JIRA_KEYS"] = JSON.dump(_smf_danger_jira_key_parameter(jira_keys))
     ENV["DANGER_LINT_PATHS"] = JSON.dump(lint_paths)
