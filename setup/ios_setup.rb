@@ -58,6 +58,7 @@ private_lane :smf_super_build do |options|
   )
 
   smf_build_ios_app(
+      skip_export: options[:skip_export].nil? ? false : options[:skip_export],
       scheme: build_variant_config[:scheme],
       should_clean_project: build_variant_config[:should_clean_project],
       required_xcode_version: @smf_fastlane_config[:project][:xcode_version],
@@ -208,3 +209,55 @@ end
 
 
 # Monitoring (MetaJSON)
+
+# Update File
+private_lane :smf_super_generate_files do |options|
+  smf_update_generated_files(
+    branch: options[:branch],
+    build_variant: options[:build_variant]
+  )
+end
+
+lane :smf_generate_files do |options|
+  smf_super_generate_files(options)
+end
+
+# Unit-Tests
+private_lane :smf_super_unit_tests do |options|
+
+  build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
+
+  smf_ios_unit_tests(
+      project_name: @smf_fastlane_config[:project][:project_name],
+      unit_test_scheme: build_variant_config[:unit_test_scheme],
+      scheme: build_variant_config[:scheme],
+      unit_test_xcconfig_name: !build_variant_config[:xcconfig_name].nil? ? build_variant_config[:xcconfig_name][:unittests] : nil,
+      device: build_variant_config["tests.device_to_test_against".to_sym],
+      required_xcode_version: @smf_fastlane_config[:project][:xcode_version]
+  )
+
+end
+
+lane :smf_unit_tests do |options|
+  smf_super_unit_tests(options)
+end
+
+private_lane :smf_super_linter do
+  smf_run_swift_lint
+end
+
+lane :smf_linter do |options|
+  smf_super_linter
+end
+
+
+# Danger
+private_lane :smf_super_danger do |options|
+  smf_danger(
+    build_variant: options[:build_variant]
+  )
+end
+
+lane :smf_pipeline_danger do |options|
+  smf_super_danger(options)
+end
