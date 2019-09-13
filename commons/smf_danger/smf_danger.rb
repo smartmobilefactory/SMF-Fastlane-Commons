@@ -10,7 +10,9 @@ private_lane :smf_danger do |options|
 
   jira_keys = options[:jira_key]
 
-  UI.user_error!("android-commons not present! Can't start danger") unless File.exist?('../android-commons')
+  if @platform  == :android
+    UI.user_error!("android-commons not present! Can't start danger") unless File.exist?('../android-commons')
+  end
 
   lint_paths = _smf_find_paths_of('lint-result.xml')
   junit_result_paths = _smf_find_paths_of_files_in_directory('build/test-results', 'xml')
