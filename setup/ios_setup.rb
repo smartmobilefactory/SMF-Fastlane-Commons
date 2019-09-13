@@ -255,6 +255,6 @@ private_lane :smf_super_danger do |options|
   )
 end
 
-lane :smf_danger do |options|
+lane :smf_pipeline_danger do |options|
   smf_super_danger(options)
 end
