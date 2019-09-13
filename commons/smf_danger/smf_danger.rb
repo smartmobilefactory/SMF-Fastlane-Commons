@@ -9,7 +9,11 @@ private_lane :smf_danger do |options|
   checkstyle_paths = []
   case @platform
   when :ios
-    checkstyle_paths.append(smf_swift_lint_ouput_path)
+    if File.exist?(smf_swift_lint_ouput_path)
+      checkstyle_paths.append(smf_swift_lint_ouput_path)
+    else
+      UI.warning("There is not SwiftLint output file at #{smf_swift_lint_ouput_path}. Is SwiftLint enabled?")
+    end
   when :android
     _smf_find_paths_of('klint.xml').each { |path| checkstyle_paths.append(path) }
     _smf_find_paths_of('detekt.xml').each { |path| checkstyle_paths.append(path) }
