@@ -47,3 +47,14 @@ smf_danger_module_config(
     junit_task: <junit_task>    #Optional, by default no unit task will be executed
 )
 ```
+
+## smf_run_swift_lint
+
+This lane runs SiwftLint and stores the output in the `<project>/build` folder.
+SwiftLint is configured with the swiftlint.yml in this directory.
+
+Example:
+
+```
+smf_run_swift_lint
+```
