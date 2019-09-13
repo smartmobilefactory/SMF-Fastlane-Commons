@@ -2,6 +2,6 @@
 // Automatically generated. Do not edit.
 //
 
-@Library('jenkins-pipeline-commons@_dev/fix_lock') _
+@Library('jenkins-pipeline-commons@_dev/structure') _
 
 androidFramework()
