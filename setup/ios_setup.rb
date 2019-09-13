@@ -219,17 +219,6 @@ lane :smf_generate_files do |options|
   smf_super_generate_files(options)
 end
 
-# Danger
-private_lane :smf_super_danger do |options|
-  smf_danger_ios(
-    build_variant: options[:build_variant]
-  )
-end
-
-lane :smf_danger do |options|
-  smf_super_danger(options)
-end
-
 # Unit-Tests
 private_lane :smf_super_unit_tests do |options|
 
@@ -248,4 +237,24 @@ end
 
 lane :smf_unit_tests do |options|
   smf_super_unit_tests(options)
+end
+
+private_lane :smf_super_linter do
+  smf_run_swift_lint
+end
+
+lane :smf_linter do |options|
+  smf_super_linter
+end
+
+
+# Danger
+private_lane :smf_super_danger do |options|
+  smf_danger(
+    build_variant: options[:build_variant]
+  )
+end
+
+lane :smf_danger do |options|
+  smf_super_danger(options)
 end

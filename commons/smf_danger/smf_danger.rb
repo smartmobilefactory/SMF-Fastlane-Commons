@@ -1,4 +1,4 @@
-private_lane :smf_danger_android do |options|
+private_lane :smf_danger do |options|
 
   jira_keys = options[:jira_key]
 
@@ -7,8 +7,15 @@ private_lane :smf_danger_android do |options|
   lint_paths = _smf_find_paths_of('lint-result.xml')
   junit_result_paths = _smf_find_paths_of_files_in_directory('build/test-results', 'xml')
   checkstyle_paths = []
-  _smf_find_paths_of('klint.xml').each { |path| checkstyle_paths.append(path) }
-  _smf_find_paths_of('detekt.xml').each { |path| checkstyle_paths.append(path) }
+  case @platform
+  when :ios
+    checkstyle_paths.append(smf_swift_lint_ouput_path)
+  when :android
+    _smf_find_paths_of('klint.xml').each { |path| checkstyle_paths.append(path) }
+    _smf_find_paths_of('detekt.xml').each { |path| checkstyle_paths.append(path) }
+  end
+
+
 
   ENV["DANGER_JIRA_KEYS"] = JSON.dump(_smf_danger_jira_key_parameter(jira_keys))
   ENV["DANGER_LINT_PATHS"] = JSON.dump(lint_paths)
