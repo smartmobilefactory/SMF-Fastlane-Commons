@@ -1,4 +1,3 @@
-
 def smf_get_apk_path(apk_file_regex)
   path = ''
   Dir["#{smf_workspace_dir}/**/#{apk_file_regex}"].each do |file|
@@ -79,12 +78,12 @@ end
 def smf_get_xcconfig_name(build_variant)
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant]
   use_xcconfig = build_variant_config[:xcconfig_name].nil? ? false : true
-  use_xcconfig ? build_variant_config[:xcconfig_name][:archive] : "Release"
+  use_xcconfig ? build_variant_config[:xcconfig_name][:archive] : 'Release'
 end
 
 def smf_get_icloud_environment(build_variant)
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant]
-  build_variant_config[:icloud_environment].nil? ? "Development" : build_variant_config[:icloud_environment]
+  build_variant_config[:icloud_environment].nil? ? 'Development' : build_variant_config[:icloud_environment]
 end
 
 def smf_path_to_ipa_or_app(build_variant)
@@ -111,7 +110,7 @@ end
 
 def smf_git_pull(branch)
   branch_name = "#{branch}"
-  branch_name.sub!("origin/", "")
+  branch_name.sub!('origin/', '')
   sh "git pull origin #{branch_name}"
 end
 
@@ -119,7 +118,7 @@ def smf_update_config(config, message = nil)
   jsonString = JSON.pretty_generate(config)
   File.write("#{smf_workspace_dir}/Config.json", jsonString)
   git_add(path: "#{smf_workspace_dir}/Config.json")
-  git_commit(path: "#{smf_workspace_dir}/Config.json", message: message || "Update Config.json")
+  git_commit(path: "#{smf_workspace_dir}/Config.json", message: message || 'Update Config.json')
 end
 
 def smf_danger_module_config(options)
@@ -146,4 +145,11 @@ end
 
 def smf_get_tag_of_pod(version_number)
   "releases/#{version_number}"
+end
+
+def smf_get_first_variant_from_config
+  variant = @smf_fastlane_config[:build_variants].keys.map(&:to_s).first
+  raise('There is no build variant in Config.') if variant.nil?
+
+  variant
 end

@@ -24,7 +24,6 @@ end
 private_lane :smf_super_pipeline_increment_build_number do |options|
 
   build_variant = options[:build_variant]
-
   smf_increment_build_number(build_variant: build_variant)
 end
 
@@ -37,8 +36,7 @@ end
 
 private_lane :smf_super_build do |options|
 
-  build_variant = options[:build_variant]
-
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
   variant = smf_get_build_variant_from_config(build_variant)
 
   smf_build_android_app(build_variant: variant)
@@ -98,7 +96,6 @@ end
 private_lane :smf_super_push_git_tag_release do |options|
 
   branch = options[:branch]
-
   smf_push_to_git_remote(local_branch: branch)
 end
 
@@ -129,8 +126,7 @@ end
 
 private_lane :smf_super_linter do |options|
 
-  build_variant = options[:build_variant]
-
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
   options[:build_variant] = smf_get_build_variant_from_config(build_variant)
 
   smf_run_klint(options)
