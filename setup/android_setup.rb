@@ -36,8 +36,7 @@ end
 
 private_lane :smf_super_build do |options|
 
-  build_variant = options[:build_variant]
-
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
   variant = smf_get_build_variant_from_config(build_variant)
 
   smf_build_android_app(build_variant: variant)
@@ -127,8 +126,7 @@ end
 
 private_lane :smf_super_linter do |options|
 
-  build_variant = options[:build_variant]
-
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
   options[:build_variant] = smf_get_build_variant_from_config(build_variant)
 
   smf_run_klint(options)

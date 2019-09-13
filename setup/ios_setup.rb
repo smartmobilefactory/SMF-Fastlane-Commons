@@ -2,10 +2,12 @@
 
 private_lane :smf_super_setup_dependencies do |options|
 
-  smf_pod_install
-  smf_sync_with_phrase_app(@smf_fastlane_config[:build_variants][options[:build_variant].to_sym][:phrase_app])
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
 
-  build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
+  smf_pod_install
+  smf_sync_with_phrase_app(@smf_fastlane_config[:build_variants][build_variant.to_sym][:phrase_app])
+
+  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
   smf_verify_itc_upload_errors(
       upload_itc: build_variant_config[:upload_itc],
@@ -43,7 +45,10 @@ end
 # Build (Build to Release)
 
 private_lane :smf_super_build do |options|
-  build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
+
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+
+  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
   smf_download_provisioning_profiles(
       team_id: build_variant_config[:team_id],
@@ -54,7 +59,7 @@ private_lane :smf_super_build do |options|
       match_read_only: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:read_only],
       match_type: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:type],
       extensions_suffixes: @smf_fastlane_config[:extensions_suffixes],
-      build_variant: options[:build_variant]
+      build_variant: build_variant
   )
 
   smf_build_ios_app(
@@ -63,12 +68,12 @@ private_lane :smf_super_build do |options|
       should_clean_project: build_variant_config[:should_clean_project],
       required_xcode_version: @smf_fastlane_config[:project][:xcode_version],
       project_name: @smf_fastlane_config[:project][:project_name],
-      xcconfig_name: smf_get_xcconfig_name(options[:build_variant].to_sym),
+      xcconfig_name: smf_get_xcconfig_name(build_variant.to_sym),
       code_signing_identity: build_variant_config[:code_signing_identity],
       upload_itc: build_variant_config[:upload_itc].nil? ? false : build_variant_config[:upload_itc],
       upload_bitcode: build_variant_config[:upload_bitcode].nil? ? true : build_variant_config[:upload_bitcode],
       export_method: build_variant_config[:export_method],
-      icloud_environment: smf_get_icloud_environment(options[:build_variant].to_sym)
+      icloud_environment: smf_get_icloud_environment(build_variant.to_sym)
   )
 end
 
@@ -212,9 +217,12 @@ end
 
 # Update File
 private_lane :smf_super_generate_files do |options|
+
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+
   smf_update_generated_files(
-    branch: options[:branch],
-    build_variant: options[:build_variant]
+      branch: options[:branch],
+      build_variant: build_variant
   )
 end
 
@@ -225,7 +233,9 @@ end
 # Unit-Tests
 private_lane :smf_super_unit_tests do |options|
 
-  build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+
+  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
   smf_ios_unit_tests(
       project_name: @smf_fastlane_config[:project][:project_name],
@@ -253,8 +263,11 @@ end
 
 # Danger
 private_lane :smf_super_danger do |options|
+
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+
   smf_danger(
-    build_variant: options[:build_variant]
+      build_variant: build_variant
   )
 end
 
