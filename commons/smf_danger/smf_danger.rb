@@ -21,7 +21,7 @@ private_lane :smf_danger do |options|
   _smf_find_paths_of('detekt.xml').each { |path| checkstyle_paths.push(path) }
 
   ENV["DANGER_JIRA_KEYS"] = JSON.dump(_smf_danger_jira_key_parameter(jira_keys))
-  ENV["DANGER_LINT_PATHS"] = JSON.dump(lint_paths)
+  ENV["DANGER_ANDROID_LINT_PATHS"] = JSON.dump(lint_paths)
   ENV["DANGER_JUNIT_PATHS"] = JSON.dump(junit_result_paths)
   ENV["DANGER_CHECKSTYLE_PATHS"] = JSON.dump(checkstyle_paths)
 
