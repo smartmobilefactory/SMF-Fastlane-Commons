@@ -17,7 +17,6 @@ ANDROID_APP_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Android.template'
 ANDROID_FRAMEWORK_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Android_Framework.template'
 
 private_lane :smf_generate_jenkins_file do |options|
-
   possible_build_variants = _smf_possible_build_variants
   jenkins_file_template_path = _smf_jenkins_file_template_path
 
@@ -28,11 +27,9 @@ private_lane :smf_generate_jenkins_file do |options|
   jenkinsFileData = _smf_insert_custom_credentials(jenkinsFileData)
 
   File.write("#{smf_workspace_dir}/Jenkinsfile", jenkinsFileData)
-
 end
 
 def _smf_jenkins_file_template_path
-
   path = nil
   case @platform
   when :ios
@@ -54,20 +51,24 @@ def _smf_jenkins_file_template_path
 end
 
 def _smf_possible_build_variants
-  build_variants = nil
+  build_variants = @smf_fastlane_config[:build_variants].keys.to_s
   case @platform
   when :ios
-    build_variants = @smf_fastlane_config[:build_variants].keys
-
-    for kind in ['Live', 'Beta', 'Alpha']
-      kind_variants = build_variants.select { |variant|
-        variant.to_s.downcase.include? kind.downcase
-      }
+    ['Live', 'Beta', 'Alpha'].each do |kind|
+      kind_variants = build_variants.select do |variant|
+        variant.downcase.include? kind.downcase
+      end
 
       build_variants.insert(0, kind) if kind_variants.length > 1
     end
   when :android
-    build_variants = @smf_fastlane_config[:build_variants].keys
+    ['Live', 'Beta', 'Alpha'].each do |kind|
+      kind_variants = build_variants.select do |variant|
+        variant.downcase.include? kind.downcase
+      end
+
+      build_variants.insert(0, kind) if !kind_variants.empty?
+    end
   when :flutter
     UI.message('Finding possible build variants for flutter is not implemented yet')
   else
