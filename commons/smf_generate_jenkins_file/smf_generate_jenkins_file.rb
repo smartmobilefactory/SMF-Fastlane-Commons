@@ -52,28 +52,13 @@ end
 
 def _smf_possible_build_variants
   build_variants = @smf_fastlane_config[:build_variants].keys.map(&:to_s)
-  case @platform
-  when :ios
-    ['Live', 'Beta', 'Alpha'].each do |kind|
-      kind_variants = build_variants.select do |variant|
-        variant.downcase.include? kind.downcase
-      end
 
-      build_variants.insert(0, kind) if kind_variants.length > 1
+  ['Live', 'Beta', 'Alpha'].each do |kind|
+    kind_variants = build_variants.select do |variant|
+      variant.downcase.include? kind.downcase
     end
-  when :android
-    ['Live', 'Beta', 'Alpha'].each do |kind|
-      kind_variants = build_variants.select do |variant|
-        variant.downcase.include? kind.downcase
-      end
 
-      build_variants.insert(0, kind) if !kind_variants.empty?
-    end
-  when :flutter
-    UI.message('Finding possible build variants for flutter is not implemented yet')
-  else
-    UI.message("There is no platform \"#{@platform}\", exiting...")
-    raise 'Unknown platform'
+    build_variants.insert(0, kind) if kind_variants.length > 1
   end
 
   build_variants
