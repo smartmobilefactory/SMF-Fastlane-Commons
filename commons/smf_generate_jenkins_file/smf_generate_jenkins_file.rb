@@ -51,7 +51,7 @@ def _smf_jenkins_file_template_path
 end
 
 def _smf_possible_build_variants
-  build_variants = @smf_fastlane_config[:build_variants].keys.to_s
+  build_variants = @smf_fastlane_config[:build_variants].keys.map(&:to_s)
   case @platform
   when :ios
     ['Live', 'Beta', 'Alpha'].each do |kind|
