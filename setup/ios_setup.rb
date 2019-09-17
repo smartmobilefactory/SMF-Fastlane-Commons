@@ -42,6 +42,20 @@ lane :smf_pipeline_increment_build_number do |options|
 end
 
 
+# Create Git Tag
+
+private_lane :smf_super_pipeline_create_git_tag do |options|
+
+  build_variant = options[:build_variant]
+  build_number = smf_get_build_number_of_app
+  smf_create_git_tag(build_variant: build_variant, build_number: build_number)
+end
+
+lane :smf_pipeline_create_git_tag do |options|
+  smf_super_pipeline_create_git_tag(options)
+end
+
+
 # Build (Build to Release)
 
 private_lane :smf_super_build do |options|
@@ -187,7 +201,7 @@ private_lane :smf_super_push_git_tag_release do |options|
   build_number = get_build_number(xcodeproj: "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj")
   smf_create_github_release(
       release_name: "#{build_variant.upcase} #{build_number}",
-      tag: get_tag_of_app(build_variant, build_number),
+      tag: smf_get_tag_of_app(build_variant, build_number),
       branch: local_branch,
       build_variant: build_variant,
       changelog: changelog
