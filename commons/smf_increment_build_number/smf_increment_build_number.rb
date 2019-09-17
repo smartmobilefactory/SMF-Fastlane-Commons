@@ -2,7 +2,6 @@ private_lane :smf_increment_build_number do |options|
 
   UI.important('increment build number')
 
-  build_variant = options[:build_variant]
   current_build_number = options[:build_number]
   NO_GIT_TAG_FAILURE = 'NO_GIT_TAG_FAILURE'
 

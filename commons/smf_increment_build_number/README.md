@@ -6,7 +6,6 @@ This lane increments the build number of the project if an app is built and retu
 Increment the build number.
 ```
 smf_increment_build_number(
-    build_variant: 'Alpha',
     current_build_number: <some number>
 )
 ```
@@ -16,6 +15,3 @@ At the beginning, the current build number will be tried to get by fetching the 
 
 ### Build number contains '.'
 If the build number contains one or multiple '.' only the first part of the number will be used.
-
-## Create new tag
-The incremented build number will be used for the new tag. If this tag exists the build number will be incremented again. This process will run ten times if needed. 

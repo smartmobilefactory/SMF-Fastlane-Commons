@@ -31,10 +31,8 @@ end
 private_lane :smf_super_pipeline_increment_build_number do |options|
 
   smf_increment_build_number(
-      build_variant: options[:build_variant],
       current_build_number: smf_get_build_number_of_app
   )
-
 end
 
 lane :smf_pipeline_increment_build_number do |options|
