@@ -9,6 +9,7 @@ private_lane :smf_super_setup_dependencies do |options|
 
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
+  # Called only when upload_itc is set to true. This way the build will fail in the beginning if there are any problems with itc. Saves time.
   smf_verify_itc_upload_errors(
       build_variant: build_variant,
       upload_itc: build_variant_config[:upload_itc],
