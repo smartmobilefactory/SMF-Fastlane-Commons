@@ -197,7 +197,6 @@ private_lane :smf_super_push_git_tag_release do |options|
   # Create the GitHub release
   build_number = get_build_number(xcodeproj: "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj")
   smf_create_github_release(
-      build_variant: build_variant,
       build_number: build_number,
       tag: smf_get_tag_of_app(build_variant, build_number),
       branch: local_branch,

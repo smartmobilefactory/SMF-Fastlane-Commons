@@ -34,7 +34,7 @@ private_lane :smf_create_github_release do |options|
    end
 
   version = smf_get_version_number(build_variant)
-  release_name = "#{options[:build_variant].upcase} #{version} (#{build_number})"
+  release_name = "#{build_variant.upcase} #{version} (#{build_number})"
 
   # Create the GitHub release as draft
   release = set_github_release(
