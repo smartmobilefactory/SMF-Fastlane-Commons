@@ -157,3 +157,16 @@ end
 def smf_get_tag_of_app(build_variant, build_number)
   "build/#{build_variant.downcase}/#{build_number}"
 end
+
+def smf_get_version_number(build_variant)
+  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
+  target = build_variant_config[:target]
+  scheme = build_variant_config[:scheme]
+
+  version_number = get_version_number(
+      xcodeproj: "#{smf_get_project_name}.xcodeproj",
+      target: (target != nil ? get_target : scheme)
+  )
+
+  return version_number
+end

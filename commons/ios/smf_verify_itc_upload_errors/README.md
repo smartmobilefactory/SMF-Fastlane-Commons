@@ -5,10 +5,9 @@ This lane checks multiple properties (duplicated build numbers, is there an edit
 Example:
 ```
 smf_verify_itc_upload_errors(
+        build_variant: "alpha",
         upload_itc: true,
         project_name: "BSR",
-        target: "target",
-        build_scheme: "alpha",
         itc_skip_version_check: false,
         username: "development@smfhq.com",
         itc_team_id: "JKSDf6SKDf",

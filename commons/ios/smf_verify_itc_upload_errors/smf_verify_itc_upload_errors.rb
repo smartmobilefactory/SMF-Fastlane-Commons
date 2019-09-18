@@ -10,17 +10,13 @@ private_lane :smf_verify_itc_upload_errors do |options|
 
   # Parameter
   project_name = options[:project_name]
-  target = options[:target]
-  build_scheme = options[:build_scheme]
+  build_variant = options[:build_variant]
   itc_skip_version_check = options[:itc_skip_verison_check]
   itc_apple_id = !options[:apple_id].nil? ? options[:apple_id] : 'development@smfhq.com'
   itc_team_id = options[:itc_team_id]
   bundle_identifier = options[:bundle_identifier]
 
-  version_number = get_version_number(
-      xcodeproj: "#{project_name}.xcodeproj",
-      target: !target.nil? ? target : build_scheme
-  )
+  version_number = smf_get_version_number(build_variant)
 
   build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
 
