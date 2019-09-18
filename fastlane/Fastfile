@@ -138,7 +138,6 @@ lane :smf_setup_workspace do
   smf_load_fastlane_config
   smf_clone_fastlane_commons_repo
   smf_import_commons
-  smf_load_fastlane_config
   smf_git_pull("")
 end
 
