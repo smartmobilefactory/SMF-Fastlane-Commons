@@ -86,7 +86,6 @@ private_lane :smf_publish_pod do |options|
   )
 
   smf_send_default_build_success_notification(
-      name: smf_get_default_name_of_pod,
-      is_library: true
+      name: smf_get_default_name_of_pod
   )
 end

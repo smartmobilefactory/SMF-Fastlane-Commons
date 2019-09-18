@@ -7,8 +7,6 @@ Sending an build success notification.
 ```
 smf_send_default_build_success_notification(
     name : 'Example App Name',
-    build_variant: 'Alpha',
-    is_library: false, #Optional, by default false
 )
 ```
 

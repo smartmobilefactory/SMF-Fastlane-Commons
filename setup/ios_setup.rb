@@ -214,7 +214,6 @@ end
 
 private_lane :smf_super_send_slack_notification do |options|
   smf_send_default_build_success_notification(
-      build_variant: options[:build_variant],
       name: smf_get_default_name_of_app(options[:build_variant])
   )
 end
