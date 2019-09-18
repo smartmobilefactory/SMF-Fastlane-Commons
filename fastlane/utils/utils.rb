@@ -111,7 +111,7 @@ end
 def smf_git_pull(branch)
   branch_name = "#{branch}"
   branch_name.sub!('origin/', '')
-  sh "git pull origin #{branch_name}"
+  sh "git pull origin #{branch_name} --quiet"
 end
 
 def smf_update_config(config, message = nil)
@@ -152,4 +152,8 @@ def smf_get_first_variant_from_config
   raise('There is no build variant in Config.') if variant.nil?
 
   variant
+end
+
+def smf_get_tag_of_app(build_variant, build_number)
+  "build/#{build_variant.downcase}/#{build_number}"
 end

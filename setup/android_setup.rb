@@ -23,12 +23,27 @@ end
 
 private_lane :smf_super_pipeline_increment_build_number do |options|
 
-  build_variant = options[:build_variant]
-  smf_increment_build_number(build_variant: build_variant)
+  smf_increment_build_number(
+      current_build_number: smf_get_build_number_of_app
+  )
 end
 
 lane :smf_pipeline_increment_build_number do |options|
   smf_super_pipeline_increment_build_number(options)
+end
+
+
+# Create Git Tag
+
+private_lane :smf_super_pipeline_create_git_tag do |options|
+
+  build_variant = options[:build_variant]
+  build_number = smf_get_build_number_of_app
+  smf_create_git_tag(build_variant: build_variant, build_number: build_number)
+end
+
+lane :smf_pipeline_create_git_tag do |options|
+  smf_super_pipeline_create_git_tag(options)
 end
 
 

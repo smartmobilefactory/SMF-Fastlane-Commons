@@ -2,7 +2,6 @@ private_lane :smf_increment_build_number do |options|
 
   UI.important('increment build number')
 
-  build_variant = options[:build_variant]
   current_build_number = options[:build_number]
   NO_GIT_TAG_FAILURE = 'NO_GIT_TAG_FAILURE'
 
@@ -34,30 +33,11 @@ private_lane :smf_increment_build_number do |options|
   unless current_build_number.nil?
     if incremented_build_number.to_i < (current_build_number.to_i + 1)
       incremented_build_number = (current_build_number + 1).to_s
-      UI.message("The project's build number is greater than the fetched build number. The incremented build number is now: #{incremented_build_number}")
+      UI.message("The project's build number is greater than the fetched build number. The incremented build number is now: #{incremented_build_number}.")
     end
   end
 
   _smf_update_build_number_in_project(incremented_build_number)
-
-  tag = get_tag_of_app(build_variant, incremented_build_number)
-
-  count = 0
-  while git_tag_exists(tag: tag)
-    if count == 10
-      raise "The Git tag \"#{tag}\" already exists even after increment it ten times! The build job will be aborted to avoid builds with the same build number. Please check the project!"
-    end
-    UI.message("The Git tag \"#{tag}\" already exists! The build number will be incremented again.")
-    count += 1
-    incremented_build_number = (incremented_build_number.to_i + 1).to_s
-    _smf_update_build_number_in_project(incremented_build_number)
-    UI.message("Incremented build number: #{incremented_build_number}")
-    tag = get_tag_of_app(build_variant, incremented_build_number)
-  end
-
-  add_git_tag(tag: tag)
-
-  tag
 end
 
 
@@ -82,8 +62,4 @@ def _smf_update_build_number_in_project(build_number)
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
   end
-end
-
-def get_tag_of_app(build_variant, build_number)
-  "build/#{build_variant.downcase}/#{build_number}"
 end
