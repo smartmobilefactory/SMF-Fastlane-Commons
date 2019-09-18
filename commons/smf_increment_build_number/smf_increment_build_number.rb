@@ -32,7 +32,7 @@ private_lane :smf_increment_build_number do |options|
 
   unless current_build_number.nil?
     if incremented_build_number.to_i < (current_build_number.to_i + 1)
-      incremented_build_number = (current_build_number + 1).to_s
+      incremented_build_number = (current_build_number.to_i + 1).to_s
       UI.message("The project's build number is greater than the fetched build number. The incremented build number is now: #{incremented_build_number}.")
     end
   end
