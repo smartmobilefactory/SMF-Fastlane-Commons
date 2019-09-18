@@ -65,8 +65,6 @@ def smf_get_build_number_of_app
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
-
-    build_number
   end
 
   if build_number.include? '.'
