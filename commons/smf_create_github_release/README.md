@@ -6,6 +6,7 @@ This lane creates a new GitHub release, which has the current tag.
 Create a GitHub release.
 ```
 smf_create_github_release(
+    build_variant: "alpha"                  # The build variant currently building
     build_number: 77,                       # The projects current build number
     tag: 'build/alpha/77',
     paths: [],                              # Optional: Paths to files to attach to the release

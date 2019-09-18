@@ -165,7 +165,7 @@ def smf_get_version_number(build_variant)
 
   version_number = get_version_number(
       xcodeproj: "#{smf_get_project_name}.xcodeproj",
-      target: (target != nil ? get_target : scheme)
+      target: (target != nil ? target : scheme)
   )
 
   return version_number
