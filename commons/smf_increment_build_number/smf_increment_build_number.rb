@@ -2,7 +2,7 @@ private_lane :smf_increment_build_number do |options|
 
   UI.important('increment build number')
 
-  current_build_number = options[:build_number]
+  current_build_number = options[:current_build_number]
   NO_GIT_TAG_FAILURE = 'NO_GIT_TAG_FAILURE'
 
   # Pull all the tags so the change log collector finds the latest tag
