@@ -2,7 +2,7 @@ private_lane :smf_increment_build_number do |options|
 
   UI.important('increment build number')
 
-  current_build_number = options[:build_number]
+  current_build_number = options[:current_build_number]
   NO_GIT_TAG_FAILURE = 'NO_GIT_TAG_FAILURE'
 
   # Pull all the tags so the change log collector finds the latest tag
@@ -32,7 +32,7 @@ private_lane :smf_increment_build_number do |options|
 
   unless current_build_number.nil?
     if incremented_build_number.to_i < (current_build_number.to_i + 1)
-      incremented_build_number = (current_build_number + 1).to_s
+      incremented_build_number = (current_build_number.to_i + 1).to_s
       UI.message("The project's build number is greater than the fetched build number. The incremented build number is now: #{incremented_build_number}.")
     end
   end
