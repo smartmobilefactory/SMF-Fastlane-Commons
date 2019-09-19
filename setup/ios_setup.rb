@@ -9,11 +9,11 @@ private_lane :smf_super_setup_dependencies do |options|
 
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
+  # Called only when upload_itc is set to true. This way the build will fail in the beginning if there are any problems with itc. Saves time.
   smf_verify_itc_upload_errors(
+      build_variant: build_variant,
       upload_itc: build_variant_config[:upload_itc],
       project_name: @smf_fastlane_config[:project][:project_name],
-      target: build_variant_config[:target],
-      build_scheme: build_variant_config[:scheme],
       itc_skip_version_check: build_variant_config[:itc_skip_version_check],
       username: build_variant_config[:itc_apple_id],
       itc_team_id: build_variant_config[:itc_team_id],
@@ -198,7 +198,7 @@ private_lane :smf_super_push_git_tag_release do |options|
   # Create the GitHub release
   build_number = get_build_number(xcodeproj: "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj")
   smf_create_github_release(
-      release_name: "#{build_variant.upcase} #{build_number}",
+      build_number: build_number,
       tag: smf_get_tag_of_app(build_variant, build_number),
       branch: local_branch,
       build_variant: build_variant,
@@ -215,7 +215,6 @@ end
 
 private_lane :smf_super_send_slack_notification do |options|
   smf_send_default_build_success_notification(
-      build_variant: options[:build_variant],
       name: smf_get_default_name_of_app(options[:build_variant])
   )
 end

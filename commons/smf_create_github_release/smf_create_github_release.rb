@@ -1,6 +1,7 @@
 private_lane :smf_create_github_release do |options|
 
-  release_name = options[:release_name]
+  build_variant = options[:build_variant]
+  build_number = options[:build_number]
   tag = options[:tag]
   paths = !options[:paths].nil? ? options[:paths] : []
   branch = options[:branch]
@@ -32,12 +33,15 @@ private_lane :smf_create_github_release do |options|
      changelog = "No description (changelog) provided."
    end
 
+  version = smf_get_version_number(build_variant)
+  release_name = "#{build_variant.upcase} #{version} (#{build_number})"
+
   # Create the GitHub release as draft
   release = set_github_release(
       is_draft: true,
       repository_name: repository_path,
       api_token: ENV[$SMF_GITHUB_TOKEN_ENV_KEY],
-      name: release_name.to_s,
+      name: release_name,
       tag_name: tag,
       description: changelog,
       commitish: branch,

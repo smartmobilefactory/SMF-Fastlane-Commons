@@ -126,15 +126,6 @@ def get_podspec_path(build_variant)
   @smf_fastlane_config[:build_variants][build_variant.to_sym][:podspec_path]
 end
 
-def smf_get_version_number
-  version_number = get_version_number(
-      xcodeproj: "#{smf_get_project_name}.xcodeproj",
-      target: (get_target != nil ? get_target : get_build_scheme)
-  )
-
-  return version_number
-end
-
 def ci_android_error_log
   $SMF_CI_ANDROID_ERROR_LOG.to_s
 end

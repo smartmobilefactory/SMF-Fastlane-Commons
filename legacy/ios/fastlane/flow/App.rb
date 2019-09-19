@@ -173,7 +173,6 @@ private_lane :smf_deploy_build_variant do |options|
   )
 
   smf_send_default_build_success_notification(
-      build_variant: build_variant,
       name: smf_get_default_name_of_app(build_variant)
   )
 
