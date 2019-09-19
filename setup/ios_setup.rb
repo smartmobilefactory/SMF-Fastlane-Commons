@@ -5,7 +5,6 @@ private_lane :smf_super_setup_dependencies do |options|
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
 
   smf_pod_install
-  smf_sync_with_phrase_app(@smf_fastlane_config[:build_variants][build_variant.to_sym][:phrase_app])
 
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
