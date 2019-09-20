@@ -31,7 +31,7 @@ def smf_import_commons
   end
 
   UI.message('Import files from fastlane commons directory.')
-  
+
   fastlane_dir_path = "#{@fastlane_commons_dir_path}/fastlane"
   UI.message("Importing utils...")
   smf_import_all("#{fastlane_dir_path}/utils")
@@ -136,7 +136,6 @@ end
 
 # sets the commons dir path and clones the fastlane repo
 lane :smf_setup_workspace do
-  smf_import_commons
   smf_git_pull("")
 end
 
