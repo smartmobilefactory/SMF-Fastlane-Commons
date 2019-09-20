@@ -31,7 +31,7 @@ end
 def smf_get_hockey_id(build_variant)
   build_variant = build_variant.to_s.downcase
 
-  @smf_fastlane_config[:build_variants][build_variant.to_sym][:hockey_id]
+  @smf_fastlane_config[:build_variants][build_variant.to_sym][:hockeyapp_id]
 end
 
 def smf_get_keystore_folder(build_variant)

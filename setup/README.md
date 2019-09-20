@@ -35,7 +35,7 @@ In the following sections the default lanes will be explained.
 
 `smf_generate_changelog`: This lane generates the changelog and saves it in a temporary file to be usually read for notifications e.g. on Slack. The changelog will be generates by looking for the last tag on Github, which contains the build variant which you build. The changes between the new build and the last one will be listed. :clipboard:
 
-`smf_upload_to_appcenter`: This lane uploads the apk to App Center if a `appcenter_id` is defined for the build variant Config.json. :arrow_up: In addition it uploads the apk to hockey if a `hockey_id` is given for the build variant.
+`smf_upload_to_appcenter`: This lane uploads the apk to App Center if a `appcenter_id` is defined for the build variant Config.json. :arrow_up: In addition it uploads the apk to hockey if a `hockeyapp_id` is given for the build variant.
 ```
  "live": {
        "variant": "productionRelease",
@@ -67,7 +67,7 @@ In the following sections the default lanes will be explained.
 
 `smf_upload_dsyms`: This lane uploads the symbolication files to sentry. :arrow_up:
 
-`smf_upload_to_appcenter`: This lane uploads the IPA to App Center if a `appcenter_id` is given for the build variant in the Config.json. :arrow_up: Further, this lane uploads the IPA to hockey if a `hockey_id` is given for the build variant.
+`smf_upload_to_appcenter`: This lane uploads the IPA to App Center if a `appcenter_id` is given for the build variant in the Config.json. :arrow_up: Further, this lane uploads the IPA to hockey if a `hockeyapp_id` is given for the build variant.
 ```
  "live": {
        "variant": "productionRelease",
