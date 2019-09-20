@@ -115,7 +115,7 @@ override_lane :smf_setup_dependencies do | options |
           "..."
       ],
       :forbid_comments_in_source => true,                   # Optional, remove if not needed
-      :files_prefix              => "...",                  # Optional, remove if not neede
+      :files_prefix              => "...",                  # Optional, remove if not needed
       :git_branch                => options[:git_branch],   # Optional, leave options[:git_branch] as default value       
       :extensions                => [
           {
