@@ -20,7 +20,8 @@ private_lane :smf_super_setup_dependencies do |options|
   )
 end
 
-lane :smf_setup_dependencies do |options|
+echo(message: "Importing setups smf_setup_dependency lane")
+override_lane :smf_setup_dependencies do |options|
   smf_super_setup_dependencies(options)
 end
 
