@@ -55,7 +55,7 @@ In the following sections the default lanes will be explained.
 `smf_pipeline_update_android_commons`: This lane updates the Android Commons.
 
 ## iOS Setup
-`smf_setup_dependencies`: This lane install pods if a podfile is present in the project. It also checks multiple properties (duplicated build numbers, is there an editable app version, etc.) to reduce the risk of errors when uploading to iTunes Connect. 
+`smf_setup_dependencies`: This lane install pods if a podfile is present in the project. It also checks multiple properties (duplicated build numbers, is there an editable app version, etc.) to reduce the risk of errors when uploading to iTunes Connect. For this check `upload_itc` must be set to true in the Config.json.
 
 `smf_pipeline_increment_build_number`: *See Android.*
 
@@ -93,11 +93,42 @@ In the following sections the default lanes will be explained.
 To add custom behaviour for your app you can simply overwrite the default lane in the Fastfile in your project. :wrench:
 
 ## Example
-Use Phraseapp.
+Use Phraseapp for iOS app.
 ```
-override_lane :smf_setup_dependencies do |options[
-    smf_super_setup_dependencies(options) #Call the "super" lane to have the usual functionality.
-    
-    smf_sync_with_phrase_app(@smf_fastlane_config[:build_variants][build_variant.to_sym][:phrase_app]) #Call the phraseapp lane to use Phraseapp.
+override_lane :smf_setup_dependencies do | options |
+  # call the default setup
+  smf_super_setup_dependencies(options)
+
+  # Add custom sync phrase app call
+  phrase_app_properties = {
+      :format           => "...",
+      :access_token_key => "...",
+      :project_id       => "...",
+      :source           => "...",
+      :locales          => [
+          "...",
+          "..."
+      ],
+      :base_directory   => "...",
+      :files            => [
+          "...",
+          "..."
+      ],
+      :forbid_comments_in_source => true,                   # Optional, remove if not needed
+      :files_prefix              => "...",                  # Optional, remove if not neede
+      :git_branch                => options[:git_branch],   # Optional, leave options[:git_branch] as default value       
+      :extensions                => [
+          {
+              :project_id       => "...",
+              :base_directory   => "...",
+              :files            => [
+                  "...",
+                  "..."
+              ]
+          }
+      ]
+  }
+  
+  smf_sync_with_phrase_app(phrase_app_properties)
 end
 ```
