@@ -60,7 +60,7 @@ def initialize_env_variable_name_mappings(git_branch)
       :format                     => ["phraseappFormat", false],
       :base_directory             => ["phraseappBasedir", false],
       :files                      => ["phraseappFiles", false],
-      :git_branch                 => ["phraseappGitBranch", true, git_branch],  # optional, defaults to @smf_git_branch
+      :git_branch                 => ["phraseappGitBranch", true, git_branch],  # optional
       :files_prefix               => ["phraseappFilesPrefix", true, ""], # optional
       :forbid_comments_in_source  => ["phraseappForbidCommentsInSource", true, "1"]  # optional
   }
@@ -77,6 +77,7 @@ def validate_and_set_phrase_app_env_variables(options)
   @phrase_app_config_keys_env_variable_mapping.each do |key, value|
     result = validate_phrase_app_variable(key, value[1], options)
     if (result == nil)
+      echo "Result for key: #{key} is nil"
       return false
     end
 
