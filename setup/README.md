@@ -25,7 +25,40 @@ override_lane :smf_setup_dependencies do | options |
   smf_super_setup_dependencies(options)
 
   # Add custom sync phrase app call
-  phrase_app_properties = []
+  phrase_app_properties = {
+    "format"            : "",
+    "access_token_key"  : "",
+    "project_id"        : "",
+    "source"            : "",
+    "locales"           : [
+      "",
+      ""
+    ],
+    "base_directory"    : "",
+    "files"             : [
+      "",
+      ""
+    ],
+    "forbid_comments_in_source" : false,
+    "files_prefix"              : "",
+    "extensions": [
+      {
+        "project_id"        : "",
+        "base_directory"    : "",
+        "files"             : [
+          ""
+        ]
+      },
+      {
+        "project_id"      : "",
+        "base_directory"  : "",
+        "files"           : [
+          ""
+        ]
+      }
+    ]
+  }
+  
   smf_sync_with_phrase_app(phrase_app_properties)
 end
 ```
