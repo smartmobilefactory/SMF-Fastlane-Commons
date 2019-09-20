@@ -53,8 +53,12 @@ private_lane :smf_super_build do |options|
 
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
   variant = smf_get_build_variant_from_config(build_variant)
+  keystore_folder = smf_get_keystore_folder(build_variant)
 
-  smf_build_android_app(build_variant: variant)
+  smf_build_android_app(
+      build_variant: variant,
+      keystore_folder: keystore_folder
+  )
 end
 
 lane :smf_build do |options|
@@ -155,7 +159,7 @@ end
 
 # Danger
 
-private_lane :smf_super_danger do |options|
+private_lane :smf_super_pipeline_danger do |options|
   smf_danger(options)
 end
 
