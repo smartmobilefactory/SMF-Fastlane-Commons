@@ -33,7 +33,9 @@ def smf_import_commons
   end
 
   fastlane_dir_path = "#{@fastlane_commons_dir_path}/fastlane"
+  UI.message("Importing utils...")
   smf_import_all("#{fastlane_dir_path}/utils")
+  UI.message("Importing commons...")
   smf_import_all("#{@fastlane_commons_dir_path}/commons")
 
   case @platform
