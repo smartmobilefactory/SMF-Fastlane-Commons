@@ -1,7 +1,7 @@
 lane :smf_sync_with_phrase_app do |options|
   case @platform
   when :ios
-    default_git_branch = options[:git_branch]
+    default_git_branch = options[:default_git_branch]
     initialize_env_variable_name_mappings(default_git_branch)
     UI.message("Strings are synced with PhraseApp using the values from the fastlane/Config.json")
 
@@ -77,7 +77,7 @@ def validate_and_set_phrase_app_env_variables(options)
   @phrase_app_config_keys_env_variable_mapping.each do |key, value|
     result = validate_phrase_app_variable(key, value[1], options)
     if (result == nil)
-      echo "Result for key: #{key} is nil"
+      UI.message("Result for key: #{key} is nil")
       return false
     end
 
