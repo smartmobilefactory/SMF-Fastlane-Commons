@@ -33,12 +33,9 @@ def smf_import_commons
   UI.message('Import files from fastlane commons directory.')
 
   fastlane_dir_path = "#{@fastlane_commons_dir_path}/fastlane"
-  UI.message("Importing utils...")
   smf_import_all("#{fastlane_dir_path}/utils")
-  UI.message("Importing commons...")
   smf_import_all("#{@fastlane_commons_dir_path}/commons")
 
-  UI.message("Importing setup...")
   case @platform
   when :ios
     ios_setup_file = "#{@fastlane_commons_dir_path}/setup/ios_setup.rb"
