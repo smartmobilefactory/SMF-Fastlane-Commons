@@ -2,7 +2,7 @@
 // Automatically generated. Do not edit.
 //
 
-@Library('jenkins-pipeline-commons@_dev/structure') _
+@Library('jenkins-pipeline-commons@_dev/SMFCI-550') _
 
 _build_variants = __BUILD_VARIANTS__
 _custom_credentials = [
