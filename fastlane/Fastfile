@@ -38,6 +38,7 @@ def smf_import_commons
   UI.message("Importing commons...")
   smf_import_all("#{@fastlane_commons_dir_path}/commons")
 
+  UI.message("Importing setup...")
   case @platform
   when :ios
     ios_setup_file = "#{@fastlane_commons_dir_path}/setup/ios_setup.rb"
