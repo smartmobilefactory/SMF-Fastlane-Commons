@@ -5,7 +5,7 @@ Androids has a separate fastlane action which can be used by overwriting the set
 Example:
 
 ```
-smf_sync_with_phrase_app(<map_with_necessary_phraseapp_properties>)
+smf_sync_with_phrase_app(<map_with_necessary_phraseapp_properties>) # Also the key :default_git_branch has to be added with the projects git branch
 ```
 
 #### Phrase App Synchronisation Variables

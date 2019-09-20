@@ -51,7 +51,7 @@ end
 # the boolean value indicates whether the value is optional or not
 # for default values a third entry in the array can be provided
 
-def initialize_env_variable_name_mappings(git_branch)
+def initialize_env_variable_name_mappings(default_git_branch)
   @phrase_app_config_keys_env_variable_mapping = {
       :access_token_key           => ["phraseappAccessToken", true, $SMF_PHRASE_APP_ACCESS_TOKEN_KEY], # optional
       :project_id                 => ["phraseappProjectId", false],
@@ -60,7 +60,7 @@ def initialize_env_variable_name_mappings(git_branch)
       :format                     => ["phraseappFormat", false],
       :base_directory             => ["phraseappBasedir", false],
       :files                      => ["phraseappFiles", false],
-      :git_branch                 => ["phraseappGitBranch", true, git_branch],  # optional
+      :git_branch                 => ["phraseappGitBranch", true, default_git_branch],  # optional
       :files_prefix               => ["phraseappFilesPrefix", true, ""], # optional
       :forbid_comments_in_source  => ["phraseappForbidCommentsInSource", true, "1"]  # optional
   }
@@ -77,7 +77,6 @@ def validate_and_set_phrase_app_env_variables(options)
   @phrase_app_config_keys_env_variable_mapping.each do |key, value|
     result = validate_phrase_app_variable(key, value[1], options)
     if (result == nil)
-      UI.message("Result for key: #{key} is nil")
       return false
     end
 
