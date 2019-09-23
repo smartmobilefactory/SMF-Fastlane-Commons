@@ -14,7 +14,6 @@ def smf_get_apk_file_regex(build_variant)
 end
 
 def smf_get_build_variant_from_config(build_variant)
-  build_variant = build_variant.to_s.downcase
   variant = @smf_fastlane_config[:build_variants][build_variant.to_sym][:variant]
 end
 
@@ -23,15 +22,18 @@ def smf_get_project_name
 end
 
 def smf_get_appcenter_id(build_variant)
-  build_variant = build_variant.to_s.downcase
 
   @smf_fastlane_config[:build_variants][build_variant.to_sym][:appcenter_id]
 end
 
 def smf_get_hockey_id(build_variant)
-  build_variant = build_variant.to_s.downcase
 
-  @smf_fastlane_config[:build_variants][build_variant.to_sym][:hockey_id]
+  @smf_fastlane_config[:build_variants][build_variant.to_sym][:hockeyapp_id]
+end
+
+def smf_get_keystore_folder(build_variant)
+
+  @smf_fastlane_config[:build_variants][build_variant.to_sym][:keystore]
 end
 
 def smf_get_default_name_of_app(build_variant)
