@@ -26,11 +26,11 @@ def smf_import_commons
   end
 
   if !Dir.exist?(@fastlane_commons_dir_path)
-    UI.message('The fastlane commons directory does not exist.')
-    return
-  else
-    UI.message('Import files from fastlane commons directory.')
+    UI.message('The fastlane commons directory does not exist yet.')
+    smf_clone_fastlane_commons_repo
   end
+
+  UI.message('Import files from fastlane commons directory.')
 
   fastlane_dir_path = "#{@fastlane_commons_dir_path}/fastlane"
   smf_import_all("#{fastlane_dir_path}/utils")
@@ -133,9 +133,6 @@ end
 
 # sets the commons dir path and clones the fastlane repo
 lane :smf_setup_workspace do
-  smf_load_fastlane_config
-  smf_clone_fastlane_commons_repo
-  smf_import_commons
   smf_git_pull("")
 end
 

@@ -17,7 +17,7 @@ To learn how to overwrite the default lanes to customize your build process have
 In the following sections the default lanes will be explained. 
 
 ## Android Setup
-`smf_setup_dependencies`: This lane does nothing. :grin: You could overwrite it to use Phraseapp. To get to know how have a look at the example in the Custom Behaviour. :wink:
+`smf_setup_dependencies_pr_check` / `smf_setup_dependencies_build`: These lanes do nothing, yet. :grin: You could overwrite one to use Phraseapp. To get to know how have a look at the example in the Custom Behaviour. :wink:
 
 `smf_run_unit_tests`: This lane usually runs junit tests.
 
@@ -55,7 +55,7 @@ In the following sections the default lanes will be explained.
 `smf_pipeline_update_android_commons`: This lane updates the Android Commons.
 
 ## iOS Setup
-`smf_setup_dependencies`: This lane install pods if a podfile is present in the project. It also checks multiple properties (duplicated build numbers, is there an editable app version, etc.) to reduce the risk of errors when uploading to iTunes Connect. For this check `upload_itc` must be set to true in the Config.json.
+`smf_setup_dependencies_pr_check` / `smf_setup_dependencies_build`: These lanes install pods if a podfile is present in the project. They also check multiple properties (duplicated build numbers, is there an editable app version, etc.) to reduce the risk of errors when uploading to iTunes Connect. For this check `upload_itc` must be set to true in the Config.json. There is one lane for PR-Checks and one for Builds to be able to only run code for one of the two. For example Phrase-App should only be called during a build. So the `smf_setup_dependencies_build` can be overridden to add Phrase-App string synchronisation. See section "Custom Behavior" for more information.
 
 `smf_pipeline_increment_build_number`: *See Android.*
 
@@ -95,7 +95,7 @@ To add custom behaviour for your app you can simply overwrite the default lane i
 ## Example
 Use Phraseapp for iOS app.
 ```
-override_lane :smf_setup_dependencies do | options |
+override_lane :smf_setup_dependencies_build do | options |
   # call the default setup
   smf_super_setup_dependencies(options)
 
