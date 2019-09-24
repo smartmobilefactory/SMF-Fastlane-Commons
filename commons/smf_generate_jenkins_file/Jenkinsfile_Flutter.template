@@ -1,0 +1,13 @@
+//
+// Automatically generated. Do not edit.
+//
+
+@Library('jenkins-pipeline-commons@migration_fastlane_commons') _
+
+_build_variants = __BUILD_VARIANTS__
+
+_build_parameters = [
+	'build_variants': _build_variants
+]
+
+flutterApp(_build_parameters)

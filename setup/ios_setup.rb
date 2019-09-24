@@ -277,12 +277,7 @@ end
 
 # Danger
 private_lane :smf_super_pipeline_danger do |options|
-
-  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
-
-  smf_danger(
-      build_variant: build_variant
-  )
+  smf_danger
 end
 
 lane :smf_pipeline_danger do |options|

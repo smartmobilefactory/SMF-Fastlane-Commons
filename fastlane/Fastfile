@@ -19,7 +19,7 @@ def smf_import_commons
   when :android
     @fastlane_commons_dir_path = "#{smf_workspace_dir}/.idea/.fastlane-smf-commons"
   when :flutter
-    UI.message('Setup for flutter is not implemented yet')
+    @fastlane_commons_dir_path = "#{smf_workspace_dir}/.idea/.fastlane-smf-commons"
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown Platform'
@@ -42,7 +42,7 @@ def smf_import_commons
     if File.exist?(ios_setup_file)
       import(ios_setup_file)
     else
-      raise "Can't find ios_release file at #{ios_setup_file}"
+      raise "Can't find ios_setup file at #{ios_setup_file}"
     end
     UI.message('Imported ios release file.')
 
@@ -51,12 +51,18 @@ def smf_import_commons
     if File.exist?(android_setup_file)
       import(android_setup_file)
     else
-      raise "Can't find android_release file at #{android_setup_file}"
+      raise "Can't find android_setup file at #{android_setup_file}"
     end
     UI.message('Imported android release file.')
 
   when :flutter
-    UI.message('Setup for flutter is not implemented yet')
+    flutter_setup_file = "#{@fastlane_commons_dir_path}/setup/flutter_setup.rb"
+    if File.exist?(flutter_setup_file)
+      import(flutter_setup_file)
+    else
+      raise "Can't find flutter_setup file at #{flutter_setup_file}"
+    end
+    UI.message('Imported flutter setup file.')
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
