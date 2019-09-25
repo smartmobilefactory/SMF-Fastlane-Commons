@@ -50,6 +50,9 @@ end
 
 private_lane :smf_super_ios_build do |options|
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+  sh("echo $PWD")
+  sh("cd ..")
+  sh("echo $PWD")
   sh("./flutterw build ios --release --no-codesign --flavor #{build_variant}")
 end
 
@@ -59,7 +62,7 @@ end
 
 private_lane :smf_super_android_build do |options|
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
-  sh("./flutterw build apk --release --flavor #{build_variant}")
+  sh("echo $PWD; ./flutterw build apk --release --flavor #{build_variant}")
 end
 
 lane :smf_android_build do |options|
