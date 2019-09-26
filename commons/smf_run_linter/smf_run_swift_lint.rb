@@ -6,7 +6,7 @@ private_lane :smf_run_swift_lint do
   swift_lint_executable_path = "#{smf_workspace_dir}/Submodules/SMF-iOS-CommonProjectSetupFiles/SwiftLint/portable_swiftlint/swiftlint"
 
   if !File.exist?(swift_lint_executable_path)
-    UI.warning("SwiftLint executable not present at #{swift_lint_executable_path}. Skipping SwiftLint.")
+    UI.important("SwiftLint executable not present at #{swift_lint_executable_path}. Skipping SwiftLint.")
     next
   end
 
