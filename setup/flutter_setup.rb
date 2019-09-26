@@ -76,10 +76,10 @@ private_lane :smf_super_ios_run_unit_tests do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
   smf_ios_unit_tests(
-      project_name: @smf_fastlane_config[:project][:project_name],
-      unit_test_scheme: build_variant_config[:unit_test_scheme],
-      scheme: build_variant_config[:scheme],
-      unit_test_xcconfig_name: !build_variant_config[:xcconfig_name].nil? ? build_variant_config[:xcconfig_name][:unittests] : nil,
+      project_name: "Runner",
+      unit_test_scheme: build_variant_config[:ios][:unit_test_scheme],
+      scheme: build_variant_config[:ios][:scheme],
+      unit_test_xcconfig_name: !build_variant_config[:ios][:xcconfig_name].nil? ? build_variant_config[:ios][:xcconfig_name][:unittests] : nil,
       device: build_variant_config["tests.device_to_test_against".to_sym],
       required_xcode_version: @smf_fastlane_config[:project][:xcode_version]
   )
