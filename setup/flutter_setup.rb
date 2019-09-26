@@ -120,7 +120,7 @@ private_lane :smf_super_android_linter do |options|
 end
 
 lane :smf_android_linter do |options|
-  smf_super_linter(options)
+  smf_super_android_linter(options)
 end
 
 
