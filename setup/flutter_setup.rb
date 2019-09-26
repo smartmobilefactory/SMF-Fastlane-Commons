@@ -95,7 +95,7 @@ private_lane :smf_super_android_run_unit_tests do |options|
 end
 
 lane :smf_run_android_unit_tests do |options|
-  smf_super_run_unit_tests(options)
+  smf_super_android_run_unit_tests(options)
 end
 
 
