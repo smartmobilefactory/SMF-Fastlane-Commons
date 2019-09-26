@@ -63,7 +63,7 @@ def smf_get_build_number_of_app
   when :android
     build_number = @smf_fastlane_config[:app_version_code].to_s
   when :flutter
-    UI.message('get build number of project for flutter is not implemented yet')
+    build_number = YAML.load(File.read("pubspec.yaml"))[:version].to_s
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'

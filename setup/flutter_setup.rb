@@ -113,7 +113,7 @@ private_lane :smf_super_android_linter do |options|
 
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
   options[:build_variant] = smf_get_build_variant_from_config(build_variant)
-
+  options[:gradle_path] = "#{smf_workspace_dir}/android"
   smf_run_klint(options)
   smf_run_detekt(options)
   smf_run_gradle_lint_task(options)
