@@ -101,7 +101,7 @@ end
 
 # Upload to AppCenter
 
-private_lane :smf_super_android_upload_to_appcenter do |options|
+private_lane :smf_super_pipeline_android_upload_to_appcenter do |options|
 
   build_variant = options[:build_variant]
   apk_file_regex = smf_get_apk_file_regex(build_variant)
@@ -124,11 +124,11 @@ private_lane :smf_super_android_upload_to_appcenter do |options|
 
 end
 
-lane :smf_android_upload_to_appcenter do |options|
-  smf_super_android_upload_to_appcenter(options)
+lane :smf_pipeline_android_upload_to_appcenter do |options|
+  smf_super_pipeline_android_upload_to_appcenter(options)
 end
 
-private_lane :smf_super_ios_upload_to_appcenter do |options|
+private_lane :smf_super_pipeline_ios_upload_to_appcenter do |options|
   build_variant = options[:build_variant]
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
   appcenter_app_id = smf_get_appcenter_id(build_variant, "ios")
@@ -156,8 +156,8 @@ private_lane :smf_super_ios_upload_to_appcenter do |options|
 
 end
 
-lane :smf_ios_upload_to_appcenter do |options|
-  smf_super_ios_upload_to_appcenter(options)
+lane :smf_pipeline_ios_upload_to_appcenter do |options|
+  smf_super_pipeline_ios_upload_to_appcenter(options)
 end
 
 
