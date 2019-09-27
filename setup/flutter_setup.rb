@@ -4,8 +4,6 @@ private_lane :smf_super_shared_setup_dependencies do |options|
 
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
 
-  smf_pod_install
-
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
   # Called only when upload_itc is set to true. This way the build will fail in the beginning if there are any problems with itc. Saves time.
@@ -69,35 +67,13 @@ end
 
 # Run Unit Tests
 
-private_lane :smf_super_ios_run_unit_tests do |options|
-
-  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
-
-  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
-
-  smf_ios_unit_tests(
-      project_name: "Runner",
-      unit_test_scheme: build_variant_config[:ios][:unit_test_scheme],
-      scheme: build_variant_config[:ios][:scheme],
-      unit_test_xcconfig_name: !build_variant_config[:ios][:xcconfig_name].nil? ? build_variant_config[:ios][:xcconfig_name][:unittests] : nil,
-      device: build_variant_config["tests.device_to_test_against".to_sym],
-      required_xcode_version: @smf_fastlane_config[:project][:xcode_version]
-  )
-
+private_lane :smf_super_run_unit_tests do |options|
+  sh("cd #{smf_workspace_dir}; ./flutterw test")
 end
 
-lane :smf_ios_run_unit_tests do |options|
-  smf_super_ios_run_unit_tests(options)
+lane :smf_run_unit_tests do |options|
+  smf_super_run_unit_tests(options)
 end
-
-private_lane :smf_super_android_run_unit_tests do |options|
-  smf_run_junit_task(options)
-end
-
-lane :smf_run_android_unit_tests do |options|
-  smf_super_android_run_unit_tests(options)
-end
-
 
 # Linter
 
@@ -114,6 +90,7 @@ private_lane :smf_super_android_linter do |options|
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
   options[:build_variant] = smf_get_build_variant_from_config(build_variant)
   options[:gradle_path] = "#{smf_workspace_dir}/android"
+  options[:project_dir] = "#{smf_workspace_dir}/android"
   smf_run_klint(options)
   smf_run_detekt(options)
   smf_run_gradle_lint_task(options)
