@@ -23,7 +23,7 @@ lane :smf_shared_setup_dependencies_pr_check do |options|
 end
 
 lane :smf_setup_dependencies_build do |options|
-  smf_super_setup_dependencies(options)
+  smf_super_shared_setup_dependencies(options)
 end
 
 
