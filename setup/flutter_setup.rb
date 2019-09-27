@@ -5,12 +5,12 @@ private_lane :smf_super_shared_setup_dependencies do |options|
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
-  sh("cd #{smf_workspace_dir}; ./flutterw doctor")
-
   generate_sh_file = "#{smf_workspace_dir}/generate.sh"
   if File.exist?(generate_sh_file)
     sh("cd #{smf_workspace_dir}; sh generate.sh")
   end
+
+  sh("cd #{smf_workspace_dir}; ./flutterw doctor")
 
   # Called only when upload_itc is set to true. This way the build will fail in the beginning if there are any problems with itc. Saves time.
   smf_verify_itc_upload_errors(
@@ -111,14 +111,14 @@ private_lane :smf_super_pipeline_android_upload_to_appcenter do |options|
   # Upload to AppCenter
   smf_android_upload_to_appcenter(
       build_variant: build_variant,
-      apk_path: smf_get_apk_path(apk_file_regex),
+      apk_path: smf_get_file_path(apk_file_regex),
       app_id: appcenter_app_id
   ) if !appcenter_app_id.nil?
 
   # Upload to Hockey
   smf_android_upload_to_hockey(
       build_variant: build_variant,
-      apk_path: smf_get_apk_path(apk_file_regex),
+      apk_path: smf_get_file_path(apk_file_regex),
       app_id: hockey_app_id
   ) if !hockey_app_id.nil?
 
@@ -131,15 +131,16 @@ end
 private_lane :smf_super_pipeline_ios_upload_to_appcenter do |options|
   build_variant = options[:build_variant]
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
-  appcenter_app_id = smf_get_appcenter_id(build_variant, "ios")
-  hockey_app_id = smf_get_hockey_id(build_variant, "ios")
+  appcenter_app_id = smf_get_appcenter_id(build_variant, 'ios')
+  hockey_app_id = smf_get_hockey_id(build_variant, 'ios')
+  app_file_regex = 'Runner.app'
 
   # Upload the IPA to AppCenter
   smf_ios_upload_to_appcenter(
       build_number: smf_get_build_number_of_app,
       app_id: appcenter_app_id,
       escaped_filename: build_variant_config[:scheme].gsub(' ', "\ "),
-      path_to_ipa_or_app: smf_path_to_ipa_or_app(build_variant),
+      path_to_ipa_or_app: smf_get_file_path(app_file_regex),
       is_mac_app: build_variant_config[:use_sparkle],
       podspec_path: build_variant_config[:podspec_path]
   ) if !appcenter_app_id.nil?
@@ -149,7 +150,7 @@ private_lane :smf_super_pipeline_ios_upload_to_appcenter do |options|
       build_number: smf_get_build_number_of_app,
       app_id: hockey_app_id,
       escaped_filename: build_variant_config[:scheme].gsub(' ', "\ "),
-      path_to_ipa_or_app: smf_path_to_ipa_or_app(build_variant),
+      path_to_ipa_or_app: smf_get_file_path(app_file_regex),
       is_mac_app: build_variant_config[:use_sparkle],
       podspec_path: build_variant_config[:podspec_path]
   ) if !hockey_app_id.nil?

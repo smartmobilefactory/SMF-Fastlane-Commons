@@ -1,8 +1,7 @@
-def smf_get_apk_path(apk_file_regex)
+def smf_get_file_path(file_regex)
   path = ''
-  Dir["#{smf_workspace_dir}/**/#{apk_file_regex}"].each do |file|
+  Dir["#{smf_workspace_dir}/**/#{file_regex}"].each do |file|
     path = File.expand_path(file)
-    UI.message("Found apk at: #{path}")
     break
   end
   path
@@ -31,7 +30,6 @@ end
 def smf_get_appcenter_id(build_variant, platform = nil)
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
   appcenter_id = platform.nil? ? build_variant_config[:appcenter_id] : build_variant_config[platform.to_sym][:appcenter_id]
-
 end
 
 def smf_get_hockey_id(build_variant, platform = nil)
@@ -178,5 +176,5 @@ def smf_get_version_number(build_variant)
       target: (target != nil ? target : scheme)
   )
 
-  return version_number
+  version_number
 end
