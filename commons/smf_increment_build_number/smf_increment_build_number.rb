@@ -57,7 +57,9 @@ def _smf_update_build_number_in_project(build_number)
         new_config,
         "Increment build number to #{build_number}")
   when :flutter
-    UI.message('increment build number for flutter is not implemented yet')
+    pubspec = YAML.load(File.read("#{smf_workspace_dir}/pubspec.yaml"))
+    pubspec['version'] = pubspec['version'].split('+').first + build_number.to_s
+    File.open("#{smf_workspace_dir}/pubspec.yaml", 'w') { |f| YAML.dump(pubspec, f) }
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
