@@ -160,7 +160,7 @@ private_lane :smf_super_pipeline_ios_upload_to_appcenter do |options|
   smf_ios_upload_to_appcenter(
       build_number: smf_get_build_number_of_app,
       app_id: appcenter_app_id,
-      escaped_filename: build_variant_config[:scheme].gsub(' ', "\ "),
+      escaped_filename: build_variant_config[:flavor].gsub(' ', "\ "),
       path_to_ipa_or_app: smf_get_file_path(app_file_regex),
       is_mac_app: build_variant_config[:use_sparkle],
       podspec_path: build_variant_config[:podspec_path]
