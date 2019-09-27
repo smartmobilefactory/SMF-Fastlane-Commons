@@ -226,9 +226,6 @@ lane :smf_send_slack_notification do |options|
   smf_super_send_slack_notification(options)
 end
 
-
-# Monitoring (MetaJSON)
-
 # Update File
 private_lane :smf_super_generate_files do |options|
 
@@ -245,6 +242,7 @@ lane :smf_generate_files do |options|
 end
 
 # Unit-Tests
+
 private_lane :smf_super_unit_tests do |options|
 
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
@@ -265,6 +263,8 @@ end
 lane :smf_unit_tests do |options|
   smf_super_unit_tests(options)
 end
+
+# Linter
 
 private_lane :smf_super_linter do
   smf_run_swift_lint

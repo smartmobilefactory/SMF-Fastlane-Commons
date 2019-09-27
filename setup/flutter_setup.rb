@@ -99,6 +99,27 @@ lane :smf_generate_changelog do |options|
 end
 
 
+# Upload Dsyms
+
+private_lane :smf_super_upload_dsyms do |options|
+
+  build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
+
+  smf_upload_to_sentry(
+      build_variant: options[:build_variant],
+      org_slug: @smf_fastlane_config[:sentry_org_slug],
+      project_slug: @smf_fastlane_config[:sentry_project_slug],
+      build_variant_org_slug: build_variant_config[:sentry_org_slug],
+      build_variant_project_slug: build_variant_config[:sentry_project_slug]
+  )
+
+end
+
+lane :smf_upload_dsyms do |options|
+  smf_super_upload_dsyms(options)
+end
+
+
 # Upload to AppCenter
 
 private_lane :smf_super_pipeline_android_upload_to_appcenter do |options|
@@ -159,6 +180,69 @@ end
 
 lane :smf_pipeline_ios_upload_to_appcenter do |options|
   smf_super_pipeline_ios_upload_to_appcenter(options)
+end
+
+# Upload to iTunes
+
+private_lane :smf_super_upload_to_itunes do |options|
+
+  build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
+
+  smf_upload_to_testflight(
+      build_variant: options[:build_variant],
+      apple_id: build_variant_config[:itc_apple_id],
+      itc_team_id: build_variant_config[:itc_team_id],
+      username: build_variant_config[:itc_apple_id],
+      skip_waiting_for_build_processing: build_variant_config[:itc_skip_waiting].nil? ? false : build_variant_config[:itc_skip_waiting],
+      slack_channel: @smf_fastlane_config[:slack_channel],
+      bundle_identifier: build_variant_config[:bundle_identifier],
+      upload_itc: build_variant_config[:upload_itc]
+  )
+end
+
+lane :smf_upload_to_itunes do |options|
+  smf_super_upload_to_itunes(options)
+end
+
+
+# Push Git Tag / Release
+
+private_lane :smf_super_push_git_tag_release do |options|
+
+  local_branch = options[:local_branch]
+  build_variant = options[:build_variant]
+
+  changelog = smf_read_changelog
+
+  smf_git_pull(local_branch)
+  smf_push_to_git_remote(local_branch: local_branch)
+
+  # Create the GitHub release
+  build_number = get_build_number(xcodeproj: "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj")
+  smf_create_github_release(
+      build_number: build_number,
+      tag: smf_get_tag_of_app(build_variant, build_number),
+      branch: local_branch,
+      build_variant: build_variant,
+      changelog: changelog
+  )
+end
+
+lane :smf_push_git_tag_release do |options|
+  smf_super_push_git_tag_release(options)
+end
+
+
+# Send Slack Notification
+
+private_lane :smf_super_send_slack_notification do |options|
+  smf_send_default_build_success_notification(
+      name: smf_get_default_name_of_app(options[:build_variant])
+  )
+end
+
+lane :smf_send_slack_notification do |options|
+  smf_super_send_slack_notification(options)
 end
 
 
