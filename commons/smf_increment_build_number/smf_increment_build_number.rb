@@ -58,7 +58,7 @@ def _smf_update_build_number_in_project(build_number)
         "Increment build number to #{build_number}")
   when :flutter
     pubspec = YAML.load(File.read("#{smf_workspace_dir}/pubspec.yaml"))
-    pubspec['version'] = pubspec['version'].split('+').first + build_number.to_s
+    pubspec['version'] = "#{pubspec['version'].split('+').first}+#{build_number}"
     File.open("#{smf_workspace_dir}/pubspec.yaml", 'w') { |f| YAML.dump(pubspec, f) }
     pubspec = YAML.load(File.read("#{smf_workspace_dir}/pubspec.yaml"))
     UI.message("updated version: #{pubspec['version']}")
