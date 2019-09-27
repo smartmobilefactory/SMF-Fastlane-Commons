@@ -9,7 +9,7 @@ private_lane :smf_super_shared_setup_dependencies do |options|
 
   generate_sh_file = "#{smf_workspace_dir}/generate.sh"
   if File.exist?(generate_sh_file)
-    sh("cd #{smf_workspace_dir}; generate.sh")
+    sh("cd #{smf_workspace_dir}; sh generate.sh")
   end
 
   # Called only when upload_itc is set to true. This way the build will fail in the beginning if there are any problems with itc. Saves time.
