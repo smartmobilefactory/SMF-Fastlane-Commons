@@ -9,7 +9,8 @@ Handle an exception.
 smf_handle_exception(
     name: 'Example App Name',
     message: 'This is just an example',
-    exception: Exception('Example')
+    exception: Exception('Example'),
+    slack_channel: 'test_channel' # Optional
 )
 ```
 

@@ -1,5 +1,7 @@
 private_lane :smf_upload_to_testflight do |options|
 
+  slack_channel = options[:slack_channel]
+
   if options[:upload_itc] != true
     UI.message("Upload to iTunes Connect is not enabled for this project.")
     next
@@ -14,7 +16,7 @@ private_lane :smf_upload_to_testflight do |options|
 
   _smf_itunes_precheck(
       options[:build_variant],
-      options[:slack_channel],
+      slack_channel,
       options[:bundle_identifier],
       username
   )
