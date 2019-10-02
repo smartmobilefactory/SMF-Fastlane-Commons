@@ -86,7 +86,7 @@ private_lane :smf_super_ios_build do |options|
 
   smf_build_ios_app(
       skip_export: options[:skip_export].nil? ? false : options[:skip_export],
-      scheme: build_variant_config[:scheme],
+      scheme: build_variant_config[:flavor],
       should_clean_project: build_variant_config[:should_clean_project],
       required_xcode_version: @smf_fastlane_config[:project][:xcode_version],
       project_name: @smf_fastlane_config[:project][:project_name],
