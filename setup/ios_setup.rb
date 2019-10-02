@@ -112,7 +112,7 @@ end
 private_lane :smf_super_upload_dsyms do |options|
 
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
-  slack_channel = @smf_fastlane_config[:slack_channel]
+  slack_channel = @smf_fastlane_config[:project][:slack_channel]
 
   smf_upload_to_sentry(
       build_variant: options[:build_variant],
@@ -170,7 +170,7 @@ end
 private_lane :smf_super_upload_to_itunes do |options|
 
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
-  slack_channel = @smf_fastlane_config[:slack_channel]
+  slack_channel = @smf_fastlane_config[:project][:slack_channel]
 
   smf_upload_to_testflight(
       build_variant: options[:build_variant],
@@ -221,7 +221,7 @@ end
 
 private_lane :smf_super_send_slack_notification do |options|
 
-  slack_channel = @smf_fastlane_config[:slack_channel]
+  slack_channel = @smf_fastlane_config[:project][:slack_channel]
 
   smf_send_default_build_success_notification(
       name: smf_get_default_name_of_app(options[:build_variant]),
