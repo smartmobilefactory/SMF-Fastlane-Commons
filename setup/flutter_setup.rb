@@ -250,9 +250,10 @@ private_lane :smf_super_push_git_tag_release do |options|
   smf_git_pull(local_branch)
   smf_push_to_git_remote(local_branch: local_branch)
 
+  build_number = smf_get_build_number_of_app
   # Create the GitHub release
   smf_create_github_release(
-      build_number: smf_get_build_number_of_app,
+      build_number: build_number,
       tag: smf_get_tag_of_app(build_variant, build_number),
       branch: local_branch,
       build_variant: build_variant,
