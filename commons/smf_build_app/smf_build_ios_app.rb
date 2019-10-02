@@ -16,11 +16,10 @@ private_lane :smf_build_ios_app do |options|
   export_method = options[:export_method]
   icloud_environment = options[:icloud_environment]
   workspace = options[:workspace]
-  output_name = options[:output_name]
 
   UI.message("export_mehtod is nil: #{export_method.nil?}")
 
-  output_name = output_name.nil? ? scheme : output_name
+  output_name = scheme
 
   # Check if the project defined if the build should be cleaned. Other wise the default behavior is used based on the whether the archiving is a bulk operation.
   clean_project = !bulk_deploy_params.nil? ? (bulk_deploy_params[:index] == 0 && bulk_deploy_params[:count] > 1) : true
