@@ -69,7 +69,10 @@ def smf_get_build_number_of_app
   when :android
     build_number = @smf_fastlane_config[:app_version_code].to_s
   when :flutter
+    UI.message('Flutter as platform detected.')
     build_number = YAML.load(File.read("#{smf_workspace_dir}/pubspec.yaml"))['version'].split('+').last
+    UI.message('build_number:')
+    UI.message(build_number)
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
@@ -80,6 +83,8 @@ def smf_get_build_number_of_app
     build_number = parts[0]
   end
 
+  UI.message('build_number 2:')
+  UI.message(build_number)
   build_number
 end
 
