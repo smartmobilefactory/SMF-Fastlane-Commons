@@ -115,13 +115,15 @@ error do |lane, exception, options|
 
     smf_handle_exception(
         exception: exception,
-        name: name
+        name: name,
+        slack_channel: @smf_fastlane_config[:slack_channel]
     )
   when :android
     UI.message('Handling exception for Android.')
     smf_handle_exception(
         exception: exception,
-        name: smf_get_default_name_of_app(build_variant)
+        name: smf_get_default_name_of_app(build_variant),
+        slack_channel: @smf_fastlane_config[:slack_channel]
     )
   when :flutter
     UI.message('Error for flutter is not implemented yet')

@@ -7,6 +7,7 @@ Upload the files to Sentry.
 ```
 smf_upload_to_sentry(
     org_slug: '',
-    project_slug: ''
+    project_slug: '',
+    slack_channel: 'test_channel'
 )
 ```

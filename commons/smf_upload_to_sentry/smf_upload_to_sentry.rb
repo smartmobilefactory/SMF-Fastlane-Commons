@@ -4,6 +4,7 @@ private_lane :smf_upload_to_sentry do |options|
   project_slug = options[:sentry_project_slug]
   build_variant_org_slug = options[:sentry_org_slug]
   build_variant_project_slug = options[:sentry_project_slug]
+  slack_channel = options[:slack_channel]
 
   has_sentry_project_settings = !org_slug.nil? && !project_slug.nil?
   has_sentry_variant_settings = !build_variant_org_slug.nil? && !build_variant_project_slug.nil?
@@ -34,7 +35,7 @@ private_lane :smf_upload_to_sentry do |options|
           title: "Failed to upload dsyms to Sentry for #{smf_get_default_name_of_app(options[:build_variant])} 😢",
           type: "warning",
           exception: exception,
-          slack_channel: smf_ci_ios_error_log
+          slack_channel: slack_channel
       )
     end
   end

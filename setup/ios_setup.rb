@@ -112,13 +112,15 @@ end
 private_lane :smf_super_upload_dsyms do |options|
 
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
+  slack_channel = @smf_fastlane_config[:slack_channel]
 
   smf_upload_to_sentry(
       build_variant: options[:build_variant],
       org_slug: @smf_fastlane_config[:sentry_org_slug],
       project_slug: @smf_fastlane_config[:sentry_project_slug],
       build_variant_org_slug: build_variant_config[:sentry_org_slug],
-      build_variant_project_slug: build_variant_config[:sentry_project_slug]
+      build_variant_project_slug: build_variant_config[:sentry_project_slug],
+      slack_channel: slack_channel
   )
 
 end
@@ -168,6 +170,7 @@ end
 private_lane :smf_super_upload_to_itunes do |options|
 
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
+  slack_channel = @smf_fastlane_config[:slack_channel]
 
   smf_upload_to_testflight(
       build_variant: options[:build_variant],
@@ -175,7 +178,7 @@ private_lane :smf_super_upload_to_itunes do |options|
       itc_team_id: build_variant_config[:itc_team_id],
       username: build_variant_config[:itc_apple_id],
       skip_waiting_for_build_processing: build_variant_config[:itc_skip_waiting].nil? ? false : build_variant_config[:itc_skip_waiting],
-      slack_channel: @smf_fastlane_config[:slack_channel],
+      slack_channel: slack_channel,
       bundle_identifier: build_variant_config[:bundle_identifier],
       upload_itc: build_variant_config[:upload_itc]
   )
@@ -217,8 +220,12 @@ end
 # Send Slack Notification
 
 private_lane :smf_super_send_slack_notification do |options|
+
+  slack_channel = @smf_fastlane_config[:slack_channel]
+
   smf_send_default_build_success_notification(
-      name: smf_get_default_name_of_app(options[:build_variant])
+      name: smf_get_default_name_of_app(options[:build_variant]),
+      slack_channel: slack_channel
   )
 end
 

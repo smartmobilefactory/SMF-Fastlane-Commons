@@ -32,6 +32,7 @@ $DEVELOPMENT_DIRECTORY_KEY = 'DEVELOPMENT_DIR'
 # Default Slack channel to send logs to
 $SMF_CI_IOS_ERROR_LOG = 'ci-ios-error-log'
 $SMF_CI_ANDROID_ERROR_LOG = 'ci-android-error-log'
+$SMF_CI_FLUTTER_ERROR_LOG = 'ci-flutter-error-log'
 
 # We host our own Sentry server so we need to supply the URL ourselves
 $SENTRY_AUTH_TOKEN = 'SENTRY_API_ACCESS_TOKEN'
