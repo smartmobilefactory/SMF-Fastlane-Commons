@@ -184,9 +184,10 @@ end
 private_lane :smf_super_pipeline_ios_upload_to_appcenter do |options|
   build_variant = options[:build_variant]
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
+  scheme = build_variant_config[:flavor]
   appcenter_app_id = smf_get_appcenter_id(build_variant, 'ios')
   hockey_app_id = smf_get_hockey_id(build_variant, 'ios')
-  app_file_regex = 'Runner.ipa'
+  app_file_regex = "#{scheme}.ipa"
 
   # Upload the IPA to AppCenter
   smf_ios_upload_to_appcenter(
