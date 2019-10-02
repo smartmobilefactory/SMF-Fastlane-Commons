@@ -168,13 +168,24 @@ end
 
 def smf_get_version_number(build_variant)
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
-  target = build_variant_config[:target]
-  scheme = build_variant_config[:scheme]
 
-  version_number = get_version_number(
-      xcodeproj: "#{smf_get_project_name}.xcodeproj",
-      target: (target != nil ? target : scheme)
-  )
+  case @platform
+  when :ios
+    target = build_variant_config[:target]
+    scheme = build_variant_config[:scheme]
+
+    version_number = get_version_number(
+        xcodeproj: "#{smf_get_project_name}.xcodeproj",
+        target: (target != nil ? target : scheme)
+    )
+  when :android
+    raise 'Get version number is not implemented for Android.'
+  when :flutter
+    version_number = YAML.load(File.read("#{smf_workspace_dir}/pubspec.yaml"))['version'].split('+').first
+  else
+    UI.message("There is no platform \"#{@platform}\", exiting...")
+    raise 'Unknown platform'
+  end
 
   version_number
 end
