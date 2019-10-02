@@ -96,7 +96,8 @@ private_lane :smf_super_ios_build do |options|
       upload_bitcode: build_variant_config[:upload_bitcode].nil? ? true : build_variant_config[:upload_bitcode],
       export_method: build_variant_config[:export_method],
       icloud_environment: smf_get_icloud_environment(build_variant.to_sym),
-      workspace: "#{smf_workspace_dir}/ios/Runner.xcworkspace"
+      workspace: "#{smf_workspace_dir}/ios/Runner.xcworkspace",
+      output_name: 'Runner.ipa'
   )
 
 end
@@ -186,7 +187,7 @@ private_lane :smf_super_pipeline_ios_upload_to_appcenter do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
   appcenter_app_id = smf_get_appcenter_id(build_variant, 'ios')
   hockey_app_id = smf_get_hockey_id(build_variant, 'ios')
-  app_file_regex = 'Runner.app'
+  app_file_regex = 'Runner.ipa'
 
   # Upload the IPA to AppCenter
   smf_ios_upload_to_appcenter(
