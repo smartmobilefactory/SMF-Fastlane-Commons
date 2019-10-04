@@ -165,10 +165,16 @@ private_lane :smf_super_pipeline_android_upload_to_appcenter do |options|
   # Upload to AppCenter
   smf_android_upload_to_appcenter(
       build_variant: build_variant,
-      apk_path: smf_get_file_path(apk_file_regex),
       aab_path: smf_get_file_path(aab_file_regex),
       app_id: appcenter_app_id
   ) if !appcenter_app_id.nil?
+
+  smf_android_upload_to_appcenter(
+      build_variant: build_variant,
+      apk_path: smf_get_file_path(apk_file_regex),
+      app_id: appcenter_app_id
+  ) if !appcenter_app_id.nil?
+
 
   # Upload to Hockey
   smf_android_upload_to_hockey(
