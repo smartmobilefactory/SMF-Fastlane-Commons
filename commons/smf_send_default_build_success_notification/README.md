@@ -7,6 +7,7 @@ Sending an build success notification.
 ```
 smf_send_default_build_success_notification(
     name : 'Example App Name',
+    slack_channel: 'test_channel' # Optional
 )
 ```
 
