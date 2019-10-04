@@ -14,7 +14,7 @@ private_lane :smf_android_upload_to_appcenter do |options|
       owner_name: owner_name,
       app_name: app_name,
       apk: apk_path,
-      aab_path: aab_path,
+      aab: aab_path,
       notify_testers: true,
       release_notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
   )
