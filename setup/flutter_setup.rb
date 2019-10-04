@@ -83,7 +83,7 @@ private_lane :smf_super_ios_build do |options|
       extensions_suffixes: @smf_fastlane_config[:extensions_suffixes],
       build_variant: build_variant
   )
-
+=begin
   smf_build_ios_app(
       skip_export: options[:skip_export].nil? ? false : options[:skip_export],
       scheme: build_variant_config[:flavor],
@@ -98,7 +98,7 @@ private_lane :smf_super_ios_build do |options|
       icloud_environment: smf_get_icloud_environment(build_variant.to_sym),
       workspace: "#{smf_workspace_dir}/ios/Runner.xcworkspace"
   )
-
+=end
 end
 
 lane :smf_ios_build do |options|
@@ -108,7 +108,7 @@ end
 private_lane :smf_super_android_build do |options|
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
   sh("cd #{smf_workspace_dir}; ./flutterw build apk --release --flavor #{build_variant}")
-
+  sh("cd #{smf_workspace_dir}; ./flutterw build appbundle --release --flavor #{build_variant}")
 
 end
 
@@ -158,20 +158,23 @@ private_lane :smf_super_pipeline_android_upload_to_appcenter do |options|
 
   build_variant = options[:build_variant]
   apk_file_regex = smf_get_apk_file_regex(build_variant)
+  aab_file_regex =  'app.aab'
   appcenter_app_id = smf_get_appcenter_id(build_variant, 'android')
   hockey_app_id = smf_get_hockey_id(build_variant, 'android')
 
   # Upload to AppCenter
   smf_android_upload_to_appcenter(
       build_variant: build_variant,
-      apk_path: smf_get_file_path(apk_file_regex),
+      apk: smf_get_file_path(apk_file_regex),
+      aab: smf_get_file_path(aab_file_regex),
       app_id: appcenter_app_id
   ) if !appcenter_app_id.nil?
 
   # Upload to Hockey
   smf_android_upload_to_hockey(
       build_variant: build_variant,
-      apk_path: smf_get_file_path(apk_file_regex),
+      apk: smf_get_file_path(apk_file_regex),
+      aab: smf_get_file_path(aab_file_regex),
       app_id: hockey_app_id
   ) if !hockey_app_id.nil?
 
