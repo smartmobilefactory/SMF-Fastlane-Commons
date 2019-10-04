@@ -158,15 +158,15 @@ private_lane :smf_super_pipeline_android_upload_to_appcenter do |options|
 
   build_variant = options[:build_variant]
   apk_file_regex = smf_get_apk_file_regex(build_variant)
-  aab_file_regex =  'app.aab'
+  aab_file_regex = 'app.aab'
   appcenter_app_id = smf_get_appcenter_id(build_variant, 'android')
   hockey_app_id = smf_get_hockey_id(build_variant, 'android')
 
   # Upload to AppCenter
   smf_android_upload_to_appcenter(
       build_variant: build_variant,
-      apk: smf_get_file_path(apk_file_regex),
-      aab: smf_get_file_path(aab_file_regex),
+      apk_path: smf_get_file_path(apk_file_regex),
+      aab_path: smf_get_file_path(aab_file_regex),
       app_id: appcenter_app_id
   ) if !appcenter_app_id.nil?
 

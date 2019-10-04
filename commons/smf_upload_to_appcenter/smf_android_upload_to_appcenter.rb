@@ -5,8 +5,8 @@ private_lane :smf_android_upload_to_appcenter do |options|
   app_id = options[:app_id]
 
   app_name, owner_name = get_app_details(app_id)
-  raise("Cannot find the APK #{apk_path}") if apk_path.nil?
-  UI.important("Cannot find the AAB #{aab_path}") if aab_path.nil?
+  raise('APK path is null.') if apk_path.nil?
+  UI.important("AAB path is null.") if aab_path.nil?
 
   UI.message('Upload android app to AppCenter.')
   appcenter_upload(
