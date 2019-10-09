@@ -68,7 +68,7 @@ end
 
 private_lane :smf_super_ios_build do |options|
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
-  build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
+  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
   build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant.to_sym][:ios]
 
   sh("cd #{smf_workspace_dir}; ./flutterw build ios --release --no-codesign --flavor #{build_variant}")
