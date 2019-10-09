@@ -59,7 +59,6 @@ def initialize_env_variable_name_mappings
       :format                     => ["phraseappFormat", false],
       :base_directory             => ["phraseappBasedir", false],
       :files                      => ["phraseappFiles", false],
-      :git_branch                 => ["phraseappGitBranch", false],
       :files_prefix               => ["phraseappFilesPrefix", true, ""], # optional
       :forbid_comments_in_source  => ["phraseappForbidCommentsInSource", true, "1"]  # optional
   }
