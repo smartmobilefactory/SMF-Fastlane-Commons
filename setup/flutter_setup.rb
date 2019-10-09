@@ -276,8 +276,11 @@ end
 # Send Slack Notification
 
 private_lane :smf_super_send_slack_notification do |options|
+
+  build_variant = options[:build_variant]
+
   smf_send_default_build_success_notification(
-      name: smf_get_default_name_of_app(options[:build_variant])
+      name: smf_get_default_name_of_app(build_variant)
   )
 end
 

@@ -78,6 +78,8 @@ def _smf_should_commit_be_ignored_in_changelog(commit_message, regexes_to_match)
 end
 
 def _smf_changelog_temp_path
-  "#{@fastlane_commons_dir_path}/#{$CHANGELOG_TEMP_FILE}"
+  changelog_temp_path = "#{@fastlane_commons_dir_path}/#{$CHANGELOG_TEMP_FILE}"
+  UI.message("Temporary changelog path: #{changelog_temp_path}")
+  changelog_temp_path
 end
 
