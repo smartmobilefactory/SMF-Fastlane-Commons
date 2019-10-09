@@ -64,7 +64,7 @@ def _smf_update_build_number_in_project(build_number)
     UI.message(version)
     new_version = "#{version.split('+').first}+#{build_number}"
     UI.message(new_version)
-    pubspec = pubspec.gsub(/#{version}/, new_version)
+    pubspec = pubspec.sub! version, new_version
     File.write(pubspec_path, pubspec)
     UI.message(pubspec.to_s)
     git_add(path: pubspec_path)
