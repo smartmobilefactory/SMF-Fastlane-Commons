@@ -83,7 +83,6 @@ private_lane :smf_super_ios_build do |options|
       extensions_suffixes: @smf_fastlane_config[:extensions_suffixes],
       build_variant: build_variant
   )
-=begin
   smf_build_ios_app(
       skip_export: options[:skip_export].nil? ? false : options[:skip_export],
       scheme: build_variant_config[:flavor],
@@ -98,7 +97,6 @@ private_lane :smf_super_ios_build do |options|
       icloud_environment: smf_get_icloud_environment(build_variant.to_sym),
       workspace: "#{smf_workspace_dir}/ios/Runner.xcworkspace"
   )
-=end
 end
 
 lane :smf_ios_build do |options|
