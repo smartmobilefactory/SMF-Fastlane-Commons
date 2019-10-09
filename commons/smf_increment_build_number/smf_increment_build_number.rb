@@ -59,10 +59,13 @@ def _smf_update_build_number_in_project(build_number)
   when :flutter
     pubspec_path = "#{smf_workspace_dir}/pubspec.yaml"
     pubspec = YAML.load(File.read(pubspec_path))
+    UI.message(pubspec.to_s)
     pubspec['version'] = "#{pubspec['version'].split('+').first}+#{build_number}"
     File.open(pubspec_path, 'w') { |f| YAML.dump(pubspec, f) }
-    git_add(path: pubspec_path)
-    git_commit(path: pubspec_path, message: "Increment build number to #{build_number}")
+    pubspec = YAML.load(File.read(pubspec_path))
+    UI.message(pubspec.to_s)
+    #git_add(path: pubspec_path)
+    #git_commit(path: pubspec_path, message: "Increment build number to #{build_number}")
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
