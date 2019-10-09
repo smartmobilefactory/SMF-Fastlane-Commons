@@ -84,14 +84,35 @@ def smf_get_build_number_of_app
 end
 
 def smf_get_xcconfig_name(build_variant)
-  build_variant_config = @smf_fastlane_config[:build_variants][build_variant]
-  use_xcconfig = build_variant_config[:xcconfig_name].nil? ? false : true
-  use_xcconfig ? build_variant_config[:xcconfig_name][:archive] : 'Release'
+
+  xcconfig_name = 'Release'
+
+  case @platform
+  when :ios
+    build_variant_config = @smf_fastlane_config[:build_variants][build_variant]
+    xcconfig_name = build_variant_config[:xcconfig_name][:archive] if !build_variant_config[:xcconfig_name].nil?
+  when :flutter
+    build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant][:ios]
+    xcconfig_name = build_variant_ios_config[:xcconfig_name][:archive] if !build_variant_ios_config[:xcconfig_name].nil?
+  end
+
+  xcconfig_name
 end
 
 def smf_get_icloud_environment(build_variant)
-  build_variant_config = @smf_fastlane_config[:build_variants][build_variant]
-  build_variant_config[:icloud_environment].nil? ? 'Development' : build_variant_config[:icloud_environment]
+
+  icloud_environment = 'Development'
+
+  case @platform
+  when :ios
+    build_variant_config = @smf_fastlane_config[:build_variants][build_variant]
+    icloud_environment = build_variant_config[:icloud_environment] if !build_variant_config[:icloud_environment].nil?
+  when :flutter
+    build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant][:ios]
+    icloud_environment = build_variant_ios_config[:icloud_environment] if !build_variant_ios_config[:icloud_environment].nil?
+  end
+
+  icloud_environment
 end
 
 def smf_path_to_ipa_or_app(build_variant)

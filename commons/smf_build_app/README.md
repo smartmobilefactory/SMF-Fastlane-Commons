@@ -20,7 +20,8 @@ smf_build_ios_app(
     upload_itc: false,                                      # If enabled, the .ipa will be uploaded to App Store Connect.
     upload_bitcode: true,                                   # If disabled, Bitcode won't be uploaded.
     export_method: false,                                   # The Xcode archive export method to use. This needs to be set for special cases only.
-    icloud_environment                                      # ("Development" or "Production"): If the app uses iCloud capabilities, this has to be set accordingly for each target.             
+    icloud_environment: "Development",                      # ("Development" or "Production"): If the app uses iCloud capabilities, this has to be set accordingly for each target.           
+    workspace: <path to workspace>                          # Optional, by default the *project_name*.xcworkspace will be used
 )
 
 ```

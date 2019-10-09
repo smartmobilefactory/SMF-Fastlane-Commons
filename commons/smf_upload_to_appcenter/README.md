@@ -19,7 +19,8 @@ smf_ios_upload_to_appcenter(
 Upload the apk to AppCenter.
 ```
 smf_android_upload_to_appcenter(
-        apk_path: <path to exampleApp>,         # Path to apk file
+        apk_path: <path to app apk>,            # Path to apk file
+        aab_path: <path to app bundle>,         # Optional to apk_path
         app_id: "eg21g21-21g1g-12g13b3-2121",   # The id of the app from AppCenter
 )
 ```
