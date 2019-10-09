@@ -58,11 +58,14 @@ def _smf_update_build_number_in_project(build_number)
         "Increment build number to #{build_number}")
   when :flutter
     pubspec_path = "#{smf_workspace_dir}/pubspec.yaml"
-    pubspec = YAML.load(File.read(pubspec_path))
+    pubspec = File.read(pubspec_path)
     UI.message(pubspec.to_s)
-    pubspec['version'] = "#{pubspec['version'].split('+').first}+#{build_number}"
-    File.open(pubspec_path, 'w') { |f| YAML.dump(pubspec, f) }
-    pubspec = YAML.load(File.read(pubspec_path))
+    version = pubspec.scan(/version:.*/).last.first
+    UI.message(version)
+    new_version = "#{version.split('+').first}+#{build_number}"
+    UI.message(new_version)
+    pubspec = pubspec.gsub(/#{pubspec_path}/, new_version)
+    File.write(pubspec_path, pubspec)
     UI.message(pubspec.to_s)
     #git_add(path: pubspec_path)
     #git_commit(path: pubspec_path, message: "Increment build number to #{build_number}")
