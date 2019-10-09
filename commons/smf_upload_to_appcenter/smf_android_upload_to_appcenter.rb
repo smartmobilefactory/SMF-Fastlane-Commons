@@ -15,7 +15,7 @@ private_lane :smf_android_upload_to_appcenter do |options|
         owner_name: owner_name,
         app_name: app_name,
         aab: aab_path,
-        destination_type: 'group',
+        destination_type: 'store',
         notify_testers: true,
         release_notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
     )
