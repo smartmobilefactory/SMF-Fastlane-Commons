@@ -64,11 +64,11 @@ def _smf_update_build_number_in_project(build_number)
     UI.message(version)
     new_version = "#{version.split('+').first}+#{build_number}"
     UI.message(new_version)
-    pubspec = pubspec.gsub(/#{pubspec_path}/, new_version)
+    pubspec = pubspec.gsub(/#{version}/, new_version)
     File.write(pubspec_path, pubspec)
     UI.message(pubspec.to_s)
-    #git_add(path: pubspec_path)
-    #git_commit(path: pubspec_path, message: "Increment build number to #{build_number}")
+    git_add(path: pubspec_path)
+    git_commit(path: pubspec_path, message: "Increment build number to #{build_number}")
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
