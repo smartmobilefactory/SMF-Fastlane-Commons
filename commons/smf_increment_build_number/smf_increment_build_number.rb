@@ -60,7 +60,7 @@ def _smf_update_build_number_in_project(build_number)
     pubspec_path = "#{smf_workspace_dir}/pubspec.yaml"
     pubspec = File.read(pubspec_path)
     UI.message(pubspec.to_s)
-    version = pubspec.scan(/version:.*/).last.first
+    version = pubspec.scan(/version:.*/).first
     UI.message(version)
     new_version = "#{version.split('+').first}+#{build_number}"
     UI.message(new_version)
