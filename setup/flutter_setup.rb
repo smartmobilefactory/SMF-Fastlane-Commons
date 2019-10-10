@@ -5,12 +5,12 @@ private_lane :smf_super_shared_setup_dependencies do |options|
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
   build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant.to_sym][:ios]
 
+  sh("cd #{smf_workspace_dir}; ./flutterw doctor")
+  sh("cd #{smf_workspace_dir}; ./flutterw packages get")
   generate_sh_file = "#{smf_workspace_dir}/generate.sh"
   if File.exist?(generate_sh_file)
     sh("cd #{smf_workspace_dir}; sh generate.sh")
   end
-
-  sh("cd #{smf_workspace_dir}; ./flutterw doctor")
 
   # Called only when upload_itc is set to true. This way the build will fail in the beginning if there are any problems with itc. Saves time.
   smf_verify_itc_upload_errors(
