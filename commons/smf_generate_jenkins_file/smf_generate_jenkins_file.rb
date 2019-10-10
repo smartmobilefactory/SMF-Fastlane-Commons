@@ -16,6 +16,9 @@ IOS_APP_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_iOS.template'
 ANDROID_APP_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Android.template'
 ANDROID_FRAMEWORK_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Android_Framework.template'
 
+# Flutter Template
+FLUTTER_APP_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Flutter.template'
+
 private_lane :smf_generate_jenkins_file do |options|
   possible_build_variants = _smf_possible_build_variants
   jenkins_file_template_path = _smf_jenkins_file_template_path
@@ -41,7 +44,7 @@ def _smf_jenkins_file_template_path
       path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{ANDROID_APP_TEMPLATE_JENKINS_FILE}"
     end
   when :flutter
-    UI.message('Generating jenkins files for flutter is not implemented yet')
+    path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{FLUTTER_APP_TEMPLATE_JENKINS_FILE}"
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'

@@ -1,16 +1,22 @@
-def smf_get_apk_path(apk_file_regex)
+def smf_get_file_path(file_regex)
   path = ''
-  Dir["#{smf_workspace_dir}/**/#{apk_file_regex}"].each do |file|
+  Dir["#{smf_workspace_dir}/**/#{file_regex}"].each do |file|
     path = File.expand_path(file)
-    UI.message("Found apk at: #{path}")
     break
   end
   path
 end
 
 def smf_get_apk_file_regex(build_variant)
-  variant = smf_get_build_variant_from_config(build_variant)
-  file_regex = "*-#{variant.gsub(/[A-Z]/) { |s| '-' + s.downcase }}.apk"
+  case @platform
+  when :android
+    variant = smf_get_build_variant_from_config(build_variant)
+    file_regex = "*-#{variant.gsub(/[A-Z]/) { |s| '-' + s.downcase }}.apk"
+  when :flutter
+    file_regex = "app-#{build_variant}-release.apk"
+  end
+
+  file_regex
 end
 
 def smf_get_build_variant_from_config(build_variant)
@@ -21,14 +27,14 @@ def smf_get_project_name
   @smf_fastlane_config[:project][:project_name]
 end
 
-def smf_get_appcenter_id(build_variant)
-
-  @smf_fastlane_config[:build_variants][build_variant.to_sym][:appcenter_id]
+def smf_get_appcenter_id(build_variant, platform = nil)
+  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
+  appcenter_id = platform.nil? ? build_variant_config[:appcenter_id] : build_variant_config[platform.to_sym][:appcenter_id]
 end
 
-def smf_get_hockey_id(build_variant)
-
-  @smf_fastlane_config[:build_variants][build_variant.to_sym][:hockeyapp_id]
+def smf_get_hockey_id(build_variant, platform = nil)
+  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
+  hockeyapp_id = platform.nil? ? build_variant_config[:hockeyapp_id] : build_variant_config[platform.to_sym][:hockeyapp_id]
 end
 
 def smf_get_keystore_folder(build_variant)
@@ -63,7 +69,7 @@ def smf_get_build_number_of_app
   when :android
     build_number = @smf_fastlane_config[:app_version_code].to_s
   when :flutter
-    UI.message('get build number of project for flutter is not implemented yet')
+    build_number = YAML.load(File.read("#{smf_workspace_dir}/pubspec.yaml"))['version'].split('+').last
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
@@ -78,14 +84,35 @@ def smf_get_build_number_of_app
 end
 
 def smf_get_xcconfig_name(build_variant)
-  build_variant_config = @smf_fastlane_config[:build_variants][build_variant]
-  use_xcconfig = build_variant_config[:xcconfig_name].nil? ? false : true
-  use_xcconfig ? build_variant_config[:xcconfig_name][:archive] : 'Release'
+
+  xcconfig_name = 'Release'
+
+  case @platform
+  when :ios
+    build_variant_config = @smf_fastlane_config[:build_variants][build_variant]
+    xcconfig_name = build_variant_config[:xcconfig_name][:archive] if !build_variant_config[:xcconfig_name].nil?
+  when :flutter
+    build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant][:ios]
+    xcconfig_name = build_variant_ios_config[:xcconfig_name][:archive] if !build_variant_ios_config[:xcconfig_name].nil?
+  end
+
+  xcconfig_name
 end
 
 def smf_get_icloud_environment(build_variant)
-  build_variant_config = @smf_fastlane_config[:build_variants][build_variant]
-  build_variant_config[:icloud_environment].nil? ? 'Development' : build_variant_config[:icloud_environment]
+
+  icloud_environment = 'Development'
+
+  case @platform
+  when :ios
+    build_variant_config = @smf_fastlane_config[:build_variants][build_variant]
+    icloud_environment = build_variant_config[:icloud_environment] if !build_variant_config[:icloud_environment].nil?
+  when :flutter
+    build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant][:ios]
+    icloud_environment = build_variant_ios_config[:icloud_environment] if !build_variant_ios_config[:icloud_environment].nil?
+  end
+
+  icloud_environment
 end
 
 def smf_path_to_ipa_or_app(build_variant)
@@ -166,13 +193,24 @@ end
 
 def smf_get_version_number(build_variant)
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
-  target = build_variant_config[:target]
-  scheme = build_variant_config[:scheme]
 
-  version_number = get_version_number(
-      xcodeproj: "#{smf_get_project_name}.xcodeproj",
-      target: (target != nil ? target : scheme)
-  )
+  case @platform
+  when :ios
+    target = build_variant_config[:target]
+    scheme = build_variant_config[:scheme]
 
-  return version_number
+    version_number = get_version_number(
+        xcodeproj: "#{smf_get_project_name}.xcodeproj",
+        target: (target != nil ? target : scheme)
+    )
+  when :android
+    raise 'Get version number is not implemented for Android.'
+  when :flutter
+    version_number = YAML.load(File.read("#{smf_workspace_dir}/pubspec.yaml"))['version'].split('+').first
+  else
+    UI.message("There is no platform \"#{@platform}\", exiting...")
+    raise 'Unknown platform'
+  end
+
+  version_number
 end

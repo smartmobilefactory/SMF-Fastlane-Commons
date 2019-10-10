@@ -15,6 +15,7 @@ private_lane :smf_build_ios_app do |options|
   upload_bitcode = options[:upload_bitcode]
   export_method = options[:export_method]
   icloud_environment = options[:icloud_environment]
+  workspace = options[:workspace]
 
   UI.message("export_mehtod is nil: #{export_method.nil?}")
 
@@ -31,7 +32,7 @@ private_lane :smf_build_ios_app do |options|
 
   gym(
       clean: clean_project,
-      workspace: "#{project_name}.xcworkspace",
+      workspace: !workspace.nil? ? workspace : "#{project_name}.xcworkspace",
       scheme: scheme,
       configuration: xcconfig_name,
       codesigning_identity: code_signing_identity,

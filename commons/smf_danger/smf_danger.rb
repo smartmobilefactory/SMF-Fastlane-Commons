@@ -1,16 +1,15 @@
 private_lane :smf_danger do |options|
 
+  jira_keys = options[:jira_key]
   checkstyle_paths = []
 
   if File.exist?(smf_swift_lint_output_path)
     checkstyle_paths.push(smf_swift_lint_output_path)
   elsif @platform == :ios
-    UI.warning("There is not SwiftLint output file at #{smf_swift_lint_output_path}. Is SwiftLint enabled?")
+    UI.important("There is not SwiftLint output file at #{smf_swift_lint_output_path}. Is SwiftLint enabled?")
   end
 
-  jira_keys = options[:jira_key]
-
-  if @platform  == :android
+  if @platform == :android
     UI.user_error!("android-commons not present! Can't start danger") unless File.exist?('../android-commons')
   end
 

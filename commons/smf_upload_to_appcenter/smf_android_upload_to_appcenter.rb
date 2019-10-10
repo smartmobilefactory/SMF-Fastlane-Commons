@@ -1,20 +1,34 @@
 private_lane :smf_android_upload_to_appcenter do |options|
 
   apk_path = options[:apk_path]
+  aab_path = options[:aab_path]
   app_id = options[:app_id]
 
   app_name, owner_name = get_app_details(app_id)
-  raise("Cannot find the APK #{apk_path}") if apk_path.nil?
+  UI.important('APK path is null.') if apk_path.nil?
+  UI.important("AAB path is null.") if aab_path.nil?
 
   UI.message('Upload android app to AppCenter.')
-  appcenter_upload(
-      api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
-      owner_name: owner_name,
-      app_name: app_name,
-      apk: apk_path,
-      notify_testers: true,
-      release_notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
-  )
+  if !aab_path.nil?
+    appcenter_upload(
+        api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
+        owner_name: owner_name,
+        app_name: app_name,
+        aab: aab_path,
+        destination_type: 'store',
+        notify_testers: true,
+        release_notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
+    )
+  else
+    appcenter_upload(
+        api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
+        owner_name: owner_name,
+        app_name: app_name,
+        apk: apk_path,
+        notify_testers: true,
+        release_notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
+    )
+  end
 
 end
 

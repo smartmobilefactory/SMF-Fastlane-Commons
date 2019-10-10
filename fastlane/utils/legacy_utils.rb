@@ -130,6 +130,10 @@ def ci_android_error_log
   $SMF_CI_ANDROID_ERROR_LOG.to_s
 end
 
+def ci_flutter_error_log
+  $SMF_CI_FLUTTER_ERROR_LOG.to_s
+end
+
 def get_phrase_app_properties
   build_variant_config[:phrase_app]
 end
