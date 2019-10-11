@@ -39,7 +39,7 @@ private_lane :smf_build_ios_app do |options|
       output_directory: "build",
       xcargs: smf_xcargs_for_build_system,
       archive_path: "build/",
-      derived_data: "build/derivedData/",
+      derived_data_path: "build/derivedData/",
       output_name: output_name,
       include_symbols: true,
       include_bitcode: (upload_itc && upload_bitcode),
