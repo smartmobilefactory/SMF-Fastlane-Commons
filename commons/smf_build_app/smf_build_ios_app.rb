@@ -58,18 +58,14 @@ def smf_is_using_old_build_system
 
   return false if project_root.nil?
 
-  UI.message("xcargs_for_build_system found Project")
-
   case @platform
-  when :ios
-    workspace_file = `cd #{project_root} && ls | grep -E "(.|\s)+\.xcworkspace"`.gsub("\n", "")
-    UI.message("ios workspace: " + workspace_file)
   when :flutter
-    workspace_file = `cd #{project_root}/ios && ls | grep -E "(.|\s)+\.xcworkspace"`.gsub("\n", "")
-    UI.message("flutter workspace: " + workspace_file)
+    project_root = project_root + "/ios"
   else
     return false
   end
+
+  workspace_file = `cd #{project_root} && ls | grep -E "(.|\s)+\.xcworkspace"`.gsub("\n", "")
 
   if (workspace_file == "" || workspace_file == nil)
     return false
