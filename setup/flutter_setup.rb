@@ -320,7 +320,7 @@ end
 # Linter
 
 private_lane :smf_super_linter do |options|
-  sh("cd #{smf_workspace_dir}; ./flutterw analyze")
+  sh("cd #{smf_workspace_dir}; ./flutterw analyze || true")
 end
 
 lane :smf_linter do |options|
