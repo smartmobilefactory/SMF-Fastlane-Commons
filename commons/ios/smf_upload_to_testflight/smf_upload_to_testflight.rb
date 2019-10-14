@@ -7,12 +7,15 @@ private_lane :smf_upload_to_testflight do |options|
     next
   end
 
+  required_xcode_version = options[:required_xcode_version]
   username = !options[:username].nil? ? options[:username] : 'development@smfhq.com'
   itc_team_id = options[:itc_team_id]
   apple_id = !options[:apple_id].nil? ? options[:apple_id] : 'development@smfhq.com'
   skip_waiting_for_build_processing = options[:skip_waiting_for_build_processing]
 
   ENV["FASTLANE_ITC_TEAM_ID"] = itc_team_id
+
+  smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
 
   _smf_itunes_precheck(
       options[:build_variant],
