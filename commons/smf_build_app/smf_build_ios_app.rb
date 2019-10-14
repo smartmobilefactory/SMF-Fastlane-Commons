@@ -58,7 +58,14 @@ def smf_is_using_old_build_system
 
   return false if project_root.nil?
 
-  workspace_file = `cd #{project_root} && ls | grep -E "(.|\s)+\.xcworkspace"`.gsub("\n", "")
+  case @platform
+  when :ios
+    workspace_file = `cd #{project_root} && ls | grep -E "(.|\s)+\.xcworkspace"`.gsub("\n", "")
+  when :flutter
+    workspace_file = `cd #{project_root}/ios && ls | grep -E "(.|\s)+\.xcworkspace"`.gsub("\n", "")
+  else
+    return false
+  end
 
   if (workspace_file == "" || workspace_file == nil)
     return false
