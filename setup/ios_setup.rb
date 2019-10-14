@@ -180,7 +180,8 @@ private_lane :smf_super_upload_to_itunes do |options|
       skip_waiting_for_build_processing: build_variant_config[:itc_skip_waiting].nil? ? false : build_variant_config[:itc_skip_waiting],
       slack_channel: slack_channel,
       bundle_identifier: build_variant_config[:bundle_identifier],
-      upload_itc: build_variant_config[:upload_itc]
+      upload_itc: build_variant_config[:upload_itc],
+      required_xcode_version: @smf_fastlane_config[:project][:xcode_version]
   )
 end
 
