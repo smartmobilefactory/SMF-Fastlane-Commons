@@ -35,7 +35,7 @@ private_lane :smf_generate_jenkins_file do |options|
       variant_value[:podspec_path] == nil && variant_value[:pods_specs_repo] == nil
     }.keys.map(&:to_s)
 
-    jenkinsFileData = jenkinsFileData.gsub("#{POD_EXAMPLE_VARIANTS_PATTERN}", JSON.dump(build_variants_from_config))
+    jenkinsFileData = jenkinsFileData.gsub("#{POD_EXAMPLE_VARIANTS_PATTERN}", JSON.dump(possible_build_variants))
     possible_build_variants.push(*POD_DEFAULT_VARIANTS)
   end
 
