@@ -5,7 +5,7 @@ private_lane :smf_danger do |options|
 
   if File.exist?(smf_swift_lint_output_path)
     checkstyle_paths.push(smf_swift_lint_output_path)
-  elsif [:ios, :pod].contains(@platform)
+  elsif [:ios, :pod].include?(@platform)
     UI.important("There is not SwiftLint output file at #{smf_swift_lint_output_path}. Is SwiftLint enabled?")
   end
 
