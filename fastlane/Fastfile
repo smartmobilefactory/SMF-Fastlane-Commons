@@ -14,7 +14,7 @@ end
 def smf_import_commons
 
   case @platform
-  when :ios
+  when :ios, :pod
     @fastlane_commons_dir_path = "#{smf_workspace_dir}/.fastlane-smf-commons"
   when :android
     @fastlane_commons_dir_path = "#{smf_workspace_dir}/.idea/.fastlane-smf-commons"
@@ -37,7 +37,7 @@ def smf_import_commons
   smf_import_all("#{@fastlane_commons_dir_path}/commons")
 
   case @platform
-  when :ios
+  when :ios, :pod
     ios_setup_file = "#{@fastlane_commons_dir_path}/setup/ios_setup.rb"
     if File.exist?(ios_setup_file)
       import(ios_setup_file)
@@ -110,7 +110,7 @@ error do |lane, exception, options|
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : '' # TODO: add build_variant to all stages
 
   case @platform
-  when :ios
+  when :ios, :pod
     UI.message('Handling exception for iOS.')
 
     if @smf_fastlane_config.key?(:build_variants)

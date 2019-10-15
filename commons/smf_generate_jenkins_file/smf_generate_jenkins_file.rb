@@ -98,6 +98,7 @@ def _smf_insert_custom_credentials(jenkinsFile)
   when :android
   when :flutter
     UI.message('Inserting custom credentials for flutter is not implemented yet')
+  when :pod
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
