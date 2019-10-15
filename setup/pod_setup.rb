@@ -7,12 +7,11 @@ else
 end
 
 # Build (Build to Release)
-
 private_lane :smf_super_build_for_pod_pr_check do |options|
 
   build_variants_for_pr_check = smf_build_variants_for_pod_pr_check
   build_variants_for_pr_check.each { |variant|
-    UI.message("Building variant #{variant} for PR Check")
+    UI.message("Building variant '#{variant}' for PR Check")
     options[:build_variant] = variant
     smf_build(options)
   }
@@ -21,4 +20,19 @@ end
 
 lane :smf_build_for_pod_pr_check do |options|
   smf_super_build_for_pod_pr_check(options)
+end
+
+private_lane :smf_super_unit_tests_for_pod_pr_check do |options|
+
+  build_variants_for_pr_check = smf_build_variants_for_pod_pr_check
+  build_variants_for_pr_check.each { |variant|
+    UI.message("Running unit tests for variant '#{variant}' for PR Check")
+    options[:build_variant] = variant
+    smf_unit_tests(options)
+  }
+
+end
+
+lane :smf_unit_tests_for_pod_pr_check do |options|
+  smf_super_unit_tests_for_pod_pr_check(options)
 end
