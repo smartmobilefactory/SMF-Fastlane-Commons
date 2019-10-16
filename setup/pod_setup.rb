@@ -102,3 +102,20 @@ end
 lane :smf_pod_generate_changelog do |options|
   smf_super_pod_generate_changelog(options)
 end
+
+
+# Send Slack Notification
+
+private_lane :smf_super_pod_send_slack_notification do |options|
+
+  slack_channel = @smf_fastlane_config[:project][:slack_channel]
+
+  smf_send_default_build_success_notification(
+      name: smf_get_default_name_of_pod("framework"), # Needs to be changed
+      slack_channel: slack_channel
+  )
+end
+
+lane :smf_pod_send_slack_notification do |options|
+  smf_super_pod_send_slack_notification(options)
+end

@@ -123,7 +123,7 @@ error do |lane, exception, options|
     UI.message('Handling exception for iOS.')
 
     if @smf_fastlane_config.key?(:build_variants)
-      name = !@smf_fastlane_config[:build_variants][build_variant][:podspec_path].nil? ? smf_get_default_name_of_pod : smf_get_default_name_of_app(build_variant)
+      name = !@smf_fastlane_config[:build_variants][build_variant][:podspec_path].nil? ? smf_get_default_name_of_pod(build_variant) : smf_get_default_name_of_app(build_variant) # Needs to be changed
     else
       name = smf_get_default_name_of_app(@smf_build_variant)
     end
