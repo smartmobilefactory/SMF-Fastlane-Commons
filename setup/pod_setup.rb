@@ -80,7 +80,7 @@ end
 private_lane :smf_super_pipeline_increment_version_number do |options|
 
   build_variant = options[:build_variant]
-  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
+  build_variant_config = @smf_fastlane_config[:build_variants][:framework]
 
   smf_increment_version_number(
       podspec_path: build_variant_config[:podspec_path],
