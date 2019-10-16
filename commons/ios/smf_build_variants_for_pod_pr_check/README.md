@@ -1,5 +1,9 @@
 ### Build Variants for Pod PR Check
-This lane returns an array which contains all build variants that contain the word "example". Build variants of this type can be build to test the code of the framework.
+This lane returns an array which contains all build variants which need to be build for a PR check.
+
+If the is a build variant specified in the Config.json which contains *alpha* and array containing this build variant will be returned. In case there are multiple alpha build variants, only the first one will be returned in an array.
+
+Otherwise an array containing all build variants which contain *example* will be returned.
 
 Example:
 
