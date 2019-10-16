@@ -9,7 +9,7 @@ private_lane :smf_build_variants_for_pod_pr_check do
   if alpha_build_variant.nil?
     example_build_variants = []
     all_build_variants.map do |variant|
-      example_build_variants.append(variant) if variant.match(/.*example.*/)
+      example_build_variants.push(variant) if variant.match(/.*example.*/)
     end
     matching_build_variants = example_build_variants
   else
