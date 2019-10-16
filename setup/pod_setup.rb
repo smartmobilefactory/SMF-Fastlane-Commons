@@ -95,10 +95,10 @@ end
 
 # Generate Changelog
 
-private_lane :smf_super_generate_changelog do |options|
+private_lane :smf_super_pod_generate_changelog do |options|
   smf_git_changelog(is_library: true)
 end
 
-lane :smf_generate_changelog do |options|
-  smf_super_generate_changelog(options)
+lane :smf_pod_generate_changelog do |options|
+  smf_super_pod_generate_changelog(options)
 end
