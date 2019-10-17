@@ -9,7 +9,7 @@ CUSTOM_IOS_CREDENTIALS = [
     "__CUSTOM_SPARKLE_PRIVATE_SSH_KEY__",
     "__CUSTOM_SPARKLE_SIGNING_KEY__"
 ]
-POD_DEFAULT_VARIANTS = ["unit_tests", "patch", "minor", "major", "current", "breaking", "internal"]
+POD_DEFAULT_VARIANTS = ["patch", "minor", "major", "current", "breaking", "internal"]
 
 # iOS Templates
 IOS_APP_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_iOS.template'
@@ -35,7 +35,6 @@ private_lane :smf_generate_jenkins_file do |options|
       variant_value[:podspec_path] == nil && variant_value[:pods_specs_repo] == nil
     }.keys.map(&:to_s)
 
-    jenkinsFileData = jenkinsFileData.gsub("#{POD_EXAMPLE_VARIANTS_PATTERN}", JSON.dump(possible_build_variants))
     possible_build_variants.push(*POD_DEFAULT_VARIANTS)
   end
 

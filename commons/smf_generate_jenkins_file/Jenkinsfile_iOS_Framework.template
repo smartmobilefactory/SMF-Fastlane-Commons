@@ -5,6 +5,5 @@
 @Library('jenkins-pipeline-commons@_dev/SMFCI-563') _
 
 _build_variants = __BUILD_VARIANTS__
-_example_variants = __EXAMPLE_VARIANTS__
 
-iOSPod(_build_variants, _example_variants)
+iOSPod(_build_variants)
