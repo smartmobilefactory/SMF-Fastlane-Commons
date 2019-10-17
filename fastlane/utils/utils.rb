@@ -63,7 +63,7 @@ end
 def smf_get_build_number_of_app
   UI.message('Get the build number of project.')
   case @platform
-  when :ios
+  when :ios, :ios_framework
     project_name = @smf_fastlane_config[:project][:project_name]
     build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
   when :android
