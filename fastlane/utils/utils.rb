@@ -195,7 +195,7 @@ def smf_get_version_number(build_variant)
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
   case @platform
-  when :ios
+  when :ios, :ios_framework
     target = build_variant_config[:target]
     scheme = build_variant_config[:scheme]
 
