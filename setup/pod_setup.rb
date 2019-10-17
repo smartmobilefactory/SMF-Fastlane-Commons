@@ -30,6 +30,23 @@ private_lane :smf_super_unit_tests_for_pod_pr_check do |options|
 
   build_variants_for_pr_check = smf_build_variants_for_pod_pr_check
   build_variants_for_pr_check.each { |variant|
+
+    build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+
+    build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
+
+    smf_download_provisioning_profiles(
+        team_id: build_variant_config[:team_id],
+        apple_id: build_variant_config[:apple_id],
+        use_wildcard_signing: build_variant_config[:use_wildcard_signing],
+        bundle_identifier: build_variant_config[:bundle_identifier],
+        use_default_match_config: build_variant_config[:match].nil?,
+        match_read_only: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:read_only],
+        match_type: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:type],
+        extensions_suffixes: @smf_fastlane_config[:extensions_suffixes],
+        build_variant: build_variant
+    )
+
     UI.message("Running unit tests for variant '#{variant}' for PR Check")
     options[:build_variant] = variant
     smf_unit_tests(options)
