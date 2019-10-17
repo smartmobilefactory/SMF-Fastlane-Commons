@@ -11,8 +11,6 @@ def _smf_for_each_build_variant(&block)
   build_variants_for_pr_check = smf_build_variants_for_pod_pr_check
   build_variants_for_pr_check.each { |variant|
     block.call(variant)
-
-    break if variant.include?('alpha') # prevent the loop from building a beta or live if it built an alpha already
   }
 end
 
