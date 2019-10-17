@@ -36,7 +36,7 @@ private_lane :smf_build_ios_app do |options|
       scheme: scheme,
       configuration: xcconfig_name,
       codesigning_identity: code_signing_identity,
-      output_directory: "build",
+      output_directory: 'build',
       xcargs: smf_xcargs_for_build_system,
       archive_path: "build/",
       derived_data_path: "build/derivedData/",
