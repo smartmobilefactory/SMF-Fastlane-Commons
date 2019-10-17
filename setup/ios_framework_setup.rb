@@ -6,30 +6,21 @@ else
   raise "Can't find ios_setup file at #{ios_setup_file}"
 end
 
-
-# Build (Build to Release)
-
-private_lane :smf_super_build_for_pod_pr_check do |options|
+def _smf_for_each_build_variant(&block)
 
   build_variants_for_pr_check = smf_build_variants_for_pod_pr_check
   build_variants_for_pr_check.each { |variant|
-    UI.message("Building variant '#{variant}' for PR Check")
-    options[:build_variant] = variant
-    smf_build(options)
+    block.call(variant)
+
+    break if variant.include?('alpha') # prevent the loop from building a beta or live if it built an alpha already
   }
 end
 
-lane :smf_build_for_pod_pr_check do |options|
-  smf_super_build_for_pod_pr_check(options)
-end
-
-
 # Run Unit Tests
 
-private_lane :smf_super_unit_tests_for_pod_pr_check do |options|
+private_lane :smf_pod_super_unit_tests_pr_check do |options|
 
-  build_variants_for_pr_check = smf_build_variants_for_pod_pr_check
-  build_variants_for_pr_check.each { |variant|
+  _smf_for_each_build_variant { |variant|
 
     build_variant_config = @smf_fastlane_config[:build_variants][variant.to_sym]
 
@@ -53,42 +44,40 @@ private_lane :smf_super_unit_tests_for_pod_pr_check do |options|
   }
 end
 
-lane :smf_unit_tests_for_pod_pr_check do |options|
-  smf_super_unit_tests_for_pod_pr_check(options)
+lane :smf_pod_unit_tests_pr_check do |options|
+  smf_pod_super_unit_tests_pr_check(options)
 end
 
 
 # Linter
 
-private_lane :smf_super_linter_for_pod_pr_check do |options|
+private_lane :smf_pod_super_linter_pr_check do |options|
 
-  build_variants_for_pr_check = smf_build_variants_for_pod_pr_check
-  build_variants_for_pr_check.each { |variant|
+  _smf_for_each_build_variant { |variant|
     UI.message("Running unit tests for variant '#{variant}' for PR Check")
     options[:build_variant] = variant
     smf_linter(options)
   }
 end
 
-lane :smf_linter_for_pod_pr_check do |options|
-  smf_super_linter_for_pod_pr_check(options)
+lane :smf_pod_linter_pr_check do |options|
+  smf_pod_super_linter_pr_check(options)
 end
 
 
 # Danger
 
-private_lane :smf_super_danger_for_pod_pr_check do |options|
+private_lane :smf_pod_super_danger_pr_check do |options|
 
-  build_variants_for_pr_check = smf_build_variants_for_pod_pr_check
-  build_variants_for_pr_check.each { |variant|
+  _smf_for_each_build_variant { |variant|
     UI.message("Running unit tests for variant '#{variant}' for PR Check")
     options[:build_variant] = variant
     smf_pipeline_danger(options)
   }
 end
 
-lane :smf_danger_for_pod_pr_check do |options|
-  smf_super_danger_for_pod_pr_check(options)
+lane :smf_pod_danger_pr_check do |options|
+  smf_pod_super_danger_pr_check(options)
 end
 
 

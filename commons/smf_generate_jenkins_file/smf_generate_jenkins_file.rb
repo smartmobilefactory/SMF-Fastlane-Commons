@@ -30,7 +30,7 @@ private_lane :smf_generate_jenkins_file do |options|
 
   UI.message("Generating Jenkinsfile with template at: #{jenkins_file_template_path}")
 
-  if @platform == :pod
+  if @platform == :ios_framework
     possible_build_variants = @smf_fastlane_config[:build_variants].select { |variant_key, variant_value|
       variant_value[:podspec_path] == nil && variant_value[:pods_specs_repo] == nil
     }.keys.map(&:to_s)
@@ -58,7 +58,7 @@ def _smf_jenkins_file_template_path
     end
   when :flutter
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{FLUTTER_APP_TEMPLATE_JENKINS_FILE}"
-  when :pod
+  when :ios_framework
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{POD_TEMPLATE_JENKINS_FILE}"
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
@@ -98,7 +98,7 @@ def _smf_insert_custom_credentials(jenkinsFile)
   when :android
   when :flutter
     UI.message('Inserting custom credentials for flutter is not implemented yet')
-  when :pod
+  when :ios_framework
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
