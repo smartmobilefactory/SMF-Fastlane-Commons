@@ -31,9 +31,7 @@ private_lane :smf_super_unit_tests_for_pod_pr_check do |options|
   build_variants_for_pr_check = smf_build_variants_for_pod_pr_check
   build_variants_for_pr_check.each { |variant|
 
-    build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
-
-    build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
+    build_variant_config = @smf_fastlane_config[:build_variants][variant.to_sym]
 
     smf_download_provisioning_profiles(
         team_id: build_variant_config[:team_id],
