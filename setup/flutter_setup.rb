@@ -107,7 +107,9 @@ end
 private_lane :smf_super_android_build do |options|
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
   sh("cd #{smf_workspace_dir}; ./flutterw build apk --release --flavor #{build_variant}")
-  sh("cd #{smf_workspace_dir}; ./flutterw build appbundle --release --flavor #{build_variant}")
+  if !options[:build_variant].nil?
+    sh("cd #{smf_workspace_dir}; ./flutterw build appbundle --release --flavor #{build_variant}")
+  end
 
 end
 
