@@ -33,6 +33,8 @@ private_lane :smf_super_unit_tests_for_pod_pr_check do |options|
 
     build_variant_config = @smf_fastlane_config[:build_variants][variant.to_sym]
 
+    UI.message("Downloading provisioning profiles for variant '#{variant}'")
+
     smf_download_provisioning_profiles(
         team_id: build_variant_config[:team_id],
         apple_id: build_variant_config[:apple_id],
@@ -42,7 +44,7 @@ private_lane :smf_super_unit_tests_for_pod_pr_check do |options|
         match_read_only: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:read_only],
         match_type: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:type],
         extensions_suffixes: @smf_fastlane_config[:extensions_suffixes],
-        build_variant: build_variant
+        build_variant: variant
     )
 
     UI.message("Running unit tests for variant '#{variant}' for PR Check")
