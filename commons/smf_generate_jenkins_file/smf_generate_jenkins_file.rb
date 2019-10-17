@@ -13,7 +13,7 @@ POD_DEFAULT_VARIANTS = ["unit_tests", "patch", "minor", "major", "current", "bre
 
 # iOS Templates
 IOS_APP_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_iOS.template'
-POD_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Pod.template'
+POD_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_iOS_Framework.template'
 
 # Android Templates
 ANDROID_APP_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Android.template'
