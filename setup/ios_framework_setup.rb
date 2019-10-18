@@ -167,7 +167,7 @@ end
 
 override_lane :smf_setup_dependencies_build do |options|
   options[:build_variant] = 'framework'
-  smf_super_setup_dependencies_build(options)
+  smf_super_setup_dependencies(options)
 end
 
 lane :smf_super_pod_setup_workspace do |options|
