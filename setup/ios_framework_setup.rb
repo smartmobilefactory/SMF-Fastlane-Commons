@@ -133,6 +133,11 @@ private_lane :smf_super_release_pod do |options|
 
   changelog = smf_read_changelog
 
+  if smf_is_keychain_enabled
+    unlock_keychain(path: "login.keychain", password: ENV[$KEYCHAIN_LOGIN_ENV_KEY])
+    unlock_keychain(path: "jenkins.keychain", password: ENV[$KEYCHAIN_JENKINS_ENV_KEY])
+  end
+
   # Create the GitHub release
   smf_create_github_release(
       tag: smf_get_tag_of_pod(smf_get_version_number(nil, podspec_path)),
