@@ -6,6 +6,7 @@ private_lane :smf_create_github_release do |options|
   paths = !options[:paths].nil? ? options[:paths] : []
   branch = options[:branch]
   changelog = options[:changelog]
+  podspec_path = options[:podspec_path]
 
   git_remote_origin_url = sh 'git config --get remote.origin.url'
   github_url_match = git_remote_origin_url.match(%r{.*github.com:(.*)\.git})

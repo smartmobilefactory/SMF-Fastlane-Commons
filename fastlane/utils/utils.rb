@@ -192,7 +192,7 @@ def smf_get_tag_of_app(build_variant, build_number)
 end
 
 def smf_get_version_number(build_variant = nil, podspec_path = nil)
-  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
+  build_variant_config = build_variant.nil? ? nil : @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
   case @platform
   when :ios

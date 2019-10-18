@@ -138,7 +138,8 @@ private_lane :smf_super_release_pod do |options|
       tag: smf_get_tag_of_pod(smf_get_version_number(podspec_path: podspec_path)),
       branch: local_branch,
       build_variant: 'framework',
-      changelog: changelog
+      changelog: changelog,
+      podspec_path: podspec_path
   )
 
 end
