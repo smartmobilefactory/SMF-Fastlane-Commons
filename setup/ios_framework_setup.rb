@@ -170,9 +170,9 @@ lane :smf_pod_setup_dependencies_build do |options|
   smf_setup_dependencies_build(options)
 end
 
-lane :smf_super_pod_setup_workspace do |options|
+private_lane :smf_super_pod_setup_workspace do |options|
   options[:build_variant] = 'framework'
-  smf_setup_dependencies_build(options)
+  smf_setup_workspace(options)
 end
 
 lane :smf_pod_setup_workspace do |options|
