@@ -121,18 +121,18 @@ private_lane :smf_super_release_pod do |options|
     unlock_keychain(path: "login.keychain", password: ENV[$KEYCHAIN_LOGIN_ENV_KEY])
     unlock_keychain(path: "jenkins.keychain", password: ENV[$KEYCHAIN_JENKINS_ENV_KEY])
   end
-  
+
   smf_git_pull(local_branch)
+
+  smf_push_to_git_remote(
+      force: true,
+      tags: true
+  )
 
   smf_push_pod(
       podspec_path: podspec_path,
       pods_specs_repo: specs_repo,
       required_xcode_version: xcode_version
-  )
-
-  smf_push_to_git_remote(
-      force: true,
-      tags: true
   )
 
   changelog = smf_read_changelog
