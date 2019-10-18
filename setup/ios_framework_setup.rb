@@ -165,9 +165,9 @@ lane :smf_pod_send_slack_notification do |options|
   smf_super_pod_send_slack_notification(options)
 end
 
-override_lane :smf_setup_dependencies_build do |options|
+lane :smf_pod_setup_dependencies_build do |options|
   options[:build_variant] = 'framework'
-  smf_super_setup_dependencies(options)
+  smf_setup_dependencies_build(options)
 end
 
 lane :smf_super_pod_setup_workspace do |options|
