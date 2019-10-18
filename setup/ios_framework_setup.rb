@@ -113,7 +113,7 @@ private_lane :smf_super_release_pod do |options|
 
   build_variant_config = @smf_fastlane_config[:build_variants][:framework]
   podspec_path = build_variant_config[:podspec_path]
-  xcode_version = @smf_fastlane_config[:xcode_version]
+  xcode_version = @smf_fastlane_config[:project][:xcode_version]
   specs_repo = build_variant_config[:pods_specs_repo]
   local_branch = options[:local_branch]
 
