@@ -117,11 +117,6 @@ private_lane :smf_super_release_pod do |options|
   specs_repo = build_variant_config[:pods_specs_repo]
   local_branch = options[:local_branch]
 
-  if smf_is_keychain_enabled
-    unlock_keychain(path: "login.keychain", password: ENV[$KEYCHAIN_LOGIN_ENV_KEY])
-    unlock_keychain(path: "jenkins.keychain", password: ENV[$KEYCHAIN_JENKINS_ENV_KEY])
-  end
-
   smf_git_pull(local_branch)
 
   smf_push_to_git_remote(
