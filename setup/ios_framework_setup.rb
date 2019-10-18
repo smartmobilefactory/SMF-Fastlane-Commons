@@ -83,12 +83,13 @@ end
 
 private_lane :smf_super_pipeline_increment_version_number do |options|
 
-  build_variant = options[:build_variant]
+  bump_type = options[:build_variant]
   build_variant_config = @smf_fastlane_config[:build_variants][:framework]
+  podspec_path = build_variant_config[:podspec_path]
 
   smf_increment_version_number(
-      podspec_path: build_variant_config[:podspec_path],
-      bump_type: build_variant
+      podspec_path: podspec_path,
+      bump_type: bump_type
   )
 end
 
@@ -107,6 +108,46 @@ lane :smf_pod_generate_changelog do |options|
   smf_super_pod_generate_changelog(options)
 end
 
+# Create Github Release
+private_lane :smf_super_release_pod do |options|
+
+  build_variant_config = @smf_fastlane_config[:build_variants][:framework]
+  podspec_path = build_variant_config[:podspec_path]
+  xcode_version = @smf_fastlane_config[:xcode_version]
+  specs_repo = build_variant_config[:pods_specs_repo]
+  local_branch = options[:local_branch]
+
+  smf_git_pull(local_branch)
+
+  smf_push_pod(
+      podspec_path: podspec_path,
+      specs_repo: specs_repo,
+      required_xcode_version: xcode_version
+  )
+
+  smf_push_to_git_remote(
+      local_branch: local_branch,
+      force: true,
+      tags: true
+  )
+
+  changelog = smf_read_changelog
+
+  # Create the GitHub release
+  build_number = get_build_number(xcodeproj: "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj")
+  smf_create_github_release(
+      build_number: build_number,
+      tag: smf_get_tag_of_pod(smf_get_version_number('framework')),
+      branch: local_branch,
+      build_variant: 'framework',
+      changelog: changelog
+  )
+
+end
+
+lane :smf_release_pod do |options|
+  smf_super_release_pod(options)
+end
 
 # Send Slack Notification
 
@@ -123,3 +164,4 @@ end
 lane :smf_pod_send_slack_notification do |options|
   smf_super_pod_send_slack_notification(options)
 end
+

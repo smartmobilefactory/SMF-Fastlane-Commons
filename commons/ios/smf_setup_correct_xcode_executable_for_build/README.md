@@ -6,6 +6,6 @@ Example Call:
 
 ```
 smf_setup_correct_xcode_executable_for_build(
-    required_xcode_version: "10.2" # The projects excode version
+    required_xcode_version: "10.2" # The projects xcode version
 )
 ```
