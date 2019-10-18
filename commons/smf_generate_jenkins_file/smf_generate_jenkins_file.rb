@@ -9,7 +9,7 @@ CUSTOM_IOS_CREDENTIALS = [
     "__CUSTOM_SPARKLE_PRIVATE_SSH_KEY__",
     "__CUSTOM_SPARKLE_SIGNING_KEY__"
 ]
-POD_DEFAULT_VARIANTS = ["patch", "minor", "major", "current", "breaking", "internal"]
+POD_DEFAULT_VARIANTS = ["patch", "minor", "major", "breaking", "internal"]
 
 # iOS Templates
 IOS_APP_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_iOS.template'
