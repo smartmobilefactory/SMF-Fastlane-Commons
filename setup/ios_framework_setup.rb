@@ -126,7 +126,6 @@ private_lane :smf_super_release_pod do |options|
   )
 
   smf_push_to_git_remote(
-      local_branch: local_branch,
       force: true,
       tags: true
   )
