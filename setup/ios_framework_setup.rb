@@ -135,7 +135,7 @@ private_lane :smf_super_release_pod do |options|
 
   # Create the GitHub release
   smf_create_github_release(
-      tag: smf_get_tag_of_pod(smf_get_version_number(podspec_path: podspec_path)),
+      tag: smf_get_tag_of_pod(smf_get_version_number(nil, podspec_path)),
       branch: local_branch,
       build_variant: 'framework',
       changelog: changelog,
