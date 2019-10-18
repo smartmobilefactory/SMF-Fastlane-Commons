@@ -140,7 +140,7 @@ private_lane :smf_super_release_pod do |options|
   build_number = get_build_number(xcodeproj: "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj")
   smf_create_github_release(
       build_number: build_number,
-      tag: smf_get_tag_of_pod(smf_get_version_number('framework')),
+      tag: smf_get_tag_of_pod(smf_get_version_number(podspec_path: podspec_path)),
       branch: local_branch,
       build_variant: 'framework',
       changelog: changelog

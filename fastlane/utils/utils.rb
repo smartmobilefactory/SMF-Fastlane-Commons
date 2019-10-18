@@ -191,11 +191,11 @@ def smf_get_tag_of_app(build_variant, build_number)
   "build/#{build_variant.downcase}/#{build_number}"
 end
 
-def smf_get_version_number(build_variant)
+def smf_get_version_number(build_variant = nil, podspec_path = nil)
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
   case @platform
-  when :ios, :ios_framework
+  when :ios
     target = build_variant_config[:target]
     scheme = build_variant_config[:scheme]
 
@@ -203,6 +203,8 @@ def smf_get_version_number(build_variant)
         xcodeproj: "#{smf_get_project_name}.xcodeproj",
         target: (target != nil ? target : scheme)
     )
+  when :ios_framework
+    version_number = version_get_podspec(path: podspec_path)
   when :android
     raise 'Get version number is not implemented for Android.'
   when :flutter
