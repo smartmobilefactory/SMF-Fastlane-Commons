@@ -124,7 +124,7 @@ private_lane :smf_super_release_pod do |options|
 
   smf_push_pod(
       podspec_path: podspec_path,
-      specs_repo: specs_repo,
+      pods_specs_repo: specs_repo,
       required_xcode_version: xcode_version
   )
 
@@ -166,11 +166,6 @@ end
 
 lane :smf_pod_send_slack_notification do |options|
   smf_super_pod_send_slack_notification(options)
-end
-
-lane :smf_pod_setup_dependencies_build do |options|
-  options[:build_variant] = 'framework'
-  smf_setup_dependencies_build(options)
 end
 
 private_lane :smf_super_pod_setup_workspace do |options|
