@@ -68,7 +68,7 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
   git_url = $FASTLANE_MATCH_REPO_URL
 
   if extensions_suffixes
-    extension_suffixes.each do |extension_suffix|
+    extensions_suffixes.each do |extension_suffix|
       identifiers << "#{app_identifier}.#{extension_suffix}"
     end
   end
