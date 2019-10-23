@@ -6,7 +6,7 @@ private_lane :smf_ios_unit_tests do |options|
   unit_test_xcconfig_name = options[:unit_test_xcconfig_name]
   device = options[:device]
   required_xcode_version = options[:required_xcode_version]
-  unit_testing_for_mac_os = options[:unit_testing_for_mac_os]
+  testing_for_mac = options[:testing_for_mac]
 
   scheme_to_use = unit_test_scheme.nil? ? scheme : unit_test_scheme
 
@@ -16,14 +16,14 @@ private_lane :smf_ios_unit_tests do |options|
                                project_name,
                                scheme_to_use,
                                unit_test_xcconfig_name,
-                               unit_testing_for_mac_os
+                               testing_for_mac
                           )
 
   if can_preform_unit_tests == true
 
     UI.important("Performing the unit tests with the scheme \"#{scheme_to_use}\"")
 
-    destination = unit_testing_for_mac_os ? "platform=macOS,arch=x86_64" : nil
+    destination = testing_for_mac ? "platform=macOS,arch=x86_64" : nil
 
     scan(
         workspace: "#{project_name}.xcworkspace",
@@ -42,11 +42,11 @@ private_lane :smf_ios_unit_tests do |options|
 
 end
 
-def _smf_can_unit_tests_be_preformed(project_name, scheme, unit_test_xcconfig_name, unit_testing_for_mac_os = nil)
+def _smf_can_unit_tests_be_preformed(project_name, scheme, unit_test_xcconfig_name, testing_for_mac = nil)
 
   UI.important("Checking whether the unit tests with the scheme \"#{scheme}\" can be performed.")
 
-  destination = unit_testing_for_mac_os ? "platform=macOS,arch=x86_64" : nil
+  destination = testing_for_mac ? "platform=macOS,arch=x86_64" : nil
 
   begin
     scan(
