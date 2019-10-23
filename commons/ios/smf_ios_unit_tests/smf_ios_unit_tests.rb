@@ -6,6 +6,7 @@ private_lane :smf_ios_unit_tests do |options|
   unit_test_xcconfig_name = options[:unit_test_xcconfig_name]
   device = options[:device]
   required_xcode_version = options[:required_xcode_version]
+  unit_testing_for_mac_os = options[:unit_testing_for_mac_os]
 
   scheme_to_use = unit_test_scheme.nil? ? scheme : unit_test_scheme
 
@@ -21,12 +22,15 @@ private_lane :smf_ios_unit_tests do |options|
 
     UI.important("Performing the unit tests with the scheme \"#{scheme_to_use}\"")
 
+    destination = unit_testing_for_mac_os ? "platform=macOS,arch=x86_64" : nil
+
     scan(
         workspace: "#{project_name}.xcworkspace",
         scheme: scheme_to_use,
         xcargs: smf_xcargs_for_build_system,
         clean: false,
         device: device,
+        destination: destination,
         configuration: unit_test_xcconfig_name,
         code_coverage: true,
         output_directory: 'build',
