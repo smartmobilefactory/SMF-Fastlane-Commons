@@ -5,6 +5,11 @@ private_lane :smf_super_shared_setup_dependencies do |options|
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
   build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant.to_sym][:ios]
 
+  smf_build_precheck(
+    build_variant: build_variant,
+    build_variant_config: build_variant_ios_config
+  )
+
   sh("cd #{smf_workspace_dir}; ./flutterw doctor")
   sh("cd #{smf_workspace_dir}; ./flutterw packages get")
   generate_sh_file = "#{smf_workspace_dir}/generate.sh"
