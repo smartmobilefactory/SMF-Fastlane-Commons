@@ -37,24 +37,19 @@ lane :smf_sync_with_phrase_app do |options|
     UI.message("Deleting phrase app ci scripts...")
     clean_up_phraseapp_ci(phrase_app_scripts_path)
 
-    puts "We first are here: #{Dir.pwd}"
+    # if phraseapp updated some translations, commit and push them
+    project_root_dir = Dir.pwd
+    sh("cd #{project_root_dir}; ls")
+    files_which_changed = sh("cd #{project_root_dir} && pwd && git status --porcelain")
+    puts "The folowing files changed: #{files_which_changed}"
+    if files_which_changed.include? '.strings'
 
-    Dir.chdir(smf_workspace_dir) do
-
-      puts "We now are here: #{Dir.pwd}"
-      # if phraseapp updated some translations, commit and push them
-      project_root_dir = Dir.pwd
-      sh("cd #{project_root_dir}; ls")
-      phraseapp_string_changed = sh("cd #{project_root_dir} && pwd && git status --porcelain").include? '.strings'
-      if phraseapp_string_changed
-          sh("cd #{project_root_dir} && git add *.strings && git commit . -m \"Updating i18n\"")
-
-          Dir.chdir(smf_workspace_dir) do
-              smf_push_to_git_remote(
-                tags: false
-              )
-          end
-      end
+        sh("cd #{project_root_dir} && git add *.strings && git commit *.strings -m \"Updating i18n\"")
+        Dir.chdir(project_root_dir) do
+            smf_push_to_git_remote(
+              tags: false
+            )
+        end
     end
 
   when :android
