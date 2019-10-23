@@ -119,6 +119,8 @@ private_lane :smf_super_release_pod do |options|
 
   smf_git_pull(local_branch)
 
+  sh("git branch -l")
+
   smf_push_pod(
       podspec_path: podspec_path,
       pods_specs_repo: specs_repo,
