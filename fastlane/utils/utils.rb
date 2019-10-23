@@ -50,8 +50,8 @@ def smf_get_default_name_of_app(build_variant)
 end
 
 # Uses Config file to access project name. Should be changed in the future.
-def smf_get_default_name_of_pod
-  podspec_path = @smf_fastlane_config[:build_variants][@smf_build_variant_sym][:podspec_path]
+def smf_get_default_name_of_pod(build_variant)
+  podspec_path = @smf_fastlane_config[:build_variants][build_variant.to_sym][:podspec_path]
   version = read_podspec(path: podspec_path)['version']
   pod_name = read_podspec(path: podspec_path)['name']
   project_name = !@smf_fastlane_config[:project][:project_name].nil? ? @smf_fastlane_config[:project][:project_name] : pod_name
@@ -63,7 +63,7 @@ end
 def smf_get_build_number_of_app
   UI.message('Get the build number of project.')
   case @platform
-  when :ios
+  when :ios, :ios_framework
     project_name = @smf_fastlane_config[:project][:project_name]
     build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
   when :android
@@ -176,7 +176,8 @@ def smf_danger_module_config(options)
   modules
 end
 
-def smf_get_tag_of_pod(version_number)
+def smf_get_tag_of_pod(podspec_path)
+  version_number = smf_get_version_number(nil, podspec_path)
   "releases/#{version_number}"
 end
 
@@ -191,8 +192,8 @@ def smf_get_tag_of_app(build_variant, build_number)
   "build/#{build_variant.downcase}/#{build_number}"
 end
 
-def smf_get_version_number(build_variant)
-  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
+def smf_get_version_number(build_variant = nil, podspec_path = nil)
+  build_variant_config = build_variant.nil? ? nil : @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
   case @platform
   when :ios
@@ -203,6 +204,8 @@ def smf_get_version_number(build_variant)
         xcodeproj: "#{smf_get_project_name}.xcodeproj",
         target: (target != nil ? target : scheme)
     )
+  when :ios_framework
+    version_number = version_get_podspec(path: podspec_path)
   when :android
     raise 'Get version number is not implemented for Android.'
   when :flutter

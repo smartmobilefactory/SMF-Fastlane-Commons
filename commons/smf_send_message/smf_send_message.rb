@@ -7,7 +7,7 @@ private_lane :smf_send_message do |options|
   content = message.length < 4000 ? message : "#{message[0..4000]}... (maximum length reached)"
 
   case @platform
-  when :ios
+  when :ios, :ios_framework
     ci_error_log = @smf_fastlane_config[:project][:slack_channel].nil? ? smf_ci_ios_error_log : @smf_fastlane_config[:project][:slack_channel]
   when :android
     ci_error_log = @smf_fastlane_config[:project][:slack_channel].nil? ? ci_android_error_log : @smf_fastlane_config[:project][:slack_channel]

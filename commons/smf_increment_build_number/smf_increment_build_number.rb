@@ -43,7 +43,7 @@ end
 
 def _smf_update_build_number_in_project(build_number)
   case @platform
-  when :ios
+  when :ios, :ios_framework
     increment_build_number(build_number: build_number.to_s)
     commit_version_bump(
         xcodeproj: "#{smf_get_project_name}.xcodeproj",
