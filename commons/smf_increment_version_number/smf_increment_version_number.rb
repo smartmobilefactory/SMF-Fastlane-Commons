@@ -8,6 +8,7 @@ private_lane :smf_increment_version_number do |options|
   # Bump library's version if needed
   _smf_bump_pod_version(podspec_path, bump_type)
 
+  version_number = smf_get_version_number(nil, podspec_path)
   tag = smf_get_tag_of_pod(podspec_path)
 
   if git_tag_exists(tag: tag)
