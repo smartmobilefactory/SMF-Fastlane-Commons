@@ -37,11 +37,11 @@ lane :smf_sync_with_phrase_app do |options|
     UI.message("Deleting phrase app ci scripts...")
     clean_up_phraseapp_ci(phrase_app_scripts_path)
 
-    echo "We first are here: #{Dir.pwd}"
+    puts "We first are here: #{Dir.pwd}"
 
     Dir.chdir(smf_workspace_dir) do
 
-      echo "We now are here: #{Dir.pwd}"
+      puts "We now are here: #{Dir.pwd}"
       # if phraseapp updated some translations, commit and push them
       if `git status --porcelain`.include? '.strings'
           `git add *.strings && git commit . -m "Updating i18n"`
