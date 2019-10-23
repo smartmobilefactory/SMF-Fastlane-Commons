@@ -6,6 +6,7 @@ private_lane :smf_ios_unit_tests do |options|
   unit_test_xcconfig_name = options[:unit_test_xcconfig_name]
   device = options[:device]
   required_xcode_version = options[:required_xcode_version]
+  testing_for_mac = options[:testing_for_mac]
 
   scheme_to_use = unit_test_scheme.nil? ? scheme : unit_test_scheme
 
@@ -14,12 +15,15 @@ private_lane :smf_ios_unit_tests do |options|
   can_preform_unit_tests = _smf_can_unit_tests_be_preformed(
                                project_name,
                                scheme_to_use,
-                               unit_test_xcconfig_name
+                               unit_test_xcconfig_name,
+                               testing_for_mac
                           )
 
   if can_preform_unit_tests == true
 
     UI.important("Performing the unit tests with the scheme \"#{scheme_to_use}\"")
+
+    destination = testing_for_mac ? "platform=macOS,arch=x86_64" : nil
 
     scan(
         workspace: "#{project_name}.xcworkspace",
@@ -27,6 +31,7 @@ private_lane :smf_ios_unit_tests do |options|
         xcargs: smf_xcargs_for_build_system,
         clean: false,
         device: device,
+        destination: destination,
         configuration: unit_test_xcconfig_name,
         code_coverage: true,
         output_directory: 'build',
@@ -37,16 +42,18 @@ private_lane :smf_ios_unit_tests do |options|
 
 end
 
-def _smf_can_unit_tests_be_preformed(project_name, scheme, unit_test_xcconfig_name)
+def _smf_can_unit_tests_be_preformed(project_name, scheme, unit_test_xcconfig_name, testing_for_mac = nil)
 
   UI.important("Checking whether the unit tests with the scheme \"#{scheme}\" can be performed.")
 
+  destination = testing_for_mac ? "platform=macOS,arch=x86_64" : nil
 
   begin
     scan(
         workspace: "#{project_name}.xcworkspace",
         scheme: scheme,
         configuration: unit_test_xcconfig_name,
+        destination: destination,
         clean: false,
         skip_build: true,
         xcargs: "-dry-run #{smf_xcargs_for_build_system}"

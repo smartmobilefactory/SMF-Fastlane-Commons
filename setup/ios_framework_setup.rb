@@ -21,6 +21,7 @@ private_lane :smf_pod_super_unit_tests_pr_check do |options|
   _smf_for_each_build_variant { |variant|
 
     build_variant_config = @smf_fastlane_config[:build_variants][variant.to_sym]
+    testing_for_mac = build_variant_config[:platform] == 'mac'
 
     UI.message("Downloading provisioning profiles for variant '#{variant}'")
 
@@ -34,10 +35,11 @@ private_lane :smf_pod_super_unit_tests_pr_check do |options|
         match_type: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:type],
         extensions_suffixes: @smf_fastlane_config[:extensions_suffixes],
         build_variant: variant
-    )
+    ) if !testing_for_mac
 
     UI.message("Running unit tests for variant '#{variant}' for PR Check")
     options[:build_variant] = variant
+    options[:testing_for_mac] = testing_for_mac
     smf_unit_tests(options)
   }
 end
