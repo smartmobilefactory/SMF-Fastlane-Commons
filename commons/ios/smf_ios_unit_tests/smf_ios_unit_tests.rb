@@ -15,7 +15,8 @@ private_lane :smf_ios_unit_tests do |options|
   can_preform_unit_tests = _smf_can_unit_tests_be_preformed(
                                project_name,
                                scheme_to_use,
-                               unit_test_xcconfig_name
+                               unit_test_xcconfig_name,
+                               unit_testing_for_mac_os
                           )
 
   if can_preform_unit_tests == true
@@ -43,16 +44,18 @@ private_lane :smf_ios_unit_tests do |options|
 
 end
 
-def _smf_can_unit_tests_be_preformed(project_name, scheme, unit_test_xcconfig_name)
+def _smf_can_unit_tests_be_preformed(project_name, scheme, unit_test_xcconfig_name, unit_testing_for_mac_os = nil)
 
   UI.important("Checking whether the unit tests with the scheme \"#{scheme}\" can be performed.")
 
+  destination = unit_testing_for_mac_os ? "platform=macOS,arch=x86_64" : nil
 
   begin
     scan(
         workspace: "#{project_name}.xcworkspace",
         scheme: scheme,
         configuration: unit_test_xcconfig_name,
+        destination: destination,
         clean: false,
         skip_build: true,
         xcargs: "-dry-run #{smf_xcargs_for_build_system}"
