@@ -5,6 +5,11 @@ private_lane :smf_super_shared_setup_dependencies do |options|
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
   build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant.to_sym][:ios]
 
+  smf_build_precheck(
+    build_variant: build_variant,
+    build_variant_config: build_variant_ios_config
+  )
+
   sh("cd #{smf_workspace_dir}; ./flutterw doctor")
   sh("cd #{smf_workspace_dir}; ./flutterw packages get")
   generate_sh_file = "#{smf_workspace_dir}/generate.sh"
@@ -236,9 +241,9 @@ private_lane :smf_super_upload_to_itunes do |options|
 
   smf_upload_to_testflight(
       build_variant: build_variant,
-      apple_id: build_variant_ios_config[:itc_apple_id],
+      apple_id: build_variant_ios_config[:apple_id],
       itc_team_id: build_variant_ios_config[:itc_team_id],
-      username: build_variant_ios_config[:itc_apple_id],
+      itc_apple_id: build_variant_config[:itc_apple_id],
       skip_waiting_for_build_processing: build_variant_ios_config[:itc_skip_waiting].nil? ? false : build_variant_ios_config[:itc_skip_waiting],
       slack_channel: @smf_fastlane_config[:slack_channel],
       bundle_identifier: build_variant_ios_config[:bundle_identifier],

@@ -3,10 +3,14 @@
 private_lane :smf_super_setup_dependencies do |options|
 
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
+
+  smf_build_precheck(
+    build_variant: build_variant,
+    build_variant_config: build_variant_config
+  )
 
   smf_pod_install
-
-  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
   # Called only when upload_itc is set to true. This way the build will fail in the beginning if there are any problems with itc. Saves time.
   smf_verify_itc_upload_errors(
@@ -174,9 +178,9 @@ private_lane :smf_super_upload_to_itunes do |options|
 
   smf_upload_to_testflight(
       build_variant: options[:build_variant],
-      apple_id: build_variant_config[:itc_apple_id],
+      apple_id: build_variant_config[:apple_id],
       itc_team_id: build_variant_config[:itc_team_id],
-      username: build_variant_config[:itc_apple_id],
+      itc_apple_id: build_variant_config[:itc_apple_id],
       skip_waiting_for_build_processing: build_variant_config[:itc_skip_waiting].nil? ? false : build_variant_config[:itc_skip_waiting],
       slack_channel: slack_channel,
       bundle_identifier: build_variant_config[:bundle_identifier],
