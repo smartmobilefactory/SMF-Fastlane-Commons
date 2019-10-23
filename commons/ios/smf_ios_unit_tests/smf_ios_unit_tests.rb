@@ -24,6 +24,8 @@ private_lane :smf_ios_unit_tests do |options|
 
     destination = unit_testing_for_mac_os ? "platform=macOS,arch=x86_64" : nil
 
+    puts "Platform is mac os" if unit_testing_for_mac_os
+
     scan(
         workspace: "#{project_name}.xcworkspace",
         scheme: scheme_to_use,
