@@ -32,6 +32,7 @@ excluded:
   - Database/Model
   - fastlane
   - App/Shared/Constants/R.generated.swift
+  - Unit-Tests
 
 opt_in_rules:
   - force_unwrapping
