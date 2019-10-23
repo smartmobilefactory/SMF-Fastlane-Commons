@@ -1,7 +1,10 @@
 private_lane :smf_build_precheck do |options|
 
-	if @platform == :ios
+	case @platform
+ 	when :ios, :flutter
 		perform_build_precheck_ios(options[:build_variant], options[:build_variant_config])
+	else
+		UI.message("Build Precheck: Nothing reportable found")
 	end
 end
 
