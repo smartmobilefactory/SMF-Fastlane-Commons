@@ -1,4 +1,4 @@
-private_lane :smf_build_prechek do |options|
+private_lane :smf_build_precheck do |options|
 
 	if @platform == :ios
 		perform_build_precheck_ios(options[:build_variant], options[:build_variant_config])
