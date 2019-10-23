@@ -2,7 +2,7 @@ desc 'Release a new Pod version'
 private_lane :smf_push_pod do |options|
 
   podspec_path = options[:podspec_path]
-  specs_repo = options[:pods_specs_repo]
+  specs_repo = options[:specs_repo]
   required_xcode_version = options[:required_xcode_version]
   local_branch = options[:local_branch]
 
