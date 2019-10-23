@@ -1,6 +1,8 @@
 # smf_send_message
 
-This lane sends a message to the configured Slack channel. 
+This lane sends a message to the configured Slack channel.
+
+For iOS: the default Channel is the one from the Config.json - if that one is not set an error Channel is used.
 
 ### Example
 Sending a message.

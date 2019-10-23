@@ -8,7 +8,7 @@ private_lane :smf_send_message do |options|
 
   case @platform
   when :ios
-    ci_error_log = smf_ci_ios_error_log
+    ci_error_log = @smf_fastlane_config[:project][:slack_channel].nil? ? smf_ci_ios_error_log : @smf_fastlane_config[:project][:slack_channel]
   when :android
     ci_error_log = ci_android_error_log
   when :flutter
