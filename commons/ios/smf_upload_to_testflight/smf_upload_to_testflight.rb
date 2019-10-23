@@ -8,7 +8,6 @@ private_lane :smf_upload_to_testflight do |options|
   end
 
   required_xcode_version = options[:required_xcode_version]
-  username = !options[:username].nil? ? options[:username] : 'development@smfhq.com'
   itc_team_id = options[:itc_team_id]
   apple_id = !options[:apple_id].nil? ? options[:apple_id] : 'development@smfhq.com'
   itc_apple_id = options[:itc_apple_id]
@@ -22,14 +21,14 @@ private_lane :smf_upload_to_testflight do |options|
       options[:build_variant],
       slack_channel,
       options[:bundle_identifier],
-      username
+      apple_id
   )
 
   UI.important("Uploading the build to Testflight.")
   upload_to_testflight(
       apple_id: itc_apple_id,
       team_id: itc_team_id,
-      username: username,
+      username: apple_id,
       skip_waiting_for_build_processing: skip_waiting_for_build_processing,
       ipa: smf_path_to_ipa_or_app(options[:build_variant]).gsub('.zip', '')
   )
