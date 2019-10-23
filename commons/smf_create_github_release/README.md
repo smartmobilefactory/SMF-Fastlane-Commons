@@ -12,5 +12,6 @@ smf_create_github_release(
     branch: "master",                       # Specifies the commitish value that determines where the Git tag is created from. Can be any branch or commit SHA
     build_variant: "alpha",                 # The current build variant
     changelog: <changelog up to this tag>   # the changelog to be added to the new release
+    podspec_path: <path to podspec file>    # Needed only for pod releases
 )
 ``` 

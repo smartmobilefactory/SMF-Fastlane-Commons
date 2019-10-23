@@ -6,6 +6,7 @@ private_lane :smf_create_github_release do |options|
   paths = !options[:paths].nil? ? options[:paths] : []
   branch = options[:branch]
   changelog = options[:changelog]
+  podspec_path = options[:podspec_path]
 
   git_remote_origin_url = sh 'git config --get remote.origin.url'
   github_url_match = git_remote_origin_url.match(%r{.*github.com:(.*)\.git})
@@ -36,7 +37,11 @@ private_lane :smf_create_github_release do |options|
   version = smf_get_version_number(build_variant)
   release_name = "#{build_variant.upcase} #{version} (#{build_number})"
 
-  # Create the GitHub release as draft
+  if @platform == :ios_framework
+    release_name = "#{smf_get_version_number(nil, podspec_path)}"
+  end
+
+    # Create the GitHub release as draft
   release = set_github_release(
       is_draft: true,
       repository_name: repository_path,
