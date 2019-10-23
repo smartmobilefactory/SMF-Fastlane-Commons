@@ -180,6 +180,7 @@ private_lane :smf_super_upload_to_itunes do |options|
       build_variant: options[:build_variant],
       apple_id: build_variant_config[:itc_apple_id],
       itc_team_id: build_variant_config[:itc_team_id],
+      itc_apple_id: build_variant_config[:itc_apple_id],
       username: build_variant_config[:itc_apple_id],
       skip_waiting_for_build_processing: build_variant_config[:itc_skip_waiting].nil? ? false : build_variant_config[:itc_skip_waiting],
       slack_channel: slack_channel,

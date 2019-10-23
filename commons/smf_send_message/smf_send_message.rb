@@ -10,9 +10,9 @@ private_lane :smf_send_message do |options|
   when :ios
     ci_error_log = @smf_fastlane_config[:project][:slack_channel].nil? ? smf_ci_ios_error_log : @smf_fastlane_config[:project][:slack_channel]
   when :android
-    ci_error_log = ci_android_error_log
+    ci_error_log = @smf_fastlane_config[:project][:slack_channel].nil? ? ci_android_error_log : @smf_fastlane_config[:project][:slack_channel]
   when :flutter
-    ci_error_log = ci_flutter_error_log
+    ci_error_log = @smf_fastlane_config[:project][:slack_channel].nil? ? ci_flutter_error_log : @smf_fastlane_config[:project][:slack_channel]
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
