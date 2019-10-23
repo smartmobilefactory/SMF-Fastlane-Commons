@@ -43,10 +43,11 @@ lane :smf_sync_with_phrase_app do |options|
 
       puts "We now are here: #{Dir.pwd}"
       # if phraseapp updated some translations, commit and push them
-
-      sh("cd #{Dir.pwd}; ls")
-      if `cd #{Dir.pwd} && pwd && git status --porcelain`.include? '.strings'
-          `cd #{Dir.pwd} && git add *.strings && git commit . -m "Updating i18n"`
+      project_root_dir = Dir.pwd
+      sh("cd #{project_root_dir}; ls")
+      push_updated_files = `cd #{project_root_dir} && pwd && git status --porcelain`.include? '.strings'
+      if push_updated_files
+          `cd #{project_root_dir} && git add *.strings && git commit . -m "Updating i18n"`
 
           smf_push_to_git_remote(
               tags: false
