@@ -62,7 +62,7 @@ def smf_is_using_old_build_system
   when :flutter
     project_root = project_root + "/ios"
   else
-    return false
+    project_root = project_root
   end
 
   workspace_file = `cd #{project_root} && ls | grep -E "(.|\s)+\.xcworkspace"`.gsub("\n", "")
