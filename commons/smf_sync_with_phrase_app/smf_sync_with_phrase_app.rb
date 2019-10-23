@@ -45,11 +45,10 @@ lane :smf_sync_with_phrase_app do |options|
     if files_which_changed.include? '.strings'
 
         sh("cd #{project_root_dir} && git add *.strings && git commit -m \"Updating i18n\" *.strings")
-        Dir.chdir(project_root_dir) do
-            smf_push_to_git_remote(
-              tags: false
-            )
-        end
+
+        smf_push_to_git_remote(
+            tags: false
+        )
     end
 
   when :android
