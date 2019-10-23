@@ -119,25 +119,18 @@ private_lane :smf_super_release_pod do |options|
 
   smf_git_pull(local_branch)
 
-  sh("git branch -l")
-  puts "local_branch: #{local_branch}"
-
   smf_push_pod(
-      podspec_path: podspec_path,
-      pods_specs_repo: specs_repo,
-      required_xcode_version: xcode_version
-  )
-
-  smf_push_to_git_remote(
-      force: false,
-      tags: true
+    podspec_path: podspec_path,
+    specs_repo: specs_repo,
+    required_xcode_version: xcode_version,
+    local_branch: local_branch
   )
 
   changelog = smf_read_changelog
 
   # Create the GitHub release
   smf_create_github_release(
-      tag: smf_get_tag_of_pod(smf_get_version_number(nil, podspec_path)),
+      tag: smf_get_tag_of_pod(podspec_path),
       branch: local_branch,
       build_variant: 'framework',
       changelog: changelog,

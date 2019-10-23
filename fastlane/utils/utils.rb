@@ -176,7 +176,8 @@ def smf_danger_module_config(options)
   modules
 end
 
-def smf_get_tag_of_pod(version_number)
+def smf_get_tag_of_pod(podspec_path)
+  version_number = smf_get_version_number(nil, podspec_path)
   "releases/#{version_number}"
 end
 
