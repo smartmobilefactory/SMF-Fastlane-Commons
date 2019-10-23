@@ -38,7 +38,7 @@ lane :smf_sync_with_phrase_app do |options|
     clean_up_phraseapp_ci(phrase_app_scripts_path)
 
     # if phraseapp updated some translations, commit and push them
-    project_root_dir = Dir.pwd
+    project_root_dir = smf_workspace_dir
     sh("cd #{project_root_dir}; ls")
     files_which_changed = sh("cd #{project_root_dir} && pwd && git status --porcelain")
     puts "The folowing files changed: #{files_which_changed}"
