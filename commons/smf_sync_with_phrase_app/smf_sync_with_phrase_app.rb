@@ -36,6 +36,18 @@ lane :smf_sync_with_phrase_app do |options|
     UI.message("Finished executing phrase app scripts for extensions...")
     UI.message("Deleting phrase app ci scripts...")
     clean_up_phraseapp_ci(phrase_app_scripts_path)
+
+    Dir.chdir(smf_workspace_dir) do
+      # if phraseapp updated some translations, commit and push them
+      if `git status --porcelain`.include? '.strings'
+          `git add *.strings && git commit . -m "Updating i18n"`
+
+          smf_push_to_git_remote(
+              tags: false
+          )
+      end
+    end
+
   when :android
     UI.message('Sync string with PhraseApp for android is implemented as fastlane action and should be overwritten in the projects fastfile.')
   when :flutter
