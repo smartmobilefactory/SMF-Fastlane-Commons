@@ -54,7 +54,6 @@ end
 private_lane :smf_pod_super_linter_pr_check do |options|
 
   _smf_for_each_build_variant { |variant|
-    UI.message("Running unit tests for variant '#{variant}' for PR Check")
     options[:build_variant] = variant
     smf_linter(options)
   }
@@ -70,7 +69,6 @@ end
 private_lane :smf_pod_super_danger_pr_check do |options|
 
   _smf_for_each_build_variant { |variant|
-    UI.message("Running unit tests for variant '#{variant}' for PR Check")
     options[:build_variant] = variant
     smf_pipeline_danger(options)
   }

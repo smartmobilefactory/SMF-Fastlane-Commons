@@ -1,5 +1,7 @@
 require 'json'
 
+message("Analysing build variant <b>#{build_variant}</b>")
+
 ## WARNINGS:
 if (github.pr_body + github.pr_title).include?("WIP")
   warn("Pull Request is Work in Progress")
