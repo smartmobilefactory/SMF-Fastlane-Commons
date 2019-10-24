@@ -30,8 +30,7 @@ private_lane :smf_danger do |options|
   danger(
       github_api_token: ENV["DANGER_GITHUB_API_TOKEN"],
       dangerfile: "#{File.expand_path(File.dirname(__FILE__))}/Dangerfile",
-      verbose: true,
-      danger_id: build_variant
+      verbose: true
   )
 end
 
