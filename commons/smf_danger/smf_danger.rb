@@ -26,7 +26,6 @@ private_lane :smf_danger do |options|
   ENV["DANGER_CHECKSTYLE_PATHS"] = JSON.dump(checkstyle_paths)
 
   ENV["BUILD_VERSION"] = smf_get_version_number(build_variant)
-  ENV["BUILD_VARIANT"] = build_variant
 
   danger(
       github_api_token: ENV["DANGER_GITHUB_API_TOKEN"],

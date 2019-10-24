@@ -6,19 +6,12 @@ else
   raise "Can't find ios_setup file at #{ios_setup_file}"
 end
 
-def _smf_for_each_build_variant(&block)
-
-  build_variants_for_pr_check = smf_build_variants_for_pod_pr_check
-  build_variants_for_pr_check.each { |variant|
-    block.call(variant)
-  }
-end
-
 # Run Unit Tests
 
 private_lane :smf_pod_super_unit_tests_pr_check do |options|
 
-  _smf_for_each_build_variant { |variant|
+  build_variants_for_pr_check = smf_build_variants_for_pod_pr_check
+  build_variants_for_pr_check.each { |variant|
 
     build_variant_config = @smf_fastlane_config[:build_variants][variant.to_sym]
     testing_for_mac = build_variant_config[:platform] == 'mac'
@@ -51,31 +44,27 @@ end
 
 # Linter
 
-private_lane :smf_pod_super_linter_pr_check do |options|
-
-  _smf_for_each_build_variant { |variant|
-    options[:build_variant] = variant
-    smf_linter(options)
-  }
+private_lane :smf_pod_super_linter_pr_check do
+    smf_linter
 end
 
-lane :smf_pod_linter_pr_check do |options|
-  smf_pod_super_linter_pr_check(options)
+lane :smf_pod_linter_pr_check do
+  smf_pod_super_linter_pr_check
 end
 
 
 # Danger
 
-private_lane :smf_pod_super_danger_pr_check do |options|
-
-  _smf_for_each_build_variant { |variant|
-    options[:build_variant] = variant
-    smf_pipeline_danger(options)
-  }
+private_lane :smf_pod_super_danger_pr_check do
+  podspec_path = @smf_fastlane_config[:build_variants][:framework][:podspec_path]
+  smf_pipeline_danger(
+    build_variant: nil,
+    podspec_path: podspec_path
+  )
 end
 
-lane :smf_pod_danger_pr_check do |options|
-  smf_pod_super_danger_pr_check(options)
+lane :smf_pod_danger_pr_check do
+  smf_pod_super_danger_pr_check
 end
 
 
