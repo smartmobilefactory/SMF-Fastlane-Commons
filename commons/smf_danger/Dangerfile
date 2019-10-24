@@ -1,6 +1,6 @@
 require 'json'
 
-puts "Build Version: <b>#{ENV["BUILD_VERSION"]}</b>"
+message("Build Version: <b>#{ENV["BUILD_VERSION"]}</b>")
 
 ## WARNINGS:
 if (github.pr_body + github.pr_title).include?("WIP")
