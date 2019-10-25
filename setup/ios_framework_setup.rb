@@ -6,8 +6,10 @@ else
   raise "Can't find ios_setup file at #{ios_setup_file}"
 end
 
-# Run Unit Tests
 
+########## PR-CHECK LANES ##########
+
+# Run Unit Tests
 private_lane :smf_pod_super_unit_tests_pr_check do |options|
 
   build_variants_for_pr_check = smf_build_variants_for_pod_pr_check
@@ -43,7 +45,6 @@ end
 
 
 # Linter
-
 private_lane :smf_pod_super_linter_pr_check do
     smf_linter
 end
@@ -54,11 +55,9 @@ end
 
 
 # Danger
-
 private_lane :smf_pod_super_danger_pr_check do
   podspec_path = @smf_fastlane_config[:build_variants][:framework][:podspec_path]
-  smf_pipeline_danger(
-    build_variant: nil,
+  smf_danger(
     podspec_path: podspec_path
   )
 end
@@ -67,9 +66,28 @@ lane :smf_pod_danger_pr_check do
   smf_pod_super_danger_pr_check
 end
 
+############ POD PUBLISH LANES ############
+
+# Setup Workspace
+private_lane :smf_super_pod_setup_workspace_for_publishing do |options|
+  options[:build_variant] = 'framework'
+  smf_setup_workspace(options)
+end
+
+lane :smf_pod_setup_workspace_for_publishing do |options|
+  smf_super_pod_setup_workspace_for_publishing(options)
+end
+
+# Generate Changelog
+private_lane :smf_super_pod_generate_changelog do |options|
+  smf_git_changelog(is_library: true)
+end
+
+lane :smf_pod_generate_changelog do |options|
+  smf_super_pod_generate_changelog(options)
+end
 
 # Increment Version Number
-
 private_lane :smf_super_pipeline_increment_version_number do |options|
 
   bump_type = options[:build_variant]
@@ -86,16 +104,6 @@ lane :smf_pipeline_increment_version_number do |options|
   smf_super_pipeline_increment_version_number(options)
 end
 
-
-# Generate Changelog
-
-private_lane :smf_super_pod_generate_changelog do |options|
-  smf_git_changelog(is_library: true)
-end
-
-lane :smf_pod_generate_changelog do |options|
-  smf_super_pod_generate_changelog(options)
-end
 
 # Create Github Release
 private_lane :smf_super_release_pod do |options|
@@ -133,7 +141,6 @@ lane :smf_release_pod do |options|
 end
 
 # Send Slack Notification
-
 private_lane :smf_super_pod_send_slack_notification do |options|
 
   slack_channel = @smf_fastlane_config[:project][:slack_channel]
@@ -148,12 +155,4 @@ lane :smf_pod_send_slack_notification do |options|
   smf_super_pod_send_slack_notification(options)
 end
 
-private_lane :smf_super_pod_setup_workspace do |options|
-  options[:build_variant] = 'framework'
-  smf_setup_workspace(options)
-end
-
-lane :smf_pod_setup_workspace do |options|
-  smf_super_pod_setup_workspace(options)
-end
 

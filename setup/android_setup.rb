@@ -114,7 +114,6 @@ end
 
 
 # Push Git Tag / Release
-
 private_lane :smf_super_push_git_tag_release do |options|
 
   branch = options[:branch]
@@ -163,7 +162,6 @@ end
 
 
 # Danger
-
 private_lane :smf_super_pipeline_danger do |options|
   smf_danger(options)
 end

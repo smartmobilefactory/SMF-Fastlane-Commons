@@ -290,14 +290,9 @@ end
 
 # Danger
 private_lane :smf_super_pipeline_danger do |options|
-
-  build_variant = options[:build_variant]
-
-  smf_danger(
-    build_variant: build_variant
-  )
+  smf_danger
 end
 
 lane :smf_pipeline_danger do |options|
-  smf_super_pipeline_danger(options)
+  smf_super_pipeline_danger
 end

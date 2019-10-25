@@ -25,7 +25,16 @@ private_lane :smf_increment_version_number do |options|
   tag
 end
 
-def _smf_bump_pod_version(podspec_path, bump_type)
+private_lane :smf_increment_version_number_dry_run do |options|
+  podspec_path = options[:podspec_path]
+  bump_type = options[:bump_type]
+
+  version_number = _smf_bump_pod_version(podspec_path, bump_type, true)
+
+  version_number
+end
+
+def _smf_bump_pod_version(podspec_path, bump_type, dry_run = false)
   UI.message("Increasing pod version: #{bump_type}")
 
   if ["major", "minor", "patch"].include? bump_type
@@ -63,4 +72,15 @@ def _smf_bump_pod_version(podspec_path, bump_type)
       )
     end
   end
+
+
+
+  # if we only want to get the new version which would be commited if
+  # we actually ran bump_pod_version
+  if dry_run
+    version_number = smf_get_version_number(nil, podspec_path)
+    sh("cd #{smf_workspace_dir} && git checkout #{podspec_path}")
+  end
+
+  version_number
 end
