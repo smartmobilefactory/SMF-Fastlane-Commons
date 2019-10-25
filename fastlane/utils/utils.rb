@@ -239,7 +239,7 @@ def smf_extract_bump_type_from_pr_body(pr_body)
   bump_type = groups.first.first
 
   if !bump_type.nil?
-    if ['breaking', 'internal'].include?(bump_type)
+    if ['major', 'minor', 'patch', 'breaking', 'internal'].include?(bump_type)
       return bump_type
     end
   end
