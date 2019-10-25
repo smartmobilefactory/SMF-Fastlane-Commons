@@ -1,9 +1,9 @@
 require 'json'
 
 if ENV['MULTIPLE_BUMP_TYPES_ERROR'] == 'true'
-    markdown ("⛔️ You have selected <b>multiple</b> \"bump types\" in the description of this PR. Please select only one!")
+    warn("⛔️ You have selected <b>multiple</b> \"bump types\" in the description of this PR. Please select only one!")
 elsif !ENV['POD_VERSION'].nil?
-    markdown ("Upcoming Build Version is <b>#{ENV['POD_VERSION']}</b>")
+    message("Upcoming Build Version is <b>#{ENV['POD_VERSION']}</b>")
 end
 
 ## WARNINGS:
