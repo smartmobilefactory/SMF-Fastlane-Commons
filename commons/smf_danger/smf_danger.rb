@@ -32,7 +32,7 @@ private_lane :smf_danger do |options|
     if !bump_type.nil?
 
       if bump_type == ''
-        ENV['MULTIPLE_BUMP_TYPES_ERROR'] = true
+        ENV['MULTIPLE_BUMP_TYPES_ERROR'] = 'true'
       else
         version_number = smf_increment_version_number_dry_run(
             podspec_path: podspec_path,
