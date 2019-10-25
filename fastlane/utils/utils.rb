@@ -223,7 +223,7 @@ def smf_extract_bump_type_from_pr_body(pr_body)
   groups = pr_body.match(regex)
 
   if groups.size > 1
-    UI.warning("Multiple bump types checkmarked in PR description!")
+    UI.error("Multiple bump types checkmarked in PR description!")
     return ''
   end
 
