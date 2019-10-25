@@ -219,8 +219,8 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
 end
 
 def smf_extract_bump_type_from_pr_body(pr_body)
-  regex = /- \[x\] \*\*(.+)\*\*/
-  groups = pr_body.match(regex)
+  regex = /- \[x\] \*\*(.+)\*\*/m
+  groups = pr_body.match(regex).captures
 
   if groups.size > 1
     UI.error("Multiple bump types checkmarked in PR description!")
