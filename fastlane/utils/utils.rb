@@ -220,7 +220,14 @@ end
 
 def smf_extract_bump_type_from_pr_body(pr_body)
   regex = /- \[x\] \*\*(.+)\*\*/
-  bump_type = pr_body.match(regex).captures[0]
+  groups = pr_body.match(regex)
+
+  if groups.size > 1
+    UI.warning("Multiple bump types checkmarked in PR description!")
+    return ''
+  end
+
+  bump_type = groups.first
 
   unless bump_type.nil?
     if ['breaking', 'internal'].include?(bump_type)

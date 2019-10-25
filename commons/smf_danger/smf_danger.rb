@@ -29,12 +29,20 @@ private_lane :smf_danger do |options|
   case @platform
   when :ios_framework
 
-    version_number = smf_increment_version_number_dry_run(
-        podspec_path: podspec_path,
-        bump_type: bump_type
-    )
+    if !bump_type.nil?
 
-    ENV['POD_VERSION'] = version_number
+      if bump_type == ''
+        ENV['MULTIPLE_BUMP_TYPES_ERROR'] = true
+      else
+        version_number = smf_increment_version_number_dry_run(
+            podspec_path: podspec_path,
+            bump_type: bump_type
+        )
+
+        ENV['POD_VERSION'] = version_number
+      end
+    end
+
   else
   end
 

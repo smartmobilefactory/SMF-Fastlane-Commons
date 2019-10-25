@@ -1,10 +1,10 @@
 require 'json'
 
-if !ENV['POD_VERSION'].nil?
+if ENV['MULTIPLE_BUMP_TYPES_ERROR']
+    markdown ("⛔️ You have selected <b>multiple<\b> \"bump types\" in the description of this PR. Please select only one!")
+elif !ENV['POD_VERSION'].nil?
     markdown ("Upcoming Build Version is <b>#{ENV['POD_VERSION']}</b>")
 end
-
-
 
 ## WARNINGS:
 if (github.pr_body + github.pr_title).include?("WIP")
