@@ -2,7 +2,7 @@ require 'json'
 
 if ENV['MULTIPLE_BUMP_TYPES_ERROR'] == 'true'
     markdown ("⛔️ You have selected <b>multiple<\b> \"bump types\" in the description of this PR. Please select only one!")
-elif !ENV['POD_VERSION'].nil?
+elsif !ENV['POD_VERSION'].nil?
     markdown ("Upcoming Build Version is <b>#{ENV['POD_VERSION']}</b>")
 end
 
