@@ -1,7 +1,7 @@
 require 'json'
 
 if !ENV['POD_VERSION'].nil?
-    markdown ("Upcoming Build Version is <b>#{version_number}</b>")
+    markdown ("Upcoming Build Version is <b>#{ENV['POD_VERSION']}</b>")
 end
 
 
