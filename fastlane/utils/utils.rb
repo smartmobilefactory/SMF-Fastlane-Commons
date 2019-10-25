@@ -219,8 +219,17 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
 end
 
 def smf_extract_bump_type_from_pr_body(pr_body)
+  matches = pr_body.match(/# Please build.+# Jira Ticket/m)
+
+  if matches.nil?
+    UI.message("There are no selectable bump types in the PRs description!")
+  end
+
+  text = matches[0]
+  puts "Text is: #{text}"
   regex = /- \[x\] \*\*(.+)\*\*/m
-  groups = pr_body.match(regex).captures
+  groups = text.match(regex).captures
+  puts "groups are: #{groups}"
 
   if groups.size > 1
     UI.error("Multiple bump types checkmarked in PR description!")
