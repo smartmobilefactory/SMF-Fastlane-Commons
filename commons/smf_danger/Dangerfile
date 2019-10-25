@@ -1,6 +1,7 @@
 require 'json'
-require_relative '../smf_increment_version_number/smf_increment_version_number.rb'
 require 'fastlane'
+require_relative '../smf_increment_version_number/smf_increment_version_number.rb'
+
 
 if !ENV['PODSPEC_PATH'].nil?
     version_number = smf_increment_version_number_dry_run(
