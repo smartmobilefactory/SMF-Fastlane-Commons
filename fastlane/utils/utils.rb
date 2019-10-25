@@ -217,3 +217,16 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
 
   version_number
 end
+
+def smf_extract_bump_type_from_pr_body(pr_body)
+  regex = /- \[x\] \*\*(.+)\*\*/
+  bump_type = pr_body.match(regex).captures[0]
+
+  unless bump_type.nil?
+    if ['breaking', 'internal'].include?(bump_type)
+      return bump_type
+    end
+  end
+
+  nil
+end

@@ -55,15 +55,19 @@ end
 
 
 # Danger
-private_lane :smf_pod_super_danger_pr_check do
+private_lane :smf_pod_super_danger_pr_check do |options|
+
   podspec_path = @smf_fastlane_config[:build_variants][:framework][:podspec_path]
+  bump_type = smf_extract_bump_type_from_pr_body(options[:pr_body])
+
   smf_danger(
-    podspec_path: podspec_path
+    podspec_path: podspec_path,
+    bump_type: bump_type
   )
 end
 
-lane :smf_pod_danger_pr_check do
-  smf_pod_super_danger_pr_check
+lane :smf_pod_danger_pr_check do |options|
+  smf_pod_super_danger_pr_check(options)
 end
 
 ############ POD PUBLISH LANES ############

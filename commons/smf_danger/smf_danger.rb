@@ -3,6 +3,7 @@ private_lane :smf_danger do |options|
   jira_keys = options[:jira_key]
   checkstyle_paths = []
   podspec_path = options[:podspec_path]
+  bump_type = options[:bump_type]
 
   if File.exist?(smf_swift_lint_output_path)
     checkstyle_paths.push(smf_swift_lint_output_path)
@@ -27,11 +28,15 @@ private_lane :smf_danger do |options|
 
   case @platform
   when :ios_framework
-    ENV["PODSPEC_PATH"] = podspec_path
+
+    version_number = smf_increment_version_number_dry_run(
+        podspec_path: podspec_path,
+        bump_type: bump_type
+    )
+
+    ENV['POD_VERSION'] = version_number
   else
   end
-
-
 
   danger(
       github_api_token: ENV["DANGER_GITHUB_API_TOKEN"],

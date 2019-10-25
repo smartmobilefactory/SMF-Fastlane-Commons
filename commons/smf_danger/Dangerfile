@@ -3,13 +3,8 @@ require 'fastlane'
 require_relative '../smf_increment_version_number/smf_increment_version_number.rb'
 
 
-if !ENV['PODSPEC_PATH'].nil?
-    version_number = smf_increment_version_number_dry_run(
-                        podspec_path: ENV['PODSPEC_PATH'],
-                        bump_type: 'breaking'
-                     )
-
-    message("Build Version is <b>#{version_number}</b>")
+if !ENV['POD_VERSION'].nil?
+    markdown ("Upcoming Build Version is <b>#{version_number}</b>")
 end
 
 
