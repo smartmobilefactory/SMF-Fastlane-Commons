@@ -27,11 +27,7 @@ private_lane :smf_danger do |options|
 
   case @platform
   when :ios_framework
-
-    ENV["BUILD_VERSION"] = smf_increment_version_number_dry_run(
-                               podspec_path: podspec_path,
-                               bump_type: 'internal'
-                           )
+    ENV["PODSPEC_PATH"] = podspec_path
   else
   end
 

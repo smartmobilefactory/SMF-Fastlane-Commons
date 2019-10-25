@@ -1,6 +1,16 @@
 require 'json'
+require_relative '../smf_increment_version_number/smf_increment_version_number.rb'
 
-message("Build Version is <b>#{ENV["BUILD_VERSION"]}</b>")
+if !ENV['PODSPEC_PATH'].nil?
+    version_number = smf_increment_version_number_dry_run(
+                        podspec_path: ENV['PODSPEC_PATH'],
+                        bump_type: 'breaking'
+                     )
+
+    message("Build Version is <b>#{version_number}</b>")
+end
+
+
 
 ## WARNINGS:
 if (github.pr_body + github.pr_title).include?("WIP")
