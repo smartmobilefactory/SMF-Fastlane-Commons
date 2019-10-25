@@ -26,24 +26,17 @@ private_lane :smf_danger do |options|
   ENV["DANGER_JUNIT_PATHS"] = JSON.dump(junit_result_paths)
   ENV["DANGER_CHECKSTYLE_PATHS"] = JSON.dump(checkstyle_paths)
 
-  case @platform
-  when :ios_framework
+  if (@platform == :ios_framework && !bump_type.nil?)
+    if bump_type == ''
+      ENV['MULTIPLE_BUMP_TYPES_ERROR'] = 'true'
+    else
+      version_number = smf_increment_version_number_dry_run(
+          podspec_path: podspec_path,
+          bump_type: bump_type
+      )
 
-    if !bump_type.nil?
-
-      if bump_type == ''
-        ENV['MULTIPLE_BUMP_TYPES_ERROR'] = 'true'
-      else
-        version_number = smf_increment_version_number_dry_run(
-            podspec_path: podspec_path,
-            bump_type: bump_type
-        )
-
-        ENV['POD_VERSION'] = version_number
-      end
+      ENV['POD_VERSION'] = version_number
     end
-
-  else
   end
 
   danger(
