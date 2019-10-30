@@ -11,9 +11,10 @@ CUSTOM_IOS_CREDENTIALS = [
 ]
 POD_DEFAULT_VARIANTS = ["patch", "minor", "major", "breaking", "internal"]
 
-# iOS Templates
+# iOS/macOS Templates
 IOS_APP_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_iOS.template'
 POD_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_iOS_Framework.template'
+MACOS_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_macOS.template'
 
 # Android Templates
 ANDROID_APP_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Android.template'
@@ -59,6 +60,8 @@ def _smf_jenkins_file_template_path
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{FLUTTER_APP_TEMPLATE_JENKINS_FILE}"
   when :ios_framework
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{POD_TEMPLATE_JENKINS_FILE}"
+  when :macos
+    path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{MACOS_TEMPLATE_JENKINS_FILE}"
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
@@ -84,7 +87,7 @@ end
 def _smf_insert_custom_credentials(jenkinsFile)
   jenkinsFileData = jenkinsFile
   case @platform
-  when :ios
+  when :ios, :macos
     for custom_credential in CUSTOM_IOS_CREDENTIALS
       if @smf_fastlane_config[:project][:custom_credentials] && @smf_fastlane_config[:project][:custom_credentials][custom_credential.to_sym]
         custom_credential_key = @smf_fastlane_config[:project][:custom_credentials][custom_credential.to_sym]

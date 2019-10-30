@@ -49,12 +49,6 @@ private_lane :smf_build_ios_app do |options|
       xcpretty_formatter: "/Library/Ruby/Gems/2.3.0/gems/xcpretty-json-formatter-0.1.0/lib/json_formatter.rb"
   )
 
-  if @platform == :macos
-    smf_create_dmg_from_app(
-        team_id: team_id,
-        scheme: scheme
-    )
-  end
 end
 
 def smf_xcargs_for_build_system
