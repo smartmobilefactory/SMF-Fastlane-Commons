@@ -1,4 +1,15 @@
-########## PULLREQUEST CHECK LANES ##########
+
+# Import ios_setup_file for normal app builds
+
+ios_setup_file = "#{@fastlane_commons_dir_path}/setup/ios_setup.rb"
+
+if File.exist?(ios_setup_file)
+  import(ios_setup_file)
+else
+  raise "Can't find ios_setup file at #{ios_setup_file}"
+end
+
+######### PULLREQUEST CHECK LANES ##########
 
 # Update File
 
