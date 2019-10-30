@@ -40,7 +40,7 @@ end
 
 
 # Run Unit Tests
-private_lane :smf_pod_super_unit_tests_pr_check do |options|
+private_lane :smf_pod_super_unit_tests do |options|
 
   build_variants_for_pr_check = smf_build_variants_for_pod_pr_check
   build_variants_for_pr_check.each { |variant|
@@ -76,23 +76,23 @@ private_lane :smf_pod_super_unit_tests_pr_check do |options|
   }
 end
 
-lane :smf_pod_unit_tests_pr_check do |options|
-  smf_pod_super_unit_tests_pr_check(options)
+lane :smf_pod_unit_tests do |options|
+  smf_pod_super_unit_tests(options)
 end
 
 
 # Linter
-private_lane :smf_pod_super_linter_pr_check do
-    smf_linter
+private_lane :smf_pod_super_linter do
+    smf_run_swift_lint
 end
 
-lane :smf_pod_linter_pr_check do
-  smf_pod_super_linter_pr_check
+lane :smf_pod_linter do
+  smf_pod_super_linter
 end
 
 
 # Danger
-private_lane :smf_pod_super_danger_pr_check do |options|
+private_lane :smf_pod_super_danger do |options|
 
   podspec_path = @smf_fastlane_config[:build_variants][:framework][:podspec_path]
   bump_type = smf_extract_bump_type_from_pr_body(options[:pr_body])
@@ -103,7 +103,7 @@ private_lane :smf_pod_super_danger_pr_check do |options|
   )
 end
 
-lane :smf_pod_danger_pr_check do |options|
+lane :smf_pod_danger do |options|
   smf_pod_super_danger_pr_check(options)
 end
 
