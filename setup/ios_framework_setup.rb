@@ -71,6 +71,15 @@ lane :smf_pod_danger_pr_check do |options|
   smf_pod_super_danger_pr_check(options)
 end
 
+# Update File
+private_lane :smf_super_generate_files do
+  smf_update_generated_files
+end
+
+lane :smf_generate_files do
+  smf_super_generate_files
+end
+
 ############ POD PUBLISH LANES ############
 
 # Setup Workspace

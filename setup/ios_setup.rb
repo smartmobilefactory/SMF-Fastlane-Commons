@@ -239,18 +239,12 @@ lane :smf_send_slack_notification do |options|
 end
 
 # Update File
-private_lane :smf_super_generate_files do |options|
-
-  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
-
-  smf_update_generated_files(
-      branch: options[:branch],
-      build_variant: build_variant
-  )
+private_lane :smf_super_generate_files do
+  smf_update_generated_files
 end
 
-lane :smf_generate_files do |options|
-  smf_super_generate_files(options)
+lane :smf_generate_files do
+  smf_super_generate_files
 end
 
 # Unit-Tests
