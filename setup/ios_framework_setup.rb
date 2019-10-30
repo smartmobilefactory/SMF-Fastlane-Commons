@@ -10,6 +10,38 @@ end
 
 ########## PR-CHECK LANES ##########
 
+private_lane :smf_super_setup_dependencies do |options|
+
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
+
+  smf_build_precheck(
+      build_variant: build_variant,
+      build_variant_config: build_variant_config
+  )
+
+  smf_pod_install
+
+  # Called only when upload_itc is set to true. This way the build will fail in the beginning if there are any problems with itc. Saves time.
+  smf_verify_itc_upload_errors(
+      build_variant: build_variant,
+      upload_itc: build_variant_config[:upload_itc],
+      project_name: @smf_fastlane_config[:project][:project_name],
+      itc_skip_version_check: build_variant_config[:itc_skip_version_check],
+      username: build_variant_config[:itc_apple_id],
+      itc_team_id: build_variant_config[:itc_team_id],
+      bundle_identifier: build_variant_config[:bundle_identifier]
+  )
+end
+
+lane :smf_setup_dependencies_pr_check do |options|
+  smf_super_setup_dependencies(options)
+end
+
+lane :smf_setup_dependencies_build do |options|
+  smf_super_setup_dependencies(options)
+end
+
 # Run Unit Tests
 private_lane :smf_pod_super_unit_tests_pr_check do |options|
 
