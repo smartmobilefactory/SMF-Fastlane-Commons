@@ -55,7 +55,7 @@ def smf_import_commons
     end
     UI.message('Imported pod release file.')
 
-  when :ios
+  when :macos
     macos_setup_file = "#{@fastlane_commons_dir_path}/setup/macos_setup.rb"
     if File.exist?(macos_setup_file)
       import(macos_setup_file)
