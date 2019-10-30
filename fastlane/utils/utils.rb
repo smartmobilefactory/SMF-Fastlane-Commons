@@ -230,7 +230,7 @@ def smf_extract_bump_type_from_pr_body(pr_body)
   text = matches[0]
   groups = text.scan(/- \[x\] \*\*([a-z]+)\*\*/m)
 
-  if groups.size > 1
+  if groups.size != 1
     UI.error("Multiple bump types checkmarked in PR description!")
     return ''
   end
