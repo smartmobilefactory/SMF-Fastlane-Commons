@@ -1,3 +1,6 @@
+
+########## PULLREQUEST CHECK LANES ##########
+
 # Setup Dependencies
 
 private_lane :smf_super_setup_dependencies do |options|
@@ -11,6 +14,37 @@ lane :smf_setup_dependencies_build do |options|
   smf_super_setup_dependencies(options)
 end
 
+
+# Update Android Commons
+
+private_lane :smf_super_update_android_commons do |options|
+  smf_update_android_commons(options)
+end
+
+lane :smf_pipeline_update_android_commons do |options|
+  smf_super_update_android_commons(options)
+end
+
+
+# Build (Build to Release)
+
+private_lane :smf_super_build do |options|
+
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+  variant = smf_get_build_variant_from_config(build_variant)
+  keystore_folder = smf_get_keystore_folder(build_variant)
+
+  smf_build_android_app(
+      build_variant: variant,
+      keystore_folder: keystore_folder
+  )
+end
+
+lane :smf_build do |options|
+  smf_super_build(options)
+end
+
+
 # Run Unit Tests
 
 private_lane :smf_super_run_unit_tests do |options|
@@ -19,6 +53,50 @@ end
 
 lane :smf_run_unit_tests do |options|
   smf_super_run_unit_tests(options)
+end
+
+
+# Linter
+
+private_lane :smf_super_linter do |options|
+
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+  options[:build_variant] = smf_get_build_variant_from_config(build_variant)
+
+  smf_run_klint(options)
+  smf_run_detekt(options)
+  smf_run_gradle_lint_task(options)
+end
+
+lane :smf_linter do |options|
+  smf_super_linter(options)
+end
+
+
+# Danger
+
+private_lane :smf_super_pipeline_danger do |options|
+  smf_danger(options)
+end
+
+lane :smf_pipeline_danger do |options|
+  smf_super_pipeline_danger(options)
+end
+
+
+########## ADDITIONAL LANES USED FOR BUILDING ##########
+
+# Generate Changelog
+
+private_lane :smf_super_generate_changelog do |options|
+
+  build_variant = options[:build_variant]
+
+  smf_git_changelog(build_variant: build_variant)
+end
+
+lane :smf_generate_changelog do |options|
+  smf_super_generate_changelog(options)
 end
 
 
@@ -47,39 +125,6 @@ end
 
 lane :smf_pipeline_create_git_tag do |options|
   smf_super_pipeline_create_git_tag(options)
-end
-
-
-# Build (Build to Release)
-
-private_lane :smf_super_build do |options|
-
-  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
-  variant = smf_get_build_variant_from_config(build_variant)
-  keystore_folder = smf_get_keystore_folder(build_variant)
-
-  smf_build_android_app(
-      build_variant: variant,
-      keystore_folder: keystore_folder
-  )
-end
-
-lane :smf_build do |options|
-  smf_super_build(options)
-end
-
-
-# Generate Changelog
-
-private_lane :smf_super_generate_changelog do |options|
-
-  build_variant = options[:build_variant]
-
-  smf_git_changelog(build_variant: build_variant)
-end
-
-lane :smf_generate_changelog do |options|
-  smf_super_generate_changelog(options)
 end
 
 
@@ -114,6 +159,7 @@ end
 
 
 # Push Git Tag / Release
+
 private_lane :smf_super_push_git_tag_release do |options|
 
   branch = options[:branch]
@@ -141,42 +187,4 @@ end
 
 lane :smf_send_slack_notification do |options|
   smf_super_send_slack_notification(options)
-end
-
-
-# Linter
-
-private_lane :smf_super_linter do |options|
-
-  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
-  options[:build_variant] = smf_get_build_variant_from_config(build_variant)
-
-  smf_run_klint(options)
-  smf_run_detekt(options)
-  smf_run_gradle_lint_task(options)
-end
-
-lane :smf_linter do |options|
-  smf_super_linter(options)
-end
-
-
-# Danger
-private_lane :smf_super_pipeline_danger do |options|
-  smf_danger(options)
-end
-
-lane :smf_pipeline_danger do |options|
-  smf_super_pipeline_danger(options)
-end
-
-
-# Update Android Commons
-
-private_lane :smf_super_update_android_commons do |options|
-  smf_update_android_commons(options)
-end
-
-lane :smf_pipeline_update_android_commons do |options|
-  smf_super_update_android_commons(options)
 end

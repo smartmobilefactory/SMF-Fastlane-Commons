@@ -1,4 +1,18 @@
-# Setup Dependencies - pod install & `sh generate.sh` (optional: Phrase App)
+
+########## PULLREQUEST CHECK LANES ##########
+
+# Update Files
+
+private_lane :smf_super_generate_files do
+  smf_update_generated_files
+end
+
+lane :smf_generate_files do
+  smf_super_generate_files
+end
+
+
+# Setup Dependencies
 
 private_lane :smf_super_setup_dependencies do |options|
 
@@ -33,35 +47,7 @@ lane :smf_setup_dependencies_build do |options|
 end
 
 
-# Increment Build Number
-
-private_lane :smf_super_pipeline_increment_build_number do |options|
-
-  smf_increment_build_number(
-      current_build_number: smf_get_build_number_of_app
-  )
-end
-
-lane :smf_pipeline_increment_build_number do |options|
-  smf_super_pipeline_increment_build_number(options)
-end
-
-
-# Create Git Tag
-
-private_lane :smf_super_pipeline_create_git_tag do |options|
-
-  build_variant = options[:build_variant]
-  build_number = smf_get_build_number_of_app
-  smf_create_git_tag(build_variant: build_variant, build_number: build_number)
-end
-
-lane :smf_pipeline_create_git_tag do |options|
-  smf_super_pipeline_create_git_tag(options)
-end
-
-
-# Build (Build to Release)
+# Build
 
 private_lane :smf_super_build do |options|
 
@@ -101,13 +87,90 @@ lane :smf_build do |options|
 end
 
 
+# Unit-Tests
+
+private_lane :smf_super_unit_tests do |options|
+
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+
+  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
+
+  smf_ios_unit_tests(
+      project_name: @smf_fastlane_config[:project][:project_name],
+      unit_test_scheme: build_variant_config[:unit_test_scheme],
+      scheme: build_variant_config[:scheme],
+      unit_test_xcconfig_name: !build_variant_config[:xcconfig_name].nil? ? build_variant_config[:xcconfig_name][:unittests] : nil,
+      device: build_variant_config["tests.device_to_test_against".to_sym],
+      required_xcode_version: @smf_fastlane_config[:project][:xcode_version],
+      testing_for_mac: options[:testing_for_mac]
+  )
+
+end
+
+lane :smf_unit_tests do |options|
+  smf_super_unit_tests(options)
+end
+
+
+# Linter
+
+private_lane :smf_super_linter do
+  smf_run_swift_lint
+end
+
+lane :smf_linter do |options|
+  smf_super_linter
+end
+
+
+# Danger
+
+private_lane :smf_super_pipeline_danger do |options|
+  smf_danger
+end
+
+lane :smf_pipeline_danger do |options|
+  smf_super_pipeline_danger
+end
+
+########## ADDITIONAL LANES USED FOR BUILDING ##########
+
 # Generate Changelog
+
 private_lane :smf_super_generate_changelog do |options|
   smf_git_changelog(build_variant: options[:build_variant])
 end
 
 lane :smf_generate_changelog do |options|
   smf_super_generate_changelog(options)
+end
+
+
+# Increment Build Number
+
+private_lane :smf_super_pipeline_increment_build_number do |options|
+
+  smf_increment_build_number(
+      current_build_number: smf_get_build_number_of_app
+  )
+end
+
+lane :smf_pipeline_increment_build_number do |options|
+  smf_super_pipeline_increment_build_number(options)
+end
+
+
+# Create Git Tag
+
+private_lane :smf_super_pipeline_create_git_tag do |options|
+
+  build_variant = options[:build_variant]
+  build_number = smf_get_build_number_of_app
+  smf_create_git_tag(build_variant: build_variant, build_number: build_number)
+end
+
+lane :smf_pipeline_create_git_tag do |options|
+  smf_super_pipeline_create_git_tag(options)
 end
 
 
@@ -236,57 +299,4 @@ end
 
 lane :smf_send_slack_notification do |options|
   smf_super_send_slack_notification(options)
-end
-
-# Update File
-private_lane :smf_super_generate_files do
-  smf_update_generated_files
-end
-
-lane :smf_generate_files do
-  smf_super_generate_files
-end
-
-# Unit-Tests
-
-private_lane :smf_super_unit_tests do |options|
-
-  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
-
-  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
-
-  smf_ios_unit_tests(
-      project_name: @smf_fastlane_config[:project][:project_name],
-      unit_test_scheme: build_variant_config[:unit_test_scheme],
-      scheme: build_variant_config[:scheme],
-      unit_test_xcconfig_name: !build_variant_config[:xcconfig_name].nil? ? build_variant_config[:xcconfig_name][:unittests] : nil,
-      device: build_variant_config["tests.device_to_test_against".to_sym],
-      required_xcode_version: @smf_fastlane_config[:project][:xcode_version],
-      testing_for_mac: options[:testing_for_mac]
-  )
-
-end
-
-lane :smf_unit_tests do |options|
-  smf_super_unit_tests(options)
-end
-
-# Linter
-
-private_lane :smf_super_linter do
-  smf_run_swift_lint
-end
-
-lane :smf_linter do |options|
-  smf_super_linter
-end
-
-
-# Danger
-private_lane :smf_super_pipeline_danger do |options|
-  smf_danger
-end
-
-lane :smf_pipeline_danger do |options|
-  smf_super_pipeline_danger
 end

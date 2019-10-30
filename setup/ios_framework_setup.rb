@@ -1,14 +1,17 @@
-=begin
-ios_setup_file = "#{@fastlane_commons_dir_path}/setup/ios_setup.rb"
+########## PULLREQUEST CHECK LANES ##########
 
-if File.exist?(ios_setup_file)
-  import(ios_setup_file)
-else
-  raise "Can't find ios_setup file at #{ios_setup_file}"
+# Update File
+
+private_lane :smf_super_generate_files do
+  smf_update_generated_files
 end
-=end
 
-########## PR-CHECK LANES ##########
+lane :smf_generate_files do
+  smf_super_generate_files
+end
+
+
+# Setup dependencies
 
 private_lane :smf_super_setup_dependencies_pr_check do |options|
 
@@ -40,6 +43,7 @@ end
 
 
 # Run Unit Tests
+
 private_lane :smf_pod_super_unit_tests do |options|
 
   build_variants_for_pr_check = smf_build_variants_for_pod_pr_check
@@ -82,6 +86,7 @@ end
 
 
 # Linter
+
 private_lane :smf_pod_super_linter do
     smf_run_swift_lint
 end
@@ -92,6 +97,7 @@ end
 
 
 # Danger
+
 private_lane :smf_pod_super_danger do |options|
 
   podspec_path = @smf_fastlane_config[:build_variants][:framework][:podspec_path]
@@ -107,18 +113,10 @@ lane :smf_pod_danger do |options|
   smf_pod_super_danger(options)
 end
 
-# Update File
-private_lane :smf_super_generate_files do
-  smf_update_generated_files
-end
-
-lane :smf_generate_files do
-  smf_super_generate_files
-end
-
 ############ POD PUBLISH LANES ############
 
 # Setup Workspace
+
 private_lane :smf_super_pod_setup_workspace_for_publishing do |options|
   options[:build_variant] = 'framework'
   smf_setup_workspace(options)
@@ -128,7 +126,9 @@ lane :smf_pod_setup_workspace_for_publishing do |options|
   smf_super_pod_setup_workspace_for_publishing(options)
 end
 
+
 # Generate Changelog
+
 private_lane :smf_super_pod_generate_changelog do |options|
   smf_git_changelog(is_library: true)
 end
@@ -137,7 +137,9 @@ lane :smf_pod_generate_changelog do |options|
   smf_super_pod_generate_changelog(options)
 end
 
+
 # Increment Version Number
+
 private_lane :smf_super_pipeline_increment_version_number do |options|
 
   bump_type = options[:build_variant]
@@ -155,7 +157,8 @@ lane :smf_pipeline_increment_version_number do |options|
 end
 
 
-# Create Github Release
+# Release Pod
+
 private_lane :smf_super_release_pod do |options|
 
   build_variant_config = @smf_fastlane_config[:build_variants][:framework]
@@ -190,7 +193,9 @@ lane :smf_release_pod do |options|
   smf_super_release_pod(options)
 end
 
+
 # Send Slack Notification
+
 private_lane :smf_super_pod_send_slack_notification do |options|
 
   slack_channel = @smf_fastlane_config[:project][:slack_channel]
