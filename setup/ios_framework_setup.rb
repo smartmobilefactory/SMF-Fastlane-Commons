@@ -1,3 +1,4 @@
+=begin
 ios_setup_file = "#{@fastlane_commons_dir_path}/setup/ios_setup.rb"
 
 if File.exist?(ios_setup_file)
@@ -5,7 +6,7 @@ if File.exist?(ios_setup_file)
 else
   raise "Can't find ios_setup file at #{ios_setup_file}"
 end
-
+=end
 
 ########## PR-CHECK LANES ##########
 
