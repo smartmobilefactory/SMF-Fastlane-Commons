@@ -18,7 +18,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
 
   NO_APP_FAILURE = 'NO_APP_FAILURE'
 
-  unless is_mac_app
+  if !is_mac_app
     sh "cd ../build; zip -r9 \"#{escaped_filename}.ipa.zip\" \"#{escaped_filename}.ipa\" || echo #{NO_APP_FAILURE}"
   end
 

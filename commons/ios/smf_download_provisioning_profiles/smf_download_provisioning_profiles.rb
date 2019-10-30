@@ -12,11 +12,6 @@ private_lane :smf_download_provisioning_profiles do |options|
   extensions_suffixes = options[:extensions_suffixes]
   build_variant = options[:build_variant]
 
-  if ENV[$FASTLANE_PLATFORM_NAME_ENV_KEY] == "mac"
-    UI.message("Skipping fastlane match, because it doesn't support mac apps.")
-    return
-  end
-
   team_id(team_id)
 
   if smf_is_keychain_enabled

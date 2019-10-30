@@ -16,6 +16,7 @@ private_lane :smf_build_ios_app do |options|
   export_method = options[:export_method]
   icloud_environment = options[:icloud_environment]
   workspace = options[:workspace]
+  team_id = options[:team_id]
 
   UI.message("export_mehtod is nil: #{export_method.nil?}")
 
@@ -47,6 +48,13 @@ private_lane :smf_build_ios_app do |options|
       skip_package_ipa: skip_package_ipa,
       xcpretty_formatter: "/Library/Ruby/Gems/2.3.0/gems/xcpretty-json-formatter-0.1.0/lib/json_formatter.rb"
   )
+
+  if @platform == :macos
+    smf_create_dmg_from_app(
+        team_id: team_id,
+        scheme: scheme
+    )
+  end
 end
 
 def smf_xcargs_for_build_system
