@@ -6,8 +6,8 @@ This lane increments the version number of the project if a library is built and
 Increment the version number.
 ```
 smf_increment_version_number(
-    podspec_path = options[:podspec_path],
-    bump_type = options[:bump_type]
+    podspec_path: <path to pods podspec file>
+    bump_type: <either major, minor, patch, breaking or internal>
 )
 ```
 
@@ -26,3 +26,17 @@ There are five possible bump types:<br />
 
 ## Create new tag
 The current build number will be incremented and used for the new tag. If this tag exists the build number will be incremented again the same way. This process will run ten times if needed. 
+
+
+# smf_incremented_version_number_dry_run
+
+This lane increments the version number in the podspec file and returns it, but then discards the changes. It can be used to get the version number which would be set if the version was actually increased.
+
+### Example
+
+```
+smf_increment_version_number_dry_run(
+    podspec_path: <path to pods podspec file>
+    bump_type: <either major, minor, patch, breaking or internal>
+)
+```

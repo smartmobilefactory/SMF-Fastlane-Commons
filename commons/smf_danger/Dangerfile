@@ -1,5 +1,11 @@
 require 'json'
 
+if ENV['MULTIPLE_BUMP_TYPES_ERROR'] == 'true'
+    warn("⛔️ You have selected <b>multiple</b> \"bump types\" in the description of this PR. Please select only one!")
+elsif !ENV['POD_VERSION'].nil?
+    message("Upcoming Build Version is <b>#{ENV['POD_VERSION']}</b>")
+end
+
 ## WARNINGS:
 if (github.pr_body + github.pr_title).include?("WIP")
   warn("Pull Request is Work in Progress")

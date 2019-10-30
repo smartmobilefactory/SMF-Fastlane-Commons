@@ -6,4 +6,4 @@
 
 _build_variants = __BUILD_VARIANTS__
 
-iOSPod(_build_variants)
+iOSFramework(_build_variants)
