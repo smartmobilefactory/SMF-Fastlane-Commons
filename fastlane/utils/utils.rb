@@ -121,6 +121,7 @@ def smf_path_to_ipa_or_app(build_variant)
 
   app_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.ipa.zip"
   app_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.ipa" unless File.exist?(app_path)
+  app_path = smf_workspace_dir + "/build/#{escaped_filename}.app" unless File.exist?(app_path)
 
   UI.message("Constructed path \"#{app_path}\" from filename \"#{escaped_filename}\"")
 

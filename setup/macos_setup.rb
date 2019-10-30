@@ -210,7 +210,7 @@ private_lane :smf_super_pipeline_upload_with_sparkle do |options|
       sparkle_version: sparkle_config[:sparkle_version],
       sparkle_signing_team: sparkle_config[:sparkle_signing_team],
       sparkle_xml_name: sparkle_config[:xml_name]
-  )
+  ) if build_variant_config[:use_sparkle] == true
 end
 
 lane :smf_pipeline_uplaod_with_sparkle do |options|
