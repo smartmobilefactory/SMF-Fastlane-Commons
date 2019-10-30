@@ -104,7 +104,7 @@ private_lane :smf_pod_super_danger do |options|
 end
 
 lane :smf_pod_danger do |options|
-  smf_pod_super_danger_pr_check(options)
+  smf_pod_super_danger(options)
 end
 
 # Update File
