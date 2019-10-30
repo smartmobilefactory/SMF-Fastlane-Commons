@@ -2,7 +2,9 @@ lane :smf_sync_with_phrase_app do |options|
   case @platform
   when :ios, :ios_framework, :macos
     initialize_env_variable_name_mappings
-    UI.message("Strings are synced with PhraseApp using the values from the fastlane/Config.json")
+    UI.message("Strings are synced with PhraseApp using the values from the fastfile")
+    
+    UI.message("DEBUGGING: phraseapp entries: #{options}")
 
     if (!validate_and_set_phrase_app_env_variables(options))
       UI.message("Either phrase app is not used in this project or you have to check the fastlane/Config.json \"phrase_app\" entries for completeness!")
