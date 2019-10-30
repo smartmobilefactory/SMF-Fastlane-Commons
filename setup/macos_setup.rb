@@ -155,7 +155,8 @@ private_lane :smf_super_create_dmg_and_gatekeeper do |options|
       team_id: build_variant_config[:team_id]
   )
 
-
+  add_plugin(notarize)
+  
   notarize(
       package: dmg_path,
       bundle_id: build_variant_config[:bundle_identifier],
