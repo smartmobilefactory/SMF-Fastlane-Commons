@@ -2,6 +2,8 @@ private_lane :smf_danger do |options|
 
   jira_keys = options[:jira_key]
   checkstyle_paths = []
+  podspec_path = options[:podspec_path]
+  bump_type = options[:bump_type]
 
   if File.exist?(smf_swift_lint_output_path)
     checkstyle_paths.push(smf_swift_lint_output_path)
@@ -23,6 +25,19 @@ private_lane :smf_danger do |options|
   ENV["DANGER_ANDROID_LINT_PATHS"] = JSON.dump(lint_paths)
   ENV["DANGER_JUNIT_PATHS"] = JSON.dump(junit_result_paths)
   ENV["DANGER_CHECKSTYLE_PATHS"] = JSON.dump(checkstyle_paths)
+
+  if (@platform == :ios_framework && !bump_type.nil?)
+    if bump_type == ''
+      ENV['MULTIPLE_BUMP_TYPES_ERROR'] = 'true'
+    else
+      version_number = smf_increment_version_number_dry_run(
+          podspec_path: podspec_path,
+          bump_type: bump_type
+      )
+
+      ENV['POD_VERSION'] = version_number
+    end
+  end
 
   danger(
       github_api_token: ENV["DANGER_GITHUB_API_TOKEN"],

@@ -1,3 +1,6 @@
+
+# Import ios_setup_file for normal app builds
+
 ios_setup_file = "#{@fastlane_commons_dir_path}/setup/ios_setup.rb"
 
 if File.exist?(ios_setup_file)
@@ -6,19 +9,56 @@ else
   raise "Can't find ios_setup file at #{ios_setup_file}"
 end
 
-def _smf_for_each_build_variant(&block)
+######### PULLREQUEST CHECK LANES ##########
 
-  build_variants_for_pr_check = smf_build_variants_for_pod_pr_check
-  build_variants_for_pr_check.each { |variant|
-    block.call(variant)
-  }
+# Update File
+
+private_lane :smf_pod_super_generate_files do
+  smf_update_generated_files
 end
+
+lane :smf_pod_generate_files do
+  smf_super_generate_files
+end
+
+
+# Setup dependencies
+
+private_lane :smf_pod_super_setup_dependencies_pr_check do |options|
+
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
+
+  smf_build_precheck(
+      build_variant: build_variant,
+      build_variant_config: build_variant_config
+  )
+
+  smf_pod_install
+
+  # Called only when upload_itc is set to true. This way the build will fail in the beginning if there are any problems with itc. Saves time.
+  smf_verify_itc_upload_errors(
+      build_variant: build_variant,
+      upload_itc: build_variant_config[:upload_itc],
+      project_name: @smf_fastlane_config[:project][:project_name],
+      itc_skip_version_check: build_variant_config[:itc_skip_version_check],
+      username: build_variant_config[:itc_apple_id],
+      itc_team_id: build_variant_config[:itc_team_id],
+      bundle_identifier: build_variant_config[:bundle_identifier]
+  )
+end
+
+lane :smf_pod_setup_dependencies_pr_check do |options|
+  smf_pod_super_setup_dependencies_pr_check(options)
+end
+
 
 # Run Unit Tests
 
-private_lane :smf_pod_super_unit_tests_pr_check do |options|
+private_lane :smf_pod_super_unit_tests do |options|
 
-  _smf_for_each_build_variant { |variant|
+  build_variants_for_pr_check = smf_build_variants_for_pod_pr_check
+  build_variants_for_pr_check.each { |variant|
 
     build_variant_config = @smf_fastlane_config[:build_variants][variant.to_sym]
     testing_for_mac = build_variant_config[:platform] == 'mac'
@@ -38,46 +78,74 @@ private_lane :smf_pod_super_unit_tests_pr_check do |options|
     ) if !testing_for_mac
 
     UI.message("Running unit tests for variant '#{variant}' for PR Check")
-    options[:build_variant] = variant
-    options[:testing_for_mac] = testing_for_mac
-    smf_unit_tests(options)
+
+    smf_ios_unit_tests(
+        project_name: @smf_fastlane_config[:project][:project_name],
+        unit_test_scheme: build_variant_config[:unit_test_scheme],
+        scheme: build_variant_config[:scheme],
+        unit_test_xcconfig_name: !build_variant_config[:xcconfig_name].nil? ? build_variant_config[:xcconfig_name][:unittests] : nil,
+        device: build_variant_config["tests.device_to_test_against".to_sym],
+        required_xcode_version: @smf_fastlane_config[:project][:xcode_version],
+        testing_for_mac: options[:testing_for_mac]
+    )
   }
 end
 
-lane :smf_pod_unit_tests_pr_check do |options|
-  smf_pod_super_unit_tests_pr_check(options)
+lane :smf_pod_unit_tests do |options|
+  smf_pod_super_unit_tests(options)
 end
 
 
 # Linter
 
-private_lane :smf_pod_super_linter_pr_check do |options|
-
-  _smf_for_each_build_variant { |variant|
-    UI.message("Running unit tests for variant '#{variant}' for PR Check")
-    options[:build_variant] = variant
-    smf_linter(options)
-  }
+private_lane :smf_pod_super_linter do
+    smf_run_swift_lint
 end
 
-lane :smf_pod_linter_pr_check do |options|
-  smf_pod_super_linter_pr_check(options)
+lane :smf_pod_linter do
+  smf_pod_super_linter
 end
 
 
 # Danger
 
-private_lane :smf_pod_super_danger_pr_check do |options|
+private_lane :smf_pod_super_danger do |options|
 
-  _smf_for_each_build_variant { |variant|
-    UI.message("Running unit tests for variant '#{variant}' for PR Check")
-    options[:build_variant] = variant
-    smf_pipeline_danger(options)
-  }
+  podspec_path = @smf_fastlane_config[:build_variants][:framework][:podspec_path]
+  bump_type = smf_extract_bump_type_from_pr_body(options[:pr_body])
+
+  smf_danger(
+    podspec_path: podspec_path,
+    bump_type: bump_type
+  )
 end
 
-lane :smf_pod_danger_pr_check do |options|
-  smf_pod_super_danger_pr_check(options)
+lane :smf_pod_danger do |options|
+  smf_pod_super_danger(options)
+end
+
+############ POD PUBLISH LANES ############
+
+# Setup Workspace
+
+private_lane :smf_super_pod_setup_workspace_for_publishing do |options|
+  options[:build_variant] = 'framework'
+  smf_setup_workspace(options)
+end
+
+lane :smf_pod_setup_workspace_for_publishing do |options|
+  smf_super_pod_setup_workspace_for_publishing(options)
+end
+
+
+# Generate Changelog
+
+private_lane :smf_super_pod_generate_changelog do |options|
+  smf_git_changelog(is_library: true)
+end
+
+lane :smf_pod_generate_changelog do |options|
+  smf_super_pod_generate_changelog(options)
 end
 
 
@@ -100,17 +168,8 @@ lane :smf_pipeline_increment_version_number do |options|
 end
 
 
-# Generate Changelog
+# Release Pod
 
-private_lane :smf_super_pod_generate_changelog do |options|
-  smf_git_changelog(is_library: true)
-end
-
-lane :smf_pod_generate_changelog do |options|
-  smf_super_pod_generate_changelog(options)
-end
-
-# Create Github Release
 private_lane :smf_super_release_pod do |options|
 
   build_variant_config = @smf_fastlane_config[:build_variants][:framework]
@@ -145,6 +204,7 @@ lane :smf_release_pod do |options|
   smf_super_release_pod(options)
 end
 
+
 # Send Slack Notification
 
 private_lane :smf_super_pod_send_slack_notification do |options|
@@ -161,12 +221,4 @@ lane :smf_pod_send_slack_notification do |options|
   smf_super_pod_send_slack_notification(options)
 end
 
-private_lane :smf_super_pod_setup_workspace do |options|
-  options[:build_variant] = 'framework'
-  smf_setup_workspace(options)
-end
-
-lane :smf_pod_setup_workspace do |options|
-  smf_super_pod_setup_workspace(options)
-end
 
