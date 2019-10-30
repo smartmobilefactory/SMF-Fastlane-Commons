@@ -13,11 +13,11 @@ end
 
 # Update File
 
-private_lane :smf_super_generate_files do
+private_lane :smf_pod_super_generate_files do
   smf_update_generated_files
 end
 
-lane :smf_generate_files do
+lane :smf_pod_generate_files do
   smf_super_generate_files
 end
 
