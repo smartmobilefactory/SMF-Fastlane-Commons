@@ -28,8 +28,8 @@ private_lane :smf_upload_with_sparkle do |options|
   # Create appcast
   sparkle_private_key = ENV['CUSTOM_SPARKLE_SIGNING_KEY']
 
-  sh "#{@fastlane_commons_dir_path}/tools/sparkle.sh #{ENV['LOGIN']} #{sparkle_private_key} #{update_dir} #{sparkle_version} #{sparkle_signing_team}"
-  # Upload appcast
+  sh "#{@fastlane_commons_dir_path}/commons/ios/smf_upload_with_sparkle/sparkle.sh #{ENV['LOGIN']} #{sparkle_private_key} #{update_dir} #{sparkle_version} #{sparkle_signing_team}"
+
   appcast_xml = "#{update_dir}#{sparkle_xml_name}"
   appcast_upload_name = sparkle_xml_name
   sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{appcast_xml} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}#{appcast_upload_name}")
