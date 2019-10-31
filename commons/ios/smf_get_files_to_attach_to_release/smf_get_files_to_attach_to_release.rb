@@ -2,7 +2,7 @@
 # Options:
 #.  :projects -> dict with project name and app_name mappings for which the app should be attached to the tag
 #
-private_lane :smf_add_app_to_git_tag do |options|
+private_lane :smf_get_files_to_attach_to_release do |options|
 
   build_variant = options[:build_variant]
   projects = options[:projects]
