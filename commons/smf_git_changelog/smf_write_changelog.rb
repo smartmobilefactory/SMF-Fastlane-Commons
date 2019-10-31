@@ -5,7 +5,7 @@ private_lane :smf_write_changelog do |options|
   File.write(_smf_changelog_temp_path, options[:changelog])
 
   if !options[:html_changelog].nil?
-    UI.message("Writing changelog as html to temoprary file #{_smf_changelog_html_temp_path_}")
+    UI.message("Writing changelog as html to temoprary file #{_smf_changelog_html_temp_path}")
     File.write(_smf_changelog_html_temp_path, options[:html_changelog])
   end
 end
