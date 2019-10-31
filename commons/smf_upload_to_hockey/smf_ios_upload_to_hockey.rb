@@ -42,7 +42,7 @@ private_lane :smf_ios_upload_to_hockey do |options|
         ipa: app_path,
         dsym: dsym_path,
         notify: "1",
-        notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
+        notes: smf_read_changelog
     )
   else
     UI.message('Upload iOS app to Hockey.')
@@ -52,7 +52,7 @@ private_lane :smf_ios_upload_to_hockey do |options|
         ipa: app_path,
         dsym: dsym_path,
         notify: "1",
-        notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
+        notes: smf_read_changelog
     )
   end
 

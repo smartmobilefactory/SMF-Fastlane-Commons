@@ -17,7 +17,7 @@ private_lane :smf_android_upload_to_appcenter do |options|
         aab: aab_path,
         destination_type: 'store',
         notify_testers: true,
-        release_notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
+        release_notes: smf_read_changelog
     )
   else
     appcenter_upload(
@@ -26,7 +26,7 @@ private_lane :smf_android_upload_to_appcenter do |options|
         app_name: app_name,
         apk: apk_path,
         notify_testers: true,
-        release_notes: ENV[$SMF_CHANGELOG_ENV_KEY].to_s
+        release_notes: smf_read_changelog
     )
   end
 

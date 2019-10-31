@@ -1,6 +1,6 @@
 # smf_git_changelog
 
-This lane collects the git commit messages into a changelog and stores it in *ENV[$SMF_CHANGELOG_ENV_KEY]*. In addition, the changelog will be stored formatted in HTML in *ENV[$SMF_CHANGELOG_ENV_HTML_KEY]*.
+This lane collects the git commit messages into a changelog and stores it using *smf_write_changelog*.
 
 ### Example
 Getting the changelog between this commit and the last commit which tag contains *Alpha*.
