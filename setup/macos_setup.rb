@@ -267,7 +267,7 @@ private_lane :smf_super_push_git_tag_release do |options|
   # Projects for which the .app and Unit-Test results should be attached to the release
   projects =  { "HiDrive" => "HiDrive"}
 
-  files_to_attach  = smf_get_file_to_attach_to_release(
+  files_to_attach  = smf_get_files_to_attach_to_release(
       build_variant: build_variant,
       projects: projects,
       project_name: @smf_fastlane_config[:project][:project_name]
