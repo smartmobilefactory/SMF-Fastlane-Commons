@@ -264,6 +264,15 @@ private_lane :smf_super_push_git_tag_release do |options|
   smf_git_pull(local_branch)
   smf_push_to_git_remote(local_branch: local_branch)
 
+  # Projects for which the .app and Unit-Test results should be attached to the release
+  projects =  { "HiDrive" => "HiDrive"}
+
+  files_to_attach  = smf_get_file_to_attach_to_release(
+      build_variant: build_variant,
+      projects: projects,
+      project_name: @smf_fastlane_config[:project][:project_name]
+  )
+
   # Create the GitHub release
   build_number = get_build_number(xcodeproj: "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj")
   smf_create_github_release(
@@ -271,7 +280,8 @@ private_lane :smf_super_push_git_tag_release do |options|
       tag: smf_get_tag_of_app(build_variant, build_number),
       branch: local_branch,
       build_variant: build_variant,
-      changelog: changelog
+      changelog: changelog,
+      paths: files_to_attach
   )
 end
 
