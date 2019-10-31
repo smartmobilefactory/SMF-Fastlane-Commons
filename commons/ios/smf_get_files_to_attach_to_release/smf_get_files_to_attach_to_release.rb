@@ -24,7 +24,7 @@ private_lane :smf_get_files_to_attach_to_release do |options|
      end
    end
 
-   if projects[current_project] != nil
+   if projects[project_name] != nil
      path_to_renamed_app_file = File.join(File.dirname(path_to_ipa_or_app), "#{projects[project_name]}.app")
      sh "cp #{path_to_ipa_or_app} #{path_to_renamed_app_file}"
      path_to_files_to_attach.append(path_to_ipa_or_app)
