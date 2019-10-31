@@ -57,9 +57,9 @@ private_lane :smf_git_changelog do |options|
   changelog = cleaned_changelog_messages.uniq.join("\n")
   changelog = "#{changelog[0..20_000]}#{'\\n...'}" if changelog.length > 20_000
 
+  # environment variable is used in legacy iOS code. TODO check if this can be removed
   ENV[$SMF_CHANGELOG_ENV_HTML_KEY] = "<ul>#{cleaned_changelog_messages.uniq.map { |x| "<li>#{x}</li>" }.join("")}</ul>"
   smf_write_changelog(changelog: changelog)
-  ENV[$SMF_CHANGELOG_ENV_KEY] = changelog
 end
 
 ##############
