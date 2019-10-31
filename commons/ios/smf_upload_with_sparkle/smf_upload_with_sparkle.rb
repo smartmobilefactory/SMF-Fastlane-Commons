@@ -12,7 +12,7 @@ private_lane :smf_upload_with_sparkle do |options|
   dmg_path = smf_path_to_dmg(build_variant)
   update_dir = "#{smf_workspace_dir}/build/"
 
-  release_notes = smf_read_changelog
+  release_notes = smf_read_changelog(html: true)
   release_notes_name = "#{scheme}.html"
   File.write("#{update_dir}#{release_notes_name}", release_notes)
 

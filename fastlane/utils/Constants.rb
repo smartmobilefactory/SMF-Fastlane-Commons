@@ -44,4 +44,5 @@ $SMF_PHRASE_APP_CUSTOM_TOKEN_KEY = 'CUSTOM_PHRASE_APP_TOKEN'
 $SMF_PHRASE_APP_SCRIPTS_REPO_URL = 'git@github.com:smartmobilefactory/Phraseapp-CI.git'
 
 $CHANGELOG_TEMP_FILE = 'temp_changelog.txt'
+$CHANGELOG_TEMP_FILE_HTML = 'temp_changelog.html'
 
