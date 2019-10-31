@@ -24,7 +24,7 @@ private_lane :smf_ios_upload_to_hockey do |options|
 
   # TODO: fix hockey for macOS
   if is_mac_app
-    UI.warn("Hockey not implemented for macOS apps yet 😬")
+    UI.message("Hockey not implemented for macOS apps yet 😬")
     next
     version_number = version_get_podspec(path: podspec_path)
 
