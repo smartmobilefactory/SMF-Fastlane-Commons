@@ -154,14 +154,14 @@ private_lane :smf_super_create_dmg_and_gatekeeper do |options|
       build_variant: build_variant,
       team_id: build_variant_config[:team_id]
   )
-
+=begin
   notarize(
       package: dmg_path,
       bundle_id: build_variant_config[:bundle_identifier],
       username: build_variant_config[:apple_id],
       asc_provider: build_variant_config[:team_id]
   ) if build_variant_config[:notarize] == true
-
+=end
 end
 
 lane :smf_create_dmg_and_gatekeeper do |options|
