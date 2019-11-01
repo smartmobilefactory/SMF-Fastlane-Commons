@@ -273,8 +273,6 @@ private_lane :smf_super_push_git_tag_release do |options|
       project_name: @smf_fastlane_config[:project][:project_name]
   )
 
-  UI.message("Ataching the following files to the Github release: #{files_to_attach}")
-
   # Create the GitHub release
   build_number = get_build_number(xcodeproj: "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj")
   smf_create_github_release(

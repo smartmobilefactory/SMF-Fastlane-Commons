@@ -70,8 +70,8 @@ end
 def zipped_path(path)
   if File.exists?(path)
     if File.extname(path) != '.zip'
-      zipped_file_path = "#{File.path(path).gsub(%r{\..*}, '')}.zip"
-      sh "cd \"#{File.dirname(path)}\"; zip -r \"#{zipped_file_path}\" \"./#{File.basename(path)}\""
+      zipped_file_path = "#{path}.zip"
+      sh "cd \"#{File.dirname(path)}\"; zip -r -q \"#{zipped_file_path}\" \"./#{File.basename(path)}\""
       File.path(zipped_file_path)
     else
       File.path(path)
