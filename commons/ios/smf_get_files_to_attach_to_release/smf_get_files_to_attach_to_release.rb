@@ -30,7 +30,7 @@ private_lane :smf_get_files_to_attach_to_release do |options|
        path_to_files_to_attach.push(path_to_ipa_or_app)
      end
 
-     test_dir = "Tests/SMFTests"
+     test_dir = "#{smf_workspace_dir}/Tests/SMFTests"
      test_dir_zipped = "#{test_dir}.zip"
      sh "zip -r \"#{test_dir_zipped}\" \"#{test_dir}\""
      path_to_files_to_attach.push(test_dir_zipped) # this will be returned
