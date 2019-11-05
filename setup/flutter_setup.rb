@@ -148,7 +148,7 @@ private_lane :smf_super_upload_dsyms do |options|
       build_variant: build_variant,
       org_slug: @smf_fastlane_config[:sentry_org_slug],
       project_slug: @smf_fastlane_config[:sentry_project_slug],
-      escaped_filename: build_variant_config[:scheme].gsub(' ', "\ "),
+      escaped_filename: build_variant_config[:flavor].gsub(' ', "\ "),
       build_variant_org_slug: build_variant_ios_config[:sentry_org_slug],
       build_variant_project_slug: build_variant_ios_config[:sentry_project_slug]
   )
@@ -216,17 +216,6 @@ private_lane :smf_super_pipeline_ios_upload_to_appcenter do |options|
       is_mac_app: build_variant_ios_config[:use_sparkle],
       podspec_path: build_variant_ios_config[:podspec_path]
   ) if !appcenter_app_id.nil?
-
-  # Upload the IPA to Hockey
-  smf_ios_upload_to_hockey(
-      build_number: smf_get_build_number_of_app,
-      app_id: hockey_app_id,
-      escaped_filename: build_variant_config[:scheme].gsub(' ', "\ "),
-      path_to_ipa_or_app: smf_get_file_path(app_file_regex),
-      is_mac_app: build_variant_ios_config[:use_sparkle],
-      podspec_path: build_variant_ios_config[:podspec_path]
-  ) if !hockey_app_id.nil?
-
 end
 
 lane :smf_pipeline_ios_upload_to_appcenter do |options|
