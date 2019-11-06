@@ -3,17 +3,13 @@ private_lane :smf_build_precheck do |options|
   upload_itc = options[:upload_itc]
   itc_apple_id = options[:itc_apple_id]
   pods_spec_repo = options[:pods_spec_repo]
-  pull_request_number = options[:pull_request_number]
-
-  UI.message("PR number at beginning of lane: #{pull_request_number}")
 
 	case @platform
  	when :ios, :flutter
 		perform_build_precheck_ios(upload_itc, itc_apple_id)
   when :ios_framework
     perform_build_precheck_ios_frameworks(
-        pods_spec_repo,
-        pull_request_number
+        pods_spec_repo
     )
 	else
 		UI.message("Build Precheck: Nothing reportable found")
@@ -37,7 +33,7 @@ def perform_build_precheck_ios(upload_itc, itc_apple_id)
 	end
 end
 
-def perform_build_precheck_ios_frameworks(pods_specs_repo, pull_request_number)
+def perform_build_precheck_ios_frameworks(pods_specs_repo)
 	podfile = "#{smf_workspace_dir}/Podfile"
 	podfile_content = File.read(podfile)
 	https_in_podfile = !podfile_content.match(/source 'https:\/\/github\.com\/smartmobilefactory\/SMF-CocoaPods-Specs'/m).nil?
@@ -57,19 +53,14 @@ def perform_build_precheck_ios_frameworks(pods_specs_repo, pull_request_number)
 		git_remote_origin_url = sh 'git config --get remote.origin.url'
 		matcher = git_remote_origin_url.match(/github\.com(:|\/)(.+)\/(.+)\.git/)
 
-		UI.message("DEBUGGING: git repo urls is: #{git_remote_origin_url} and matcher is: #{matcher}")
-		UI.message("DEBUGGING: pull request number is: #{pull_request_number}")
-
 		if !matcher.nil?
-			if !matcher.captures.nil? && matcher.captures.count == 3
+			if !matcher.captures.nil? && matcher.captures.count == 3 && !ENV["CHANGE_ID"].nil?
 				repo_owner = matcher.captures[1]
 				repo_name = matcher.captures[2]
 
-				UI.message("DEBUGGING; repo_owner: #{repo_owner}, repo_name: #{repo_name}, github_token is nil: #{ENV["GITHUB_TOKEN"].nil?}")
-
 				UI.message("Posting error as pr comment!")
 
-				sh("curl -H \"Authorization: token #{ENV["GITHUB_TOKEN"]}\" -d '{\"body\": \"#{log_msg}\"}' -X POST https://api.github.com/repos/#{repo_owner}/#{repo_name}/issues/#{pull_request_number}/comments")
+				sh("curl -H \"Authorization: token #{ENV["GITHUB_TOKEN"]}\" -d '{\"body\": \"#{log_msg}\"}' -X POST https://api.github.com/repos/#{repo_owner}/#{repo_name}/issues/#{ENV["CHANGE_ID"]}/comments -sS")
 			end
 		end
 
