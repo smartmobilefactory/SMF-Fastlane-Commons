@@ -150,7 +150,7 @@ end
 def smf_git_pull(branch)
   branch_name = "#{branch}"
   branch_name.sub!('origin/', '')
-  sh "git pull origin #{branch_name} --depth=1 --quiet --allow-unrelated-histories"
+  sh "git pull origin #{branch_name} --depth=1 --quiet --allow-unrelated-histories -X theirs"
 end
 
 def smf_update_config(config, message = nil)

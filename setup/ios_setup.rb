@@ -187,6 +187,7 @@ private_lane :smf_super_upload_dsyms do |options|
       project_slug: @smf_fastlane_config[:sentry_project_slug],
       build_variant_org_slug: build_variant_config[:sentry_org_slug],
       build_variant_project_slug: build_variant_config[:sentry_project_slug],
+      escaped_filename: build_variant_config[:scheme].gsub(' ', "\ "),
       slack_channel: slack_channel
   )
 

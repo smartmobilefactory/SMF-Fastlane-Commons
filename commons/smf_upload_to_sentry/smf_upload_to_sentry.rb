@@ -5,6 +5,7 @@ private_lane :smf_upload_to_sentry do |options|
   build_variant_org_slug = options[:sentry_org_slug]
   build_variant_project_slug = options[:sentry_project_slug]
   slack_channel = options[:slack_channel]
+  escaped_filename = options[:escaped_filename]
 
   has_sentry_project_settings = !org_slug.nil? && !project_slug.nil?
   has_sentry_variant_settings = !build_variant_org_slug.nil? && !build_variant_project_slug.nil?
@@ -21,11 +22,19 @@ private_lane :smf_upload_to_sentry do |options|
         project_slug = project_slug_variant
       end
 
+      dsym_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.app.dSYM.zip"
+      UI.message("Constructed the dsym path \"#{dsym_path}\"")
+      unless File.exist?(dsym_path)
+        dsym_path = nil
+        UI.message('Using nil as dsym_path as no file exists at the constructed path.')
+      end
+
       sentry_upload_dsym(
           auth_token: ENV[$SENTRY_AUTH_TOKEN],
           org_slug: org_slug,
           project_slug: project_slug,
-          url: 'https://sentry.solutions.smfhq.com/'
+          url: 'https://sentry.solutions.smfhq.com/',
+          dsym_path: dsym_path
       )
 
     rescue => exception
