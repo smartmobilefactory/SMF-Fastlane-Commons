@@ -54,6 +54,7 @@ def perform_build_precheck_ios_frameworks(pods_specs_repo, pull_request_number)
 		matcher = git_remote_origin_url.match(/github\.com(:|\/)(.+)\/(.+)\.git/)
 
 		UI.message("DEBUGGING: git repo urls is: #{git_remote_origin_url} and matcher is: #{matcher}")
+		UI.message("DEBUGGING: captures are: #{matcher.captures}")
 
 		if !matcher.nil?
 			if !matcher.captures.nil? && matcher.captures.count == 2
