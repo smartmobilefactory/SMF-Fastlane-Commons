@@ -51,9 +51,9 @@ def perform_build_precheck_ios_frameworks(pods_specs_repo, pull_request_number)
 		# Try to post a comment on the PR
 
 		git_remote_origin_url = sh 'git config --get remote.origin.url'
-		matcher = git_remote_origin_url.match(/git@github\.com:(.+)\/(.+)\.git/)
+		matcher = git_remote_origin_url.match(/github\.com(:|\/)(.+)\/(.+)\.git/)
 
-		UI.message("DEBUGGING; git repo urls is: #{git_remote_origin_url} and matcher is: #{matcher}")
+		UI.message("DEBUGGING: git repo urls is: #{git_remote_origin_url} and matcher is: #{matcher}")
 
 		if !matcher.nil?
 			if !matcher.captures.nil? && matcher.captures.count == 2
