@@ -20,6 +20,9 @@ private_lane :smf_verify_itc_upload_errors do |options|
 
   build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
 
+  unlock_keychain(path: 'login.keychain', password: ENV['LOGIN'])
+  unlock_keychain(path: 'jenkins.keychain', password: ENV['JENKINS'])
+
   credentials = CredentialsManager::AccountManager.new(user: itc_apple_id)
 
   # Setup Spaceship
