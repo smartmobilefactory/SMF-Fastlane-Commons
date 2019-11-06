@@ -44,7 +44,7 @@ def perform_build_precheck_ios_frameworks(pods_specs_repo, pull_request_number)
 		prefix_config = https_in_config ? 'in the Config.json' : ''
 		connector = https_in_podfile && https_in_config ? ' and ' : ''
 
-		log_msg = "The https podspec repo url is still present #{prefix_podfile}#{connector}#{prefix_config}. See https://smartmobilefactory.atlassian.net/wiki/spaces/SMFIOS/pages/674201953/Wrong+cocoapods+repo+in... for more information"
+		log_msg = "⛔️ The HTTPS podspec repo url is still present #{prefix_podfile}#{connector}#{prefix_config}. Please update to use the 'git@' url. See https://smartmobilefactory.atlassian.net/wiki/spaces/SMFIOS/pages/674201953/Wrong+cocoapods+repo+in... for more information"
 
 		UI.error(log_msg)
 
@@ -54,7 +54,7 @@ def perform_build_precheck_ios_frameworks(pods_specs_repo, pull_request_number)
 		matcher = git_remote_origin_url.match(/github\.com(:|\/)(.+)\/(.+)\.git/)
 
 		UI.message("DEBUGGING: git repo urls is: #{git_remote_origin_url} and matcher is: #{matcher}")
-		UI.message("DEBUGGING: captures are: #{matcher.captures}")
+		UI.message("DEBUGGING: pull request number is: #{pull_request_number}")
 
 		if !matcher.nil?
 			if !matcher.captures.nil? && matcher.captures.count == 3
