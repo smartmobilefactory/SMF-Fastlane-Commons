@@ -53,10 +53,16 @@ def perform_build_precheck_ios_frameworks(pods_specs_repo, pull_request_number)
 		git_remote_origin_url = sh 'git config --get remote.origin.url'
 		matcher = git_remote_origin_url.match(/git@github\.com:(.+)\/(.+)\.git/)
 
+		UI.message("DEBUGGING; git repo urls is: #{git_remote_origin_url} and matcher is: #{matcher}")
+
 		if !matcher.nil?
 			if !matcher.captures.nil? && matcher.captures.count == 2
 				repo_owner = matcher.captures[0]
 				repo_name = matcher.captures[0]
+
+				UI.message("DEBUGGING; repo_owner: #{repo_owner}, repo_name: #{repo_name}, github_token is nil: #{ENV["GITHUB_TOKEN"].nil?}")
+
+				UI.message("Posting error as pr comment!")
 
 				sh("curl -H \"Authorization: token #{ENV["GITHUB_TOKEN"]}\" -d '{\"body\": \"#{log_msg}\"}' -X POST https://api.github.com/repos/#{repo_owner}/#{repo_name}/issues/#{pull_request_number}/comments")
 			end
