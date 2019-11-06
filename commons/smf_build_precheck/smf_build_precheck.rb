@@ -5,6 +5,8 @@ private_lane :smf_build_precheck do |options|
   pods_spec_repo = options[:pods_spec_repo]
   pull_request_number = options[:pull_request_number]
 
+  UI.message("PR number at beginning of lane: #{pull_request_number}")
+
 	case @platform
  	when :ios, :flutter
 		perform_build_precheck_ios(upload_itc, itc_apple_id)
