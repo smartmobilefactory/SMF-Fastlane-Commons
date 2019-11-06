@@ -2,14 +2,16 @@ private_lane :smf_build_precheck do |options|
 
   upload_itc = options[:upload_itc]
   itc_apple_id = options[:itc_apple_id]
+  pods_spec_repo = options[:pods_spec_repo]
+  pull_request_number = options[:pull_request_number]
 
 	case @platform
  	when :ios, :flutter
 		perform_build_precheck_ios(upload_itc, itc_apple_id)
   when :ios_framework
     perform_build_precheck_ios_frameworks(
-        options[:pod_spec_repo],
-        options[:pull_request_number]
+        pods_spec_repo,
+        pull_request_number
     )
 	else
 		UI.message("Build Precheck: Nothing reportable found")
