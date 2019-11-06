@@ -23,6 +23,7 @@ private_lane :smf_update_generated_files do
       smf_push_to_git_remote(remote_branch: ENV['CHANGE_BRANCH'])
 
       UI.error('Generated Jenkinsfile changed since last build, build will be restarted. This is not a failure.')
+      raise "Jenkinsfile changed, restarting buildjob 🔄"
     else
       UI.success('Generated Jenkinsfile is up to date. Nothing to do.')
     end

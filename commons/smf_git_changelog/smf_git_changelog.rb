@@ -56,10 +56,12 @@ private_lane :smf_git_changelog do |options|
   # Limit the size of changelog as it's crashes if it's too long
   changelog = cleaned_changelog_messages.uniq.join("\n")
   changelog = "#{changelog[0..20_000]}#{'\\n...'}" if changelog.length > 20_000
+  html_changelog = "<ul>#{cleaned_changelog_messages.uniq.map { |x| "<li>#{x}</li>" }.join("")}</ul>"
 
-  # environment variable is used in legacy iOS code. TODO check if this can be removed
-  ENV[$SMF_CHANGELOG_ENV_HTML_KEY] = "<ul>#{cleaned_changelog_messages.uniq.map { |x| "<li>#{x}</li>" }.join("")}</ul>"
-  smf_write_changelog(changelog: changelog)
+  smf_write_changelog(
+      changelog: changelog,
+      html_changelog: html_changelog
+  )
 end
 
 ##############
@@ -79,5 +81,9 @@ end
 
 def _smf_changelog_temp_path
   "#{@fastlane_commons_dir_path}/#{$CHANGELOG_TEMP_FILE}"
+end
+
+def _smf_changelog_html_temp_path
+  "#{@fastlane_commons_dir_path}/#{$CHANGELOG_TEMP_FILE_HTML}"
 end
 

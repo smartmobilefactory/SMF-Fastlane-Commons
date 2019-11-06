@@ -63,7 +63,7 @@ end
 def smf_get_build_number_of_app
   UI.message('Get the build number of project.')
   case @platform
-  when :ios, :ios_framework
+  when :ios, :ios_framework, :macos
     project_name = @smf_fastlane_config[:project][:project_name]
     build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
   when :android
@@ -88,7 +88,7 @@ def smf_get_xcconfig_name(build_variant)
   xcconfig_name = 'Release'
 
   case @platform
-  when :ios
+  when :ios, :ios_framework, :macos
     build_variant_config = @smf_fastlane_config[:build_variants][build_variant]
     xcconfig_name = build_variant_config[:xcconfig_name][:archive] if !build_variant_config[:xcconfig_name].nil?
   when :flutter
@@ -104,7 +104,7 @@ def smf_get_icloud_environment(build_variant)
   icloud_environment = 'Development'
 
   case @platform
-  when :ios
+  when :ios, :ios_framework, :macos
     build_variant_config = @smf_fastlane_config[:build_variants][build_variant]
     icloud_environment = build_variant_config[:icloud_environment] if !build_variant_config[:icloud_environment].nil?
   when :flutter
@@ -119,10 +119,9 @@ def smf_path_to_ipa_or_app(build_variant)
 
   escaped_filename = @smf_fastlane_config[:build_variants][build_variant.to_sym][:scheme].gsub(' ', "\ ")
 
-  app_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.ipa.zip"
-  app_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.ipa" unless File.exist?(app_path)
-
-  UI.message("Constructed path \"#{app_path}\" from filename \"#{escaped_filename}\"")
+  app_path = smf_workspace_dir + "/build/#{escaped_filename}.ipa.zip"
+  app_path = smf_workspace_dir + "/build/#{escaped_filename}.ipa" unless File.exist?(app_path)
+  app_path = smf_workspace_dir + "/build/#{escaped_filename}.app" unless File.exist?(app_path)
 
   unless File.exist?(app_path)
     app_path = lane_context[SharedValues::IPA_OUTPUT_PATH]
@@ -131,6 +130,13 @@ def smf_path_to_ipa_or_app(build_variant)
   end
 
   app_path
+end
+
+def smf_path_to_dmg(build_variant)
+  app_path = smf_path_to_ipa_or_app(build_variant)
+  dmg_path = app_path.sub('.app', '.dmg')
+
+  dmg_path
 end
 
 def smf_ci_ios_error_log
@@ -196,7 +202,7 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
   build_variant_config = build_variant.nil? ? nil : @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
   case @platform
-  when :ios
+  when :ios, :macos
     target = build_variant_config[:target]
     scheme = build_variant_config[:scheme]
 

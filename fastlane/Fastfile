@@ -14,7 +14,7 @@ end
 def smf_import_commons
 
   case @platform
-  when :ios, :ios_framework
+  when :ios, :ios_framework, :macos
     @fastlane_commons_dir_path = "#{smf_workspace_dir}/.fastlane-smf-commons"
   when :android
     @fastlane_commons_dir_path = "#{smf_workspace_dir}/.idea/.fastlane-smf-commons"
@@ -54,6 +54,15 @@ def smf_import_commons
       raise "Can't find pod_setup file at #{pod_setup_file}"
     end
     UI.message('Imported pod release file.')
+
+  when :macos
+    macos_setup_file = "#{@fastlane_commons_dir_path}/setup/macos_setup.rb"
+    if File.exist?(macos_setup_file)
+      import(macos_setup_file)
+    else
+      raise "Can't find macos_setup file at #{macos_setup_file}"
+    end
+    UI.message('Imported macos release file.')
 
   when :android
     android_setup_file = "#{@fastlane_commons_dir_path}/setup/android_setup.rb"
@@ -119,8 +128,8 @@ error do |lane, exception, options|
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : '' # TODO: add build_variant to all stages
 
   case @platform
-  when :ios, :ios_framework
-    UI.message('Handling exception for iOS.')
+  when :ios, :ios_framework, :macos
+    UI.message('Handling exception for iOS/macOS.')
 
     if @smf_fastlane_config.key?(:build_variants)
       name = !@smf_fastlane_config[:build_variants][build_variant][:podspec_path].nil? ? smf_get_default_name_of_pod(build_variant) : smf_get_default_name_of_app(build_variant) # Needs to be changed

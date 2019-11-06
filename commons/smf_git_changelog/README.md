@@ -32,7 +32,7 @@ If the changelog contains more than 20 000 characters it will be shortened.
 # Global Changelog Availability With a Temporary Changelog File
 ### Reading
 The private lane `smf_read_changelog` reads the temporary changelog file and returns the changelog as a string.
-With the option `remove_changelog` set to true, the changelog file will be removed after reading.
+If the flag `hmtl` is set to true,  the html formatted changelog file is read and returned instead.
 
 Example: 
 
@@ -40,13 +40,18 @@ Example:
 changelog = smf_read_changelog()
 ```
 
+```
+changelog = smf_read_changelog(html: true) # returns the html formatted changelog
+```
+
 ### Writing
-The private lane `smf_write_changelog` writes a given string to the temporary changelog file. The file is complete overwritten.
+The private lane `smf_write_changelog` writes a given string to the temporary changelog file. The file is complete overwritten. Additionally the changelog in html format can be written to a second file, too.
 
 Exampel:
 
 ```
 changelog = smf_write_changelog(
     changelog: "Some commit messages"  # The changelog which will be written to the file
+    html_changelog: "<b> Changelog as HTML </b>" # The changelog formatted in html
 )
 ```
