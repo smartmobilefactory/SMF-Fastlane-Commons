@@ -1,11 +1,11 @@
 private_lane :smf_ios_upload_to_appcenter do |options|
 
+  build_variant = options[:build_variant]
   build_number = options[:build_number]
   app_id = options[:app_id]
   escaped_filename = options[:escaped_filename]
   path_to_ipa_or_app = options[:path_to_ipa_or_app]
   is_mac_app = !options[:is_mac_app].nil? ? options[:is_mac_app] : false
-  podspec_path = options[:podspec_path]
 
   app_name, owner_name = get_app_details(app_id)
 
@@ -25,7 +25,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
   app_path = path_to_ipa_or_app
 
   if is_mac_app
-    version_number = version_get_podspec(path: podspec_path)
+    version_number = smf_get_version_number(build_variant)
 
     app_path = app_path.sub('.ipa', '.dmg')
 
