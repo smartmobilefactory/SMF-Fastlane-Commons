@@ -30,6 +30,7 @@ private_lane :smf_pod_super_setup_dependencies_pr_check do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
   UI.message("PR number in dependencies lane: #{options[:pull_request_number]}")
+  UI.message("PR number from env: #{ENV["CHANGE_ID"]}")
 
   smf_build_precheck(
     pods_spec_repo: @smf_fastlane_config[:build_variants]['framework'.to_sym][:pods_specs_repo],
