@@ -200,32 +200,16 @@ end
 private_lane :smf_super_pipeline_ios_upload_to_appcenter do |options|
   build_variant = options[:build_variant]
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
-  build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant.to_sym][:ios]
   scheme = build_variant_config[:flavor]
   appcenter_app_id = smf_get_appcenter_id(build_variant, 'ios')
-  hockey_app_id = smf_get_hockey_id(build_variant, 'ios')
   app_file_regex = "#{scheme}.ipa"
 
   # Upload the IPA to AppCenter
   smf_ios_upload_to_appcenter(
-      build_number: smf_get_build_number_of_app,
       app_id: appcenter_app_id,
       escaped_filename: build_variant_config[:flavor].gsub(' ', "\ "),
-      path_to_ipa_or_app: smf_get_file_path(app_file_regex),
-      is_mac_app: build_variant_ios_config[:use_sparkle],
-      podspec_path: build_variant_ios_config[:podspec_path]
+      path_to_ipa_or_app: smf_get_file_path(app_file_regex)
   ) if !appcenter_app_id.nil?
-
-  # Upload the IPA to Hockey
-  smf_ios_upload_to_hockey(
-      build_number: smf_get_build_number_of_app,
-      app_id: hockey_app_id,
-      escaped_filename: build_variant_config[:scheme].gsub(' ', "\ "),
-      path_to_ipa_or_app: smf_get_file_path(app_file_regex),
-      is_mac_app: build_variant_ios_config[:use_sparkle],
-      podspec_path: build_variant_ios_config[:podspec_path]
-  ) if !hockey_app_id.nil?
-
 end
 
 lane :smf_pipeline_ios_upload_to_appcenter do |options|
