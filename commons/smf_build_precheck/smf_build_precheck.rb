@@ -60,7 +60,7 @@ def perform_build_precheck_ios_frameworks(pods_specs_repo)
 
 				UI.message("Posting error as pr comment!")
 
-				sh("curl -H \"Authorization: token #{ENV["GITHUB_TOKEN"]}\" -d '{\"body\": \"#{log_msg}\"}' -X POST https://api.github.com/repos/#{repo_owner}/#{repo_name}/issues/#{ENV["CHANGE_ID"]}/comments -sS")
+				sh("curl -H \"Authorization: token #{ENV["GITHUB_TOKEN"]}\" -d '{\"body\": \"#{log_msg}\"}' -X POST https://api.github.com/repos/#{repo_owner}/#{repo_name}/issues/#{ENV["CHANGE_ID"]}/comments -sS -o /dev/null")
 			end
 		end
 
