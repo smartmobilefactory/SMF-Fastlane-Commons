@@ -57,9 +57,9 @@ def perform_build_precheck_ios_frameworks(pods_specs_repo, pull_request_number)
 		UI.message("DEBUGGING: captures are: #{matcher.captures}")
 
 		if !matcher.nil?
-			if !matcher.captures.nil? && matcher.captures.count == 2
-				repo_owner = matcher.captures[0]
-				repo_name = matcher.captures[0]
+			if !matcher.captures.nil? && matcher.captures.count == 3
+				repo_owner = matcher.captures[1]
+				repo_name = matcher.captures[2]
 
 				UI.message("DEBUGGING; repo_owner: #{repo_owner}, repo_name: #{repo_name}, github_token is nil: #{ENV["GITHUB_TOKEN"].nil?}")
 
