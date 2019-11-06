@@ -44,7 +44,7 @@ def perform_build_precheck_ios_frameworks(pods_specs_repo)
 		prefix_config = https_in_config ? 'in the Config.json' : ''
 		connector = https_in_podfile && https_in_config ? ' and ' : ''
 
-		log_msg = "⛔️ The HTTPS podspec repo url is still present #{prefix_podfile}#{connector}#{prefix_config}. Please update to use the 'git@' url. See https://smartmobilefactory.atlassian.net/wiki/spaces/SMFIOS/pages/674201953/Wrong+cocoapods+repo+in... for more information"
+		log_msg = "⛔️ The HTTPS podspec repo url is still present #{prefix_podfile}#{connector}#{prefix_config}. Please update to use the ssh url. See https://smartmobilefactory.atlassian.net/wiki/spaces/SMFIOS/pages/674201953/Wrong+cocoapods+repo+in... for more information"
 
 		UI.error(log_msg)
 
