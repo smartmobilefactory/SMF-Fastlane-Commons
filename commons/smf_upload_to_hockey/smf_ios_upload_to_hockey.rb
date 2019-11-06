@@ -25,13 +25,11 @@ private_lane :smf_ios_upload_to_hockey do |options|
   # TODO: fix hockey for macOS
   if is_mac_app
     UI.message("Hockey not implemented for macOS apps yet 😬")
-    next
     version_number = version_get_podspec(path: podspec_path)
 
     app_path = app_path.sub('.ipa', '.dmg')
 
     raise("DMG file #{app_path} does not exit. Nothing to upload.") unless File.exist?(app_path)
-
 
     UI.message('Upload mac app to Hockey.')
     hockey(
