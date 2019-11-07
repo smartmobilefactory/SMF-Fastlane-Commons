@@ -48,21 +48,9 @@ def perform_build_precheck_ios_frameworks(pods_specs_repo)
 
 		UI.error(log_msg)
 
-		# Try to post a comment on the PR
-
-		git_remote_origin_url = sh 'git config --get remote.origin.url'
-		matcher = git_remote_origin_url.match(/github\.com(:|\/)(.+)\/(.+)\.git/)
-
-		if !matcher.nil?
-			if !matcher.captures.nil? && matcher.captures.count == 3 && !ENV["CHANGE_ID"].nil?
-				repo_owner = matcher.captures[1]
-				repo_name = matcher.captures[2]
-
-				UI.message("Posting error as pr comment!")
-
-				sh("curl -H \"Authorization: token #{ENV["GITHUB_TOKEN"]}\" -d '{\"body\": \"#{log_msg}\"}' -X POST https://api.github.com/repos/#{repo_owner}/#{repo_name}/issues/#{ENV["CHANGE_ID"]}/comments -sS -o /dev/null")
-			end
-		end
+		smf_create_pull_request_comment(
+				comment: log_msg
+		)
 
 		raise "Pospec repo is an https url"
 	end
