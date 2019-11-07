@@ -4,7 +4,7 @@ SWIFT_LINT_OUTPUT_PATH = 'build/swiftlint.result.json'
 private_lane :smf_run_swift_lint do
 
   swift_lint_executable_path = "#{smf_workspace_dir}/Submodules/SMF-iOS-CommonProjectSetupFiles/SwiftLint/portable_swiftlint/swiftlint"
-  swift_lint_yml = "#{smf_workspace_dir}swiftlint.yml"
+  swift_lint_yml = "#{smf_workspace_dir}/swiftlint.yml"
 
   if !File.exist?(swift_lint_executable_path)
     UI.important("SwiftLint executable not present at #{swift_lint_executable_path}. Skipping SwiftLint.")
