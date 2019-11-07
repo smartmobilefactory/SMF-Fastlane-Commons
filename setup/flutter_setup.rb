@@ -6,8 +6,8 @@ private_lane :smf_super_shared_setup_dependencies do |options|
   build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant.to_sym][:ios]
 
   smf_build_precheck(
-      upload_itc: build_variant_config[:upload_itc],
-      itc_apple_id: build_variant_config[:itc_apple_id]
+      upload_itc: build_variant_ios_config[:upload_itc],
+      itc_apple_id: build_variant_ios_config[:itc_apple_id]
   )
 
   sh("cd #{smf_workspace_dir}; ./flutterw doctor")
