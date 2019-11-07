@@ -159,7 +159,8 @@ private_lane :smf_super_create_dmg_and_gatekeeper do |options|
       package: dmg_path,
       bundle_id: build_variant_config[:bundle_identifier],
       username: build_variant_config[:apple_id],
-      asc_provider: build_variant_config[:team_id]
+      asc_provider: build_variant_config[:team_id],
+      print_log: false
   ) if build_variant_config[:notarize] == true
 
 end
