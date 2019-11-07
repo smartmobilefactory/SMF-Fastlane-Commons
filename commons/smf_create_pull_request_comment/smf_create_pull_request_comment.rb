@@ -15,7 +15,7 @@ private_lane :smf_create_pull_request_comment do |options|
       repo_owner = matcher.captures[1]
       repo_name = matcher.captures[2]
 
-      UI.message("Commenting: \"#{comment}\" on the pull request.")
+      UI.message("Commenting on the pull request.")
 
       sh("curl -H \"Authorization: token #{ENV["GITHUB_TOKEN"]}\" -d '{\"body\": \"#{comment}\"}' -X POST https://api.github.com/repos/#{repo_owner}/#{repo_name}/issues/#{ENV["CHANGE_ID"]}/comments -sS -o /dev/null")
   else
