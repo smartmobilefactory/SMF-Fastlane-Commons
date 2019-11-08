@@ -20,7 +20,7 @@ smf_ios_upload_to_appcenter(
 Upload the apk to AppCenter.
 ```
 smf_android_upload_to_appcenter(
-		appcenter_destinations: "*",			# To Distribute to all Distribution Groups
+        appcenter_destinations: "*",			# To Distribute to all Distribution Groups
         apk_path: <path to app apk>,            # Path to apk file
         aab_path: <path to app bundle>,         # Optional to apk_path
         app_id: "eg21g21-21g1g-12g13b3-2121",   # The id of the app from AppCenter
