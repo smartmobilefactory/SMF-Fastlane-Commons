@@ -105,6 +105,13 @@ def smf_load_fastlane_config
   end
 end
 
+def smf_set_platform_dynamically_if_needed
+  if !ENV['OVERRIDE_PLATFORM'].nil?
+    UI.important("Dynamically setting @platform to #{ENV['OVERRIDE_PLATFORM'].to_sym}")
+    @platform = ENV['OVERRIDE_PLATFORM'].to_sym
+  end
+end
+
 # removes the fastlane commons repo
 def smf_remove_fastlane_commons_repo
   sh "if [ -d #{@fastlane_commons_dir_path} ]; then rm -rf #{@fastlane_commons_dir_path}; fi"
@@ -118,6 +125,7 @@ def smf_clone_fastlane_commons_repo
   sh 'git clone -b "' + @fastlane_commons_branch + "\" git@github.com:smartmobilefactory/SMF-Fastlane-Commons.git #{@fastlane_commons_dir_path}"
 end
 
+smf_set_platform_dynamically_if_needed
 smf_import_commons
 smf_load_fastlane_config
 
