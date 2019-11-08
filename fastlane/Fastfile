@@ -106,6 +106,7 @@ def smf_load_fastlane_config
 end
 
 def smf_set_platform_dynamically_if_needed
+  UI.message("DEBUGGING; checking for platfrom override, platfor_env is : #{ENV['OVERRIDE_PLATFORM']}")
   if !ENV['OVERRIDE_PLATFORM'].nil?
     UI.important("Dynamically setting @platform to #{ENV['OVERRIDE_PLATFORM'].to_sym}")
     @platform = ENV['OVERRIDE_PLATFORM'].to_sym
