@@ -6,6 +6,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
   escaped_filename = options[:escaped_filename]
   path_to_ipa_or_app = options[:path_to_ipa_or_app]
   is_mac_app = !options[:is_mac_app].nil? ? options[:is_mac_app] : false
+  destinations = options[:destinations].nil? ? "Collaborators" : options[:destinations]
 
   app_name, owner_name = get_app_details(app_id)
 
@@ -42,6 +43,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
         ipa: app_path,
         dsym: dsym_path,
         notify_testers: true,
+        destinations: destinations,
         release_notes: smf_read_changelog
     )
   else
@@ -53,9 +55,8 @@ private_lane :smf_ios_upload_to_appcenter do |options|
         ipa: app_path,
         dsym: dsym_path,
         notify_testers: true,
+        destinations: destinations,
         release_notes: smf_read_changelog
     )
   end
-
-
 end
