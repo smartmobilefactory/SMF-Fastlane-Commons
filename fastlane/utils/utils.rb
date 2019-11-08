@@ -45,9 +45,15 @@ end
 def smf_get_default_name_of_app(build_variant)
   build_number = smf_get_build_number_of_app
   project_name = @smf_fastlane_config[:project][:project_name]
-  version_number = smf_get_version_number(build_variant)
 
-  "#{project_name} #{build_variant.upcase} #{version_number} (#{build_number})"
+  version_number = smf_get_version_number(build_variant)
+  if version_number.nil?
+    version_number = ''
+  else
+    version_number += ' '
+  end
+
+  "#{project_name} #{build_variant.upcase} #{version_number}(#{build_number})"
 end
 
 # Uses Config file to access project name. Should be changed in the future.
@@ -214,7 +220,7 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
   when :ios_framework
     version_number = version_get_podspec(path: podspec_path)
   when :android
-    raise 'Get version number is not implemented for Android.'
+    version_number = nil
   when :flutter
     version_number = YAML.load(File.read("#{smf_workspace_dir}/pubspec.yaml"))['version'].split('+').first
   else
