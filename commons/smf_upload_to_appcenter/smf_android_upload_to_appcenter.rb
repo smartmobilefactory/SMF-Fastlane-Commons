@@ -15,7 +15,7 @@ private_lane :smf_android_upload_to_appcenter do |options|
         api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
         owner_name: owner_name,
         app_name: app_name,
-        aab: aab_path,
+        file: aab_path,
         destination_type: 'store',
         destinations: destinations,
         notify_testers: true,
@@ -26,7 +26,7 @@ private_lane :smf_android_upload_to_appcenter do |options|
         api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
         owner_name: owner_name,
         app_name: app_name,
-        apk: apk_path,
+        file: apk_path,
         destinations: destinations,
         notify_testers: true,
         release_notes: smf_read_changelog

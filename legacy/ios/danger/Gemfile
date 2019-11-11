@@ -1,4 +1,0 @@
-source "https://rubygems.org"
-
-# This needs to be removed.
-# Might be removed when all Projects dont reference this Gemfile
