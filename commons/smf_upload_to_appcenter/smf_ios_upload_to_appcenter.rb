@@ -57,5 +57,5 @@ private_lane :smf_ios_upload_to_appcenter do |options|
     )
   end
 
-
+  sh "cd ../build; rm \"#{escaped_filename}.ipa.zip\""
 end
