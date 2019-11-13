@@ -6,8 +6,8 @@ private_lane :smf_super_shared_setup_dependencies do |options|
   build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant.to_sym][:ios]
 
   smf_build_precheck(
-      upload_itc: build_variant_config[:upload_itc],
-      itc_apple_id: build_variant_config[:itc_apple_id]
+      upload_itc: build_variant_ios_config[:upload_itc],
+      itc_apple_id: build_variant_ios_config[:itc_apple_id]
   )
 
   sh("cd #{smf_workspace_dir}; ./flutterw doctor")
@@ -142,6 +142,7 @@ end
 private_lane :smf_super_upload_dsyms do |options|
 
   build_variant = options[:build_variant]
+  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
   build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant.to_sym][:ios]
 
   smf_upload_to_sentry(
@@ -165,33 +166,20 @@ end
 private_lane :smf_super_pipeline_android_upload_to_appcenter do |options|
 
   build_variant = options[:build_variant]
+  build_variant_config_android = @smf_fastlane_config[:build_variants][build_variant.to_sym][:android]
   apk_file_regex = smf_get_apk_file_regex(build_variant)
   aab_file_regex = 'app.aab'
   appcenter_app_id = smf_get_appcenter_id(build_variant, 'android')
   hockey_app_id = smf_get_hockey_id(build_variant, 'android')
+  destinations = build_variant_config_android[:appcenter_destinations]
 
   # Upload to AppCenter
   smf_android_upload_to_appcenter(
-      build_variant: build_variant,
-      aab_path: smf_get_file_path(aab_file_regex),
-      app_id: appcenter_app_id
+    destinations: destinations,
+    build_variant: build_variant,
+    aab_path: smf_get_file_path(aab_file_regex),
+    app_id: appcenter_app_id
   ) if !appcenter_app_id.nil?
-
-  smf_android_upload_to_appcenter(
-      build_variant: build_variant,
-      apk_path: smf_get_file_path(apk_file_regex),
-      app_id: appcenter_app_id
-  ) if !appcenter_app_id.nil?
-
-
-  # Upload to Hockey
-  smf_android_upload_to_hockey(
-      build_variant: build_variant,
-      apk: smf_get_file_path(apk_file_regex),
-      aab: smf_get_file_path(aab_file_regex),
-      app_id: hockey_app_id
-  ) if !hockey_app_id.nil?
-
 end
 
 lane :smf_pipeline_android_upload_to_appcenter do |options|
@@ -201,15 +189,18 @@ end
 private_lane :smf_super_pipeline_ios_upload_to_appcenter do |options|
   build_variant = options[:build_variant]
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
+  build_variant_config_ios = build_variant_config[:ios]
   scheme = build_variant_config[:flavor]
   appcenter_app_id = smf_get_appcenter_id(build_variant, 'ios')
   app_file_regex = "#{scheme}.ipa"
+  destinations = build_variant_config_ios[:appcenter_destinations]
 
   # Upload the IPA to AppCenter
   smf_ios_upload_to_appcenter(
-      app_id: appcenter_app_id,
-      escaped_filename: build_variant_config[:flavor].gsub(' ', "\ "),
-      path_to_ipa_or_app: smf_get_file_path(app_file_regex)
+    destinations: destinations,
+    app_id: appcenter_app_id,
+    escaped_filename: build_variant_config[:flavor].gsub(' ', "\ "),
+    path_to_ipa_or_app: smf_get_file_path(app_file_regex)
   ) if !appcenter_app_id.nil?
 end
 

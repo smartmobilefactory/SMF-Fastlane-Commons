@@ -6,6 +6,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
   escaped_filename = options[:escaped_filename]
   path_to_ipa_or_app = options[:path_to_ipa_or_app]
   is_mac_app = !options[:is_mac_app].nil? ? options[:is_mac_app] : false
+  destinations = options[:destinations].nil? ? "Collaborators" : options[:destinations]
 
   app_name, owner_name = get_app_details(app_id)
 
@@ -27,10 +28,9 @@ private_lane :smf_ios_upload_to_appcenter do |options|
   if is_mac_app
     version_number = smf_get_version_number(build_variant)
 
-    app_path = app_path.sub('.ipa', '.dmg')
+    app_path = app_path.sub('.app', '.dmg')
 
     raise("DMG file #{app_path} does not exit. Nothing to upload.") unless File.exist?(app_path)
-
 
     UI.message('Upload mac app to AppCenter.')
     appcenter_upload(
@@ -39,9 +39,10 @@ private_lane :smf_ios_upload_to_appcenter do |options|
         app_name: app_name,
         build_number: build_number,
         version: version_number,
-        ipa: app_path,
+        file: app_path,
         dsym: dsym_path,
         notify_testers: true,
+        destinations: destinations,
         release_notes: smf_read_changelog
     )
   else
@@ -50,12 +51,11 @@ private_lane :smf_ios_upload_to_appcenter do |options|
         api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
         owner_name: owner_name,
         app_name: app_name,
-        ipa: app_path,
+        file: app_path,
         dsym: dsym_path,
         notify_testers: true,
+        destinations: destinations,
         release_notes: smf_read_changelog
     )
   end
-
-
 end

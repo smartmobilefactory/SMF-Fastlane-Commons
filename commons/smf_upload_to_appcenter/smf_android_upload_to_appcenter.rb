@@ -3,6 +3,7 @@ private_lane :smf_android_upload_to_appcenter do |options|
   apk_path = options[:apk_path]
   aab_path = options[:aab_path]
   app_id = options[:app_id]
+  destinations = options[:destinations].nil? ? "Collaborators" : options[:destinations]
 
   app_name, owner_name = get_app_details(app_id)
   UI.important('APK path is null.') if apk_path.nil?
@@ -14,8 +15,9 @@ private_lane :smf_android_upload_to_appcenter do |options|
         api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
         owner_name: owner_name,
         app_name: app_name,
-        aab: aab_path,
+        file: aab_path,
         destination_type: 'store',
+        destinations: destinations,
         notify_testers: true,
         release_notes: smf_read_changelog
     )
@@ -24,7 +26,8 @@ private_lane :smf_android_upload_to_appcenter do |options|
         api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
         owner_name: owner_name,
         app_name: app_name,
-        apk: apk_path,
+        file: apk_path,
+        destinations: destinations,
         notify_testers: true,
         release_notes: smf_read_changelog
     )
