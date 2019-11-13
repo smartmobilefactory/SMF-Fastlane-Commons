@@ -18,7 +18,6 @@ private_lane :smf_super_setup_dependencies do |options|
 
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
-  UI.message("build variant: #{build_variant}")
   smf_build_precheck(
       upload_itc: build_variant_config[:upload_itc],
       itc_apple_id: build_variant_config[:itc_apple_id]
