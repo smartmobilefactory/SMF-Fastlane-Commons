@@ -1,4 +1,3 @@
-
 ########## PULLREQUEST CHECK LANES ##########
 
 # Update Files
@@ -207,10 +206,10 @@ private_lane :smf_super_upload_to_appcenter do |options|
 
   # Upload the IPA to AppCenter
   smf_ios_upload_to_appcenter(
-    destinations: destinations,
-    app_id: appcenter_app_id,
-    escaped_filename: build_variant_config[:scheme].gsub(' ', "\ "),
-    path_to_ipa_or_app: smf_path_to_ipa_or_app(build_variant)
+      destinations: destinations,
+      app_id: appcenter_app_id,
+      escaped_filename: build_variant_config[:scheme].gsub(' ', "\ "),
+      path_to_ipa_or_app: smf_path_to_ipa_or_app(build_variant)
   ) if !appcenter_app_id.nil?
 end
 
@@ -276,10 +275,11 @@ end
 
 private_lane :smf_super_send_slack_notification do |options|
 
+  build_variant = options[:build_variant]
   slack_channel = @smf_fastlane_config[:project][:slack_channel]
 
   smf_send_default_build_success_notification(
-      name: smf_get_default_name_of_app(options[:build_variant]),
+      name: smf_get_default_name_of_app(build_variant),
       slack_channel: slack_channel
   )
 end
