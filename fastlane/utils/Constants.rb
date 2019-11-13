@@ -46,3 +46,5 @@ $SMF_PHRASE_APP_SCRIPTS_REPO_URL = 'git@github.com:smartmobilefactory/Phraseapp-
 $CHANGELOG_TEMP_FILE = 'temp_changelog.txt'
 $CHANGELOG_TEMP_FILE_HTML = 'temp_changelog.html'
 
+$FLUTTER_BINARY_BASE_PATH = '/.flutter'
+
