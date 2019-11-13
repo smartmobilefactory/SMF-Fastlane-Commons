@@ -202,24 +202,17 @@ end
 
 private_lane :smf_super_upload_to_appcenter do |options|
   build_variant = options[:build_variant]
-  build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
+  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
   appcenter_app_id = smf_get_appcenter_id(build_variant)
-  hockey_app_id = smf_get_hockey_id(build_variant)
+  destinations = build_variant_config[:appcenter_destinations]
 
   # Upload the IPA to AppCenter
   smf_ios_upload_to_appcenter(
-      app_id: appcenter_app_id,
-      escaped_filename: build_variant_config[:scheme].gsub(' ', "\ "),
-      path_to_ipa_or_app: smf_path_to_ipa_or_app(build_variant)
+    destinations: destinations,
+    app_id: appcenter_app_id,
+    escaped_filename: build_variant_config[:scheme].gsub(' ', "\ "),
+    path_to_ipa_or_app: smf_path_to_ipa_or_app(build_variant)
   ) if !appcenter_app_id.nil?
-
-  # Upload the IPA to Hockey
-  smf_ios_upload_to_hockey(
-      app_id: hockey_app_id,
-      escaped_filename: build_variant_config[:scheme].gsub(' ', "\ "),
-      path_to_ipa_or_app: smf_path_to_ipa_or_app(build_variant)
-  ) if !hockey_app_id.nil?
-
 end
 
 lane :smf_upload_to_appcenter do |options|
