@@ -133,7 +133,7 @@ def smf_update_flutter_binary_cache
 
   submodule_status = sh "git submodule status"
   UI.message("DEBUGGING: submodule status is: #{submodule_status}")
-  matcher = submodule_status.match(/(.+) \.flutter/m)
+  matcher = submodule_status.match(/(.+) .*flutter/m)
 
   if matcher.nil? || matcher.captures.nil? || matcher.captures.size != 1
     UI.error("Unable to find sha1 of submodule 'flutter' while looking up flutter binary in cache")
@@ -141,6 +141,8 @@ def smf_update_flutter_binary_cache
   end
 
   flutter_sha = matcher.captures[0]
+
+  UI.message("DEBUGGING: sha is: #{flutter_sha}")
 
   @flutter_binary_path = "#{$FLUTTER_BINARY_BASE_PATH}/#{flutter_sha}/.flutter/bin/flutter"
 
