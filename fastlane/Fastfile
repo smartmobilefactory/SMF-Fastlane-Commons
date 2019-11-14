@@ -127,6 +127,8 @@ end
 
 def smf_update_flutter_binary_cache
 
+  UI.message("DEBUGGING: nodename: #{ENV["NODE_NAME"]}")
+
   if @platform != :flutter && ENV["NODE_NAME"] != 'androidbuild'
     return
   end
