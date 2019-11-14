@@ -140,14 +140,14 @@ def smf_update_flutter_binary_cache
     raise "Unable to find sha1 of submodule 'flutter' while looking up flutter binary in cache"
   end
 
-  flutter_sha = matcher.captures[0]
+  flutter_sha = matcher.captures[0].gsub(' ', '')
 
   UI.message("DEBUGGING: sha is: #{flutter_sha}")
 
   @flutter_binary_path = "#{$FLUTTER_BINARY_BASE_PATH}/#{flutter_sha}/.flutter/bin/flutter"
 
   if !File.exist?(@flutter_binary_path)
-    sh("mkdir #{$FLUTTER_BINARY_BASE_PATH}/#{flutter_sha} && cp -r #{smf_workspace_dir}/.flutter #{$FLUTTER_BINARY_BASE_PATH}/#{flutter_sha}")
+    sh("mkdir -p #{$FLUTTER_BINARY_BASE_PATH}/#{flutter_sha} && cp -r #{smf_workspace_dir}/.flutter #{$FLUTTER_BINARY_BASE_PATH}/#{flutter_sha}")
   end
 end
 
