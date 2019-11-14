@@ -5,12 +5,17 @@ private_lane :smf_build_precheck do |options|
   pods_spec_repo = options[:pods_spec_repo]
 
   case @platform
-  when :ios, :flutter
+  when :ios
     perform_build_precheck_ios(upload_itc, itc_apple_id)
-  when :ios_framework
-    perform_build_precheck_ios_frameworks(
+    perform_build_precheck_for_pods_spec_repo_url(
       pods_spec_repo
     )
+  when :ios_framework
+    perform_build_precheck_for_pods_spec_repo_url(
+      pods_spec_repo
+    )
+  when :flutter
+    perform_build_precheck_ios(upload_itc, itc_apple_id)
   else
     UI.message("Build Precheck: Nothing reportable found")
   end
@@ -33,8 +38,9 @@ def perform_build_precheck_ios(upload_itc, itc_apple_id)
   end
 end
 
-def perform_build_precheck_ios_frameworks(pods_specs_repo)
-  podfile = "#{smf_workspace_dir}/Podfile"
+def perform_build_precheck_for_pods_spec_repo_url(pods_specs_repo = false)
+
+  podfile = @platform == :flutter ? "#{smf_workspace_dir}/ios/Podfile" : "#{smf_workspace_dir}/Podfile"
   podfile_content = File.read(podfile)
   https_in_podfile = !podfile_content.match(/source 'https:\/\/github\.com\/smartmobilefactory\/SMF-CocoaPods-Specs'/m).nil?
   https_in_config = pods_specs_repo == 'https://github.com/smartmobilefactory/SMF-CocoaPods-Specs'
