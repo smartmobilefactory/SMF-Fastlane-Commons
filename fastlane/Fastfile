@@ -141,10 +141,10 @@ def smf_update_flutter_binary_cache
 
   flutter_sha = matcher.captures[0].gsub(' ', '')
 
-  @flutter_binary_path = "#{flutter_binary_path}/#{flutter_sha}/.flutter/bin/flutter"
+  @flutter_binary_path = "#{$FLUTTER_BINARY_ROOT_DIR}/#{flutter_sha}/.flutter/bin/flutter"
 
   if !File.exist?(@flutter_binary_path)
-    sh("mkdir -p #{flutter_binary_path}/#{flutter_sha} && cp -r #{smf_workspace_dir}/.flutter #{flutter_binary_path}/#{flutter_sha}")
+    sh("mkdir -p #{$FLUTTER_BINARY_ROOT_DIR}/#{flutter_sha} && cp -r #{smf_workspace_dir}/.flutter #{$FLUTTER_BINARY_ROOT_DIR}/#{flutter_sha}")
     UI.message("Updated flutter binray cache")
   end
 end
