@@ -10,8 +10,8 @@ private_lane :smf_super_shared_setup_dependencies do |options|
       itc_apple_id: build_variant_ios_config[:itc_apple_id]
   )
 
-  sh("cd #{smf_workspace_dir}; ./flutterw doctor")
-  sh("cd #{smf_workspace_dir}; ./flutterw packages get")
+  sh("#{@flutter_binary_path} doctor")
+  sh("#{@flutter_binary_path} packages get")
   generate_sh_file = "#{smf_workspace_dir}/generate.sh"
   if File.exist?(generate_sh_file)
     sh("cd #{smf_workspace_dir}; sh generate.sh")
@@ -76,7 +76,7 @@ private_lane :smf_super_ios_build do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
   build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant.to_sym][:ios]
 
-  sh("cd #{smf_workspace_dir}; ./flutterw build ios --release --no-codesign --flavor #{build_variant}")
+  sh("#{@flutter_binary_path} build ios --release --no-codesign --flavor #{build_variant}")
 
   smf_download_provisioning_profiles(
       team_id: build_variant_ios_config[:team_id],
@@ -111,9 +111,9 @@ end
 
 private_lane :smf_super_android_build do |options|
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
-  sh("cd #{smf_workspace_dir}; ./flutterw build apk --release --flavor #{build_variant}")
+  sh("#{@flutter_binary_path} build apk --release --flavor #{build_variant}")
   if !options[:build_variant].nil?
-    sh("cd #{smf_workspace_dir}; ./flutterw build appbundle --release --flavor #{build_variant}")
+    sh("#{@flutter_binary_path} build appbundle --release --flavor #{build_variant}")
   end
 
 end
@@ -280,7 +280,7 @@ end
 # Run Unit Tests
 
 private_lane :smf_super_run_unit_tests do |options|
-  sh("cd #{smf_workspace_dir}; ./flutterw test")
+  sh("#{@flutter_binary_path} test")
 end
 
 lane :smf_run_unit_tests do |options|
@@ -304,7 +304,7 @@ end
 # Linter
 
 private_lane :smf_super_linter do |options|
-  sh("cd #{smf_workspace_dir}; ./flutterw analyze || true")
+  sh("#{@flutter_binary_path} analyze || true")
 end
 
 lane :smf_linter do |options|
