@@ -258,3 +258,11 @@ def smf_extract_bump_type_from_pr_body(pr_body)
 
   nil
 end
+
+def user_root_dir
+  sh "echo $HOME"
+end
+
+def flutter_binary_path
+  "#{user_root_dir}/.flutter_cache"
+end
