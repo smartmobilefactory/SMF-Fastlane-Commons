@@ -132,6 +132,7 @@ def smf_update_flutter_binary_cache
   end
 
   submodule_status = sh "cd #{smf_workspace_dir}/.flutter; git submodule status"
+  UI.message("DEBUGGING: submodule status is: #{submodule_status}")
   matcher = submodule_status.match(/(.+) \.flutter/m)
 
   if matcher.nil? || matcher.captures.nil? || matcher.captures.size != 1
