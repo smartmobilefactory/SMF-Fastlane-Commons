@@ -127,7 +127,7 @@ end
 
 def smf_update_flutter_binary_cache
 
-  if @platform != :flutter
+  if @platform != :flutter && !Dir.exist?("/home/jenkins")
     return
   end
 
