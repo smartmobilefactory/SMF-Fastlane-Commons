@@ -260,7 +260,7 @@ def smf_extract_bump_type_from_pr_body(pr_body)
 end
 
 def user_root_dir
-  sh "echo $HOME"
+  sh("echo $HOME").gsub('\n', '')
 end
 
 def flutter_binary_path
