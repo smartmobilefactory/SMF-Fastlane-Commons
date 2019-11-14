@@ -281,4 +281,5 @@ def get_flutter_binary_path
     UI.message("Updated flutter binray cache")
   end
 
+  return flutter_binary_path
 end
