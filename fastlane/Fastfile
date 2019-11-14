@@ -125,43 +125,9 @@ def smf_clone_fastlane_commons_repo
   sh 'git clone -b "' + @fastlane_commons_branch + "\" git@github.com:smartmobilefactory/SMF-Fastlane-Commons.git #{@fastlane_commons_dir_path}"
 end
 
-def smf_update_flutter_binary_cache
-
-  UI.message("DEBUGGING: nodename: #{ENV["NODE_NAME"].downcase}")
-
-  if @platform != :flutter || !ENV["NODE_NAME"].downcase.include?('android')
-    return
-  end
-
-  submodule_status = sh "git submodule status"
-  matcher = submodule_status.match(/(.+) .*flutter/m)
-
-  if matcher.nil? || matcher.captures.nil? || matcher.captures.size != 1
-    UI.error("Unable to find sha1 of submodule 'flutter' while looking up flutter binary in cache")
-    raise "Unable to find sha1 of submodule 'flutter' while looking up flutter binary in cache"
-  end
-
-  flutter_sha = matcher.captures[0].gsub(' ', '')
-
-  @flutter_binary_path = "#{$FLUTTER_BINARY_ROOT_DIR}/#{flutter_sha}/flutter/bin/flutter"
-
-  # DEBUGGING
-  sh("ls #{$FLUTTER_BINARY_ROOT_DIR}")
-  if File.exist?(@flutter_binary_path)
-    sh("rm -r #{@flutter_binary_path}")
-  end
-  sh("ls #{$FLUTTER_BINARY_ROOT_DIR}")
-
-  if !File.exist?(@flutter_binary_path)
-    sh("mkdir -p #{$FLUTTER_BINARY_ROOT_DIR}/#{flutter_sha} && git clone git@github.com:flutter/flutter.git #{$FLUTTER_BINARY_ROOT_DIR}/#{flutter_sha}/flutter && cd #{$FLUTTER_BINARY_ROOT_DIR}/#{flutter_sha}/flutter && git reset --hard #{flutter_sha}")
-    UI.message("Updated flutter binray cache")
-  end
-end
-
 smf_set_platform_dynamically_if_needed
 smf_import_commons
 smf_load_fastlane_config
-smf_update_flutter_binary_cache
 
 desc 'Called on error'
 error do |lane, exception, options|

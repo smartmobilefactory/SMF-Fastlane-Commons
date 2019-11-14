@@ -258,3 +258,27 @@ def smf_extract_bump_type_from_pr_body(pr_body)
 
   nil
 end
+
+def get_flutter_binary_path
+
+  submodule_status = sh "cd #{smf_workspace_dir} && git submodule status"
+  matcher = submodule_status.match(/(.+) .*flutter/m)
+
+  if matcher.nil? || matcher.captures.nil? || matcher.captures.size != 1
+    UI.error("Unable to find sha1 of submodule 'flutter' while looking up flutter binary in cache")
+    raise "Unable to find sha1 of submodule 'flutter' while looking up flutter binary in cache"
+  end
+
+  flutter_sha = matcher.captures[0].gsub(' ', '')
+
+  user_root_dir = ENV['HOME']
+  flutter_cache_base = "#{user_root_dir}/.flutter_cache"
+  flutter_repo_path = "#{user_root_dir}/.flutter_cache/#{flutter_sha}"
+  flutter_binary_path = flutter_repo_path + "/bin/flutter"
+
+  if !File.exist?(flutter_binary_path)
+    sh("mkdir -p #{flutter_cache_base} && git clone git@github.com:flutter/flutter.git #{flutter_repo_path} && cd #{flutter_repo_path} && git reset --hard #{flutter_sha}")
+    UI.message("Updated flutter binray cache")
+  end
+
+end
