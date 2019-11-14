@@ -127,7 +127,7 @@ end
 
 def smf_update_flutter_binary_cache
 
-  if @platform != :flutter && !Dir.exist?("/home/jenkins")
+  if @platform != :flutter && ENV["NODE_NAME"] != 'androidbuild'
     return
   end
 
@@ -144,9 +144,11 @@ def smf_update_flutter_binary_cache
   @flutter_binary_path = "#{$FLUTTER_BINARY_ROOT_DIR}/#{flutter_sha}/flutter/bin/flutter"
 
   # DEBUGGING
+  sh("ls #{$FLUTTER_BINARY_ROOT_DIR}")
   if File.exist?(@flutter_binary_path)
     sh("rm -r #{@flutter_binary_path}")
   end
+  sh("ls #{$FLUTTER_BINARY_ROOT_DIR}")
 
   if !File.exist?(@flutter_binary_path)
     sh("mkdir -p #{$FLUTTER_BINARY_ROOT_DIR}/#{flutter_sha} && git clone git@github.com:flutter/flutter.git #{$FLUTTER_BINARY_ROOT_DIR}/#{flutter_sha}/flutter && cd #{$FLUTTER_BINARY_ROOT_DIR}/#{flutter_sha}/flutter && git reset --hard #{flutter_sha}")
