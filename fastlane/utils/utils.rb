@@ -258,22 +258,3 @@ def smf_extract_bump_type_from_pr_body(pr_body)
 
   nil
 end
-
-def smf_update_flutter_binary
-  submodule_status = sh "cd #{smf_workspace_dir}/.flutter; git submodule status"
-  matcher = submodule_status.match(/(.+) \.flutter/m)
-
-  if matcher.nil? || matcher.captures.nil? || matcher.captures.size != 1
-    UI.error("Unable to find sha1 of submodule 'flutter'")
-    raise "Unable to find sha1 of submodule 'flutter'"
-  end
-
-  flutter_sha = matcher.captures[0]
-
-  @flutter_binary_path = "#{$FLUTTER_BINARY_BASE_PATH}/#{flutter_sha}/.flutter/bin/flutter"
-
-  if !File.exist?(@flutter_binary_path)
-
-    sh("mkdir #{$FLUTTER_BINARY_BASE_PATH}/#{flutter_sha} && cp #{smf_workspace_dir}/.flutter #{$FLUTTER_BINARY_BASE_PATH}/#{flutter_sha}")
-  end
-end
