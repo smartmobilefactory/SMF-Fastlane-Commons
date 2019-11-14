@@ -50,14 +50,20 @@ def perform_build_precheck_for_pods_spec_repo_url(pods_specs_repo = false)
     prefix_config = https_in_config ? 'in the Config.json' : ''
     connector = https_in_podfile && https_in_config ? ' and ' : ''
 
-    log_msg = "⛔️ The HTTPS podspec repo url is still present #{prefix_podfile}#{connector}#{prefix_config}. Please update to use the ssh url. See https://smartmobilefactory.atlassian.net/wiki/spaces/SMFIOS/pages/674201953/Wrong+cocoapods+repo+in... for more information"
+    message = "⛔️ The HTTPS podspec repo url is still present #{prefix_podfile}#{connector}#{prefix_config}. Please update to use the ssh url. See https://smartmobilefactory.atlassian.net/wiki/spaces/SMFIOS/pages/674201953/Wrong+cocoapods+repo+in... for more information"
 
-    UI.error(log_msg)
+    UI.error(message)
 
-    smf_create_pull_request_comment(
-      comment: log_msg
+    smf_send_message(
+      title: 'Build Precheck Error',
+      message: message,
+      type: 'error'
     )
 
-    raise "Pospec repo is an https url"
+    smf_create_pull_request_comment(
+      comment: message
+    )
+
+    raise "Podspec repo is an https url"
   end
 end
