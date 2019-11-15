@@ -30,8 +30,7 @@ private_lane :smf_pod_super_setup_dependencies_pr_check do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
   smf_build_precheck(
-      upload_itc: build_variant_config[:upload_itc],
-      itc_apple_id: build_variant_config[:itc_apple_id]
+    pods_spec_repo: @smf_fastlane_config[:build_variants][:framework][:pods_specs_repo]
   )
 
   smf_pod_install
