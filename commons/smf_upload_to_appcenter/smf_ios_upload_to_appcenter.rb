@@ -19,10 +19,6 @@ private_lane :smf_ios_upload_to_appcenter do |options|
 
   NO_APP_FAILURE = 'NO_APP_FAILURE'
 
-  if !is_mac_app
-    sh "cd ../build; zip -r9 \"#{escaped_filename}.ipa.zip\" \"#{escaped_filename}.ipa\" || echo #{NO_APP_FAILURE}"
-  end
-
   app_path = path_to_ipa_or_app
 
   if is_mac_app
@@ -30,7 +26,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
 
     app_path = app_path.sub('.app', '.dmg')
 
-    raise("DMG file #{app_path} does not exit. Nothing to upload.") unless File.exist?(app_path)
+    raise("Binary file #{app_path} does not exit. Nothing to upload.") unless File.exist?(app_path)
 
     UI.message('Upload mac app to AppCenter.')
     appcenter_upload(
@@ -46,6 +42,9 @@ private_lane :smf_ios_upload_to_appcenter do |options|
         release_notes: smf_read_changelog
     )
   else
+
+    raise("Binary file #{app_path} does not exit. Nothing to upload.") unless File.exist?(app_path)
+
     UI.message('Upload iOS app to AppCenter.')
     appcenter_upload(
         api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
