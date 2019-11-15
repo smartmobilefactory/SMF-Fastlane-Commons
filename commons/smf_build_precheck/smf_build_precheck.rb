@@ -5,7 +5,6 @@ private_lane :smf_build_precheck do |options|
   pods_spec_repo = options[:pods_spec_repo]
 
   case @platform
-
   when :ios
     perform_build_precheck_ios(upload_itc, itc_apple_id)
     perform_build_precheck_for_pods_spec_repo_url(
