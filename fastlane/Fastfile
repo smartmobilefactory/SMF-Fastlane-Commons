@@ -136,20 +136,24 @@ error do |lane, exception, options|
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : '' # TODO: add build_variant to all stages
 
   case @platform
-  when :ios, :ios_framework, :macos
+  when :ios, :macos
     UI.message('Handling exception for iOS/macOS.')
-
-    if @smf_fastlane_config.key?(:build_variants)
-      name = !@smf_fastlane_config[:build_variants][build_variant][:podspec_path].nil? ? smf_get_default_name_of_pod(build_variant) : smf_get_default_name_of_app(build_variant) # Needs to be changed
-    else
-      name = smf_get_default_name_of_app(@smf_build_variant)
-    end
 
     smf_handle_exception(
         exception: exception,
-        name: name,
+        name: smf_get_default_name_of_app(build_variant),
         slack_channel: @smf_fastlane_config[:project][:slack_channel]
     )
+
+  when :ios_framework
+    UI.message('Handling exception for iOS Framework.')
+
+    smf_handle_exception(
+      exception: exception,
+      name: smf_get_default_name_of_pod(build_variant),
+      slack_channel: @smf_fastlane_config[:project][:slack_channel]
+    )
+
   when :android
     UI.message('Handling exception for Android.')
     smf_handle_exception(
@@ -157,11 +161,13 @@ error do |lane, exception, options|
         name: smf_get_default_name_of_app(build_variant),
         slack_channel: @smf_fastlane_config[:project][:slack_channel]
     )
+
   when :flutter
     smf_handle_exception(
         exception: exception,
         name: smf_get_default_name_of_app(build_variant)
     )
+
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown Platform'
