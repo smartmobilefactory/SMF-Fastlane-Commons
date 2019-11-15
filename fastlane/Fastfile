@@ -133,16 +133,15 @@ desc 'Called on error'
 error do |lane, exception, options|
   UI.error("Exception: #{exception.to_s} was called from lane #{lane.to_s}.")
 
-  build_variant = !options[:build_variant].nil? ? options[:build_variant] : ''
+  build_variant = options[:build_variant]
 
   name = ''
   slack_channel = nil
-  
+
   if !@smf_fastlane_config[:project].nil? && !@smf_fastlane_config[:project][:slack_channel].nil?
     slack_channel = @smf_fastlane_config[:project][:slack_channel]
   end
-
-
+  
   case @platform
   when :ios, :macos, :android, :flutter
     UI.message('Handling exception for iOS/macOS/android/flutter.')
