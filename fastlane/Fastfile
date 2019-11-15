@@ -133,45 +133,35 @@ desc 'Called on error'
 error do |lane, exception, options|
   UI.error("Exception: #{exception.to_s} was called from lane #{lane.to_s}.")
 
-  build_variant = !options[:build_variant].nil? ? options[:build_variant] : '' # TODO: add build_variant to all stages
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : ''
+
+  name = ''
+  slack_channel = nil
+  
+  if !@smf_fastlane_config[:project].nil? && !@smf_fastlane_config[:project][:slack_channel].nil?
+    slack_channel = @smf_fastlane_config[:project][:slack_channel]
+  end
+
 
   case @platform
-  when :ios, :macos
-    UI.message('Handling exception for iOS/macOS.')
-
-    smf_handle_exception(
-        exception: exception,
-        name: smf_get_default_name_of_app(build_variant),
-        slack_channel: @smf_fastlane_config[:project][:slack_channel]
-    )
+  when :ios, :macos, :android, :flutter
+    UI.message('Handling exception for iOS/macOS/android/flutter.')
+    name = smf_get_default_name_of_app(build_variant)
 
   when :ios_framework
     UI.message('Handling exception for iOS Framework.')
-
-    smf_handle_exception(
-      exception: exception,
-      name: smf_get_default_name_of_pod(build_variant),
-      slack_channel: @smf_fastlane_config[:project][:slack_channel]
-    )
-
-  when :android
-    UI.message('Handling exception for Android.')
-    smf_handle_exception(
-        exception: exception,
-        name: smf_get_default_name_of_app(build_variant),
-        slack_channel: @smf_fastlane_config[:project][:slack_channel]
-    )
-
-  when :flutter
-    smf_handle_exception(
-        exception: exception,
-        name: smf_get_default_name_of_app(build_variant)
-    )
+    name = smf_get_default_name_of_pod(build_variant)
 
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown Platform'
   end
+
+  smf_handle_exception(
+    exception: exception,
+    name: name,
+    slack_channel: slack_channel
+  )
 end
 
 # sets the commons dir path and clones the fastlane repo
