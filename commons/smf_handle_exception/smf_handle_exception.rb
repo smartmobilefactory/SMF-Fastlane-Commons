@@ -8,17 +8,9 @@ private_lane :smf_handle_exception do |options|
   slack_channel = options[:slack_channel]
 
   smf_send_default_build_fail_notification(
-      name: name,
-      message: message,
-      exception: exception
+    name: name,
+    message: message,
+    exception: exception,
+    slack_channel: slack_channel
   )
-
-  if !slack_channel.nil?
-    smf_send_default_build_fail_notification(
-        name: name,
-        message: message,
-        exception: exception,
-        slack_channel: slack_channel
-    )
-  end
 end
