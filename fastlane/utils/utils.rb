@@ -265,8 +265,9 @@ def get_flutter_binary_path
   matcher = submodule_status.match(/(.+) .*flutter/m)
 
   if matcher.nil? || matcher.captures.nil? || matcher.captures.size != 1
-    UI.error("Unable to find sha1 of submodule 'flutter' while looking up flutter binary in cache")
-    raise "Unable to find sha1 of submodule 'flutter' while looking up flutter binary in cache"
+    error_message = "Unable to find sha1 of submodule 'flutter' to look up flutter binary in cache"
+    UI.error(error_message)
+    raise error_message
   end
 
   flutter_sha = matcher.captures[0].gsub(' ', '')
