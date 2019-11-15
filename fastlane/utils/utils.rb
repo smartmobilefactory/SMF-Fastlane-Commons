@@ -277,7 +277,7 @@ def get_flutter_binary_path
   flutter_binary_path = flutter_repo_path + "/bin/flutter"
 
   if !File.exist?(flutter_binary_path)
-    sh("mkdir -p #{flutter_cache_base} && git clone git@github.com:flutter/flutter.git #{flutter_repo_path} && cd #{flutter_repo_path} && git checkout #{flutter_sha}")
+    sh "mkdir -p #{flutter_cache_base} && git clone git@github.com:flutter/flutter.git #{flutter_repo_path} && cd #{flutter_repo_path} && git checkout #{flutter_sha}"
     UI.message("Updated flutter binray cache")
   else
     UI.message("Using flutter binary from cache 🎉")
