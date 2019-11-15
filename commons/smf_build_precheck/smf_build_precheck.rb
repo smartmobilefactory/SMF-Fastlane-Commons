@@ -28,9 +28,9 @@ def perform_build_precheck_ios(upload_itc, itc_apple_id)
     message = 'itc_apple_id not set in Config.json. Please Read: https://smartmobilefactory.atlassian.net/wiki/spaces/SMFIOS/pages/669646876/Missing+itc+apple+id '
 
     smf_send_message(
-        title: 'Build Precheck Error',
-        message: message,
-        type: 'error'
+      title: 'Build Precheck Error',
+      message: message,
+      type: 'error'
     )
 
     raise message
