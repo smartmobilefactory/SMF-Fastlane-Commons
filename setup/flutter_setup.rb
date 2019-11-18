@@ -168,7 +168,7 @@ private_lane :smf_super_pipeline_android_upload_to_appcenter do |options|
   build_variant = options[:build_variant]
   build_variant_config_android = @smf_fastlane_config[:build_variants][build_variant.to_sym][:android]
   apk_file_regex = smf_get_apk_file_regex(build_variant)
-  aab_file_regex = 'app.aab'
+  aab_file_regex = smf_get_aab_file_regex(build_variant)
   appcenter_app_id = smf_get_appcenter_id(build_variant, 'android')
   hockey_app_id = smf_get_hockey_id(build_variant, 'android')
   destinations = build_variant_config_android[:appcenter_destinations]
@@ -180,6 +180,14 @@ private_lane :smf_super_pipeline_android_upload_to_appcenter do |options|
     aab_path: smf_get_file_path(aab_file_regex),
     app_id: appcenter_app_id
   ) if !appcenter_app_id.nil?
+
+  smf_android_upload_to_appcenter(    
+    destinations: destinations,
+    build_variant: build_variant,    
+    apk_path: smf_get_file_path(apk_file_regex),   
+    app_id: appcenter_app_id 
+  ) if !appcenter_app_id.nil?
+
 end
 
 lane :smf_pipeline_android_upload_to_appcenter do |options|

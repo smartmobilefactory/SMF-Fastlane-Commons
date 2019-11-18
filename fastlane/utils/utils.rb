@@ -7,16 +7,24 @@ def smf_get_file_path(file_regex)
   path
 end
 
-def smf_get_apk_file_regex(build_variant)
+def smf_get_ouput_file_regex(build_variant)
   case @platform
   when :android
     variant = smf_get_build_variant_from_config(build_variant)
-    file_regex = "*-#{variant.gsub(/[A-Z]/) { |s| '-' + s.downcase }}.apk"
+    file_regex = "*-#{variant.gsub(/[A-Z]/) { |s| '-' + s.downcase }}"
   when :flutter
-    file_regex = "app-#{build_variant}-release.apk"
+    file_regex = "app-#{build_variant}-release"
   end
 
   file_regex
+end
+
+def smf_get_apk_file_regex(build_variant)
+  "#{smf_get_ouput_file_regex(build_variant)}.apk"
+end
+
+def smf_get_aab_file_regex(build_variant)
+  "#{smf_get_ouput_file_regex(build_variant)}.aab"
 end
 
 def smf_get_build_variant_from_config(build_variant)
