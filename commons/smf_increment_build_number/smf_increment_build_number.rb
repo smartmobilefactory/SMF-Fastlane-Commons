@@ -7,7 +7,7 @@ private_lane :smf_increment_build_number do |options|
 
   # Pull all the tags so the change log collector finds the latest tag
   UI.message('Fetching all tags...')
-  sh('git fetch --tags --quiet')
+  sh("git fetch --tags --quiet || echo #{NO_GIT_TAG_FAILURE}")
 
   last_tag = sh("git describe --tags --match \"build/*/*\" `git rev-list --tags --max-count=1` --abbrev=0 || echo #{NO_GIT_TAG_FAILURE}").to_s
 
