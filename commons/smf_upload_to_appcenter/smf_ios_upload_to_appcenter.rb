@@ -57,4 +57,10 @@ private_lane :smf_ios_upload_to_appcenter do |options|
         release_notes: smf_read_changelog
     )
   end
+
+  smf_create_appcenter_push(
+    app_owner: owner_id,
+    app_display_name: app_name,
+    app_id: app_id
+  )
 end
