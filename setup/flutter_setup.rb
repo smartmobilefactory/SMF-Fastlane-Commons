@@ -110,9 +110,23 @@ lane :smf_ios_build do |options|
 end
 
 private_lane :smf_super_android_build do |options|
+
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
-  sh("cd #{smf_workspace_dir} && #{get_flutter_binary_path} build apk --release --flavor #{build_variant}")
-  if !options[:build_variant].nil?
+  build_variant_android_config = @smf_fastlane_config[:build_variants][build_variant.to_sym][:android]
+
+  keystore_folder = build_variant_android_config[:keystore]
+
+  if keystore_folder.nil?
+    sh("cd #{smf_workspace_dir} && #{get_flutter_binary_path} build apk --release --flavor #{build_variant}")
+  else
+    keystore_values = smf_pull_keystore(folder: keystore_folder)
+    ENV["keystore_file"] = keystore_values[:keystore_file]
+    ENV["keystore_password"] = keystore_values[:keystore_password]
+    ENV["keystore_key_alias"] = keystore_values[:keystore_key_alias]
+    ENV["keystore_key_password"] = keystore_values[:keystore_key_password]
+
+    # build apk for internal testing and aab for play store distribution
+    sh("cd #{smf_workspace_dir} && #{get_flutter_binary_path} build apk --release --flavor #{build_variant}")
     sh("cd #{smf_workspace_dir} && #{get_flutter_binary_path} build appbundle --release --flavor #{build_variant}")
   end
 
@@ -167,26 +181,27 @@ private_lane :smf_super_pipeline_android_upload_to_appcenter do |options|
 
   build_variant = options[:build_variant]
   build_variant_config_android = @smf_fastlane_config[:build_variants][build_variant.to_sym][:android]
-  apk_file_regex = smf_get_apk_file_regex(build_variant)
-  aab_file_regex = smf_get_aab_file_regex(build_variant)
   appcenter_app_id = smf_get_appcenter_id(build_variant, 'android')
   hockey_app_id = smf_get_hockey_id(build_variant, 'android')
   destinations = build_variant_config_android[:appcenter_destinations]
 
-  # Upload to AppCenter
-  smf_android_upload_to_appcenter(
-    destinations: destinations,
-    build_variant: build_variant,
-    aab_path: smf_get_file_path(aab_file_regex),
-    app_id: appcenter_app_id
-  ) if !appcenter_app_id.nil?
-
+  # Upload APK to AppCenter
+  apk_path = smf_get_file_path(smf_get_apk_file_regex(build_variant))
   smf_android_upload_to_appcenter(    
     destinations: destinations,
     build_variant: build_variant,    
-    apk_path: smf_get_file_path(apk_file_regex),   
+    apk_path: apk_path,
     app_id: appcenter_app_id 
-  ) if !appcenter_app_id.nil?
+  ) if apk_path != '' && !appcenter_app_id.nil?
+
+  # Upload AAB to AppCenter
+  aab_path = smf_get_file_path(smf_get_aab_file_regex(build_variant))
+  smf_android_upload_to_appcenter(
+    destinations: destinations,
+    build_variant: build_variant,
+    aab_path: aab_path,
+    app_id: appcenter_app_id
+  ) if aab_path != '' && !appcenter_app_id.nil?
 
 end
 
