@@ -5,7 +5,7 @@ private_lane :smf_android_upload_to_appcenter do |options|
   app_id = options[:app_id]
   destinations = options[:destinations].nil? ? "Collaborators" : options[:destinations]
 
-  app_name, owner_name = get_app_details(app_id)
+  app_name, owner_name, owner_id = get_app_details(app_id)
   UI.important('APK path is null.') if apk_path.nil?
   UI.important("AAB path is null.") if aab_path.nil?
 
@@ -57,6 +57,7 @@ def get_app_details(app_id)
 
   app_name = project_app['name']
   owner_name = project_app['owner']['name']
+  owner_id = project_app['owner']['id']
   UI.message("app_name: #{app_name}, owner_name: #{owner_name}")
-  [app_name, owner_name]
+  [app_name, owner_name, owner_id]
 end
