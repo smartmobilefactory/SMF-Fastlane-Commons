@@ -8,7 +8,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
   is_mac_app = !options[:is_mac_app].nil? ? options[:is_mac_app] : false
   destinations = options[:destinations].nil? ? "Collaborators" : options[:destinations]
 
-  app_name, owner_name = get_app_details(app_id)
+  app_name, owner_name, owner_id = get_app_details(app_id)
 
   dsym_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.app.dSYM.zip"
   UI.message("Constructed the dsym path \"#{dsym_path}\"")
@@ -57,4 +57,10 @@ private_lane :smf_ios_upload_to_appcenter do |options|
         release_notes: smf_read_changelog
     )
   end
+
+  smf_create_appcenter_push(
+    app_owner: owner_id,
+    app_display_name: app_name,
+    app_id: app_id
+  )
 end
