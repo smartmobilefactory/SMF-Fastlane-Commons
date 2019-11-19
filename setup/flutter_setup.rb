@@ -112,7 +112,7 @@ end
 private_lane :smf_super_android_build do |options|
 
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
-  build_variant_android_config = @smf_fastlane_config[:build_variants][build_variant.to_sym][:ios]
+  build_variant_android_config = @smf_fastlane_config[:build_variants][build_variant.to_sym][:android]
 
   keystore_folder = build_variant_android_config[:keystore]
 
