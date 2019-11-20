@@ -7,7 +7,7 @@ Increment the version number.
 ```
 smf_increment_version_number(
     podspec_path: <path to pods podspec file>
-    bump_type: <either major, minor, patch, breaking or internal>
+    bump_type: <either major, minor, current, patch, breaking or internal>
 )
 ```
 
@@ -21,8 +21,9 @@ There are five possible bump types:<br />
 | patch      | Increments the third part of the version number.     | 1.2.3 -> 1.2.4     |
 | breaking   | Like patch and sets last part to 0.                  | 1.2.3.4 -> 1.2.4.0<br />1.2.3 -> 1.2.4.0 |
 | internal   | Increments the last part.                            | 1.2.3.4 -> 1.2.3.5<br />1.2.3 -> 1.2.3.1 |
-    
-"mayor" and "minor" are usually set manually. "breaking" and "internal" are only incremented via Fastlane.
+| current    | The version number is not changed.                   | 1.2.3.4 -> 1.2.3.4 |
+
+"current" is used when the version number is set manually and shouldn't be changed by fastlane.
 
 ## Create new tag
 The current build number will be incremented and used for the new tag. If this tag exists the build number will be incremented again the same way. This process will run ten times if needed. 
@@ -37,6 +38,6 @@ This lane increments the version number in the podspec file and returns it, but 
 ```
 smf_increment_version_number_dry_run(
     podspec_path: <path to pods podspec file>
-    bump_type: <either major, minor, patch, breaking or internal>
+    bump_type: <either major, minor, current, patch, breaking or internal>
 )
 ```
