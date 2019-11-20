@@ -182,7 +182,6 @@ private_lane :smf_super_pipeline_android_upload_to_appcenter do |options|
   build_variant = options[:build_variant]
   build_variant_config_android = @smf_fastlane_config[:build_variants][build_variant.to_sym][:android]
   appcenter_app_id = smf_get_appcenter_id(build_variant, 'android')
-  hockey_app_id = smf_get_hockey_id(build_variant, 'android')
   destinations = build_variant_config_android[:appcenter_destinations]
 
   # Upload APK to AppCenter
