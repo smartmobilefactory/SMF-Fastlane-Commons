@@ -37,7 +37,7 @@ private_lane :smf_increment_version_number_dry_run do |options|
 end
 
 def _smf_bump_pod_version(podspec_path, bump_type, dry_run = false)
-  UI.message("Increasing pod version: #{bump_type}")
+  UI.message("Increasing pod version: #{bump_type}") unless bump_type == 'current'
 
   if ['major', 'minor', 'patch'].include? bump_type
     version_bump_podspec(
