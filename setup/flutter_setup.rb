@@ -1,3 +1,20 @@
+# Update Jenkinsfile
+
+private_lane :smf_shared_super_generate_files do |options|
+
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+
+  smf_update_generated_files(
+      branch: options[:branch],
+      build_variant: build_variant
+  )
+end
+
+lane :smf_shared_generate_files do |options|
+  smf_shared_super_generate_files(options)
+end
+
+
 # Setup Dependencies - pod install & `sh generate.sh` (optional: Phrase App)
 
 private_lane :smf_super_shared_setup_dependencies do |options|
@@ -35,37 +52,6 @@ end
 
 lane :smf_setup_dependencies_build do |options|
   smf_super_shared_setup_dependencies(options)
-end
-
-
-# Update Jenkinsfile
-
-private_lane :smf_shared_super_generate_files do |options|
-
-  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
-
-  smf_update_generated_files(
-      branch: options[:branch],
-      build_variant: build_variant
-  )
-end
-
-lane :smf_shared_generate_files do |options|
-  smf_shared_super_generate_files(options)
-end
-
-
-# Create Git Tag
-
-private_lane :smf_super_pipeline_create_git_tag do |options|
-
-  build_variant = options[:build_variant]
-  build_number = smf_get_build_number_of_app
-  smf_create_git_tag(build_variant: build_variant, build_number: build_number)
-end
-
-lane :smf_pipeline_create_git_tag do |options|
-  smf_super_pipeline_create_git_tag(options)
 end
 
 
@@ -134,6 +120,53 @@ end
 
 lane :smf_android_build do |options|
   smf_super_android_build(options)
+end
+
+
+# Linter
+
+private_lane :smf_super_linter do |options|
+  sh("cd #{smf_workspace_dir} && #{get_flutter_binary_path} analyze || true")
+end
+
+lane :smf_linter do |options|
+  smf_super_linter(options)
+end
+
+
+# Run Unit Tests
+
+private_lane :smf_super_run_unit_tests do |options|
+  sh("cd #{smf_workspace_dir} && #{get_flutter_binary_path} test")
+end
+
+lane :smf_run_unit_tests do |options|
+  smf_super_run_unit_tests(options)
+end
+
+
+# Danger
+
+private_lane :smf_super_shared_pipeline_danger do |options|
+  smf_danger(options)
+end
+
+lane :smf_shared_pipeline_danger do |options|
+  smf_super_shared_pipeline_danger(options)
+end
+
+
+# Create Git Tag
+
+private_lane :smf_super_pipeline_create_git_tag do |options|
+
+  build_variant = options[:build_variant]
+  build_number = smf_get_build_number_of_app
+  smf_create_git_tag(build_variant: build_variant, build_number: build_number)
+end
+
+lane :smf_pipeline_create_git_tag do |options|
+  smf_super_pipeline_create_git_tag(options)
 end
 
 
@@ -299,16 +332,6 @@ lane :smf_send_slack_notification do |options|
 end
 
 
-# Run Unit Tests
-
-private_lane :smf_super_run_unit_tests do |options|
-  sh("cd #{smf_workspace_dir} && #{get_flutter_binary_path} test")
-end
-
-lane :smf_run_unit_tests do |options|
-  smf_super_run_unit_tests(options)
-end
-
 # Increment Build Number
 
 private_lane :smf_super_pipeline_increment_build_number do |options|
@@ -321,26 +344,3 @@ end
 lane :smf_pipeline_increment_build_number do |options|
   smf_super_pipeline_increment_build_number(options)
 end
-
-
-# Linter
-
-private_lane :smf_super_linter do |options|
-  sh("cd #{smf_workspace_dir} && #{get_flutter_binary_path} analyze || true")
-end
-
-lane :smf_linter do |options|
-  smf_super_linter(options)
-end
-
-
-# Danger
-
-private_lane :smf_super_shared_pipeline_danger do |options|
-  smf_danger(options)
-end
-
-lane :smf_shared_pipeline_danger do |options|
-  smf_super_shared_pipeline_danger(options)
-end
-
