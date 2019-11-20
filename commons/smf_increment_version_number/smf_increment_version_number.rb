@@ -1,11 +1,11 @@
 private_lane :smf_increment_version_number do |options|
 
-  UI.message('Incrementing version number')
-
   podspec_path = options[:podspec_path]
   bump_type = options[:bump_type]
 
-  # Bump library's version if needed
+  UI.message('Incrementing version number') unless bump_type == 'current'
+
+    # Bump library's version if needed
   _smf_bump_pod_version(podspec_path, bump_type)
 
   version_number = smf_get_version_number(nil, podspec_path)
@@ -21,7 +21,7 @@ private_lane :smf_increment_version_number do |options|
         message: "Release Pod #{version_number}"
     )
   end
-  
+
   add_git_tag(tag: tag)
 
   tag
