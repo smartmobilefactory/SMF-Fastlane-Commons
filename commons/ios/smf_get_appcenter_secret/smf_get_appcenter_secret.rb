@@ -62,7 +62,9 @@ private_lane :smf_get_appcenter_secret_diagnostic_wrapper do |options|
   appcenter_secret_dynamically = ''
 
   begin
-    appcenter_secret_dynamically = smf_get_appcenter_secret(build_variant)
+    appcenter_secret_dynamically = smf_get_appcenter_secret(
+      build_variant: build_variant
+    )
   rescue => exception
     smf_send_diagnostic_message(
       title: 'Dynamic appcenter secret extraction',
