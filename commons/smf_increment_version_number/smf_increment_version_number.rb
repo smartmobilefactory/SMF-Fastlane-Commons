@@ -5,7 +5,7 @@ private_lane :smf_increment_version_number do |options|
 
   UI.message('Incrementing version number') unless bump_type == 'current'
 
-    # Bump library's version if needed
+  # Bump library's version if needed
   _smf_bump_pod_version(podspec_path, bump_type)
 
   version_number = smf_get_version_number(nil, podspec_path)
