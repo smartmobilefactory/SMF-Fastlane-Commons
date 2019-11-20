@@ -15,11 +15,13 @@ private_lane :smf_increment_version_number do |options|
     raise "⛔️ The new tag ('#{tag}') already exists! Aborting..."
   end
 
-  git_commit(
-      path: podspec_path,
-      message: "Release Pod #{version_number}"
-  )
-
+  if bump_type != 'current'
+    git_commit(
+        path: podspec_path,
+        message: "Release Pod #{version_number}"
+    )
+  end
+  
   add_git_tag(tag: tag)
 
   tag
