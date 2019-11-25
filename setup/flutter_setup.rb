@@ -157,12 +157,13 @@ private_lane :smf_super_upload_dsyms do |options|
 
   build_variant = options[:build_variant]
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
+  project_config = @smf_fastlane_config[:project]
   build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant.to_sym][:ios]
 
   smf_upload_to_sentry(
       build_variant: build_variant,
-      org_slug: @smf_fastlane_config[:sentry_org_slug],
-      project_slug: @smf_fastlane_config[:sentry_project_slug],
+      org_slug: project_config[:sentry_org_slug],
+      project_slug: project_config[:sentry_project_slug],
       escaped_filename: build_variant_config[:flavor].gsub(' ', "\ "),
       build_variant_org_slug: build_variant_ios_config[:sentry_org_slug],
       build_variant_project_slug: build_variant_ios_config[:sentry_project_slug]
