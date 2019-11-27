@@ -36,8 +36,17 @@ def smf_get_project_name
 end
 
 def smf_get_appcenter_id(build_variant, platform = nil)
-  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
-  appcenter_id = platform.nil? ? build_variant_config[:appcenter_id] : build_variant_config[platform.to_sym][:appcenter_id]
+
+  if @platform == :ios
+    appcenter_id = smf_get_appcenter_secret_diagnostic_wrapper(
+      build_variant: build_variant
+    )
+  else
+    build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
+    appcenter_id = platform.nil? ? build_variant_config[:appcenter_id] : build_variant_config[platform.to_sym][:appcenter_id]
+  end
+
+  appcenter_id
 end
 
 def smf_get_hockey_id(build_variant, platform = nil)
