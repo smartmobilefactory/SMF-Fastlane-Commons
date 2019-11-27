@@ -160,7 +160,7 @@ end
 def smf_git_pull(branch)
   branch_name = "#{branch}"
   branch_name.sub!('origin/', '')
-  sh "git pull origin #{branch_name} --depth=1 --quiet --allow-unrelated-histories -X theirs"
+  sh "git pull origin #{branch_name} --depth=5 --quiet --allow-unrelated-histories -X theirs"
 end
 
 def smf_update_config(config, message = nil)
@@ -254,7 +254,7 @@ def smf_extract_bump_type_from_pr_body(pr_body)
   bump_type = groups.first.first
 
   if !bump_type.nil?
-    if ['major', 'minor', 'patch', 'breaking', 'internal'].include?(bump_type)
+    if $POD_DEFAULT_VARIANTS.include?(bump_type)
       return bump_type
     end
   end
@@ -262,7 +262,7 @@ def smf_extract_bump_type_from_pr_body(pr_body)
   nil
 end
 
-def get_flutter_binary_path
+def smf_get_flutter_binary_path
 
   submodule_status = sh "cd #{smf_workspace_dir} && git submodule status"
   matcher = submodule_status.match(/(.+) .*flutter/m)

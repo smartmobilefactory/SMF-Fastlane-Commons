@@ -1,9 +1,9 @@
 private_lane :smf_upload_to_sentry do |options|
 
-  org_slug = options[:sentry_org_slug]
-  project_slug = options[:sentry_project_slug]
-  build_variant_org_slug = options[:sentry_org_slug]
-  build_variant_project_slug = options[:sentry_project_slug]
+  org_slug = options[:org_slug]
+  project_slug = options[:project_slug]
+  build_variant_org_slug = options[:build_variant_org_slug]
+  build_variant_project_slug = options[:build_variant_project_slug]
   slack_channel = options[:slack_channel]
   escaped_filename = options[:escaped_filename]
 

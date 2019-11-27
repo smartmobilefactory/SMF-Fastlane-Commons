@@ -29,8 +29,8 @@ private_lane :smf_super_shared_setup_dependencies do |options|
       itc_apple_id: build_variant_ios_config[:itc_apple_id]
   )
 
-  sh("cd #{smf_workspace_dir} && #{get_flutter_binary_path} doctor")
-  sh("cd #{smf_workspace_dir} && #{get_flutter_binary_path} packages get")
+  sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} doctor")
+  sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} packages get")
   generate_sh_file = "#{smf_workspace_dir}/generate.sh"
   if File.exist?(generate_sh_file)
     sh("cd #{smf_workspace_dir}; sh generate.sh")
@@ -64,7 +64,7 @@ private_lane :smf_super_ios_build do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
   build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant.to_sym][:ios]
 
-  sh("cd #{smf_workspace_dir} && #{get_flutter_binary_path} build ios --release --no-codesign --flavor #{build_variant}")
+  sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} build ios --release --no-codesign --flavor #{build_variant}")
 
   smf_download_provisioning_profiles(
       team_id: build_variant_ios_config[:team_id],
@@ -105,7 +105,7 @@ private_lane :smf_super_android_build do |options|
   keystore_folder = build_variant_android_config[:keystore]
 
   if keystore_folder.nil?
-    sh("cd #{smf_workspace_dir} && #{get_flutter_binary_path} build apk --release --flavor #{build_variant}")
+    sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} build apk --release --flavor #{build_variant}")
   else
     keystore_values = smf_pull_keystore(folder: keystore_folder)
     ENV["keystore_file"] = keystore_values[:keystore_file]
@@ -114,8 +114,8 @@ private_lane :smf_super_android_build do |options|
     ENV["keystore_key_password"] = keystore_values[:keystore_key_password]
 
     # build apk for internal testing and aab for play store distribution
-    sh("cd #{smf_workspace_dir} && #{get_flutter_binary_path} build apk --release --flavor #{build_variant}")
-    sh("cd #{smf_workspace_dir} && #{get_flutter_binary_path} build appbundle --release --flavor #{build_variant}")
+    sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} build apk --release --flavor #{build_variant}")
+    sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} build appbundle --release --flavor #{build_variant}")
   end
 
 end
@@ -128,7 +128,7 @@ end
 # Linter
 
 private_lane :smf_super_linter do |options|
-  sh("cd #{smf_workspace_dir} && #{get_flutter_binary_path} analyze || true")
+  sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} analyze || true")
 end
 
 lane :smf_linter do |options|
@@ -139,7 +139,7 @@ end
 # Run Unit Tests
 
 private_lane :smf_super_run_unit_tests do |options|
-  sh("cd #{smf_workspace_dir} && #{get_flutter_binary_path} test")
+  sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} test")
 end
 
 lane :smf_run_unit_tests do |options|
@@ -208,12 +208,13 @@ private_lane :smf_super_upload_dsyms do |options|
 
   build_variant = options[:build_variant]
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
+  project_config = @smf_fastlane_config[:project]
   build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant.to_sym][:ios]
 
   smf_upload_to_sentry(
       build_variant: build_variant,
-      org_slug: @smf_fastlane_config[:sentry_org_slug],
-      project_slug: @smf_fastlane_config[:sentry_project_slug],
+      org_slug: project_config[:sentry_org_slug],
+      project_slug: project_config[:sentry_project_slug],
       escaped_filename: build_variant_config[:flavor].gsub(' ', "\ "),
       build_variant_org_slug: build_variant_ios_config[:sentry_org_slug],
       build_variant_project_slug: build_variant_ios_config[:sentry_project_slug]
@@ -280,7 +281,6 @@ end
 lane :smf_pipeline_ios_upload_to_appcenter do |options|
   smf_super_pipeline_ios_upload_to_appcenter(options)
 end
-
 
 # Upload to iTunes
 
