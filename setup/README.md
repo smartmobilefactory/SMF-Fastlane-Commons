@@ -13,11 +13,14 @@ As mentioned before the specific lanes will be called directly from the stages i
 
 To learn how to overwrite the default lanes to customize your build process have a look at the *Custom Behaviour* section.
 
+**For every lane there is a README.** To see what how each lane acts and what parameter it needs have a look at it. How to find it: In the SMF-Fastlane-Commons Repository you can find a directory called "commens". For each lane a same named directory exists which contains the expected README. If you can not find the directory you are looking for search for it in the subdirectories "ios" and "android". 
+
 Table of Contents
 =================
 
    * [Get Started](#get-started)
         * [Fastlane and Jenkins Pipeline Commons](#fastlane-and-jenkins-pipeline-commons)
+   * [Table of Contents](#table-of-contents)
    * [Common Setup](#common-setup)
         * [Fastlane Lanes](#fastlane-lanes)
             * [smf_pipeline_danger](#smf_pipeline_danger)
@@ -78,9 +81,26 @@ Table of Contents
             * [smf_upload_to_itunes](#smf_upload_to_itunes-1)
             * [smf_push_git_tag_release](#smf_push_git_tag_release-2)
             * [smf_send_slack_notification](#smf_send_slack_notification-3)
+      * [macOS App Setup](#macos-app-setup)
+         * [Pull Request Lanes](#pull-request-lanes-3)
+            * [smf_generate_files](#smf_generate_files-2)
+            * [smf_setup_dependencies_pr_check/smf_setup_dependencies_build](#smf_setup_dependencies_pr_checksmf_setup_dependencies_build-2)
+            * [smf_build](#smf_build-2)
+            * [smf_unit_tests](#smf_unit_tests-1)
+            * [smf_linter](#smf_linter-3)
+            * [smf_pipeline_danger](#smf_pipeline_danger-3)
+         * [Additional Lanes used for building](#additional-lanes-used-for-building-3)
+            * [smf_generate_changelog](#smf_generate_changelog-5)
+            * [smf_pipeline_increment_build_number](#smf_pipeline_increment_build_number-4)
+            * [smf_pipeline_create_git_tag](#smf_pipeline_create_git_tag-4)
+            * [smf_create_dmg_and_gatekeeper](#smf_create_dmg_and_gatekeeper)
+            * [smf_upload_dsyms](#smf_upload_dsyms-2)
+            * [smf_pipeline_upload_with_sparkle](#smf_pipeline_upload_with_sparkle)
+            * [smf_upload_to_appcenter](#smf_upload_to_appcenter-2)
+            * [smf_push_git_tag_release](#smf_push_git_tag_release-3)
+            * [smf_send_slack_notification](#smf_send_slack_notification-4)
    * [Custom Behaviour](#custom-behaviour)
       * [Example](#example)
-            
       
 # Common Setup
 In the following sections the common default Fastlane lanes for iOS and Android Apps will be explained. They are used both multiple platforms.
@@ -121,6 +141,7 @@ For each platform they are ordered by the following criteria:
 This lane generates the Jenkinsfile if it was outdated. If there are other files which should be generate files you can overwrite this lane.
 
 #### `smf_setup_dependencies_pr_check`/`smf_setup_dependencies_build`
+These lanes install pods if a podfile is present in the project. They also check multiple properties (duplicated build numbers, is there an editable app version, etc.) to reduce the risk of errors when uploading to iTunes Connect. For this check `upload_itc` must be set to true in the Config.json. There is one lane for PR-Checks and one for Builds to be able to only run code for one of the two. For example Phrase-App should only be called during a build. To get to know how have a look at the [example](#Example`). :wink:
 
 #### `smf_build`
 This lane downloads the provisioning profiles and builds the app and saves the IPA. :floppy_disk:
@@ -194,7 +215,7 @@ This lane usually runs junit tests.
 This lane runs lint tasks like klint.
 
 #### `smf_pipeline_danger`
-[See this lane in Common Setup](#smf_pipeline_danger`)
+[See this lane in Common Setup](#smf_pipeline_danger)
 
 ### Additional Lanes used for building
 
@@ -291,6 +312,57 @@ This lane pushes changes to GitHub using the created tag. Is also creates a GitH
 
 
 
+
+## macOS App Setup
+
+### Pull Request Lanes
+
+#### `smf_generate_files`
+This lane generates the Jenkinsfile if it was outdated. If there are other files which should be generate files you can overwrite this lane.
+
+#### `smf_setup_dependencies_pr_check`/`smf_setup_dependencies_build`
+These lanes install pods if a podfile is present in the project. There is one lane for PR-Checks and one for Builds to be able to only run code for one of the two. For example Phrase-App should only be called during a build. To get to know how have a look at the [example](#Example`). :wink:
+
+#### `smf_build`
+This lane builds the macOS app.
+
+#### `smf_unit_tests`
+This lane runs the unit tests.
+
+#### `smf_linter`
+This lane runs lint tasks like swift lint.
+
+#### `smf_pipeline_danger`
+[See this lane in Common Setup](#smf_pipeline_danger)
+
+### Additional Lanes used for building
+
+#### `smf_generate_changelog`
+[See this lane in Common Setup](#smf_generate_changelog)
+
+#### `smf_pipeline_increment_build_number`
+[See this lane in Common Setup](#smf_pipeline_increment_build_number)
+
+#### `smf_pipeline_create_git_tag`
+[See this lane in Common Setup](#smf_pipeline_create_git_tag)
+
+#### `smf_create_dmg_and_gatekeeper`
+This lane creates the dmg from the app and notarizes it if `notarize` is set to true in the build variant config in the Config.json.
+
+#### `smf_upload_dsyms`
+This lane uploads the dsyms to sentry.
+
+#### `smf_pipeline_upload_with_sparkle`
+This lane uploads the dmg with sparkle.
+
+#### `smf_upload_to_appcenter`
+This lane uploads the dmg to AppCenter.
+
+#### `smf_push_git_tag_release`
+This lane pushes changes to GitHub using the created tag. Is also creates a GitHub release.
+
+#### `smf_send_slack_notification`
+[See this lane in Common Setup](#smf_send_slack_notification)
 
 # Custom Behaviour
 

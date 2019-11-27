@@ -213,7 +213,7 @@ private_lane :smf_super_pipeline_upload_with_sparkle do |options|
   ) if build_variant_config[:use_sparkle] == true
 end
 
-lane :smf_pipeline_uplaod_with_sparkle do |options|
+lane :smf_pipeline_upload_with_sparkle do |options|
   smf_super_pipeline_upload_with_sparkle(options)
 end
 
