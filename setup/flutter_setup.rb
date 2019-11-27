@@ -1,3 +1,5 @@
+########## PULLREQUEST CHECK LANES ##########
+
 # Update Jenkinsfile
 
 private_lane :smf_shared_super_generate_files do |options|
@@ -156,19 +158,7 @@ lane :smf_shared_pipeline_danger do |options|
 end
 
 
-# Create Git Tag
-
-private_lane :smf_super_pipeline_create_git_tag do |options|
-
-  build_variant = options[:build_variant]
-  build_number = smf_get_build_number_of_app
-  smf_create_git_tag(build_variant: build_variant, build_number: build_number)
-end
-
-lane :smf_pipeline_create_git_tag do |options|
-  smf_super_pipeline_create_git_tag(options)
-end
-
+########## ADDITIONAL LANES USED FOR BUILDING ##########
 
 # Generate Changelog
 
@@ -181,6 +171,34 @@ end
 
 lane :smf_generate_changelog do |options|
   smf_super_generate_changelog(options)
+end
+
+
+# Increment Build Number
+
+private_lane :smf_super_pipeline_increment_build_number do |options|
+
+  smf_increment_build_number(
+      current_build_number: smf_get_build_number_of_app
+  )
+end
+
+lane :smf_pipeline_increment_build_number do |options|
+  smf_super_pipeline_increment_build_number(options)
+end
+
+
+# Create Git Tag
+
+private_lane :smf_super_pipeline_create_git_tag do |options|
+
+  build_variant = options[:build_variant]
+  build_number = smf_get_build_number_of_app
+  smf_create_git_tag(build_variant: build_variant, build_number: build_number)
+end
+
+lane :smf_pipeline_create_git_tag do |options|
+  smf_super_pipeline_create_git_tag(options)
 end
 
 
@@ -263,6 +281,7 @@ lane :smf_pipeline_ios_upload_to_appcenter do |options|
   smf_super_pipeline_ios_upload_to_appcenter(options)
 end
 
+
 # Upload to iTunes
 
 private_lane :smf_super_upload_to_itunes do |options|
@@ -329,18 +348,4 @@ end
 
 lane :smf_send_slack_notification do |options|
   smf_super_send_slack_notification(options)
-end
-
-
-# Increment Build Number
-
-private_lane :smf_super_pipeline_increment_build_number do |options|
-
-  smf_increment_build_number(
-      current_build_number: smf_get_build_number_of_app
-  )
-end
-
-lane :smf_pipeline_increment_build_number do |options|
-  smf_super_pipeline_increment_build_number(options)
 end
