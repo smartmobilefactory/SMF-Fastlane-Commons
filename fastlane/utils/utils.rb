@@ -75,10 +75,13 @@ end
 
 # Uses Config file to access project name. Should be changed in the future.
 def smf_get_default_name_of_pod(build_variant)
-  podspec_path = @smf_fastlane_config[:build_variants][build_variant.to_sym][:podspec_path]
-  version = read_podspec(path: podspec_path)['version']
-  pod_name = read_podspec(path: podspec_path)['name']
-  project_name = !@smf_fastlane_config[:project][:project_name].nil? ? @smf_fastlane_config[:project][:project_name] : pod_name
+  version = ''
+  if !build_variant.nil?
+    podspec_path = @smf_fastlane_config[:build_variants][build_variant.to_sym][:podspec_path]
+    version = read_podspec(path: podspec_path)['version']
+  end
+
+  project_name = @smf_fastlane_config[:project][:project_name]
 
   "#{project_name} #{version}"
 end
