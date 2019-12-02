@@ -69,7 +69,7 @@ echo "** generate_appcast **"
 
 ./generate_appcast $APPCAST_BASE_URI
 
-#echo "---- clean up ----"
+echo "---- clean up ----"
 # Delete the private key and codesigned version of the generate_appcast.
 security delete-generic-password -a "ed25519" -s "https://sparkle-project.org" -D "private key"
 rm generate_appcast
