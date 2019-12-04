@@ -194,7 +194,7 @@ This lane pushes changes to GitHub using the created tag. Is also creates a GitH
 ### Pull Request Lanes
 
 #### `smf_setup_dependencies_pr_check`/`smf_setup_dependencies_build`
-These lanes do nothing, yet. :grin: You could overwrite one to use Phraseapp. To get to know how have a look at the [example](#Example`). :wink:
+These lanes do nothing, yet. :grin: You could overwrite one to use Phraseapp. To get to know how, have a look at the [example](#Example`). :wink:
 
 #### `smf_pipeline_update_android_commons`
 This lane updates the Android Commons and generates the Jenkins file if it was outdated.
@@ -302,7 +302,7 @@ This lane uploads the APK to AppCenter. :arrow_up:
 This lane uploads the app to Testflight. :arrow_up::airplane:
 
 #### `smf_push_git_tag_release`
-This lane pushes changes to GitHub using the created tag. Is also creates a GitHub release.
+This lane pushes changes to GitHub using the created tag. It also creates a GitHub release.
 
 #### `smf_send_slack_notification`
 [See this lane in Common Setup](#smf_send_slack_notification)
