@@ -255,7 +255,7 @@ This lane pushes changes to GitHub using the created tag.
 This lane generates the Jenkinsfile if it was outdated. If there are other files which should be generated, you can overwrite this lane.
 
 #### `smf_shared_setup_dependencies_pr_check`/`smf_setup_dependencies_build`
-These lanes install pods if a podfile is present and execute `sh generate.sh` in the project. They also check multiple properties (duplicated build numbers, is there an editable app version, etc.) to reduce the risk of errors when uploading to iTunes Connect. For this check `upload_itc` must be set to true in the Config.json. There is one lane for PR-Checks and one for Builds to be able to only run code for one of the two. For example Phrase-App should only be called during a build. To get to know how have a look at the [example](#Example`). :wink:
+These lanes install pods if a podfile is present and execute `sh generate.sh` in the project. They also check multiple properties (duplicated build numbers, is there an editable app version, etc.) to reduce the risk of errors when uploading to iTunes Connect. For this check `upload_itc` must be set to true in the Config.json. There is one lane for PR-Checks and one for Builds to be able to only run code for one of the two. For example Phrase-App should only be called during a build. To get to know how, have a look at the [example](#Example`). :wink:
 
 #### `smf_ios_build`
 This lane downloads the provisioning profiles and builds the iOS App of the flutter project by first building the App via flutter command `build ios` and building it as a default iOS app afterwards.
@@ -318,7 +318,7 @@ This lane pushes changes to GitHub using the created tag. It also creates a GitH
 This lane generates the Jenkinsfile if it was outdated. If there are other files which should be generated, you can overwrite this lane.
 
 #### `smf_setup_dependencies_pr_check`/`smf_setup_dependencies_build`
-These lanes install pods if a podfile is present in the project. There is one lane for PR-Checks and one for Builds to be able to only run code for one of the two. For example Phrase-App should only be called during a build. To get to know how have a look at the [example](#Example`). :wink:
+These lanes install pods if a podfile is present in the project. There is one lane for PR-Checks and one for Builds to be able to only run code for one of the two. For example Phrase-App should only be called during a build. To get to know how, have a look at the [example](#Example`). :wink:
 
 #### `smf_build`
 This lane builds the macOS app.
