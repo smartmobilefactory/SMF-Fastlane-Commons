@@ -13,7 +13,7 @@ As mentioned before the specific lanes will be called directly from the stages i
 
 To learn how to overwrite the default lanes to customize your build process have a look at the *Custom Behaviour* section.
 
-**For every lane there is a README.** To see how each lane acts and what parameter it needs have a look at it. How to find it: In the SMF-Fastlane-Commons Repository you can find a directory called "commens". For each lane an equally named directory exists which contains the expected README. If you can not find the directory you are looking for search for it in the subdirectories "ios" and "android". 
+**For every lane there is a README.** To see how each lane acts and what parameter it needs have a look at it. How to find it: In the SMF-Fastlane-Commons Repository you can find a directory called "commons". For each lane an equally named directory exists which contains the expected README. If you can not find the directory you are looking for search for it in the subdirectories "ios" and "android". 
 
 Table of Contents
 =================
