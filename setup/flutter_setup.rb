@@ -188,20 +188,20 @@ private_lane :smf_super_pipeline_android_upload_to_appcenter do |options|
 
   # Upload APK to AppCenter
   apk_path = smf_get_file_path(smf_get_apk_file_regex(build_variant))
-  smf_android_upload_to_appcenter(    
-    destinations: destinations,
-    build_variant: build_variant,    
-    apk_path: apk_path,
-    app_id: appcenter_app_id 
+  smf_android_upload_to_appcenter(
+      destinations: destinations,
+      build_variant: build_variant,
+      apk_path: apk_path,
+      app_id: appcenter_app_id
   ) if apk_path != '' && !appcenter_app_id.nil?
 
   # Upload AAB to AppCenter
   aab_path = smf_get_file_path(smf_get_aab_file_regex(build_variant))
   smf_android_upload_to_appcenter(
-    destinations: destinations,
-    build_variant: build_variant,
-    aab_path: aab_path,
-    app_id: appcenter_app_id
+      destinations: destinations,
+      build_variant: build_variant,
+      aab_path: aab_path,
+      app_id: appcenter_app_id
   ) if aab_path != '' && !appcenter_app_id.nil?
 
 end
@@ -221,10 +221,10 @@ private_lane :smf_super_pipeline_ios_upload_to_appcenter do |options|
 
   # Upload the IPA to AppCenter
   smf_ios_upload_to_appcenter(
-    destinations: destinations,
-    app_id: appcenter_app_id,
-    escaped_filename: build_variant_config[:flavor].gsub(' ', "\ "),
-    path_to_ipa_or_app: smf_get_file_path(app_file_regex)
+      destinations: destinations,
+      app_id: appcenter_app_id,
+      escaped_filename: build_variant_config[:flavor].gsub(' ', "\ "),
+      path_to_ipa_or_app: smf_get_file_path(app_file_regex)
   ) if !appcenter_app_id.nil?
 end
 
@@ -290,9 +290,11 @@ end
 private_lane :smf_super_send_slack_notification do |options|
 
   build_variant = options[:build_variant]
+  slack_channel = @smf_fastlane_config[:project][:slack_channel]
 
   smf_send_default_build_success_notification(
-      name: smf_get_default_name_of_app(build_variant)
+      name: smf_get_default_name_of_app(build_variant),
+      slack_channel: slack_channel
   )
 end
 
