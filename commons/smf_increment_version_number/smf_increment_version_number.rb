@@ -46,7 +46,7 @@ def _smf_bump_pod_version(podspec_path, bump_type, dry_run = false)
     )
 
   elsif ['breaking', 'internal'].include? bump_type
-    # The versionning here is major.minor.breaking.internal
+    # The versioning here is major.minor.breaking.internal
     # major & minor are set manually
     # Only breaking and internal are incremented via Fastlane
     if bump_type == "breaking"
@@ -54,8 +54,12 @@ def _smf_bump_pod_version(podspec_path, bump_type, dry_run = false)
       # # And set back the appendix to 0
       version_bump_podspec(
           path: podspec_path,
-          bump_type: 'patch',
-          version_appendix: '0'
+          bump_type: 'patch'
+      )
+
+      version_bump_podspec(
+        path: podspec_path,
+        version_appendix: '0'
       )
 
     elsif bump_type == 'internal'
