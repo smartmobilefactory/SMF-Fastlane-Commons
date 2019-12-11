@@ -28,7 +28,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
 
     raise("Binary file #{app_path} does not exit. Nothing to upload.") unless File.exist?(app_path)
 
-    package_path = app_path.sub('.dmg', 'zip')
+    package_path = app_path.sub('.dmg', '.zip')
 
     sh "cd \"#{File.dirname(app_path)}\"; zip -r -q \"#{package_path}\" \"./#{escaped_filename}.dmg\" \"./#{escaped_filename}.html\" \"./#{escaped_filename}.xml\""
 
