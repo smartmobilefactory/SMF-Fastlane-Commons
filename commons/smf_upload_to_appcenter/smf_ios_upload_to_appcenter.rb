@@ -27,8 +27,13 @@ private_lane :smf_ios_upload_to_appcenter do |options|
     app_path = app_path.sub('.app', '.dmg')
 
     raise("Binary file #{app_path} does not exit. Nothing to upload.") unless File.exist?(app_path)
+
+    package_path = app_path.sub('.dmg', 'zip')
+
+    sh "cd \"#{File.dirname(app_path)}\"; zip -r -q \"#{package_path}\" \"./#{escaped_filename}.dmg\" \"./#{escaped_filename}.html\" \"./#{escaped_filename}.xml\""
+
     UI.message("app_path: #{app_path}")
-    app_path = zipped_path(app_path)
+    app_path = package_path
     UI.message("app_path: #{app_path}")
 
     UI.message('Upload mac app to AppCenter.')
