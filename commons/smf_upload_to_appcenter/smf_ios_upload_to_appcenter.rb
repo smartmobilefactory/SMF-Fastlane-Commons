@@ -7,6 +7,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
   path_to_ipa_or_app = options[:path_to_ipa_or_app]
   is_mac_app = !options[:is_mac_app].nil? ? options[:is_mac_app] : false
   destinations = options[:destinations].nil? ? "Collaborators" : options[:destinations]
+  sparkle_xml_name = options[:sparkle_xml_name]
 
   app_name, owner_name, owner_id = get_app_details(app_id)
 
@@ -30,7 +31,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
 
     package_path = app_path.sub('.dmg', '.dmg.zip')
 
-    sh "cd \"#{File.dirname(app_path)}\"; zip -r -q \"#{package_path}\" \"./#{escaped_filename}.dmg\" \"./#{escaped_filename}.html\" \"./*.xml\""
+    sh "cd \"#{File.dirname(app_path)}\"; zip -r -q \"#{package_path}\" \"./#{escaped_filename}.dmg\" \"./#{escaped_filename}.html\" \"./#{sparkle_xml_name}.xml\""
 
     UI.message("app_path: #{app_path}")
     app_path = package_path
