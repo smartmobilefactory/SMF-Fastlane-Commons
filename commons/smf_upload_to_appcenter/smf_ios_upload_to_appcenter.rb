@@ -28,6 +28,8 @@ private_lane :smf_ios_upload_to_appcenter do |options|
 
     raise("Binary file #{app_path} does not exit. Nothing to upload.") unless File.exist?(app_path)
 
+    app_path = zipped_path(app_path)
+    
     UI.message('Upload mac app to AppCenter.')
     appcenter_upload(
         api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
