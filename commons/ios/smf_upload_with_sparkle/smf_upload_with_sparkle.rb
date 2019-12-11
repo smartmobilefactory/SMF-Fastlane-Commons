@@ -29,7 +29,7 @@ private_lane :smf_upload_with_sparkle do |options|
   build_variant_private_env_key = @smf_fastlane_config[:build_variants][build_variant.to_sym][:sparkle][:signing_key]
   default_private_env_key = 'CUSTOM_SPARKLE_SIGNING_KEY'
 
-  env_key_to_use = build_variant_private_env_key.nil? && @platform == :macos ? default_private_env_key : build_variant_private_env_key
+  env_key_to_use = build_variant_private_env_key.nil? || @platform != :macos ? default_private_env_key : build_variant_private_env_key
   sparkle_private_key = ENV[env_key_to_use]
 
   UI.message("Using '#{env_key_to_use}' as private sparkle 🔑")
