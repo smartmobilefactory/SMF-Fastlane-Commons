@@ -26,7 +26,10 @@ private_lane :smf_upload_with_sparkle do |options|
   sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{dmg_path} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{app_name}")
 
   # Create appcast
-  sparkle_private_key = ENV['CUSTOM_SPARKLE_SIGNING_KEY']
+  build_variant_private_key = @smf_fastlane_config[:build_variants][build_variant.to_sym][:sparkle][:signing_key]
+  sparkle_private_key = build_variant_private_key.nil? && @platform == :macos ? ENV['CUSTOM_SPARKLE_SIGNING_KEY'] : ENV[build_variant_private_key]
+
+  UI.message("Using '#{sparkle_private_key}' as private sparkle 🔑")
 
   sh "#{@fastlane_commons_dir_path}/commons/ios/smf_upload_with_sparkle/sparkle.sh #{ENV['LOGIN']} #{sparkle_private_key} #{update_dir} #{sparkle_version} #{sparkle_signing_team}"
 
