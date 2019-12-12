@@ -15,7 +15,7 @@ private_lane :smf_upload_with_sparkle do |options|
   sparkle_xml_name = options[:sparkle_xml_name]
   sparkle_private_key = options[:sparkle_private_key]
 
-  if sparkle_private_key.nil? || ENV[sparkle_private_key]
+  if sparkle_private_key.nil? || ENV[sparkle_private_key].nil?
     UI.error("Sparkle private key is either not set in the Config.json, or there is no credential stored in Jenkins")
     raise "Error none existing private key credential"
   end
