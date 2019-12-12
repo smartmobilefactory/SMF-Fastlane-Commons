@@ -1,5 +1,10 @@
 private_lane :smf_upload_with_sparkle do |options|
 
+  if @platform != :macos
+    UI.error("Sparkle is only available for macOS, your are on: #{@platform.to_s}")
+    raise "Error using Sparkle on none macOS platform"
+  end
+
   build_variant = options[:build_variant]
   scheme = options[:scheme]
   sparkle_dmg_path = options[:sparkle_dmg_path]
@@ -8,6 +13,12 @@ private_lane :smf_upload_with_sparkle do |options|
   sparkle_version = options[:sparkle_version]
   sparkle_signing_team = options[:sparkle_signing_team]
   sparkle_xml_name = options[:sparkle_xml_name]
+  sparkle_private_key = options[:sparkle_private_key]
+
+  if sparkle_private_key.nil? || ENV[sparkle_private_key]
+    UI.error("Sparkle private key is either not set in the Config.json, or there is no credential stored in Jenkins")
+    raise "Error none existing private key credential"
+  end
 
   dmg_path = smf_path_to_dmg(build_variant)
   update_dir = "#{smf_workspace_dir}/build/"
@@ -26,13 +37,8 @@ private_lane :smf_upload_with_sparkle do |options|
   sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{dmg_path} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{app_name}")
 
   # Create appcast
-  build_variant_private_env_key = @smf_fastlane_config[:build_variants][build_variant.to_sym][:sparkle][:signing_key]
-  default_private_env_key = 'CUSTOM_SPARKLE_SIGNING_KEY'
-
-  env_key_to_use = build_variant_private_env_key.nil? || @platform != :macos ? default_private_env_key : build_variant_private_env_key
-  sparkle_private_key = ENV[env_key_to_use]
-
-  UI.message("Using '#{env_key_to_use}' as private sparkle 🔑")
+  UI.message("Using '#{sparkle_private_key}' as private sparkle 🔑")
+  sparkle_private_key = ENV[sparkle_private_key]
 
   sh "#{@fastlane_commons_dir_path}/commons/ios/smf_upload_with_sparkle/sparkle.sh #{ENV['LOGIN']} #{sparkle_private_key} #{update_dir} #{sparkle_version} #{sparkle_signing_team}"
 
