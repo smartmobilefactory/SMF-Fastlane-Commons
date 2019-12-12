@@ -163,9 +163,7 @@ def smf_path_to_renamed_app(build_variant, new_app_name)
   app_file_path = smf_path_to_ipa_or_app(build_variant)
 
   if !new_app_name.nil?
-    file_extension = File.extname(app_file_path)
-    new_app_name += file_extension
-    new_app_file_path = File.join(File.dirname(app_file_path), new_app_name)
+    new_app_file_path = smf_workspace_dir + "/build/#{new_app_name}.app"
   else
     return app_file_path
   end
