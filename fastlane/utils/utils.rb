@@ -159,8 +159,35 @@ def smf_path_to_ipa_or_app(build_variant)
   app_path
 end
 
-def smf_path_to_dmg(build_variant)
-  app_path = smf_path_to_ipa_or_app(build_variant)
+def smf_path_to_renamed_app(build_variant, new_app_name)
+  app_file_path = smf_path_to_ipa_or_app(build_variant)
+
+  if !new_app_name.nil?
+    file_extension = File.extname(app_file_path)
+    new_app_name += file_extension
+    new_app_file_path = File.join(File.dirname(app_file_path), new_app_name)
+  else
+    return app_file_path
+  end
+
+  new_app_file_path
+end
+
+def smf_rename_app_file(build_variant, new_app_name)
+
+  if !new_app_name.nil?
+    app_file_path = smf_path_to_ipa_or_app(build_variant)
+    new_app_file_path = smf_path_to_renamed_app(build_variant, new_app_name)
+    UI.message("Renaming #{app_file_path} to #{new_app_file_path}")
+    File.rename(app_file_path, new_app_file_path)
+  else
+    UI.message("There is no app name provided in this build_variants Config.json, specify one, if the app should be renamed.")
+  end
+
+end
+
+def smf_path_to_dmg(build_variant, new_app_name)
+  app_path = smf_path_to_renamed_app(build_variant, new_app_name)
   dmg_path = app_path.sub('.app', '.dmg')
 
   dmg_path

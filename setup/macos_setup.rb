@@ -53,6 +53,12 @@ end
 
 lane :smf_build do |options|
   smf_super_build(options)
+
+  # Rename .app file
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+  new_app_name = @smf_fastlane_config[:build_variants][build_variant.to_sym][:app_name]
+
+  smf_rename_app_file(build_variant, new_app_name)
 end
 
 
@@ -149,10 +155,11 @@ private_lane :smf_super_create_dmg_and_gatekeeper do |options|
 
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
+  app_name = build_variant_config[:app_name]
 
   dmg_path = smf_create_dmg_from_app(
-      build_variant: build_variant,
-      team_id: build_variant_config[:team_id]
+      team_id: build_variant_config[:team_id],
+      app_path: smf_path_to_renamed_app(build_variant, app_name)
   )
 
   notarize(
@@ -204,6 +211,7 @@ private_lane :smf_super_pipeline_upload_with_sparkle do |options|
   smf_upload_with_sparkle(
       build_variant: build_variant,
       scheme: build_variant_config[:scheme],
+      app_name: build_variant_config[:app_name],
       sparkle_dmg_path: sparkle_config[:dmg_path],
       sparkle_upload_user: sparkle_config[:upload_user],
       sparkle_upload_url: sparkle_config[:upload_url],
