@@ -145,7 +145,7 @@ end
 def smf_path_to_ipa_or_app(build_variant)
 
   if !ENV['APP_NAME'].nil?
-    UI.messages("Using app name: #{ENV['APP_NAME']} from Info.plist to construct .app path")
+    UI.message("Using app name: #{ENV['APP_NAME']} from Info.plist to construct .app path")
     return smf_workspace_dir + "/build/#{ENV['APP_NAME']}.app"
   end
 
