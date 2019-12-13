@@ -7,7 +7,7 @@ Uploads the .dmg to Sparkle.
 ```
 smf_upload_with_sparkle(
     build_variant: "alpha",                     # The currently building build variant
-    scheme: <scheme>,                   
+    scheme: <scheme>,                           
     sparkle_dmg_path: <path to file>,           # The Path to the .dmg file
     sparkle_upload_user: <>,
     sparkle_upload_url: <>,
