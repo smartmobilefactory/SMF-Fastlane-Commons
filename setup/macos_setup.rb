@@ -53,6 +53,10 @@ end
 
 lane :smf_build do |options|
   smf_super_build(options)
+
+  # Rename .app file
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+  smf_rename_app_file(build_variant)
 end
 
 
