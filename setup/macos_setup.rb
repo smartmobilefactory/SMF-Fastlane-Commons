@@ -156,7 +156,7 @@ private_lane :smf_super_create_dmg_and_gatekeeper do |options|
 
   dmg_path = smf_create_dmg_from_app(
       team_id: build_variant_config[:team_id],
-      app_path: smf_path_to_renamed_app(build_variant)
+      app_path: smf_path_to_ipa_or_app(build_variant)
   )
 
   notarize(
@@ -208,7 +208,6 @@ private_lane :smf_super_pipeline_upload_with_sparkle do |options|
   smf_upload_with_sparkle(
       build_variant: build_variant,
       scheme: build_variant_config[:scheme],
-      app_name: @app_name,
       sparkle_dmg_path: sparkle_config[:dmg_path],
       sparkle_upload_user: sparkle_config[:upload_user],
       sparkle_upload_url: sparkle_config[:upload_url],
