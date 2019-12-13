@@ -213,7 +213,8 @@ private_lane :smf_super_pipeline_upload_with_sparkle do |options|
       sparkle_upload_url: sparkle_config[:upload_url],
       sparkle_version: sparkle_config[:sparkle_version],
       sparkle_signing_team: sparkle_config[:sparkle_signing_team],
-      sparkle_xml_name: sparkle_config[:xml_name]
+      sparkle_xml_name: sparkle_config[:xml_name],
+      sparkle_private_key: sparkle_config[:signing_key]
   ) if build_variant_config[:use_sparkle] == true
 end
 
