@@ -77,6 +77,9 @@ if [ -z $APPPATH ]; then
 	usage
 fi
 
+echo "App path is: $APPPATH"
+echo "App name is: ${$(basename $APPPATH)%.*}"
+
 INFO_PLIST=$APPPATH/Contents/Info.plist
 NAME=${$(basename $APPPATH)%.*}
 VOLNAME=$NAME
