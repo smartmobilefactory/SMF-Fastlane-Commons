@@ -7,7 +7,7 @@ Example Call:
 
 ```
 smf_create_dmg_from_app(
-    team_id: "JZ2H644EU7",                  # The Team ID to use for the Apple Member Center.
-    app_path = "example/path/TheApp.app"    # The path to the .app file
+    build_variant: <the current build variant>  
+    team_id: "JZ2H644EU7",                      # The Team ID to use for the Apple Member Center.
 )
 ```
