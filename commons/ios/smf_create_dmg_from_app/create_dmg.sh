@@ -78,7 +78,7 @@ if [ -z $APPPATH ]; then
 fi
 
 INFO_PLIST=$APPPATH/Contents/Info.plist
-NAME=$(defaults read $INFO_PLIST CFBundleName)
+NAME=${$(basename $APPPATH)%.*}
 VOLNAME=$NAME
 VERSION=$(defaults read $INFO_PLIST CFBundleShortVersionString)
 SHORT_VERSION=$(defaults read $INFO_PLIST CFBundleVersion)
