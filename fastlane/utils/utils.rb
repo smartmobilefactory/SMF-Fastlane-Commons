@@ -145,6 +145,7 @@ end
 def smf_path_to_ipa_or_app(build_variant)
 
   if !@app_name.nil?
+    UI.messages("Using app name: #{@app_name} from Info.plist to construct .app path")
     return smf_workspace_dir + "/build/#{@app_name}.app"
   end
 
@@ -167,7 +168,7 @@ def smf_rename_app_file(build_variant)
 
   app_file_path = smf_path_to_ipa_or_app(build_variant)
   info_plist_path=File.join(app_file_path,"/Contents/Info.plist")
-  app_name=sh("defaults read #{info_plist_path} CFBundleName")
+  app_name= sh("defaults read #{info_plist_path} CFBundleName").gsub("\n", '')
 
   @app_name = app_name
   new_app_file_path = smf_path_to_ipa_or_app(build_variant)
