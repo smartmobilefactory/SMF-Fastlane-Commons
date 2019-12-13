@@ -159,10 +159,10 @@ def smf_path_to_ipa_or_app(build_variant)
   app_path
 end
 
-def smf_path_to_renamed_app(build_variant, new_app_name)
+def smf_path_to_renamed_app(build_variant)
 
-  if !new_app_name.nil?
-    new_app_file_path = smf_workspace_dir + "/build/#{new_app_name}.app"
+  if !@app_name.nil?
+    new_app_file_path = smf_workspace_dir + "/build/#{@app_name}.app"
   else
     return smf_path_to_ipa_or_app(build_variant)
   end
@@ -172,11 +172,14 @@ def smf_path_to_renamed_app(build_variant, new_app_name)
   new_app_file_path
 end
 
-def smf_rename_app_file(build_variant, new_app_name)
+def smf_rename_app_file(build_variant)
 
   if !new_app_name.nil?
     app_file_path = smf_path_to_ipa_or_app(build_variant)
-    new_app_file_path = smf_path_to_renamed_app(build_variant, new_app_name)
+    info_plist_path=File.join(app_file_path,"/Contents/Info.plist")
+    app_name=sh("defaults read #{info_plist_path} CFBundleName")
+    @app_name = app_name
+    new_app_file_path = smf_path_to_renamed_app(build_variant, @app_name)
     UI.message("Renaming #{app_file_path} to #{new_app_file_path}")
     File.rename(app_file_path, new_app_file_path)
   else
@@ -185,11 +188,15 @@ def smf_rename_app_file(build_variant, new_app_name)
 
 end
 
-def smf_path_to_dmg(build_variant, new_app_name)
-  app_path = smf_path_to_renamed_app(build_variant, new_app_name)
+def smf_path_to_dmg(build_variant)
+  app_path = smf_path_to_renamed_app(build_variant)
   dmg_path = app_path.sub('.app', '.dmg')
 
   dmg_path
+end
+
+def smf_get_macos_app_name
+
 end
 
 def smf_ci_ios_error_log

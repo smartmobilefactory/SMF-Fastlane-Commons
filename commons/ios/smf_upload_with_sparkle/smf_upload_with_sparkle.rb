@@ -2,7 +2,6 @@ private_lane :smf_upload_with_sparkle do |options|
 
   build_variant = options[:build_variant]
   scheme = options[:scheme]
-  app_name = options[:app_name]
   sparkle_dmg_path = options[:sparkle_dmg_path]
   sparkle_upload_user = options[:sparkle_upload_user]
   sparkle_upload_url = options[:sparkle_upload_url]
@@ -10,7 +9,7 @@ private_lane :smf_upload_with_sparkle do |options|
   sparkle_signing_team = options[:sparkle_signing_team]
   sparkle_xml_name = options[:sparkle_xml_name]
 
-  dmg_path = smf_path_to_dmg(build_variant, app_name)
+  dmg_path = smf_path_to_dmg(build_variant)
   update_dir = "#{smf_workspace_dir}/build/"
 
   release_notes = smf_read_changelog(html: true)
