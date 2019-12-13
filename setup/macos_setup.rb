@@ -155,8 +155,8 @@ private_lane :smf_super_create_dmg_and_gatekeeper do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
   dmg_path = smf_create_dmg_from_app(
-      build_variant: build_variant
-      team_id: build_variant_config[:team_id],
+      build_variant: build_variant,
+      team_id: build_variant_config[:team_id]
   )
 
   notarize(
