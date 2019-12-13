@@ -78,7 +78,9 @@ if [ -z $APPPATH ]; then
 fi
 
 echo "App path is: $APPPATH"
-echo "App name is: ${$(basename $APPPATH)%.*}"
+echo "App name is: $(basename $APPPATH)"
+
+exit 1
 
 INFO_PLIST=$APPPATH/Contents/Info.plist
 NAME=${$(basename $APPPATH)%.*}
