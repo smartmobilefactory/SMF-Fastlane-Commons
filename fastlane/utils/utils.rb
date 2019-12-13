@@ -185,10 +185,6 @@ def smf_path_to_dmg(build_variant)
   dmg_path
 end
 
-def smf_get_macos_app_name
-
-end
-
 def smf_ci_ios_error_log
   $SMF_CI_IOS_ERROR_LOG.to_s
 end
