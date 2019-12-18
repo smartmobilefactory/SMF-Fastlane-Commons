@@ -53,6 +53,10 @@ end
 
 lane :smf_build do |options|
   smf_super_build(options)
+
+  # Rename .app file
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+  smf_rename_app_file(build_variant)
 end
 
 
@@ -209,7 +213,8 @@ private_lane :smf_super_pipeline_upload_with_sparkle do |options|
       sparkle_upload_url: sparkle_config[:upload_url],
       sparkle_version: sparkle_config[:sparkle_version],
       sparkle_signing_team: sparkle_config[:sparkle_signing_team],
-      sparkle_xml_name: sparkle_config[:xml_name]
+      sparkle_xml_name: sparkle_config[:xml_name],
+      sparkle_private_key: sparkle_config[:signing_key]
   ) if build_variant_config[:use_sparkle] == true
 end
 
