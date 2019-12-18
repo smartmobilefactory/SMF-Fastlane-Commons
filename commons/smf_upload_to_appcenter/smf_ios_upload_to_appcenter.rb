@@ -6,7 +6,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
   escaped_filename = options[:escaped_filename]
   path_to_ipa_or_app = options[:path_to_ipa_or_app]
   is_mac_app = !options[:is_mac_app].nil? ? options[:is_mac_app] : false
-  destinations = options[:destinations].nil? ? "Collaborators" : options[:destinations]
+  destinations = options[:destinations].nil? ? 'Collaborators' : options[:destinations]
   sparkle_xml_name = options[:sparkle_xml_name]
   upload_to_appcenter = options[:upload_to_appcenter]
 
@@ -29,6 +29,28 @@ private_lane :smf_ios_upload_to_appcenter do |options|
     app_path = app_path.sub('.app', '.dmg')
 
     raise("Binary file #{app_path} does not exit. Nothing to upload.") unless File.exist?(app_path)
+
+    begin
+      su_feed_url = get_ipa_info_plist_value(ipa: app_path, key: 'SUFeedURL')
+
+      su_feed_url = !su_feed_url.nil? ? su_feed_url : ''
+
+      UI.message("su_feed_url: #{su_feed_url.to_s}")
+
+      doc = File.open(sparkle_xml_name) { |f| Nokogiri::XML(f) }
+      UI.message(doc.to_s)
+      description = doc.at_css('rss channel item description')
+      description.add_next_sibling("<sparkle:releaseNotesLink>#{su_feed_url}</sparkle:releaseNotesLink>")
+      description.remove
+      doc.xpath('//text()').find_all { |t| t.to_s.strip == '' }.map(&:remove)
+      UI.message(doc.to_s)
+
+      File.open(sparkle_xml_name, 'w+') do |f|
+        f.write(doc)
+      end
+    rescue => exception
+      UI.important('An error occurred during changing item description to sparkle:releaseNotesLink. Will continue.')
+    end
 
     if upload_to_appcenter
       package_path = app_path.sub_ext('.zip')
