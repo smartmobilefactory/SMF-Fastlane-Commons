@@ -8,6 +8,7 @@ Example Call:
 ```
 smf_create_dmg_from_app(
     build_variant: <the current build variant>  
-    team_id: "JZ2H644EU7",                      # The Team ID to use for the Apple Member Center.
+    team_id: "JZ2H644EU7",                          # The Team ID to use for the Apple Member Center.
+    code_signing_identity: <code signing identity>  # Optional, used for code signing the .dmg if provided
 )
 ```

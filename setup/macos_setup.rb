@@ -156,7 +156,8 @@ private_lane :smf_super_create_dmg_and_gatekeeper do |options|
 
   dmg_path = smf_create_dmg_from_app(
       build_variant: build_variant,
-      team_id: build_variant_config[:team_id]
+      team_id: build_variant_config[:team_id],
+      code_signing_identity: build_variant_config[:code_signing_identity]
   )
 
   smf_notarize(
