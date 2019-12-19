@@ -110,7 +110,7 @@ fi
 #
 
 if [ -n $CODE_SIGN_ID ]; then
-	codesign -s $CODE_SIGN_ID ${APPDIR}/${NAME}.dmg
+	codesign -s '$CODE_SIGN_ID' ${APPDIR}/${NAME}.dmg
 	if [ $? -gt 0 ]; then
 		echo "Abort: Error code signing the DMG"
 		exit 1
