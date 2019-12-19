@@ -3,7 +3,7 @@ private_lane :smf_notarize do |options|
   should_notarize = options[:should_notarize]
 
   if should_notarize != true || @platform != :macos
-    return
+    next
   end
 
   dmg_path = options[:dmg_path]
