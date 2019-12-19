@@ -2,7 +2,7 @@ private_lane :smf_notarize do |options|
 
   should_notarize = options[:should_notarize]
 
-  if should_notarize == false || @platform != :macos
+  if should_notarize != true || @platform != :macos
     return
   end
 
