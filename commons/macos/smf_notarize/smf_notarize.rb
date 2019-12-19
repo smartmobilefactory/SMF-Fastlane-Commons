@@ -3,6 +3,7 @@ private_lane :smf_notarize do |options|
   should_notarize = options[:should_notarize]
 
   if should_notarize != true || @platform != :macos
+    UI.message("Notarization is not enabled for this build variant, or the platform is not macOS")
     next
   end
 
