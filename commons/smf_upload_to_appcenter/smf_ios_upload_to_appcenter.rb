@@ -24,28 +24,20 @@ private_lane :smf_ios_upload_to_appcenter do |options|
   app_path = path_to_ipa_or_app
 
   if is_mac_app
-    version_number = smf_get_version_number(build_variant)
-
     info_plist_path = File.join(app_path, '/Contents/Info.plist')
-
+    version_number = smf_get_version_number(build_variant)
     app_path = app_path.sub('.app', '.dmg')
 
     raise("Binary file #{app_path} does not exit. Nothing to upload.") unless File.exist?(app_path)
 
     begin
-
       su_feed_url = sh("defaults read #{info_plist_path} SUFeedURL").gsub("\n", '')
-
-      UI.message("su_feed_url: #{su_feed_url.to_s}")
-
       sparkle_xml_path = Pathname.getwd.dirname.to_s + "/build/#{sparkle_xml_name}"
       doc = File.open(sparkle_xml_path) { |f| Nokogiri::XML(f) }
-      UI.message(doc.to_s)
       description = doc.at_css('rss channel item description')
       description.add_next_sibling("<sparkle:releaseNotesLink>#{su_feed_url}</sparkle:releaseNotesLink>")
       description.remove
       doc.xpath('//text()').find_all { |t| t.to_s.strip == '' }.map(&:remove)
-      UI.message(doc.to_s)
 
       File.open(sparkle_xml_path, 'w+') do |f|
         f.write(doc)
@@ -89,10 +81,4 @@ private_lane :smf_ios_upload_to_appcenter do |options|
         release_notes: smf_read_changelog
     )
   end
-
-#smf_create_appcenter_push(
-#  app_owner: owner_id,
-#  app_display_name: app_name,
-#  app_id: app_id
-#)
 end
