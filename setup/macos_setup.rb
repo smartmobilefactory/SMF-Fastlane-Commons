@@ -156,16 +156,18 @@ private_lane :smf_super_create_dmg_and_gatekeeper do |options|
 
   dmg_path = smf_create_dmg_from_app(
       build_variant: build_variant,
-      team_id: build_variant_config[:team_id]
+      team_id: build_variant_config[:team_id],
+      code_signing_identity: build_variant_config[:code_signing_identity]
   )
 
-  notarize(
-      package: dmg_path,
-      bundle_id: build_variant_config[:bundle_identifier],
-      username: build_variant_config[:apple_id],
-      asc_provider: build_variant_config[:team_id],
-      print_log: false
-  ) if build_variant_config[:notarize] == true
+  smf_notarize(
+    should_notarize: build_variant_config[:notarize],
+    dmg_path: dmg_path,
+    bundle_id: build_variant_config[:bundle_identifier],
+    username: build_variant_config[:apple_id],
+    asc_provider: build_variant_config[:team_id],
+    custom_provider: build_variant_config[:notarization_custom_provider]
+  )
 
 end
 
