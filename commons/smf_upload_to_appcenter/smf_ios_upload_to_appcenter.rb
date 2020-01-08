@@ -26,13 +26,13 @@ private_lane :smf_ios_upload_to_appcenter do |options|
   if is_mac_app
     version_number = smf_get_version_number(build_variant)
 
+    info_plist_path = File.join(app_path, '/Contents/Info.plist')
+
     app_path = app_path.sub('.app', '.dmg')
 
     raise("Binary file #{app_path} does not exit. Nothing to upload.") unless File.exist?(app_path)
 
     begin
-
-      info_plist_path = File.join(app_path, '/Contents/Info.plist')
 
       su_feed_url = sh("defaults read #{info_plist_path} SUFeedURL").gsub("\n", '')
 
