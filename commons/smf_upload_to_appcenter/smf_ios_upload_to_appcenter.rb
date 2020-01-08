@@ -8,11 +8,11 @@ private_lane :smf_ios_upload_to_appcenter do |options|
   is_mac_app = !options[:is_mac_app].nil? ? options[:is_mac_app] : false
   destinations = options[:destinations].nil? ? 'Collaborators' : options[:destinations]
   sparkle_xml_name = options[:sparkle_xml_name]
-  upload_to_appcenter = options[:upload_to_appcenter]
+  upload_sparkle = options[:upload_sparkle]
 
   app_name, owner_name, owner_id = get_app_details(app_id)
 
-  dsym_path = Pathname.getwd.dirname.to_s + "/build/#{escaped_filename}.app.dSYM.zip"
+  dsym_path = "#{smf_workspace_dir}/build/#{escaped_filename}.app.dSYM.zip"
   UI.message("Constructed the dsym path \"#{dsym_path}\"")
   unless File.exist?(dsym_path)
     dsym_path = nil
@@ -32,7 +32,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
 
 
     su_feed_url = sh("defaults read #{info_plist_path} SUFeedURL").gsub("\n", '')
-    sparkle_xml_path = Pathname.getwd.dirname.to_s + "/build/#{sparkle_xml_name}"
+    sparkle_xml_path = "#{smf_workspace_dir}/build/#{sparkle_xml_name}"
     doc = File.open(sparkle_xml_path) { |f| Nokogiri::XML(f) }
     description = doc.at_css('rss channel item description')
     description.add_next_sibling("<sparkle:releaseNotesLink>#{su_feed_url}</sparkle:releaseNotesLink>")
@@ -43,7 +43,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
       f.write(doc)
     end
 
-    if upload_to_appcenter
+    if upload_sparkle
       package_path = app_path.sub_ext('.zip')
       sh "cd \"#{File.dirname(app_path)}\"; zip -r -q \"#{package_path}\" \"./#{escaped_filename}.dmg\" \"./#{escaped_filename}.html\" \"./#{sparkle_xml_name}\""
       app_path = package_path
