@@ -48,6 +48,8 @@ def _smf_can_unit_tests_be_preformed(project_name, scheme, unit_test_xcconfig_na
 
   destination = testing_for_mac ? "platform=macOS,arch=x86_64" : nil
 
+  UI.message("Using destination: #{destination}")
+
   begin
     scan(
         workspace: "#{project_name}.xcworkspace",

@@ -62,19 +62,22 @@ private_lane :smf_pod_super_unit_tests do |options|
     build_variant_config = @smf_fastlane_config[:build_variants][variant.to_sym]
     testing_for_mac = build_variant_config[:platform] == 'mac'
 
-    UI.message("Downloading provisioning profiles for variant '#{variant}'")
+    if !testing_for_mac and build_variant_config[:download_provisioning_profiles] != false
 
-    smf_download_provisioning_profiles(
-        team_id: build_variant_config[:team_id],
-        apple_id: build_variant_config[:apple_id],
-        use_wildcard_signing: build_variant_config[:use_wildcard_signing],
-        bundle_identifier: build_variant_config[:bundle_identifier],
-        use_default_match_config: build_variant_config[:match].nil?,
-        match_read_only: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:read_only],
-        match_type: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:type],
-        extensions_suffixes: @smf_fastlane_config[:extensions_suffixes],
-        build_variant: variant
-    ) if !testing_for_mac and build_variant_config[:download_provisioning_profiles] != false
+      UI.message("Downloading provisioning profiles for variant '#{variant}'")
+
+      smf_download_provisioning_profiles(
+          team_id: build_variant_config[:team_id],
+          apple_id: build_variant_config[:apple_id],
+          use_wildcard_signing: build_variant_config[:use_wildcard_signing],
+          bundle_identifier: build_variant_config[:bundle_identifier],
+          use_default_match_config: build_variant_config[:match].nil?,
+          match_read_only: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:read_only],
+          match_type: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:type],
+          extensions_suffixes: @smf_fastlane_config[:extensions_suffixes],
+          build_variant: variant
+      )
+    end
 
     UI.message("Running unit tests for variant '#{variant}' for PR Check")
 
