@@ -50,7 +50,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
         f.write(doc)
       end
     rescue => exception
-      UI.important('An error occurred during changing item description to sparkle:releaseNotesLink. Will continue.')
+      UI.important("An error occurred during changing item description to sparkle:releaseNotesLink: #{exception}\nWill continue.")
     end
 
     if upload_to_appcenter
