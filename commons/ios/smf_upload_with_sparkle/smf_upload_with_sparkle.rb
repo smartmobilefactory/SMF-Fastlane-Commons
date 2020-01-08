@@ -43,7 +43,7 @@ private_lane :smf_upload_with_sparkle do |options|
 
   sh "#{@fastlane_commons_dir_path}/commons/ios/smf_upload_with_sparkle/sparkle.sh #{ENV['LOGIN']} #{sparkle_private_key} #{update_dir} #{sparkle_version} #{sparkle_signing_team}"
 
-  _smf_prepare_sparkle_xml_for_upload
+  _smf_prepare_sparkle_xml_for_upload(build_variant, sparkle_xml_name)
 
   unless sparkle_upload_url.nil? || sparkle_upload_user.nil?
     appcast_xml = "#{update_dir}#{sparkle_xml_name}"
@@ -52,7 +52,7 @@ private_lane :smf_upload_with_sparkle do |options|
   end
 end
 
-def _smf_prepare_sparkle_xml_for_upload
+def _smf_prepare_sparkle_xml_for_upload(build_variant, sparkle_xml_name)
   UI.message('Prepare sparkle xml file for upload.')
   info_plist_path = File.join(smf_path_to_ipa_or_app(build_variant), '/Contents/Info.plist')
   su_feed_url = sh("defaults read #{info_plist_path} SUFeedURL").gsub("\n", '')
