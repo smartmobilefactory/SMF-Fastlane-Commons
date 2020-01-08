@@ -31,9 +31,10 @@ private_lane :smf_ios_upload_to_appcenter do |options|
     raise("Binary file #{app_path} does not exit. Nothing to upload.") unless File.exist?(app_path)
 
     begin
-      su_feed_url = get_ipa_info_plist_value(ipa: app_path, key: 'SUFeedURL')
 
-      su_feed_url = !su_feed_url.nil? ? su_feed_url : ''
+      info_plist_path = File.join(app_path, '/Contents/Info.plist')
+
+      su_feed_url = sh("defaults read #{info_plist_path} SUFeedURL").gsub("\n", '')
 
       UI.message("su_feed_url: #{su_feed_url.to_s}")
 
