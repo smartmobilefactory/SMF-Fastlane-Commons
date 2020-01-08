@@ -38,7 +38,8 @@ private_lane :smf_ios_upload_to_appcenter do |options|
 
       UI.message("su_feed_url: #{su_feed_url.to_s}")
 
-      doc = File.open(sparkle_xml_name) { |f| Nokogiri::XML(f) }
+      sparkle_xml_path = Pathname.getwd.dirname.to_s + "/build/#{sparkle_xml_name}"
+      doc = File.open(sparkle_xml_path) { |f| Nokogiri::XML(f) }
       UI.message(doc.to_s)
       description = doc.at_css('rss channel item description')
       description.add_next_sibling("<sparkle:releaseNotesLink>#{su_feed_url}</sparkle:releaseNotesLink>")
@@ -46,7 +47,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
       doc.xpath('//text()').find_all { |t| t.to_s.strip == '' }.map(&:remove)
       UI.message(doc.to_s)
 
-      File.open(sparkle_xml_name, 'w+') do |f|
+      File.open(sparkle_xml_path, 'w+') do |f|
         f.write(doc)
       end
     rescue => exception
