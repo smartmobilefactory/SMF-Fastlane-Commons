@@ -30,20 +30,17 @@ private_lane :smf_ios_upload_to_appcenter do |options|
 
     raise("Binary file #{app_path} does not exit. Nothing to upload.") unless File.exist?(app_path)
 
-    begin
-      su_feed_url = sh("defaults read #{info_plist_path} SUFeedURL").gsub("\n", '')
-      sparkle_xml_path = Pathname.getwd.dirname.to_s + "/build/#{sparkle_xml_name}"
-      doc = File.open(sparkle_xml_path) { |f| Nokogiri::XML(f) }
-      description = doc.at_css('rss channel item description')
-      description.add_next_sibling("<sparkle:releaseNotesLink>#{su_feed_url}</sparkle:releaseNotesLink>")
-      description.remove
-      doc.xpath('//text()').find_all { |t| t.to_s.strip == '' }.map(&:remove)
 
-      File.open(sparkle_xml_path, 'w+') do |f|
-        f.write(doc)
-      end
-    rescue => exception
-      UI.important("An error occurred during changing item description to sparkle:releaseNotesLink: #{exception}\nWill continue.")
+    su_feed_url = sh("defaults read #{info_plist_path} SUFeedURL").gsub("\n", '')
+    sparkle_xml_path = Pathname.getwd.dirname.to_s + "/build/#{sparkle_xml_name}"
+    doc = File.open(sparkle_xml_path) { |f| Nokogiri::XML(f) }
+    description = doc.at_css('rss channel item description')
+    description.add_next_sibling("<sparkle:releaseNotesLink>#{su_feed_url}</sparkle:releaseNotesLink>")
+    description.remove
+    doc.xpath('//text()').find_all { |t| t.to_s.strip == '' }.map(&:remove)
+
+    File.open(sparkle_xml_path, 'w+') do |f|
+      f.write(doc)
     end
 
     if upload_to_appcenter
