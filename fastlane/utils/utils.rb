@@ -63,6 +63,8 @@ def smf_get_default_name_of_app(build_variant)
   build_number = smf_get_build_number_of_app
   project_name = @smf_fastlane_config[:project][:project_name]
 
+  UI.message("#{project_name} #{build_number}")
+
   version_number = smf_get_version_number(build_variant)
   if version_number.nil?
     version_number = ''
@@ -93,6 +95,7 @@ def smf_get_build_number_of_app
   when :ios, :ios_framework, :macos
     project_name = @smf_fastlane_config[:project][:project_name]
     build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
+    UI.message("#{project_name} #{build_number}")
   when :android
     build_number = @smf_fastlane_config[:app_version_code].to_s
   when :flutter
@@ -103,10 +106,12 @@ def smf_get_build_number_of_app
   end
 
   if build_number.include? '.'
+    UI.message("included a .")
     parts = build_number.split('.')
     build_number = parts[0]
   end
 
+  UI.message("return #{build_number}")
   build_number
 end
 
