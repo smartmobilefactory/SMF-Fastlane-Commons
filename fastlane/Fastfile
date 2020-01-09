@@ -156,6 +156,8 @@ error do |lane, exception, options|
     raise 'Unknown Platform'
   end
 
+  UI.message("Handle Exeption")
+
   smf_handle_exception(
     exception: exception,
     name: name,

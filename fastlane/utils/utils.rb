@@ -66,11 +66,14 @@ def smf_get_default_name_of_app(build_variant)
   UI.message("#{project_name} #{build_number}")
 
   version_number = smf_get_version_number(build_variant)
+  UI.message("#{version_number}")
   if version_number.nil?
     version_number = ''
   else
     version_number += ' '
   end
+
+  UI.message("return \"#{project_name} #{build_variant.upcase} #{version_number}(#{build_number})\"")
 
   "#{project_name} #{build_variant.upcase} #{version_number}(#{build_number})"
 end
