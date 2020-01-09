@@ -132,6 +132,7 @@ smf_load_fastlane_config
 desc 'Called on error'
 error do |lane, exception, options|
   UI.error("Exception: #{exception.to_s} was called from lane #{lane.to_s}.")
+  UI.error("options: #{options}")
 
   build_variant = options[:build_variant]
 
