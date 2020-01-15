@@ -14,9 +14,13 @@ end
 can_merge = github.pr_json["mergeable"]
 warn("This PR cannot be merged yet.", sticky: false) unless can_merge
 
-## TODOs:
-todoist.warn_for_todos
-todoist.print_todos_table
+begin
+  ## TODOs:
+  todoist.warn_for_todos
+  todoist.print_todos_table
+rescue
+  message("Todoist could not be executed")
+end
 
 ## LINT:
 JSON.parse(ENV["DANGER_ANDROID_LINT_PATHS"]).each do |lint_path|
