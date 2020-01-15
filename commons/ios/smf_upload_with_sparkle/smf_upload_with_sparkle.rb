@@ -57,9 +57,9 @@ def _smf_prepare_sparkle_xml_for_upload(build_variant, sparkle_xml_name, release
   # Read SUFeedUrl to get URL
   info_plist_path = File.join(smf_path_to_ipa_or_app(build_variant), '/Contents/Info.plist')
   su_feed_url = sh("defaults read #{info_plist_path} SUFeedURL").gsub("\n", '')
-
+  UI.message("su_feed_url: #{su_feed_url}")
   # set releaseNotesLink to URL of the .html file, which contains the release notes
-  html_url = su_feed_url.gsub(/[^\/]*$/,release_notes_name)
+  html_url = su_feed_url.gsub(/[^\/]+$/,release_notes_name)
   UI.message("Created html url: #{html_url}")
   sparkle_xml_path = "#{smf_workspace_dir}/build/#{sparkle_xml_name}"
   doc = File.open(sparkle_xml_path) { |f| Nokogiri::XML(f) }
