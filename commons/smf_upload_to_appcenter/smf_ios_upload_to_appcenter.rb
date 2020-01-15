@@ -32,27 +32,36 @@ private_lane :smf_ios_upload_to_appcenter do |options|
     UI.message("app_path = #{app_path}")
 
     if upload_sparkle
-      package_path = "#{app_path}.zip"
+      package_path = "#{app_path}.zip".sub('.dmg', '.app')
       sh "cd \"#{File.dirname(app_path)}\"; zip -r -q \"#{package_path}\" \"./#{escaped_filename}.dmg\" \"./#{escaped_filename}.html\" \"./#{sparkle_xml_name}\""
       app_path = package_path
+      UI.message('Upload mac app to AppCenter.')
+      UI.message("app_path = #{app_path}")
+      appcenter_upload(
+          api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
+          owner_name: owner_name,
+          app_name: app_name,
+          file: app_path,
+          dsym: dsym_path,
+          notify_testers: true,
+          destinations: destinations,
+          release_notes: smf_read_changelog
+      )
+    else
+      UI.message('Upload mac app to AppCenter.')
+      appcenter_upload(
+          api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
+          owner_name: owner_name,
+          app_name: app_name,
+          build_number: build_number,
+          version: version_number,
+          file: app_path,
+          dsym: dsym_path,
+          notify_testers: true,
+          destinations: destinations,
+          release_notes: smf_read_changelog
+      )
     end
-
-    UI.message("app_path = #{app_path}")
-
-    UI.message('Upload mac app to AppCenter.')
-    appcenter_upload(
-        api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
-        owner_name: owner_name,
-        app_name: app_name,
-        app_os: 'MacOS',
-        build_number: build_number,
-        version: version_number,
-        file: app_path,
-        dsym: dsym_path,
-        notify_testers: true,
-        destinations: destinations,
-        release_notes: smf_read_changelog
-    )
   else
 
     raise("Binary file #{app_path} does not exit. Nothing to upload.") unless File.exist?(app_path)
