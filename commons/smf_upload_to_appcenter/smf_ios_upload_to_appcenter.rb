@@ -27,10 +27,10 @@ private_lane :smf_ios_upload_to_appcenter do |options|
     version_number = smf_get_version_number(build_variant)
     app_path = app_path.sub('.app', '.dmg')
 
-    raise("Binary file #{app_path} does not exit. Nothing to upload.") unless File.exist?(app_path)
+    raise("Binary file #{app_path} does not exist. Nothing to upload.") unless File.exist?(app_path)
 
     if upload_sparkle
-      package_path = "#{app_path}.zip"
+      package_path = "#{app_path}.zip".sub('.dmg', '.app')
       sh "cd \"#{File.dirname(app_path)}\"; zip -r -q \"#{package_path}\" \"./#{escaped_filename}.dmg\" \"./#{escaped_filename}.html\" \"./#{sparkle_xml_name}\""
       app_path = package_path
     end
