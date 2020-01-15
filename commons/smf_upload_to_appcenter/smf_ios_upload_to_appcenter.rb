@@ -33,7 +33,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
 
     if upload_sparkle
       package_path = "#{app_path}.zip".sub('.dmg', '.app')
-      sh "cd \"#{File.dirname(app_path)}\"; zip -r -q \"#{package_path}\" \"./#{escaped_filename}_copy.app\" \"./#{escaped_filename}.dmg\" \"./#{escaped_filename}.html\" \"./#{sparkle_xml_name}\""
+      sh "cd \"#{File.dirname(app_path)}\"; zip -r -q \"#{package_path}\" \"./#{escaped_filename}.app\" \"./#{escaped_filename}.dmg\" \"./#{escaped_filename}.html\" \"./#{sparkle_xml_name}\""
       app_path = package_path
       UI.message('Upload mac app to AppCenter.')
       UI.message("app_path = #{app_path}")
