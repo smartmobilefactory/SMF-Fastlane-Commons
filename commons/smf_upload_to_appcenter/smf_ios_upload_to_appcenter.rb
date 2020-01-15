@@ -36,7 +36,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
       sh "cd \"#{File.dirname(app_path)}\"; zip -r -q \"#{package_path}\" \"./#{escaped_filename}.app\" \"./#{escaped_filename}.dmg\" \"./#{escaped_filename}.html\" \"./#{sparkle_xml_name}\""
       app_path = package_path
 
-      UI.message('Upload zipped mac app to AppCenter.')
+      UI.message('Upload mac app Sparkle package to AppCenter.')
       appcenter_upload(
           api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
           owner_name: owner_name,
