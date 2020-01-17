@@ -61,6 +61,13 @@ private_lane :smf_send_message do |options|
 
   if slack_channel && (slack_channel.include? '/') == false
 
+    payload = {
+      'Build Job' => build_url,
+      'Build Type' => type,
+    }
+
+    payload['Notarization Log'] = 'http://test.notarize.com'#ENV['FL_NOTARIZE_LOG_FILE_URL'] if @platform == :mac and !ENV['FL_NOTARIZE_LOG_FILE_URL'].nil?
+
     # Send failure messages also to CI to notice them so that we can see if they can be improved
     begin
       if type == 'error' && !(slack_channel.eql? ci_error_log)
@@ -72,10 +79,7 @@ private_lane :smf_send_message do |options|
             channel: ci_error_log,
             username: "#{project_name} CI",
             success: success,
-            payload: {
-                'Build Job' => build_url,
-                'Build Type' => type,
-            },
+            payload: payload,
             default_payloads: [:git_branch],
         )
       end
@@ -93,10 +97,7 @@ private_lane :smf_send_message do |options|
             channel: slack_channel,
             username: "#{project_name} CI",
             success: success,
-            payload: {
-                'Build Job' => build_url,
-                'Build Type' => type,
-            },
+            payload: payload,
             default_payloads: [:git_branch],
             attachment_properties: {
                 fields: [
@@ -116,10 +117,7 @@ private_lane :smf_send_message do |options|
             channel: slack_channel,
             username: "#{project_name} CI",
             success: success,
-            payload: {
-                'Build Job' => build_url,
-                'Build Type' => type,
-            },
+            payload: payload,
             default_payloads: [:git_branch],
         )
       end
