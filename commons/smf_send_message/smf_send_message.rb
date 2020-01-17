@@ -66,7 +66,7 @@ private_lane :smf_send_message do |options|
       'Build Type' => type,
     }
 
-    payload['Notarization Log'] = 'http://test.notarize.com'#ENV['FL_NOTARIZE_LOG_FILE_URL'] if @platform == :mac and !ENV['FL_NOTARIZE_LOG_FILE_URL'].nil?
+    payload['Notarization Log'] = ENV['FL_NOTARIZE_LOG_FILE_URL'] if @platform == :mac and !ENV['FL_NOTARIZE_LOG_FILE_URL'].nil?
 
     # Send failure messages also to CI to notice them so that we can see if they can be improved
     begin
