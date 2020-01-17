@@ -252,10 +252,23 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
     target = build_variant_config[:target]
     scheme = build_variant_config[:scheme]
 
-    version_number = get_version_number(
-        xcodeproj: "#{smf_get_project_name}.xcodeproj",
-        target: (target != nil ? target : scheme)
-    )
+    begin
+      version_number = get_version_number(
+          xcodeproj: "#{smf_get_project_name}.xcodeproj",
+          target: (target != nil ? target : scheme),
+          configuration: build_variant_config[:xcconfig_name][:archive]
+      )
+    rescue
+      begin
+          UI.message("Fastlane was not able to determine project version. Checking now for MARKETING_VERSION in the build settings")
+          buildConfigurationString = `xcodebuild -workspace "#{smf_get_project_name}.xcworkspace" -scheme "#{scheme}" -configuration "#{build_variant_config[:xcconfig_name][:archive]}" -showBuildSettings -json`
+          buildConfigurationJSON = JSON.parse(buildConfigurationString)
+          version_number = buildConfigurationJSON.first['buildSettings']["MARKETING_VERSION"]
+      rescue
+          UI.message("Cannot find MARKETING_VERSION in your build settings. Make sure that your marketing version is either writen in the Info.plist or that MARKETING_VERSION is set in the build settings")
+          raise 'Cannot find marketing version number'
+      end
+    end
   when :ios_framework
     version_number = version_get_podspec(path: podspec_path)
   when :android
