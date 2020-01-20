@@ -253,6 +253,7 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
     scheme = build_variant_config[:scheme]
 
     begin
+      # First we try to get the version number from the plist via fastlane
       version_number = get_version_number(
           xcodeproj: "#{smf_get_project_name}.xcodeproj",
           target: (target != nil ? target : scheme),
@@ -260,21 +261,22 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
       )
     rescue
       begin
+          # Depending on the project configuration, we might have the version number as a variable in the plist
+          # If that's the case, fastlane won't manage to get it, and we'll endup here.
+          # The next strategy is to check for MARKETING_VERSION in the build configuration
+          UI.message("Fastlane was not able to determine project version. Checking now for MARKETING_VERSION in the build settings")
+
+          # First we make sure that we are using the correct Xcode version
           required_xcode_version = @smf_fastlane_config[:project][:xcode_version]
-          UI.message("XCode version: #{required_xcode_version}")
           smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
 
           workspacePath = "#{smf_workspace_dir}/#{smf_get_project_name}.xcworkspace"
-          UI.message("workspace path #{workspacePath}")
-          UI.message("COMMAND: xcodebuild -workspace \"#{workspacePath}\" -scheme \"#{scheme}\" -configuration \"#{build_variant_config[:xcconfig_name][:archive]}\" -showBuildSettings -json")
-          UI.message("Fastlane was not able to determine project version. Checking now for MARKETING_VERSION in the build settings")
           buildConfigurationString = `xcodebuild -workspace "#{workspacePath}" -scheme "#{scheme}" -configuration "#{build_variant_config[:xcconfig_name][:archive]}" -showBuildSettings -json`
           buildConfigurationJSON = JSON.parse(buildConfigurationString)
           version_number = buildConfigurationJSON.first['buildSettings']["MARKETING_VERSION"]
-          UI.message("Found version number LOL: #{version_number}")
+          UI.message("Found MARKETING_VERSION in the build settings: #{version_number}")
       rescue
-          UI.message("Cannot find MARKETING_VERSION in your build settings. Make sure that your marketing version is either writen in the Info.plist or that MARKETING_VERSION is set in the build settings")
-          raise 'Cannot find marketing version number'
+          raise "Cannot find marketing version: #{e}"
       end
     end
   when :ios_framework
