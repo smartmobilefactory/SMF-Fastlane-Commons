@@ -260,6 +260,9 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
       )
     rescue
       begin
+          required_xcode_version = @smf_fastlane_config[:required_xcode_version]
+          smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
+
           workspacePath = "#{smf_workspace_dir}/#{smf_get_project_name}.xcworkspace"
           UI.message("workspace path #{workspacePath}")
           UI.message("COMMAND: xcodebuild -workspace \"#{workspacePath}\" -scheme \"#{scheme}\" -configuration \"#{build_variant_config[:xcconfig_name][:archive]}\" -showBuildSettings -json")
