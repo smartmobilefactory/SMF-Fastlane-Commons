@@ -22,6 +22,8 @@ private_lane :smf_super_setup_dependencies do |options|
     itc_apple_id: build_variant_config[:itc_apple_id]
   )
 
+  smf_get_version_number(build_variant)
+
   smf_pod_install
 
   # Called only when upload_itc is set to true. This way the build will fail in the beginning if there are any problems with itc. Saves time.

@@ -260,7 +260,8 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
       )
     rescue
       begin
-          required_xcode_version = @smf_fastlane_config[:required_xcode_version]
+          required_xcode_version = @smf_fastlane_config[:project][:xcode_version]
+          UI.message("XCode version: #{required_xcode_version}")
           smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
 
           workspacePath = "#{smf_workspace_dir}/#{smf_get_project_name}.xcworkspace"
@@ -270,6 +271,7 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
           buildConfigurationString = `xcodebuild -workspace "#{workspacePath}" -scheme "#{scheme}" -configuration "#{build_variant_config[:xcconfig_name][:archive]}" -showBuildSettings -json`
           buildConfigurationJSON = JSON.parse(buildConfigurationString)
           version_number = buildConfigurationJSON.first['buildSettings']["MARKETING_VERSION"]
+          UI.message("Found version number LOL: #{version_number}")
       rescue
           UI.message("Cannot find MARKETING_VERSION in your build settings. Make sure that your marketing version is either writen in the Info.plist or that MARKETING_VERSION is set in the build settings")
           raise 'Cannot find marketing version number'
