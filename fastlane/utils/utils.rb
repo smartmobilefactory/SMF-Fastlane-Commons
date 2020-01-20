@@ -252,10 +252,33 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
     target = build_variant_config[:target]
     scheme = build_variant_config[:scheme]
 
-    version_number = get_version_number(
-        xcodeproj: "#{smf_get_project_name}.xcodeproj",
-        target: (target != nil ? target : scheme)
-    )
+    begin
+      # First we try to get the version number from the plist via fastlane
+      version_number = get_version_number(
+          xcodeproj: "#{smf_get_project_name}.xcodeproj",
+          target: (target != nil ? target : scheme),
+          configuration: build_variant_config[:xcconfig_name][:archive]
+      )
+    rescue
+      begin
+          # Depending on the project configuration, we might have the version number as a variable in the plist
+          # If that's the case, fastlane won't manage to get it, and we'll endup here.
+          # The next strategy is to check for MARKETING_VERSION in the build configuration
+          UI.message("Fastlane was not able to determine project version. Checking now for MARKETING_VERSION in the build settings")
+
+          # First we make sure that we are using the correct Xcode version
+          required_xcode_version = @smf_fastlane_config[:project][:xcode_version]
+          smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
+
+          workspacePath = "#{smf_workspace_dir}/#{smf_get_project_name}.xcworkspace"
+          buildConfigurationString = `xcodebuild -workspace "#{workspacePath}" -scheme "#{scheme}" -configuration "#{build_variant_config[:xcconfig_name][:archive]}" -showBuildSettings -json`
+          buildConfigurationJSON = JSON.parse(buildConfigurationString)
+          version_number = buildConfigurationJSON.first['buildSettings']["MARKETING_VERSION"]
+          UI.message("Found MARKETING_VERSION in the build settings: #{version_number}")
+      rescue
+          raise "Cannot find marketing version: #{e}"
+      end
+    end
   when :ios_framework
     version_number = version_get_podspec(path: podspec_path)
   when :android
