@@ -260,8 +260,9 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
       )
     rescue
       begin
+          workspacePath = "#{smf_workspace_dir}/#{smf_get_project_name}.xcworkspace"
           UI.message("Fastlane was not able to determine project version. Checking now for MARKETING_VERSION in the build settings")
-          buildConfigurationString = `xcodebuild -workspace "#{smf_get_project_name}.xcworkspace" -scheme "#{scheme}" -configuration "#{build_variant_config[:xcconfig_name][:archive]}" -showBuildSettings -json`
+          buildConfigurationString = `xcodebuild -workspace "#{workspacePath}" -scheme "#{scheme}" -configuration "#{build_variant_config[:xcconfig_name][:archive]}" -showBuildSettings -json`
           buildConfigurationJSON = JSON.parse(buildConfigurationString)
           version_number = buildConfigurationJSON.first['buildSettings']["MARKETING_VERSION"]
       rescue
