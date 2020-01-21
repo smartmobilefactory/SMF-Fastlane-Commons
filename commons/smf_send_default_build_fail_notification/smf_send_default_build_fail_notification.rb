@@ -2,7 +2,10 @@ private_lane :smf_send_default_build_fail_notification do |options|
 
   branch = ENV['CHANGE_BRANCH']
 
-  if branch.match(/PR-*/) and !options[:slack_channel].nil?
+  UI.message("smf_send_default_build_fail_notification")
+  UI.message("Branch: #{branch}")
+
+  if branch.nil? and !options[:slack_channel].nil?
     UI.message("Message will not be delivered, this seems to be a PR")
     return
   end
