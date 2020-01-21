@@ -63,19 +63,14 @@ def smf_get_default_name_of_app(build_variant)
   build_number = smf_get_build_number_of_app
   project_name = @smf_fastlane_config[:project][:project_name]
 
-  UI.message("#{project_name} #{build_number}")
-  UI.message("#{build_variant}")
-
   if !build_variant.nil?
     version_number = smf_get_version_number(build_variant)
-    UI.message("#{version_number}")
+
     if version_number.nil?
       version_number = ''
     else
       version_number += ' '
     end
-
-    UI.message("return \"#{project_name} #{build_variant.upcase} #{version_number}(#{build_number})\"")
 
     return "#{project_name} #{build_variant.upcase} #{version_number}(#{build_number})"
   else 
@@ -115,12 +110,10 @@ def smf_get_build_number_of_app
   end
 
   if build_number.include? '.'
-    UI.message("included a .")
     parts = build_number.split('.')
     build_number = parts[0]
   end
 
-  UI.message("return #{build_number}")
   build_number
 end
 
@@ -287,8 +280,6 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
   end
-
-  UI.message("return #{version_number}")
 
   version_number
 end
