@@ -252,12 +252,7 @@ def smf_get_tag_of_app(build_variant, build_number)
 end
 
 def smf_get_version_number(build_variant = nil, podspec_path = nil)
-  UI.message("Get Version number")
-  UI.message("#{build_variant}")
   build_variant_config = build_variant.nil? ? nil : @smf_fastlane_config[:build_variants][build_variant.to_sym]
-
-  UI.message("Got Config #{build_variant_config == nil}")
-  UI.message("#{build_variant_config}")
 
   case @platform
   when :ios, :macos
@@ -268,8 +263,6 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
         xcodeproj: "#{smf_get_project_name}.xcodeproj",
         target: (target != nil ? target : scheme)
     )
-
-    UI.message("Version number: #{version_number}")
   when :ios_framework
     version_number = version_get_podspec(path: podspec_path)
   when :android
