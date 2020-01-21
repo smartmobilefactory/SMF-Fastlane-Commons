@@ -62,22 +62,25 @@ end
 def smf_get_default_name_of_app(build_variant)
   build_number = smf_get_build_number_of_app
   project_name = @smf_fastlane_config[:project][:project_name]
-  build_variant = build_variant.nil? ? smf_get_first_variant_from_config : build_variant
 
   UI.message("#{project_name} #{build_number}")
   UI.message("#{build_variant}")
 
-  version_number = smf_get_version_number(build_variant)
-  UI.message("#{version_number}")
-  if version_number.nil?
-    version_number = ''
-  else
-    version_number += ' '
+  if !build_variant.nil?
+    version_number = smf_get_version_number(build_variant)
+    UI.message("#{version_number}")
+    if version_number.nil?
+      version_number = ''
+    else
+      version_number += ' '
+    end
+
+    UI.message("return \"#{project_name} #{build_variant.upcase} #{version_number}(#{build_number})\"")
+
+    return "#{project_name} #{build_variant.upcase} #{version_number}(#{build_number})"
+  else 
+    return project_name
   end
-
-  UI.message("return \"#{project_name} #{build_variant.upcase} #{version_number}(#{build_number})\"")
-
-  "#{project_name} #{build_variant.upcase} #{version_number}(#{build_number})"
 end
 
 # Uses Config file to access project name. Should be changed in the future.
