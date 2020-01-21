@@ -263,7 +263,7 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
       version_number = get_version_number(
           xcodeproj: "#{smf_get_project_name}.xcodeproj",
           target: (target != nil ? target : scheme),
-          configuration: build_variant_config[:xcconfig_name][:archive]
+          configuration: build_variant_config[:xcconfig_name].nil? ? nil : build_variant_config[:xcconfig_name][:archive]
       )
     rescue
       begin
@@ -281,8 +281,10 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
           buildConfigurationJSON = JSON.parse(buildConfigurationString)
           version_number = buildConfigurationJSON.first['buildSettings']["MARKETING_VERSION"]
           UI.message("Found MARKETING_VERSION in the build settings: #{version_number}")
+      rescue StandardError => e 
+          raise "Cannot find marketing version #{e}"
       rescue
-          raise "Cannot find marketing version: #{e}"
+          raise "Cannot find marketing version"
       end
     end
   when :ios_framework
