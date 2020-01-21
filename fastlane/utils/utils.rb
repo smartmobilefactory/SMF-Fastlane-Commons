@@ -99,7 +99,6 @@ def smf_get_build_number_of_app
   when :ios, :ios_framework, :macos
     project_name = @smf_fastlane_config[:project][:project_name]
     build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
-    UI.message("#{project_name} #{build_number}")
   when :android
     build_number = @smf_fastlane_config[:app_version_code].to_s
   when :flutter
