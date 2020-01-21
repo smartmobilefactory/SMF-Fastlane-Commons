@@ -256,7 +256,7 @@ end
 def smf_get_version_number(build_variant = nil, podspec_path = nil)
   UI.message("Get Version number")
   UI.message("#{build_variant}")
-  build_variant_config = build_variant.nil? ? nil : @smf_fastlane_config[:build_variants][build_variant.to_sym]
+  build_variant_config = build_variant.nil? ? @smf_fastlane_config[:build_variants][smf_get_first_variant_from_config.to_sym] : @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
   UI.message("Got Config #{build_variant_config == nil}")
   UI.message("#{build_variant_config}")
