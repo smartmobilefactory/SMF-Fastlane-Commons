@@ -62,6 +62,7 @@ end
 def smf_get_default_name_of_app(build_variant)
   build_number = smf_get_build_number_of_app
   project_name = @smf_fastlane_config[:project][:project_name]
+  build_variant = build_variant.nil? ? smf_get_first_variant_from_config : build_variant
 
   UI.message("#{project_name} #{build_number}")
   UI.message("#{build_variant}")
@@ -81,6 +82,7 @@ end
 
 # Uses Config file to access project name. Should be changed in the future.
 def smf_get_default_name_of_pod(build_variant)
+
   version = ''
   if !build_variant.nil?
     podspec_path = @smf_fastlane_config[:build_variants][build_variant.to_sym][:podspec_path]
@@ -256,7 +258,7 @@ end
 def smf_get_version_number(build_variant = nil, podspec_path = nil)
   UI.message("Get Version number")
   UI.message("#{build_variant}")
-  build_variant_config = build_variant.nil? ? @smf_fastlane_config[:build_variants][smf_get_first_variant_from_config.to_sym] : @smf_fastlane_config[:build_variants][build_variant.to_sym]
+  build_variant_config = build_variant.nil? ? nil : @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
   UI.message("Got Config #{build_variant_config == nil}")
   UI.message("#{build_variant_config}")
