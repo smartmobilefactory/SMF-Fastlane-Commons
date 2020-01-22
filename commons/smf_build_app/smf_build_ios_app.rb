@@ -45,7 +45,7 @@ private_lane :smf_build_ios_app do |options|
       include_bitcode: (upload_itc && upload_bitcode),
       export_options: { iCloudContainerEnvironment: icloud_environment },
       skip_package_ipa: skip_package_ipa,
-      xcpretty_formatter: "/Library/Ruby/Gems/2.3.0/gems/xcpretty-json-formatter-0.1.0/lib/json_formatter.rb"
+      xcpretty_formatter: _smf_get_xcpretty_formatter_path
   )
 end
 
@@ -82,5 +82,18 @@ def smf_is_using_old_build_system
 
   return true if (contents.match(regex) != nil)
 
+end
+
+def _smf_get_xcpretty_formatter_path
+  path = sh('xcpretty-json-formatter').delete('\n')
+
+  if path.nil?
+    path = '/Library/Ruby/Gems/2.3.0/gems/xcpretty-json-formatter-0.1.0/lib/json_formatter.rb'
+    UI.message("Using hardcoded fallback path for xcpretty-formatter: #{path}")
+  else
+    UI.message("Found path for xcpretty-formatter: #{path}")
+  end
+
+  path
 end
 
