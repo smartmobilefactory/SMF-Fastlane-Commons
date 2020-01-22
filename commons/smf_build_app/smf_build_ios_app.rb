@@ -89,10 +89,10 @@ def _smf_get_xcpretty_formatter_path
   path = sh('xcpretty-json-formatter').split("\n").last
 
   if path.nil?
-    path = '/Library/Ruby/Gems/2.3.0/gems/xcpretty-json-formatter-0.1.0/lib/json_formatter.rb'
-    UI.message("Using hardcoded fallback path for xcpretty-formatter: #{path}")
+    UI.message("Error getting path to xcpretty-json-formatter. Seems like the Gem (https://github.com/marcelofabri/xcpretty-json-formatter) is not (corrrectly) installed!")
+    raise "Error getting path to xcpretty-json-formatter"
   else
-    UI.message("Found path for xcpretty-formatter: #{path}")
+    UI.message("Found path to xcpretty-formatter: #{path}")
   end
 
   path
