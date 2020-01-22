@@ -85,7 +85,7 @@ def smf_is_using_old_build_system
 end
 
 def _smf_get_xcpretty_formatter_path
-  # Because currently bundler is printeing a lot of gem warnings, we have to take the last line of the output which actually is the correct path we want
+  # Because currently bundler is printing a lot of gem warnings, we have to take the last line of the output which actually is the correct path we want
   path = sh('xcpretty-json-formatter').split("\n").last
 
   if path.nil?
