@@ -6,13 +6,15 @@ This lane uploads the build to AppCenter by using the *appcenter_upload* lane.
 Upload the ipa to AppCenter.
 ```
 smf_ios_upload_to_appcenter(
-        appcenter_destinations: "*",			# To Distribute to all Distribution Groups
+        destinations: "*",			            # Optional, set to 'Collaborators' by default
         build_variant: "alpha"                  # Needed only for mac apps
         build_number: 83,                       # Needed only for mac apps
         app_id: "eg21g21-21g1g-12g13b3-2121",   # The id of the app from AppCenter
         escaped_filename: <escaped filename>,   # Needed only for iOS
         path_to_ipa_or_app: <path to ipa>,      # Needed only for iOS
         is_mac_app: false,                      # Optional, false by default
+        sparkle_xml_name: 'test.xml',           # Needed only for macOS
+        upload_sparkle: true                    # Optional, used to upload a zip of the app to AppCenter
 )
 ```
 

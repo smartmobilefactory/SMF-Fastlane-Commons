@@ -297,7 +297,7 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
   end
-
+  UI.message("Use #{version_number} as version number.")
   version_number
 end
 
