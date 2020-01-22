@@ -89,8 +89,8 @@ def _smf_get_xcpretty_formatter_path
   path = sh('xcpretty-json-formatter').split("\n").last
 
   if path.nil?
-    UI.message("Error getting path to xcpretty-json-formatter. Seems like the Gem (https://github.com/marcelofabri/xcpretty-json-formatter) is not (corrrectly) installed!")
-    raise "Error getting path to xcpretty-json-formatter"
+    UI.message('Error getting path to xcpretty-json-formatter. Seems like the Gem (https://github.com/marcelofabri/xcpretty-json-formatter) is not (corrrectly) installed!')
+    raise 'Error getting path to xcpretty-json-formatter'
   else
     UI.message("Found path to xcpretty-formatter: #{path}")
   end
