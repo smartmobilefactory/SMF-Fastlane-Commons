@@ -5,5 +5,6 @@
 @Library('jenkins-pipeline-commons@migration_fastlane_commons') _
 
 _build_variants = __BUILD_VARIANTS__
+_build_nodes = __BUILD_NODES__
 
-iOSFramework(_build_variants)
+iOSFramework(_build_variants, _build_nodes)

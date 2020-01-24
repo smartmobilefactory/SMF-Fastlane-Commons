@@ -5,15 +5,18 @@
 @Library('jenkins-pipeline-commons@migration_fastlane_commons') _
 
 _build_variants = __BUILD_VARIANTS__
+_build_nodes = __BUILD_NODES__
+
 _custom_credentials = [
 	'CUSTOM_PHRASE_APP_TOKEN': '__CUSTOM_PHRASE_APP_TOKEN__',
 	'CUSTOM_SPARKLE_PRIVATE_SSH_KEY': '__CUSTOM_SPARKLE_PRIVATE_SSH_KEY__',
 	'CUSTOM_SPARKLE_SIGNING_KEY': '__CUSTOM_SPARKLE_SIGNING_KEY__'
 ]
 
-_build_parameters = [ 
+_build_parameters = [
 	'build_variants': _build_variants,
-	'custom_credentials': _custom_credentials
+	'custom_credentials': _custom_credentials,
+	'build_nodes': _build_nodes
 ]
 
 iOSApp(_build_parameters)
