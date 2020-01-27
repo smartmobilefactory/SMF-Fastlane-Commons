@@ -48,4 +48,4 @@ $CHANGELOG_TEMP_FILE_HTML = 'temp_changelog.html'
 
 $POD_DEFAULT_VARIANTS = ['patch', 'minor', 'major', 'current', 'breaking', 'internal']
 
-$IOS_BUILD_NODES = ["iosbuild", "mobileci7", "mobileci8"]
+$IOS_BUILD_NODES = ['iosbuild', 'mobileci7', 'mobileci8']
