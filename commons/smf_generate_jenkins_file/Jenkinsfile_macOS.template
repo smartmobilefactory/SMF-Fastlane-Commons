@@ -2,7 +2,7 @@
 // Automatically generated. Do not edit.
 //
 
-@Library('jenkins-pipeline-commons@migration_fastlane_commons') _
+@Library('jenkins-pipeline-commons@setup_mobileci_8') _
 
 _build_variants = __BUILD_VARIANTS__
 _build_nodes = __BUILD_NODES__
