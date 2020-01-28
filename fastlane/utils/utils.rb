@@ -73,7 +73,7 @@ def smf_get_default_name_of_app(build_variant)
     end
 
     return "#{project_name} #{build_variant.upcase} #{version_number}(#{build_number})"
-  else 
+  else
     return project_name
   end
 end
@@ -281,7 +281,7 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
           buildConfigurationJSON = JSON.parse(buildConfigurationString)
           version_number = buildConfigurationJSON.first['buildSettings']["MARKETING_VERSION"]
           UI.message("Found MARKETING_VERSION in the build settings: #{version_number}")
-      rescue StandardError => e 
+      rescue StandardError => e
           raise "Cannot find marketing version #{e}"
       rescue
           raise "Cannot find marketing version"
@@ -306,7 +306,7 @@ def smf_extract_bump_type_from_pr_body(pr_body)
   matches = pr_body.match(/## Build.+## Jira Ticket/m)
 
   if matches.nil?
-    UI.messsage("There are no selectable bump types in the PRs description!")
+    UI.message("There are no selectable bump types in the PRs description!")
     return nil
   end
 
