@@ -2,6 +2,7 @@ require 'json'
 
 # Local Constants
 BUILD_VARIANTS_PATTERN = "__BUILD_VARIANTS__"
+BUILD_IOS_NODES_PATTERN =  "__BUILD_NODES__"
 POD_EXAMPLE_VARIANTS_PATTERN = "__EXAMPLE_VARIANTS__"
 FALLBACK_TEMPLATE_CREDENTIAL_KEY = "PIPELINE_TEMPLATE_CREDENTIAL"
 CUSTOM_IOS_CREDENTIALS = [
@@ -39,6 +40,8 @@ private_lane :smf_generate_jenkins_file do |options|
   end
 
   jenkinsFileData = jenkinsFileData.gsub("#{BUILD_VARIANTS_PATTERN}", JSON.dump(possible_build_variants))
+
+  jenkinsFileData = jenkinsFileData.gsub("#{BUILD_IOS_NODES_PATTERN}", JSON.dump($IOS_BUILD_NODES))
 
   jenkinsFileData = _smf_insert_custom_credentials(jenkinsFileData) unless @platform == :macos
 
