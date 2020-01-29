@@ -229,6 +229,7 @@ private_lane :smf_super_upload_to_appcenter do |options|
   appcenter_app_id = smf_get_appcenter_id(build_variant)
   destinations = build_variant_config[:appcenter_destinations]
   sparkle_config = build_variant_config[:sparkle]
+  sparkle_upload_to_appcenter = sparkle_config.nil? ? false : sparkle_config[:upload_to_appcenter]
 
   # Upload the IPA to AppCenter
   smf_ios_upload_to_appcenter(
@@ -240,7 +241,7 @@ private_lane :smf_super_upload_to_appcenter do |options|
     path_to_ipa_or_app: smf_path_to_ipa_or_app(build_variant),
     is_mac_app: true,
     podspec_path: build_variant_config[:podspec_path],
-    upload_sparkle: sparkle_config[:upload_to_appcenter] && build_variant_config[:use_sparkle],
+    upload_sparkle: sparkle_upload_to_appcenter && build_variant_config[:use_sparkle],
     sparkle_xml_name: sparkle_config[:xml_name]
   ) if !appcenter_app_id.nil?
 
