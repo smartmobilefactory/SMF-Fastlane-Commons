@@ -128,6 +128,8 @@ private_lane :smf_super_pipeline_danger do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
   jira_ticket_base_url = build_variant_config[:jira_ticket_base_url]
 
+  UI.message("Options: #{options}")
+
   smf_create_jira_ticket_links(
     pr_number: options[:pr_number],
     git_url: options[:git_repo_url],

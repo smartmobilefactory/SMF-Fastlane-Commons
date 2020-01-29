@@ -1,5 +1,5 @@
 
-private_lane :smf_create_jira_ticket_links do | options |
+private_lane :smf_create_jira_ticket_links do |options|
   pr_number = options[:pr_number]
   git_url = options[:git_url]
   branch_name = options[:branch_name]
@@ -11,7 +11,7 @@ private_lane :smf_create_jira_ticket_links do | options |
   UI.message("DEBUGGING: ticket_base_url is: #{ticket_base_url}")
 
   default_ticket_base_url = ticket_base_url.nil? ? 'https://smartmobilefactory.atlassian.net/browse/' : ticket_base_url
-  tickets = smf_find_jira_tickets(pr_number, git_url, branch_name)
+  tickets = _smf_find_jira_tickets(pr_number, git_url, branch_name)
 
   ticket_urls = []
 
