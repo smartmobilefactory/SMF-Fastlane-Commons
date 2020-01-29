@@ -157,12 +157,15 @@ def smf_path_to_ipa_or_app(build_variant)
 
   escaped_filename = @smf_fastlane_config[:build_variants][build_variant.to_sym][:scheme].gsub(' ', "\ ")
 
+  UI.message("LOL: DIR BEFORE " + smf_workspace_dir + "/build")
   Dir.foreach(smf_workspace_dir + "/build") do |filename|
   
+    UI.message("LOL: Checking " + filename)
     file_exists = filename.end_with?(".ipa.zip")
     file_exists = filename.end_with?(".ipa") unless file_exists
     file_exists = filename.end_with?(".app") unless file_exists
     
+    UI.message("LOL: File exists " + file_exists)
     if file_exists
       app_path = smf_workspace_dir + "/build/" + filename
       break
