@@ -139,7 +139,7 @@ private_lane :smf_super_pipeline_danger do |options|
 end
 
 lane :smf_pipeline_danger do |options|
-  smf_super_pipeline_danger
+  smf_super_pipeline_danger(options)
 end
 
 ########## ADDITIONAL LANES USED FOR BUILDING ##########
