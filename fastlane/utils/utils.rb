@@ -165,8 +165,9 @@ def smf_path_to_ipa_or_app(build_variant)
     file_exists = filename.end_with?(".ipa") unless file_exists
     file_exists = filename.end_with?(".app") unless file_exists
     
-    UI.message("LOL: File exists " + file_exists)
+
     if file_exists
+      UI.message("FOUND SOMETHING" + filename)
       app_path = smf_workspace_dir + "/build/" + filename
       break
     end
