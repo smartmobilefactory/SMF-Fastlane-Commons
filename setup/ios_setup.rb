@@ -124,6 +124,17 @@ end
 # Danger
 
 private_lane :smf_super_pipeline_danger do |options|
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
+  jira_ticket_base_url = build_variant_config[]
+
+  smf_create_jira_ticket_links(
+    pr_number: options[:pr_number],
+    git_url: options[:git_repo_url],
+    branch_name: options[:git_branch],
+    ticket_base_url: jira_ticket_base_url
+  )
+
   smf_danger
 end
 
