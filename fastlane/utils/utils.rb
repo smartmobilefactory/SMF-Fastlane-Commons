@@ -157,9 +157,17 @@ def smf_path_to_ipa_or_app(build_variant)
 
   escaped_filename = @smf_fastlane_config[:build_variants][build_variant.to_sym][:scheme].gsub(' ', "\ ")
 
-  app_path = smf_workspace_dir + "/build/#{escaped_filename}.ipa.zip"
-  app_path = smf_workspace_dir + "/build/#{escaped_filename}.ipa" unless File.exist?(app_path)
-  app_path = smf_workspace_dir + "/build/#{escaped_filename}.app" unless File.exist?(app_path)
+  Dir.foreach(smf_workspace_dir + "/build") do |filename|
+  
+    file_exists = filename.end_with?(".ipa.zip")
+    file_exists = filename.end_with?(".ipa") unless file_exists
+    file_exists = filename.end_with?(".app") unless file_exists
+    
+    if file_exists
+      app_path = smf_workspace_dir + "/build/" + filename
+      break
+    end
+  end
 
   unless File.exist?(app_path)
     app_path = lane_context[SharedValues::IPA_OUTPUT_PATH]
@@ -168,6 +176,20 @@ def smf_path_to_ipa_or_app(build_variant)
   end
 
   app_path
+end
+
+def smf_rename_app_file(build_variant)
+
+  app_file_path = smf_path_to_ipa_or_app(build_variant)
+  info_plist_path=File.join(app_file_path,"/Contents/Info.plist")
+
+  app_name= sh("defaults read #{info_plist_path} CFBundleName").gsub("\n", '')
+  ENV['APP_NAME'] = app_name
+
+  new_app_file_path = smf_path_to_ipa_or_app(build_variant)
+
+  UI.message("Renaming #{app_file_path} to #{new_app_file_path}")
+  File.rename(app_file_path, new_app_file_path)
 end
 
 def smf_path_to_dmg(build_variant)

@@ -47,6 +47,8 @@ private_lane :smf_super_build do |options|
       export_method: build_variant_config[:export_method],
       icloud_environment: smf_get_icloud_environment(build_variant.to_sym)
   )
+
+  smf_rename_app_file(build_variant)
 end
 
 lane :smf_build do |options|
