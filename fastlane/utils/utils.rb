@@ -170,20 +170,6 @@ def smf_path_to_ipa_or_app(build_variant)
   app_path
 end
 
-def smf_rename_app_file(build_variant)
-
-  app_file_path = smf_path_to_ipa_or_app(build_variant)
-  info_plist_path=File.join(app_file_path,"/Contents/Info.plist")
-
-  app_name= sh("defaults read #{info_plist_path} CFBundleName").gsub("\n", '')
-  ENV['APP_NAME'] = app_name
-
-  new_app_file_path = smf_path_to_ipa_or_app(build_variant)
-
-  UI.message("Renaming #{app_file_path} to #{new_app_file_path}")
-  File.rename(app_file_path, new_app_file_path)
-end
-
 def smf_path_to_dmg(build_variant)
   app_path = smf_path_to_ipa_or_app(build_variant)
   dmg_path = app_path.sub('.app', '.dmg')
