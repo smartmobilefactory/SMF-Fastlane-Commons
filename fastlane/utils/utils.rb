@@ -156,6 +156,7 @@ def smf_path_to_ipa_or_app(build_variant)
   end
 
   escaped_filename = @smf_fastlane_config[:build_variants][build_variant.to_sym][:scheme].gsub(' ', "\ ")
+  app_path = ""
 
   UI.message("LOL: DIR BEFORE " + smf_workspace_dir + "/build")
   Dir.foreach(smf_workspace_dir + "/build") do |filename|
@@ -167,7 +168,7 @@ def smf_path_to_ipa_or_app(build_variant)
     
 
     if file_exists
-      UI.message("FOUND SOMETHING" + filename)
+      UI.message("FOUND SOMETHING " + filename)
       app_path = smf_workspace_dir + "/build/" + filename
       break
     end
