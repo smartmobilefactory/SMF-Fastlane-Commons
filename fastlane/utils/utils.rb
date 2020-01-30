@@ -155,11 +155,19 @@ def smf_path_to_ipa_or_app(build_variant)
     return smf_workspace_dir + "/build/#{ENV['APP_NAME']}.app"
   end
 
-  escaped_filename = @smf_fastlane_config[:build_variants][build_variant.to_sym][:scheme].gsub(' ', "\ ")
+  app_path = ''
 
-  app_path = smf_workspace_dir + "/build/#{escaped_filename}.ipa.zip"
-  app_path = smf_workspace_dir + "/build/#{escaped_filename}.ipa" unless File.exist?(app_path)
-  app_path = smf_workspace_dir + "/build/#{escaped_filename}.app" unless File.exist?(app_path)
+  Dir.foreach(smf_workspace_dir + '/build') do |filename|
+  
+    file_exists = filename.end_with?('.ipa.zip')
+    file_exists = filename.end_with?('.ipa') unless file_exists
+    file_exists = filename.end_with?('.app') unless file_exists
+    
+    if file_exists
+      app_path = smf_workspace_dir + '/build/' + filename
+      break
+    end
+  end
 
   unless File.exist?(app_path)
     app_path = lane_context[SharedValues::IPA_OUTPUT_PATH]
