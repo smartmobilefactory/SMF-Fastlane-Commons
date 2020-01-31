@@ -73,7 +73,12 @@ end
 
 
 def _smf_create_jira_ticket_links(pr_number, branch_name, ticket_base_url)
+
   git_url = smf_get_repo_url
+
+  UI.message("pr_number is: #{pr_number}")
+  UI.message("branch_name is: #{branch_name}")
+  UI.message("git_url is: #{git_url}")
 
   default_ticket_base_url = ticket_base_url.nil? ? 'https://smartmobilefactory.atlassian.net/browse/' : ticket_base_url
   tickets = _smf_find_jira_tickets(pr_number, git_url, branch_name)
