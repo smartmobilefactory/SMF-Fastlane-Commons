@@ -48,15 +48,11 @@ private_lane :smf_super_build do |options|
       icloud_environment: smf_get_icloud_environment(build_variant.to_sym)
   )
 
-
+  smf_rename_app_file(build_variant)
 end
 
 lane :smf_build do |options|
   smf_super_build(options)
-
-  # Rename .app file
-  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
-  smf_rename_app_file(build_variant)
 end
 
 
@@ -233,6 +229,8 @@ private_lane :smf_super_upload_to_appcenter do |options|
   appcenter_app_id = smf_get_appcenter_id(build_variant)
   destinations = build_variant_config[:appcenter_destinations]
   sparkle_config = build_variant_config[:sparkle]
+  sparkle_upload_to_appcenter = sparkle_config.nil? ? false : sparkle_config[:upload_to_appcenter]
+  sparkle_xml_name = sparkle_config.nil? ? nil : sparkle_config[:xml_name]
 
   # Upload the IPA to AppCenter
   smf_ios_upload_to_appcenter(
@@ -244,8 +242,8 @@ private_lane :smf_super_upload_to_appcenter do |options|
     path_to_ipa_or_app: smf_path_to_ipa_or_app(build_variant),
     is_mac_app: true,
     podspec_path: build_variant_config[:podspec_path],
-    upload_sparkle: sparkle_config[:upload_to_appcenter] && build_variant_config[:use_sparkle],
-    sparkle_xml_name: sparkle_config[:xml_name]
+    upload_sparkle: sparkle_upload_to_appcenter && build_variant_config[:use_sparkle],
+    sparkle_xml_name: sparkle_xml_name
   ) if !appcenter_app_id.nil?
 
 end

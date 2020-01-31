@@ -73,7 +73,7 @@ def smf_get_default_name_of_app(build_variant)
     end
 
     return "#{project_name} #{build_variant.upcase} #{version_number}(#{build_number})"
-  else 
+  else
     return project_name
   end
 end
@@ -155,11 +155,19 @@ def smf_path_to_ipa_or_app(build_variant)
     return smf_workspace_dir + "/build/#{ENV['APP_NAME']}.app"
   end
 
-  escaped_filename = @smf_fastlane_config[:build_variants][build_variant.to_sym][:scheme].gsub(' ', "\ ")
+  app_path = ''
 
-  app_path = smf_workspace_dir + "/build/#{escaped_filename}.ipa.zip"
-  app_path = smf_workspace_dir + "/build/#{escaped_filename}.ipa" unless File.exist?(app_path)
-  app_path = smf_workspace_dir + "/build/#{escaped_filename}.app" unless File.exist?(app_path)
+  Dir.foreach(smf_workspace_dir + '/build') do |filename|
+  
+    file_exists = filename.end_with?('.ipa.zip')
+    file_exists = filename.end_with?('.ipa') unless file_exists
+    file_exists = filename.end_with?('.app') unless file_exists
+    
+    if file_exists
+      app_path = smf_workspace_dir + '/build/' + filename
+      break
+    end
+  end
 
   unless File.exist?(app_path)
     app_path = lane_context[SharedValues::IPA_OUTPUT_PATH]
@@ -281,7 +289,7 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
           buildConfigurationJSON = JSON.parse(buildConfigurationString)
           version_number = buildConfigurationJSON.first['buildSettings']["MARKETING_VERSION"]
           UI.message("Found MARKETING_VERSION in the build settings: #{version_number}")
-      rescue StandardError => e 
+      rescue StandardError => e
           raise "Cannot find marketing version #{e}"
       rescue
           raise "Cannot find marketing version"
@@ -304,7 +312,7 @@ end
 def smf_extract_bump_type_from_pr_body(pr_number)
 
   pr_body = smf_github_get_pr_body(pr_number, smf_get_repo_url)
-
+  
   matches = pr_body.match(/build(.+)\)\n\n/ms)
 
   if matches.nil? or matches.captures.nil?
