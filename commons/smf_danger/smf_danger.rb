@@ -70,8 +70,6 @@ def _smf_find_paths_of_files_in_directory(directory, file_type = '')
   paths
 end
 
-
-
 def _smf_create_jira_ticket_links(pr_number, branch_name, ticket_base_url)
 
   git_url = smf_get_repo_url
