@@ -18,7 +18,9 @@ smf_danger(
 
 The `podspec_path` and `bump_type` are used to calculate the upcoming pod version and add it to dangers pull request report.
 
-##### Jira Tickets
+##### Jira Tickets Auto Detection
 
 The `pr_number` and `branch_name` (and `ticket_base_url`) are used to automatically detect the Jira Issue associated with
 the Pull Request and add them to the danger log.
+If you want to use a custom base url for the jira issues, add a property with the key `jira_ticket_base_url` to the build 
+variants config.json entry.

@@ -124,6 +124,7 @@ end
 # Danger
 
 private_lane :smf_super_pipeline_danger do |options|
+
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
