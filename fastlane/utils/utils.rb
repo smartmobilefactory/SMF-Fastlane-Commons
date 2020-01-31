@@ -324,7 +324,8 @@ def smf_extract_bump_type_from_pr_body(pr_number)
     return nil
   end
 
-  if matches.size != 1
+  # 2 because we want the whole match plus one group captured
+  if matches.size != 2
     UI.error("More or less then one bump type checkmarked in PR description!")
     return ''
   end
