@@ -6,13 +6,13 @@ def smf_get_repo_url
   return url
 end
 
-def smf_github_get_commit_messages_for_pr(number, git_url)
-  request_url = git_url.gsub('.git', "/pulls/#{number}/commits").gsub('git@github.com:', 'https://api.github.com/repos/')
+def smf_github_get_commit_messages_for_pr(pr_number, git_url)
+  request_url = git_url.gsub('.git', "/pulls/#{pr_number}/commits").gsub('git@github.com:', 'https://api.github.com/repos/')
   response = `curl -X GET -s -H "Authorization: token #{ENV[$SMF_GITHUB_TOKEN_ENV_KEY]}" #{request_url}`
   response_as_json = JSON.parse(response)
 
   if !response_as_json.is_a?(Array) then
-    UI.warning("Error getting commit messages for pull request number #{number} in for repository: #{git_url}")
+    UI.warning("Error getting commit messages for pull request number #{pr_number} in for repository: #{git_url}")
     return nil
   end
 
@@ -38,12 +38,12 @@ def smf_github_get_pull_request(number, git_url)
   return response_as_json
 end
 
-def smf_github_get_pr_body(number, git_url)
-  pull_request = smf_github_get_pull_request(number, git_url)
+def smf_github_get_pr_body(pr_number, git_url)
+  pull_request = smf_github_get_pull_request(pr_number, git_url)
   return pull_request.nil? ? nil : pull_request['body']
 end
 
-def smf_github_get_pr_title(number, git_url)
-  pull_request = smf_github_get_pull_request(number, git_url)
+def smf_github_get_pr_title(pr_number, git_url)
+  pull_request = smf_github_get_pull_request(pr_number, git_url)
   return pull_request.nil? ? nil : pull_request['title']
 end
