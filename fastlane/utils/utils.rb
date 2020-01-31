@@ -315,16 +315,16 @@ def smf_extract_bump_type_from_pr_body(pr_number)
 
   UI.message("PR_BODY IS: \n#{pr_body}")
 
-  matches = pr_body.match(/# Please build.+# Jira Ticket/m)
+  matches = pr_body.match(/# Please build.+\n\n/m)
 
   UI.message("MATCHES: \n#{matches}")
 
-  if matches.nil? or matches.captures.nil?
+  if matches.nil?
     UI.message("There are no selectable bump types in the PRs description!")
     return nil
   end
 
-  text = matches.captures.first
+  text = matches[0]
   groups = text.scan(/- \[x\] \*\*([a-z]+)\*\*/m)
 
   if groups.size != 1
