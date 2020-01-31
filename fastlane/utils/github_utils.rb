@@ -13,7 +13,7 @@ def smf_github_get_commit_messages_for_pr(pr_number, git_repo_url)
   response_as_json = JSON.parse(response)
 
   if !response_as_json.is_a?(Array) then
-    UI.warning("Error getting commit messages for pull request number #{pr_number} in for repository: #{git_repo_url}")
+    UI.error("Error getting commit messages for pull request number #{pr_number} in for repository: #{git_repo_url}")
     return nil
   end
 
@@ -34,7 +34,7 @@ def smf_github_get_pull_request(pr_number, git_repo_url)
   response_as_json = JSON.parse(response)
 
   if response_as_json['message'] == 'Not Found'
-    UI.warning("Error getting commit messages for pull request number #{pr_number} in for repository: #{git_repo_url}")
+    UI.error("Error getting commit messages for pull request number #{pr_number} in for repository: #{git_repo_url}")
     return nil
   end
 
