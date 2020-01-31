@@ -312,7 +312,7 @@ end
 def smf_extract_bump_type_from_pr_body(pr_number)
 
   pr_body = smf_github_get_pr_body(pr_number, smf_get_repo_url)
-  
+
   matches = pr_body.match(/build(.+)\)\n\n/ms)
 
   if matches.nil? or matches.captures.nil?
