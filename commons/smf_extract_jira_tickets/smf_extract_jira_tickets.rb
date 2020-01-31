@@ -1,9 +1,10 @@
 
 private_lane :smf_create_jira_ticket_links do |options|
   pr_number = options[:pr_number]
-  git_url = options[:git_url]
   branch_name = options[:branch_name]
   ticket_base_url = options[:ticket_base_url]
+
+  git_url = smf_get_repo_url
 
   UI.message("DEBUGGING: pr_number is: #{pr_number}")
   UI.message("DEBUGGING: git_url is: #{git_url}")

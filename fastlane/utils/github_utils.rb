@@ -1,5 +1,11 @@
 require 'json'
 
+def smf_get_repo_url
+  url = `git remote get-url origin`.gsub("\n", '')
+
+  return url
+end
+
 def smf_github_get_commit_messages_for_pr(number, git_url)
   request_url = git_url.gsub('.git', "/pulls/#{number}/commits").gsub('git@github.com:', 'https://api.github.com/repos/')
   response = `curl -X GET -s -H "Authorization: token #{ENV[$SMF_GITHUB_TOKEN_ENV_KEY]}" #{request_url}`

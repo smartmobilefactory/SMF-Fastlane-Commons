@@ -132,7 +132,6 @@ private_lane :smf_super_pipeline_danger do |options|
 
   smf_create_jira_ticket_links(
     pr_number: options[:pr_number],
-    git_url: options[:git_repo_url],
     branch_name: options[:git_branch],
     ticket_base_url: jira_ticket_base_url
   )
