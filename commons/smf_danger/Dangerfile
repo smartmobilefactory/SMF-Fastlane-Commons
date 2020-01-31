@@ -64,11 +64,6 @@ JSON.parse(ENV["DANGER_JUNIT_PATHS"]).each do |junit_tests_dir|
   end
 end
 
-## JIRA:
-JSON.parse(ENV["DANGER_JIRA_KEYS"]).each do |key|
-  jira.check(key: key["key"], url: key["url"], search_commits: true)
-end
-
 ## JIRA TICKETS
 jira_tickets = JSON.parse(ENV["DANGER_JIRA_TICKETS"])["ticket_urls"]
 
