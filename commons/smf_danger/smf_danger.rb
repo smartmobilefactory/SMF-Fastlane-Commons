@@ -112,18 +112,29 @@ def _smf_find_jira_tickets(pr_number, git_url, branch_name)
   tickets = []
 
   pr_title = smf_github_get_pr_title(pr_number, git_url)
-  tickets_from_pr_title = _smf_find_tickets_in(pr_title)
-  if !tickets_from_pr_title.empty? then UI.message("Found #{tickets_from_pr_title} in pull request title") end
-  tickets.concat(tickets_from_pr_title).uniq
+
+  if pr_title.nil?
+    UI.error("Can't look for Jira Tickets in Pull Request title, unable to download the PR title")
+  else
+    tickets_from_pr_title = _smf_find_tickets_in(pr_title)
+    if !tickets_from_pr_title.empty? then UI.message("Found #{tickets_from_pr_title} in pull request title") end
+    tickets.concat(tickets_from_pr_title).uniq
+  end
 
   pr_body = smf_github_get_pr_body(pr_number, git_url)
-  tickets_from_pr_body = _smf_find_tickets_in(pr_body)
-  if !tickets_from_pr_body.empty? then UI.message("Found #{tickets_from_pr_body} in pull request body") end
-  tickets.concat(tickets_from_pr_body).uniq
+
+  if pr_body.nil?
+    UI.error("Can't look for Jira Tickets in Pull Request body, unable to download the PR body")
+  else
+    tickets_from_pr_body = _smf_find_tickets_in(pr_body)
+    if !tickets_from_pr_body.empty? then UI.message("Found #{tickets_from_pr_body} in pull request body") end
+    tickets.concat(tickets_from_pr_body).uniq
+  end
 
   tickets_from_branch_name = _smf_find_tickets_in(branch_name)
   if !tickets_from_branch_name.empty? then UI.message("Found #{tickets_from_branch_name} in branch_name") end
   tickets.concat(tickets_from_branch_name).uniq
+
 
   commit_messages = smf_github_get_commit_messages_for_pr(pr_number, git_url)
   if !commit_messages.nil? then
@@ -133,6 +144,8 @@ def _smf_find_jira_tickets(pr_number, git_url, branch_name)
       if !tickets_from_message.empty? then UI.message("Found #{tickets_from_message} in commit message") end
       tickets.concat(tickets_from_message).uniq
     end
+  else
+    UI.error("Can't look for Jira Tickets in commits, unable to download the commits of this PR!")
   end
 
   return tickets
