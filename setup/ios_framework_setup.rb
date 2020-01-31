@@ -114,11 +114,16 @@ end
 private_lane :smf_pod_super_danger do |options|
 
   podspec_path = @smf_fastlane_config[:build_variants][:framework][:podspec_path]
-  bump_type = smf_extract_bump_type_from_pr_body(options[:pr_body])
+  bump_type = smf_extract_bump_type_from_pr_body(options[:pr_number])
+
+  jira_ticket_base_url = build_variant_config[:jira_ticket_base_url]
 
   smf_danger(
     podspec_path: podspec_path,
-    bump_type: bump_type
+    bump_type: bump_type,
+    pr_number: options[:pr_number],
+    branch_name: options[:git_branch],
+    ticket_base_url: jira_ticket_base_url
   )
 end
 
