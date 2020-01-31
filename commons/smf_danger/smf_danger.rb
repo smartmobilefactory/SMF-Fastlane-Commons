@@ -127,8 +127,7 @@ def _smf_find_jira_tickets(pr_number, git_url, branch_name)
   tickets_from_branch_name = _smf_find_tickets_in(branch_name)
   if !tickets_from_branch_name.empty? then UI.message("Found #{tickets_from_branch_name} in branch_name") end
   tickets.concat(tickets_from_branch_name).uniq
-
-
+  
   commit_messages = smf_github_get_commit_messages_for_pr(pr_number, git_url)
   if !commit_messages.nil? then
 
