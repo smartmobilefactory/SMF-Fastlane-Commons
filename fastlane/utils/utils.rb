@@ -315,7 +315,7 @@ def smf_extract_bump_type_from_pr_body(pr_number)
 
   UI.message("PR_BODY IS: \n#{pr_body}")
 
-  matches = pr_body.match(/# Please build.+\n\n/m)
+  matches = pr_body.match(/- \[x\] \*\*([nothing|patch|minor|major]+)\*\*/m)
 
   UI.message("MATCHES: \n#{matches}")
 
@@ -324,15 +324,12 @@ def smf_extract_bump_type_from_pr_body(pr_number)
     return nil
   end
 
-  text = matches[0]
-  groups = text.scan(/- \[x\] \*\*([a-z]+)\*\*/m)
-
-  if groups.size != 1
+  if matches.size != 1
     UI.error("More or less then one bump type checkmarked in PR description!")
     return ''
   end
 
-  bump_type = groups.first.first
+  bump_type = matches.captures.nil? ? nil : matches.captures.first
 
   if !bump_type.nil?
     if $POD_DEFAULT_VARIANTS.include?(bump_type)
