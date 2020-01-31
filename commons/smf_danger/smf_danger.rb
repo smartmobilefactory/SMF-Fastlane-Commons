@@ -93,7 +93,7 @@ def _smf_create_jira_ticket_links(pr_number, branch_name, ticket_base_url)
 end
 
 def _smf_find_tickets_in(string)
-  regex = /(?<=\s|[^a-zA-Z])[A-Z]{2,14}-[0-9]{1,8}/
+  regex = /(?<=\s|[^a-zA-Z]|)[A-Z]{2,14}-[0-9]{1,8}/
   matches = string.match(regex)
 
   tickets = []
