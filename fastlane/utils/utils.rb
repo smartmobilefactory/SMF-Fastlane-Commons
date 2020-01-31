@@ -301,20 +301,22 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
   version_number
 end
 
-def smf_extract_bump_type_from_pr_body(pr_body)
+def smf_extract_bump_type_from_pr_body(pr_number)
 
-  matches = pr_body.match(/## Build.+## Jira Ticket/m)
+  pr_body = smf_github_get_pr_body(pr_number, smf_get_repo_url)
 
-  if matches.nil?
+  matches = pr_body.match(/## Build(.+)\)\n\n/ms)
+
+  if matches.nil? or matches.captures.nil?
     UI.messsage("There are no selectable bump types in the PRs description!")
     return nil
   end
 
-  text = matches[0]
+  text = matches.captures.first
   groups = text.scan(/- \[x\] \*\*([a-z]+)\*\*/m)
 
   if groups.size != 1
-    UI.error("Multiple bump types checkmarked in PR description!")
+    UI.error("More or less then one bump type checkmarked in PR description!")
     return ''
   end
 
