@@ -313,7 +313,11 @@ def smf_extract_bump_type_from_pr_body(pr_number)
 
   pr_body = smf_github_get_pr_body(pr_number, smf_get_repo_url)
 
+  UI.message("PR_BODY IS: \n#{pr_body}")
+
   matches = pr_body.match(/build(.+)\)\n\n/ms)
+
+  UI.message("MATCHES: \n#{matches}")
 
   if matches.nil? or matches.captures.nil?
     UI.message("There are no selectable bump types in the PRs description!")
