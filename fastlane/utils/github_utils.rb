@@ -8,6 +8,7 @@ end
 
 def smf_github_get_commit_messages_for_pr(pr_number, git_repo_url)
   request_url = _smf_github_create_api_url(git_repo_url, pr_number)+ "/commits"
+  UI.message("Request URL for commits: #{request_url}")
   response = `curl -X GET -s -H "Authorization: token #{ENV[$SMF_GITHUB_TOKEN_ENV_KEY]}" #{request_url}`
   response_as_json = JSON.parse(response)
 
@@ -40,11 +41,15 @@ end
 
 def smf_github_get_pr_body(pr_number, git_url)
   pull_request = smf_github_get_pull_request(pr_number, git_url)
+  UI.message("Request URL for pull request body: #{request_url}")
+  UI.message("Found pr body: #{pull_request['body']}")
   return pull_request.nil? ? nil : pull_request['body']
 end
 
 def smf_github_get_pr_title(pr_number, git_url)
   pull_request = smf_github_get_pull_request(pr_number, git_url)
+  UI.message("Request URL for pull request title: #{request_url}")
+  UI.message("Found pr title: #{pull_request['title']}")
   return pull_request.nil? ? nil : pull_request['title']
 end
 
