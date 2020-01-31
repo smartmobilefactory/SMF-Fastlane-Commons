@@ -316,7 +316,7 @@ def smf_extract_bump_type_from_pr_body(pr_number)
   matches = pr_body.match(/build(.+)\)\n\n/ms)
 
   if matches.nil? or matches.captures.nil?
-    UI.messsage("There are no selectable bump types in the PRs description!")
+    UI.message("There are no selectable bump types in the PRs description!")
     return nil
   end
 
