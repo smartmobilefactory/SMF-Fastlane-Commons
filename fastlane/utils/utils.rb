@@ -315,7 +315,7 @@ def smf_extract_bump_type_from_pr_body(pr_number)
 
   UI.message("PR_BODY IS: \n#{pr_body}")
 
-  matches = pr_body.match(/# Please build\n(.+)\)\n\n/ms)
+  matches = pr_body.match(/# Please build.+# Jira Ticket/m)
 
   UI.message("MATCHES: \n#{matches}")
 
