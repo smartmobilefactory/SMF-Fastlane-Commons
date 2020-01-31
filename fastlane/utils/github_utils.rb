@@ -30,6 +30,7 @@ def smf_github_get_pull_request(pr_number, git_repo_url)
   request_url = _smf_github_create_api_url(git_repo_url, pr_number)
   UI.message("Request URL for pull request: #{request_url}")
   response = `curl -X GET -s -H "Authorization: token #{ENV[$SMF_GITHUB_TOKEN_ENV_KEY]}" #{request_url}`
+  UI.message("Response: \n#{response}")
   response_as_json = JSON.parse(response)
 
   if response_as_json['message'] == 'Not Found'
