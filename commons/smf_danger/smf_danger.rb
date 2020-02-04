@@ -18,7 +18,7 @@ private_lane :smf_danger do |options|
   lint_paths = _smf_find_paths_of('lint-result.xml')
   junit_result_paths = _smf_find_paths_of_files_in_directory('build/test-results', 'xml')
 
-  _smf_find_paths_of('klint.xml').each { |path| checkstyle_paths.push(path) }
+  _smf_find_paths_of('ktlint.xml').each { |path| checkstyle_paths.push(path) }
   _smf_find_paths_of('detekt.xml').each { |path| checkstyle_paths.push(path) }
 
   ENV["DANGER_JIRA_KEYS"] = JSON.dump(_smf_danger_jira_key_parameter(jira_keys))
