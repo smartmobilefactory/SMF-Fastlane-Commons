@@ -134,7 +134,7 @@ private_lane :smf_super_pipeline_danger do |options|
   jira_ticket_search_context = {
     "pull request title" => ENV["PR_TITLE"],
     "pull request body" => ENV["PR_BODY"],
-    "commits" => ENV["COMMITS"],
+    "commits" => ENV["COMMITS"].gsub("[", "").gsub("]", "").split(", "),
     "branch name" => ENV["CHANGE_BRANCH"]
   }
 
