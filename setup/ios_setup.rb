@@ -133,7 +133,7 @@ private_lane :smf_super_pipeline_danger do |options|
   UI.message("Jira ticket contexts:\n#{options["jira_ticket_contexts"]}")
 
   smf_danger(
-    contexts_to_search: options["jir_ticket_contexts"],
+    contexts_to_search: options["jira_ticket_contexts"],
     ticket_base_url: jira_ticket_base_url
   )
 end
