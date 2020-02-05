@@ -130,9 +130,15 @@ private_lane :smf_super_pipeline_danger do |options|
 
   jira_ticket_base_url = build_variant_config[:jira_ticket_base_url]
 
+  contexts_to_search = {
+    "pull request title" => options[:pr_title],
+    "pull request body" => options[:pr_body],
+    "commits" => options[:commits],
+    "branch name" => options[:git_branch]
+  }
+
   smf_danger(
-    pr_number: options[:pr_number],
-    branch_name: options[:git_branch],
+    contexts_to_search: contexts_to_search,
     ticket_base_url: jira_ticket_base_url
   )
 end
