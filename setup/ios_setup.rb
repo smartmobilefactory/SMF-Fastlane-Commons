@@ -137,7 +137,10 @@ private_lane :smf_super_pipeline_danger do |options|
     "pull request body" => options[:pr_body],
     "branch name" => options[:git_branch],
     "commits" => options[:commits].split(', ')
-  }-
+  }
+
+  UI.message("Commits in fastlane: #{options[:commits].split(', ')} is type: #{options[:commits].split(', ').class} element type: #{options[:commits].split(', ').first.class}")
+
 
   smf_danger(
     contexts_to_search: contexts_to_search,
