@@ -131,10 +131,17 @@ private_lane :smf_super_pipeline_danger do |options|
 
   jira_ticket_base_url = build_variant_config[:jira_ticket_base_url]
 
-  UI.message("Jira ticket contexts:\n#{JSON.parse(options[:jira_ticket_contexts])}")
+  jira_ticket_search_context = {
+    "pull request title" => ENV["PR_TITLE"],
+    "pull request body" => ENV["PR_BODY"],
+    "commits" => ENV["COMMITS"],
+    "branch name" => ENV["CHANGE_BRANCH"]
+  }
+
+  UI.message("Jira ticket contexts:\n#{jira_ticket_search_context}")
 
   smf_danger(
-    contexts_to_search: JSON.parse(options[:jira_ticket_contexts]),
+    contexts_to_search: jira_ticket_search_context,
     ticket_base_url: jira_ticket_base_url
   )
 end
