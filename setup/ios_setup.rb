@@ -135,8 +135,8 @@ private_lane :smf_super_pipeline_danger do |options|
   contexts_to_search = {
     "pull request title" => options[:pr_title],
     "pull request body" => options[:pr_body],
-    "commits" => options[:commits],
-    "branch name" => options[:git_branch]
+    "branch name" => options[:git_branch],
+    "commits" => options[:commits]
   }
 
   smf_danger(
