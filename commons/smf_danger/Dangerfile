@@ -68,7 +68,7 @@ end
 jira_tickets = JSON.parse(ENV["DANGER_JIRA_TICKETS"])["ticket_urls"]
 
 if jira_tickets.nil? || jira_tickets.empty? then
-    warn("Unable to find any Jira Tickets related to this Pull Request, are there none?")
+    warn("Unable to find any Jira Tickets related to this Pull Request, are there any?")
 else
     ticket_message = "Jira Tickets related to this Pull Request: <br>"
 
