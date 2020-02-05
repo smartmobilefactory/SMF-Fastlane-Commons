@@ -1,3 +1,4 @@
+require 'json'
 ########## PULLREQUEST CHECK LANES ##########
 
 # Update Files
@@ -130,7 +131,7 @@ private_lane :smf_super_pipeline_danger do |options|
 
   jira_ticket_base_url = build_variant_config[:jira_ticket_base_url]
 
-  UI.message("Jira ticket contexts:\n#{options[:jira_ticket_contexts]}")
+  UI.message("Jira ticket contexts:\n#{JSON.parse(options[:jira_ticket_contexts])}")
 
   smf_danger(
     contexts_to_search: options["jira_ticket_contexts"],
