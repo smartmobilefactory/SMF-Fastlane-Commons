@@ -3,8 +3,7 @@ private_lane :smf_danger do |options|
   checkstyle_paths = []
   podspec_path = options[:podspec_path]
   bump_type = options[:bump_type]
-  pr_number = options[:pr_number]
-  branch_name = options[:branch_name]
+  contexts_to_search = options[:contexts_to_search]
   ticket_base_url = options[:ticket_base_url]
 
   if File.exist?(smf_swift_lint_output_path)
@@ -41,8 +40,7 @@ private_lane :smf_danger do |options|
   end
 
   _smf_create_jira_ticket_links(
-    pr_number,
-    branch_name,
+    contexts_to_search,
     ticket_base_url
   )
 
@@ -70,11 +68,10 @@ def _smf_find_paths_of_files_in_directory(directory, file_type = '')
   paths
 end
 
-def _smf_create_jira_ticket_links(pr_number, branch_name, ticket_base_url)
+def _smf_create_jira_ticket_links(contexts_to_search, ticket_base_url)
 
-  git_url = smf_get_repo_url
   default_ticket_base_url = ticket_base_url.nil? ? 'https://smartmobilefactory.atlassian.net/browse/' : ticket_base_url
-  tickets = _smf_find_jira_tickets(pr_number, git_url, branch_name)
+  tickets = _smf_find_jira_tickets(contexts_to_search)
 
   ticket_urls = []
 
@@ -85,59 +82,46 @@ def _smf_create_jira_ticket_links(pr_number, branch_name, ticket_base_url)
   ENV["DANGER_JIRA_TICKETS"] = "{ \"ticket_urls\" : #{ticket_urls} }"
 end
 
-def _smf_find_tickets_in(string)
-  regex = /(?<=\s|[^a-zA-Z]|)[A-Z]{2,14}-[0-9]{1,8}/
-  matches = string.match(regex)
+def _smf_find_tickets_in(string, string_context)
 
-  tickets = []
+  if string.nil?
+    UI.error("Can't look for Jira Tickets in #{string_context}, content is nil!")
+    return []
+   end
 
-  return tickets if matches.nil?
+  min_ticket_name_length = 2
+  max_ticket_name_length = 14
 
-  matches.to_a.each do | match |
-    tickets << match
-  end
+  min_ticket_number_lngeth = 1
+  max_ticket_number_length = 8
+
+  # This regex matches anything that starts with 2 ot 14 captial letters, followed by a dash followed by 1 to 8 digits
+  regex = /([A-Z]{#{min_ticket_name_length}, #{max_ticket_name_length}}-[0-9]{#{min_ticket_number_lngeth}, #{max_ticket_number_length}}/
+  tickets = string.scan(regex)
+
+  if !tickets.empty? then UI.message("Found #{tickets} in #{string_context}") end
 
   return tickets.uniq
 end
 
-def _smf_find_jira_tickets(pr_number, git_url, branch_name)
+def _smf_find_jira_tickets(contexts_to_search)
 
   tickets = []
 
-  pr_title = smf_github_get_pr_title(pr_number, git_url)
+  contexts_to_search.each do |context, content|
+    if context == "commits"
+      UI.message("Commit: #{content.first}")
 
-  if pr_title.nil?
-    UI.error("Can't look for Jira Tickets in Pull Request title, unable to download the PR title")
-  else
-    tickets_from_pr_title = _smf_find_tickets_in(pr_title)
-    if !tickets_from_pr_title.empty? then UI.message("Found #{tickets_from_pr_title} in pull request title") end
-    tickets.concat(tickets_from_pr_title).uniq
-  end
-
-  pr_body = smf_github_get_pr_body(pr_number, git_url)
-
-  if pr_body.nil?
-    UI.error("Can't look for Jira Tickets in Pull Request body, unable to download the PR body")
-  else
-    tickets_from_pr_body = _smf_find_tickets_in(pr_body)
-    if !tickets_from_pr_body.empty? then UI.message("Found #{tickets_from_pr_body} in pull request body") end
-    tickets.concat(tickets_from_pr_body).uniq
-  end
-
-  tickets_from_branch_name = _smf_find_tickets_in(branch_name)
-  if !tickets_from_branch_name.empty? then UI.message("Found #{tickets_from_branch_name} in branch_name") end
-  tickets.concat(tickets_from_branch_name).uniq
-  
-  commit_messages = smf_github_get_commit_messages_for_pr(pr_number, git_url)
-  if !commit_messages.nil? then
-
-    commit_messages.each do | message |
-      tickets_from_message = _smf_find_tickets_in(message)
-      if !tickets_from_message.empty? then UI.message("Found #{tickets_from_message} in commit message") end
-      tickets.concat(tickets_from_message).uniq
+      if !content.nil? then
+        content.each do |message|
+          tickets.concat(_smf_find_tickets_in(message, "commit message")).uniq
+        end
+      else
+        UI.error("Can't look for Jira Tickets in commits, unable to download the commits of this PR!")
+      end
+    else
+      tickets.concat(_smf_find_tickets_in(content, context)).uniq
     end
-  else
-    UI.error("Can't look for Jira Tickets in commits, unable to download the commits of this PR!")
   end
 
   return tickets
