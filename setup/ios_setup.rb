@@ -130,6 +130,8 @@ private_lane :smf_super_pipeline_danger do |options|
 
   jira_ticket_base_url = build_variant_config[:jira_ticket_base_url]
 
+  UI.message("Commits: #{options[:commits]}")
+
   contexts_to_search = {
     "pull request title" => options[:pr_title],
     "pull request body" => options[:pr_body],
