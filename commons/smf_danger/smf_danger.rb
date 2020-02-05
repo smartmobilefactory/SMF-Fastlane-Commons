@@ -110,7 +110,6 @@ def _smf_find_jira_tickets(contexts_to_search)
 
   contexts_to_search.each do |context, content|
     if context == "commits"
-      UI.message("Commit: #{content.first}")
 
       if !content.nil? then
         content.each do |message|

@@ -130,16 +130,14 @@ private_lane :smf_super_pipeline_danger do |options|
 
   jira_ticket_base_url = build_variant_config[:jira_ticket_base_url]
 
-  UI.message("Commits: #{options[:commits]}")
-
   contexts_to_search = {
     "pull request title" => options[:pr_title],
     "pull request body" => options[:pr_body],
     "branch name" => options[:git_branch],
-    "commits" => options[:commits].split(', ')
+    "commits" => options[:commits].gsub('[', '').gsub(']', '').split(', ')
   }
 
-  UI.message("Commits in fastlane: #{options[:commits].split(', ')} is type: #{options[:commits].split(', ').class} element type: #{options[:commits].split(', ').first.class}")
+  UI.message("Commits in fastlane: #{contexts_to_search["commits"]} is type: #{contexts_to_search["commits"].class} element type: #{contexts_to_search["commits"].first.class}")
 
 
   smf_danger(
