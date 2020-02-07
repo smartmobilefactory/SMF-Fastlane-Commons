@@ -123,7 +123,6 @@ lane :smf_pipeline_increment_build_number do |options|
   smf_super_pipeline_increment_build_number(options)
 end
 
-
 # Create Git Tag
 
 private_lane :smf_super_pipeline_create_git_tag do |options|
