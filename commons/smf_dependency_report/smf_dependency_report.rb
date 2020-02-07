@@ -16,7 +16,7 @@ private_lane :smf_dependency_report do |options|
 
   unless dependencyReport.nil?
     dependencyReport["environment"] = build_variant
-    dependencyReport["project"] = @smf_fastlane_config["project"]["meta_db_name"]
+    dependencyReport["project"] = @smf_fastlane_config[:project][:meta_db_name]
     smf_send_dependency_report(dependencyReport)
   end
 end
