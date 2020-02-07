@@ -52,11 +52,8 @@ def smf_send_dependency_report(report)
   https = Net::HTTP.new(uri.host,uri.port)
   https.use_ssl = true
 
-  UI.message("APIKEY: #{ENV["METADB_API_CREDENTIALS"]}")
-
   req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
   req.body = report.to_json
-  UI.message("data :\n#{report.to_json}")
   auth = ENV["METADB_API_CREDENTIALS"].split(':')
   req.basic_auth auth[0], auth[1]
 
