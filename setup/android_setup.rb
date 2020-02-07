@@ -83,6 +83,16 @@ lane :smf_pipeline_danger do |options|
   smf_super_pipeline_danger(options)
 end
 
+# Report project data
+
+private_lane :smf_super_report do |options|
+  build_variant = options[:build_variant]
+  smf_dependency_report(build_variant: build_variant)
+end
+
+lane :smf_report do |options|
+  smf_super_report(options)
+end
 
 ########## ADDITIONAL LANES USED FOR BUILDING ##########
 
