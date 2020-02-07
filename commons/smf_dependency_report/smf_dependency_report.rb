@@ -1,11 +1,12 @@
 require 'json'
 
 private_lane :smf_dependency_report do |options|
+  build_variant = options[:build_variant]
   dependencyReport = nil
   begin
     case @platform
     when :android
-      dependencyReport = smf_dependency_report_android(options)
+      dependencyReport = smf_dependency_report_android()
     else
       UI.message("The platform \"#{@platform}\" does not support dependency reports")
     end
@@ -14,12 +15,12 @@ private_lane :smf_dependency_report do |options|
   end
 
   unless dependencyReport.nil?
-    dependencyReport["environment"] = options[:build_variant]
+    dependencyReport["environment"] = build_variant
     smf_send_dependency_report(dependencyReport)
   end
 end
 
-def smf_dependency_report_android(options)
+def smf_dependency_report_android()
   gradle(task: 'allLicenseReport')
   dependencies = []
   smf_get_file_paths("license*Report.json").each { |path|
@@ -39,7 +40,6 @@ def smf_dependency_report_android(options)
     "software_versions" => dependencies,
     "type" => "dependency",
     "package_manager" => "gradle",
-    "environment" => options[:build_variant],
     "project" => "Test",
     "project_type" => "Android"
   }
