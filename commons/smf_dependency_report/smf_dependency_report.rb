@@ -16,6 +16,7 @@ private_lane :smf_dependency_report do |options|
 
   unless dependencyReport.nil?
     dependencyReport["environment"] = build_variant
+    dependencyReport["project"] = @smf_fastlane_config["project"]["meta_db_name"]
     smf_send_dependency_report(dependencyReport)
   end
 end
@@ -40,7 +41,6 @@ def smf_dependency_report_android()
     "software_versions" => dependencies,
     "type" => "dependency",
     "package_manager" => "gradle",
-    "project" => "Test",
     "project_type" => "Android"
   }
   apiData
