@@ -1,5 +1,3 @@
-require 'json'
-
 private_lane :smf_dependency_report do |options|
   build_variant = options[:build_variant]
   dependencyReport = nil
