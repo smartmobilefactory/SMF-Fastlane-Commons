@@ -313,20 +313,19 @@ def smf_extract_bump_type_from_pr_body
 
   pr_body = ENV['PR_BODY']
 
-  matches = pr_body.match(/- \[x\] \*\*([nothing|patch|minor|major]+)\*\*/m) unless pr_body.nil?
+  matches = pr_body.scan(/- \[x\] \*\*([nothing|patch|minor|major]+)\*\*/) unless pr_body.nil?
 
-  if matches.nil?
+  if matches.nil? || matches.empty?
     UI.error("No bump type selected!")
     return 'NO_BUMP_TYPE_ERROR'
   end
 
-  # 2 because we want the whole match plus one group captured
-  if matches.size > 2
+  if matches.size > 1
     UI.error("More then one bump types checkmarked in PR description!")
     return 'MULTIPLE_BUMP_TYPES_ERROR'
   end
 
-  bump_type = matches.captures.nil? ? nil : matches.captures.first
+  bump_type = matches.first.first
 
   if !bump_type.nil?
     if $POD_DEFAULT_VARIANTS.include?(bump_type)
