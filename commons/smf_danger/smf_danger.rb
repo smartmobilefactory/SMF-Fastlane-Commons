@@ -129,6 +129,6 @@ def _smf_find_jira_tickets(contexts_to_search)
       tickets.concat(_smf_find_tickets_in(content, context)).uniq
     end
   end
-
+  
   tickets.uniq
 end
