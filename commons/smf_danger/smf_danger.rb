@@ -22,9 +22,9 @@ private_lane :smf_danger do |options|
   _smf_find_paths_of('klint.xml').each { |path| checkstyle_paths.push(path) }
   _smf_find_paths_of('detekt.xml').each { |path| checkstyle_paths.push(path) }
 
-  ENV["DANGER_ANDROID_LINT_PATHS"] = JSON.dump(lint_paths)
-  ENV["DANGER_JUNIT_PATHS"] = JSON.dump(junit_result_paths)
-  ENV["DANGER_CHECKSTYLE_PATHS"] = JSON.dump(checkstyle_paths)
+  ENV['DANGER_ANDROID_LINT_PATHS'] = JSON.dump(lint_paths)
+  ENV['DANGER_JUNIT_PATHS'] = JSON.dump(junit_result_paths)
+  ENV['DANGER_CHECKSTYLE_PATHS'] = JSON.dump(checkstyle_paths)
 
   if (@platform == :ios_framework && !bump_type.nil?)
     if bump_type == ''
@@ -45,7 +45,7 @@ private_lane :smf_danger do |options|
   )
 
   danger(
-    github_api_token: ENV["DANGER_GITHUB_API_TOKEN"],
+    github_api_token: ENV[$DANGER_GITHUB_TOKEN_KEY],
     dangerfile: "#{File.expand_path(File.dirname(__FILE__))}/Dangerfile",
     verbose: true
   )
@@ -70,7 +70,8 @@ end
 
 def _smf_create_jira_ticket_links(contexts_to_search, ticket_base_url)
 
-  default_ticket_base_url = ticket_base_url.nil? ? 'Test' : ticket_base_url
+  default_ticket_base_url = ticket_base_url.nil? ? 'https://smartmobilefactory.atlassian.net/' : ticket_base_url
+  default_ticket_base_url += 'browse/'
   tickets = _smf_find_jira_tickets(contexts_to_search)
 
   ticket_urls = []
@@ -79,7 +80,7 @@ def _smf_create_jira_ticket_links(contexts_to_search, ticket_base_url)
     ticket_urls << "<a href='#{default_ticket_base_url}#{ticket}'>#{ticket}</a>"
   end
 
-  ENV["DANGER_JIRA_TICKETS"] = "{ \"ticket_urls\" : #{ticket_urls} }"
+  ENV['DANGER_JIRA_TICKETS'] = "{ \"ticket_urls\" : #{ticket_urls} }"
 end
 
 def _smf_find_tickets_in(string, string_context)
@@ -92,11 +93,11 @@ def _smf_find_tickets_in(string, string_context)
   min_ticket_name_length = 2
   max_ticket_name_length = 14
 
-  min_ticket_number_lngeth = 1
+  min_ticket_number_length = 1
   max_ticket_number_length = 8
 
   # This regex matches anything that starts with 2 or 14 captial letters, followed by a dash followed by 1 to 8 digits
-  regex = /[A-Z]{#{min_ticket_name_length},#{max_ticket_name_length}}-[0-9]{#{min_ticket_number_lngeth},#{max_ticket_number_length}}/
+  regex = /[A-Z]{#{min_ticket_name_length},#{max_ticket_name_length}}-[0-9]{#{min_ticket_number_length},#{max_ticket_number_length}}/
   tickets = string.scan(regex)
 
   if !tickets.empty? then UI.message("Found #{tickets} in #{string_context}") end
@@ -109,8 +110,7 @@ def _smf_find_jira_tickets(contexts_to_search)
   tickets = []
 
   contexts_to_search.each do |context, content|
-    if context == "commits"
-
+    if context == 'commits'
       if !content.nil? then
         content.each do |message|
           tickets.concat(_smf_find_tickets_in(message, "commit message")).uniq
