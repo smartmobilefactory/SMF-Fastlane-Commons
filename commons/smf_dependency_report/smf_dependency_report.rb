@@ -1,10 +1,17 @@
 private_lane :smf_dependency_report do |options|
   build_variant = options[:build_variant]
+  project_name = options[:meta_db_project_name]
   dependencyReport = nil
   begin
     case @platform
     when :android
-      dependencyReport = smf_dependency_report_android()
+      dependencyReport = _smf_dependency_report_android
+    when :ios, :macos
+      dependencyReport = _smf_dependency_report_cocoapods
+      dependencyReport["project_type"] = "iOS"
+    when :macos
+      dependencyReport = _smf_dependency_report_cocoapods
+      dependencyReport["project_type"] = "macOS"
     else
       UI.message("The platform \"#{@platform}\" does not support dependency reports")
     end
@@ -14,15 +21,12 @@ private_lane :smf_dependency_report do |options|
 
   unless dependencyReport.nil?
     dependencyReport["environment"] = build_variant
-    dependencyReport["project"] = @smf_fastlane_config[:project][:meta_db_name]
-    if dependencyReport["project"].nil?
-      dependencyReport["project"] = @smf_fastlane_config[:project][:project_name]
-    end
-    smf_send_dependency_report(dependencyReport)
+    dependencyReport["project"] = project_name
+    _smf_send_dependency_report(dependencyReport)
   end
 end
 
-def smf_dependency_report_android()
+def _smf_dependency_report_android
   gradle(task: 'allLicenseReport')
   dependencies = []
   smf_get_file_paths("license*Report.json").each { |path|
@@ -47,7 +51,46 @@ def smf_dependency_report_android()
   apiData
 end
 
-def smf_send_dependency_report(report)
+def _smf_dependency_report_cocoapods
+
+  podfile = YAML.load(File.read(smf_get_file_path("Podfile.lock")))
+
+  UI.message("dependencies: " + podfile["DEPENDENCIES"].to_json)
+
+  dependencies = []
+  podfile["DEPENDENCIES"].each { |value|
+
+    dependency = value.match(/([0-9a-zA-Z_\/]*) \((.*)\)/)
+    version = dependency[2]
+
+    # parse tag from dependency versions like "from `https://github.com/getsentry/sentry-cocoa.git`, tag `3.13.1`"
+    tagVersionMatch = version.match(/from \`.*\`, tag \`(.*)\`/)
+    if tagVersionMatch
+      version = tagVersionMatch[1]
+    end
+
+    # converts dependency version from "= 3.13.1" to "3.13.1"
+    absoluteVersionMatch = version.match(/[^\d]*(\d.*)/)
+    if absoluteVersionMatch
+      version = absoluteVersionMatch[1]
+    end
+
+    dependencies.append({
+        'name' => dependency[1],
+        'version' => version
+    })
+  }
+
+  UI.message("dependencies: " + dependencies.to_json)
+  apiData = {
+    "software_versions" => dependencies,
+    "type" => "dependency",
+    "package_manager" => "cocoapods"
+  }
+  apiData
+end
+
+def _smf_send_dependency_report(report)
   uri = URI('https://metadb.solutions.smfhq.com/api/v1/software')
 
   https = Net::HTTP.new(uri.host,uri.port)
@@ -55,7 +98,7 @@ def smf_send_dependency_report(report)
 
   req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
   req.body = report.to_json
-  auth = ENV["METADB_API_CREDENTIALS"].split(':')
+  auth = ENV[$SMF_METADB_API_CREDENTIALS].split(':')
   req.basic_auth auth[0], auth[1]
 
   res = https.request(req)
