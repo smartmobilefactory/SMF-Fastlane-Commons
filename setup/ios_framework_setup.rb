@@ -119,17 +119,10 @@ private_lane :smf_pod_super_danger do |options|
   bump_type = smf_extract_bump_type_from_pr_body(options[:pr_number])
 
   jira_ticket_base_url = options[:jira_ticket_base_url]
-  jira_ticket_search_context = {
-    'pull request title' => ENV['PR_TITLE'],
-    'pull request body' => ENV['PR_BODY'],
-    'commits' => ENV['COMMITS'].gsub('[', '').gsub(']', '').split(', '),
-    'branch name' => ENV['CHANGE_BRANCH']
-  }
 
   smf_danger(
     podspec_path: podspec_path,
     bump_type: bump_type,
-    contexts_to_search: jira_ticket_search_context,
     ticket_base_url: jira_ticket_base_url
   )
 end

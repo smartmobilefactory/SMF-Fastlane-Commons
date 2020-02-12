@@ -8,18 +8,17 @@ smf_danger(
     modules: [],                                            # Optional, see *smf_danger_module_config* for further information
     podspec_path: <path to podspec file>                    # only needed for ios frameworks
     bump_type: <either internal or breaking>                # only needed for ios frameworks
-    contexts_to_search = <dict with string to search in>    # the string in this dict will be searched for jira ticket tags
-    ticket_base_url: <base url for jira tickets>            # Optional, default is https://smartmobilefactory.atlassian.net/browse/          
+    ticket_base_url: <base url for jira tickets>            # Optional, default is https://smartmobilefactory.atlassian.net/        
 )
 ```
 
-#### Note
+##### Note
 
 The `podspec_path` and `bump_type` are used to calculate the upcoming pod version and add it to dangers pull request report.
 
-##### Jira Tickets Auto Detection
+#### Jira Tickets Auto Detection
 
-The context that are passed to the danger lane are searched to automatically detect the Jira Issue associated with the Pull Request and add them to the danger log. If you want to use a custom base url for the jira issues, you can override the `smf_pipeline_danger_lane` and add the base url to the options map. Here  is an example:
+The pr title, pr body, branch name and commits are searched to automatically detect the Jira Issue associated with the Pull Request and add them to the danger log. If you want to use a custom base url for the jira issues, you can override the `smf_pipeline_danger_lane` (depends on the platform, see NOTEs below) and add the base url to the options map. Here  is an example:
 ```
 override_lane :smf_pipeline_danger do |options|
   options[:jira_ticket_base_url] = '<your default base url>'

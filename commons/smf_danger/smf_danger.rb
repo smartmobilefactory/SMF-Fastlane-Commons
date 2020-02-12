@@ -3,7 +3,6 @@ private_lane :smf_danger do |options|
   checkstyle_paths = []
   podspec_path = options[:podspec_path]
   bump_type = options[:bump_type]
-  contexts_to_search = options[:contexts_to_search]
   ticket_base_url = options[:ticket_base_url]
 
   if File.exist?(smf_swift_lint_output_path)
@@ -40,7 +39,6 @@ private_lane :smf_danger do |options|
   end
 
   _smf_create_jira_ticket_links(
-    contexts_to_search,
     ticket_base_url
   )
 
@@ -68,7 +66,14 @@ def _smf_find_paths_of_files_in_directory(directory, file_type = '')
   paths
 end
 
-def _smf_create_jira_ticket_links(contexts_to_search, ticket_base_url)
+def _smf_create_jira_ticket_links(ticket_base_url)
+
+  contexts_to_search = {
+    'pull request title' => ENV['PR_TITLE'],
+    'pull request body' => ENV['PR_BODY'],
+    'commits' => ENV['COMMITS'].nil? ? nil : ENV['COMMITS'].gsub('[', '').gsub(']', '').split(', '),
+    'branch name' => ENV['CHANGE_BRANCH']
+  }
 
   default_ticket_base_url = ticket_base_url.nil? ? 'https://smartmobilefactory.atlassian.net/' : ticket_base_url
   default_ticket_base_url += 'browse/'
