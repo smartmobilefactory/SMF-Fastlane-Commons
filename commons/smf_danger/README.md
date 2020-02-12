@@ -5,7 +5,6 @@ This lane collects all paths from linter tasks and runs *danger* from Fastlane.
 ### Example
 ```
 smf_danger(
-    modules: [],                                            # Optional, see *smf_danger_module_config* for further information
     podspec_path: <path to podspec file>                    # only needed for ios frameworks
     bump_type: <either internal or breaking>                # only needed for ios frameworks
     ticket_base_url: <base url for jira tickets>            # Optional, default is https://smartmobilefactory.atlassian.net/        
