@@ -2,7 +2,7 @@ require 'json'
 
 if ENV['MULTIPLE_BUMP_TYPES_ERROR'] == 'true'
     warn("⛔️ You have selected <b>multiple</b> \"bump types\" in the description of this PR. Please select only one!")
-elsif ENV['MULTIPLE_BUMP_TYPES_ERROR'] == 'true'
+elsif ENV['NO_BUMP_TYPE_ERROR'] == 'true'
     warn("⛔️ You <b>didn't</b> select a \"bump type\" in the description of this PR. Please select one!")
 elsif !ENV['POD_VERSION'].nil?
     message("Upcoming Build Version is <b>#{ENV['POD_VERSION']}</b>")
