@@ -26,7 +26,9 @@ private_lane :smf_danger do |options|
   ENV['DANGER_CHECKSTYLE_PATHS'] = JSON.dump(checkstyle_paths)
 
   if (@platform == :ios_framework && !bump_type.nil?)
-    if bump_type == ''
+    if bump_type == 'NO_BUMP_TYPE_ERROR'
+      ENV['NO_BUMP_TYPE_ERROR'] = 'true'
+    elsif bump_type == 'MULTIPLE_BUMP_TYPES_ERROR'
       ENV['MULTIPLE_BUMP_TYPES_ERROR'] = 'true'
     else
       version_number = smf_increment_version_number_dry_run(
