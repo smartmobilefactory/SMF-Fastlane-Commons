@@ -116,7 +116,7 @@ def _smf_find_jira_tickets(contexts_to_search)
           tickets.concat(_smf_find_tickets_in(message, "commit message")).uniq
         end
       else
-        UI.error("Can't look for Jira Tickets in commits, unable to download the commits of this PR!")
+        UI.error("Can't look for Jira Tickets in commits, no commits available!")
       end
     else
       tickets.concat(_smf_find_tickets_in(content, context)).uniq
