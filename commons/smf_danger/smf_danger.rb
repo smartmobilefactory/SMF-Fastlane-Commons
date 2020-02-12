@@ -111,7 +111,7 @@ def _smf_find_jira_tickets(contexts_to_search)
 
   contexts_to_search.each do |context, content|
     if context == 'commits'
-      if !content.nil? then
+      if !content.nil? && !content.empty? then
         content.each do |message|
           tickets.concat(_smf_find_tickets_in(message, "commit message")).uniq
         end
