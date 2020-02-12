@@ -6,22 +6,22 @@ private_lane :smf_dependency_report do |options|
     case @platform
     when :android
       dependencyReport = _smf_dependency_report_android
-    when :ios, :macos
+    when :ios
       dependencyReport = _smf_dependency_report_cocoapods
       dependencyReport["project_type"] = "iOS"
     when :macos
       dependencyReport = _smf_dependency_report_cocoapods
-      dependencyReport["project_type"] = "macOS"
+      dependencyReport['project_type'] = "macOS"
     else
       UI.message("The platform \"#{@platform}\" does not support dependency reports")
     end
   rescue
-    UI.message("Platform dependencies could not be reported")
+    UI.message('Platform dependencies could not be reported')
   end
 
   unless dependencyReport.nil?
-    dependencyReport["environment"] = build_variant
-    dependencyReport["project"] = project_name
+    dependencyReport['environment'] = build_variant
+    dependencyReport['project'] = project_name
     _smf_send_dependency_report(dependencyReport)
   end
 end
@@ -29,7 +29,7 @@ end
 def _smf_dependency_report_android
   gradle(task: 'allLicenseReport')
   dependencies = []
-  smf_get_file_paths("license*Report.json").each { |path|
+  smf_get_file_paths('license*Report.json').each { |path|
     report = JSON.parse(File.read(path), :symbolize_names => false)
     report.each { |value|
       license = value['licenses'][0]['license'] unless value['licenses'].nil? || value['licenses'].empty?
@@ -43,20 +43,20 @@ def _smf_dependency_report_android
   }
 
   apiData = {
-    "software_versions" => dependencies,
-    "type" => "dependency",
-    "package_manager" => "gradle",
-    "project_type" => "Android"
+    'software_versions' => dependencies,
+    'type' => 'dependency',
+    'package_manager' => 'gradle',
+    'project_type' => 'Android'
   }
   apiData
 end
 
 def _smf_dependency_report_cocoapods
 
-  podfile = YAML.load(File.read(smf_get_file_path("Podfile.lock")))
+  podfile = YAML.load(File.read(smf_get_file_path('Podfile.lock')))
 
   dependencies = []
-  podfile["DEPENDENCIES"].each { |value|
+  podfile['DEPENDENCIES'].each { |value|
 
     dependency = value.match(/([0-9a-zA-Z_\/]*) \((.*)\)/)
     version = dependency[2]
@@ -80,9 +80,9 @@ def _smf_dependency_report_cocoapods
   }
 
   apiData = {
-    "software_versions" => dependencies,
-    "type" => "dependency",
-    "package_manager" => "cocoapods"
+    'software_versions' => dependencies,
+    'type' => 'dependency',
+    'package_manager' => 'cocoapods'
   }
   apiData
 end
