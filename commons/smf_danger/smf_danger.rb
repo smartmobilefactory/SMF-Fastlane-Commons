@@ -70,7 +70,7 @@ end
 
 def _smf_create_jira_ticket_links(contexts_to_search, ticket_base_url)
 
-  default_ticket_base_url = ticket_base_url.nil? ? 'https://smartmobilefactory.atlassian.net/browse/' : ticket_base_url
+  default_ticket_base_url = ticket_base_url.nil? ? 'Test' : ticket_base_url
   tickets = _smf_find_jira_tickets(contexts_to_search)
 
   ticket_urls = []
@@ -95,7 +95,7 @@ def _smf_find_tickets_in(string, string_context)
   min_ticket_number_lngeth = 1
   max_ticket_number_length = 8
 
-  # This regex matches anything that starts with 2 ot 14 captial letters, followed by a dash followed by 1 to 8 digits
+  # This regex matches anything that starts with 2 or 14 captial letters, followed by a dash followed by 1 to 8 digits
   regex = /[A-Z]{#{min_ticket_name_length},#{max_ticket_name_length}}-[0-9]{#{min_ticket_number_lngeth},#{max_ticket_number_length}}/
   tickets = string.scan(regex)
 
