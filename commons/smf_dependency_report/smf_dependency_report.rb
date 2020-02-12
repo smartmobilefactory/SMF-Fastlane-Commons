@@ -55,8 +55,6 @@ def _smf_dependency_report_cocoapods
 
   podfile = YAML.load(File.read(smf_get_file_path("Podfile.lock")))
 
-  UI.message("dependencies: " + podfile["DEPENDENCIES"].to_json)
-
   dependencies = []
   podfile["DEPENDENCIES"].each { |value|
 
@@ -81,7 +79,6 @@ def _smf_dependency_report_cocoapods
     })
   }
 
-  UI.message("dependencies: " + dependencies.to_json)
   apiData = {
     "software_versions" => dependencies,
     "type" => "dependency",
