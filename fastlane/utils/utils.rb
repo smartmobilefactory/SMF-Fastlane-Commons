@@ -309,15 +309,11 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
   version_number
 end
 
-def smf_extract_bump_type_from_pr_body(pr_number)
+def smf_extract_bump_type_from_pr_body
 
-  pr_body = smf_github_get_pr_body(pr_number, smf_get_repo_url)
+  pr_body = ENV['PR_BODY']
 
-  UI.message("PR_BODY IS: \n#{pr_body}")
-
-  matches = pr_body.match(/- \[x\] \*\*([nothing|patch|minor|major]+)\*\*/m)
-
-  UI.message("MATCHES: \n#{matches}")
+  matches = pr_body.match(/- \[x\] \*\*([nothing|patch|minor|major]+)\*\*/m) unless pr_body.nil?
 
   if matches.nil?
     UI.message("There are no selectable bump types in the PRs description!")
@@ -326,7 +322,7 @@ def smf_extract_bump_type_from_pr_body(pr_number)
 
   # 2 because we want the whole match plus one group captured
   if matches.size != 2
-    UI.error("More then one or no bump type checkmarked in PR description!")
+    UI.error("More then one or no bump types checkmarked in PR description!")
     return ''
   end
 
