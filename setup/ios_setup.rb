@@ -127,15 +127,12 @@ end
 private_lane :smf_super_pipeline_danger do |options|
 
   jira_ticket_base_url = options[:jira_ticket_base_url]
-
   jira_ticket_search_context = {
     'pull request title' => ENV['PR_TITLE'],
     'pull request body' => ENV['PR_BODY'],
     'commits' => ENV['COMMITS'].gsub('[', '').gsub(']', '').split(', '),
     'branch name' => ENV['CHANGE_BRANCH']
   }
-
-  UI.message("Jira ticket contexts:\n#{jira_ticket_search_context}")
 
   smf_danger(
     contexts_to_search: jira_ticket_search_context,

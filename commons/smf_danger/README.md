@@ -28,3 +28,5 @@ override_lane :smf_pipeline_danger do |options|
 end
 ```
 For example if the base url is `https://acme.atlassian.net/` a `browse/` is added and then this is put in front of the ticket tag. Assuming the ticket tag `TICKET-123` is found, this produces `https://acme.atlassian.net/browse/TICKET-123`.
+
+**NOTE**: For a framework the lanes are called `:smf_pod_danger` and `:smf_super_pod_danger`. And for flutter projects the lanes are called `smf_shared_pipeline_danger` and `smf_super_shared_pipeline_danger`.

@@ -77,14 +77,16 @@ end
 
 private_lane :smf_super_pipeline_danger do |options|
 
-  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
-  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
-
-  jira_ticket_base_url = build_variant_config[:jira_ticket_base_url]
+  jira_ticket_base_url = options[:jira_ticket_base_url]
+  jira_ticket_search_context = {
+    'pull request title' => ENV['PR_TITLE'],
+    'pull request body' => ENV['PR_BODY'],
+    'commits' => ENV['COMMITS'].gsub('[', '').gsub(']', '').split(', '),
+    'branch name' => ENV['CHANGE_BRANCH']
+  }
 
   smf_danger(
-    pr_number: options[:pr_number],
-    branch_name: options[:git_branch],
+    contexts_to_search: jira_ticket_search_context,
     ticket_base_url: jira_ticket_base_url
   )
 end

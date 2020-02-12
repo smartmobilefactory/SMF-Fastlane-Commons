@@ -78,7 +78,7 @@ def _smf_create_jira_ticket_links(contexts_to_search, ticket_base_url)
 
   tickets.each do | ticket |
     ticket_urls << "<a href='#{default_ticket_base_url}#{ticket}'>#{ticket}</a>"
-  end
+  end unless tickets.nil?
 
   ENV['DANGER_JIRA_TICKETS'] = "{ \"ticket_urls\" : #{ticket_urls} }"
 end
@@ -111,7 +111,7 @@ def _smf_find_jira_tickets(contexts_to_search)
 
   contexts_to_search.each do |context, content|
     if context == 'commits'
-      if !content.nil? && !content.empty? then
+      if !content.nil? then
         content.each do |message|
           tickets.concat(_smf_find_tickets_in(message, "commit message")).uniq
         end
