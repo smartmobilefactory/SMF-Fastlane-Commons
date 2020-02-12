@@ -35,6 +35,8 @@ $SMF_CI_FLUTTER_ERROR_LOG = 'ci-flutter-error-log'
 # We host our own Sentry server so we need to supply the URL ourselves
 $SENTRY_AUTH_TOKEN = 'SENTRY_API_ACCESS_TOKEN'
 
+$DANGER_GITHUB_TOKEN_KEY = 'DANGER_GITHUB_API_TOKEN'
+
 # match
 $FASTLANE_MATCH_REPO_URL = 'git@github.com:smartmobilefactory/SMF-iOS-Fastlane-Match.git'
 $SMF_FASTLANE_ITC_TEAM_ID_KEY = 'FASTLANE_ITC_TEAM_ID'
