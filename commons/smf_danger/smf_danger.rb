@@ -130,5 +130,5 @@ def _smf_find_jira_tickets(contexts_to_search)
     end
   end
 
-  return tickets
+  tickets.uniq
 end
