@@ -308,7 +308,7 @@ def smf_extract_bump_type_from_pr_body
 
   pr_body = ENV['PR_BODY']
 
-  matches = pr_body.scan(/- \[x\] \*\*([nothing|patch|minor|major]+)\*\*/) unless pr_body.nil?
+  matches = pr_body.scan(/- \[x\] \*\*(nothing|patch|minor|major|current|internal|breaking)\*\*/) unless pr_body.nil?
 
   if matches.nil? || matches.empty?
     UI.error("No bump type selected!")
