@@ -8,10 +8,10 @@ private_lane :smf_dependency_report do |options|
       dependencyReport = _smf_dependency_report_android
     when :ios
       dependencyReport = _smf_dependency_report_cocoapods
-      dependencyReport["project_type"] = "iOS"
+      dependencyReport['project_type'] = 'iOS'
     when :macos
       dependencyReport = _smf_dependency_report_cocoapods
-      dependencyReport['project_type'] = "macOS"
+      dependencyReport['project_type'] = 'macOS'
     else
       UI.message("The platform \"#{@platform}\" does not support dependency reports")
     end
