@@ -33,11 +33,11 @@ private_lane :smf_android_upload_to_appcenter do |options|
     )
   end
 
-  smf_create_appcenter_push(
-    app_owner: owner_id,
-    app_display_name: app_name,
-    app_id: app_id
-  )
+  #smf_create_appcenter_push(
+  #  app_owner: owner_id,
+  #  app_display_name: app_name,
+  #  app_id: app_id
+  #)
 end
 
 def get_app_details(app_id)

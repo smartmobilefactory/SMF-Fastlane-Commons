@@ -47,7 +47,8 @@ security unlock-keychain -p $KEYCHAIN_PASSWORD "/Users/smf/Library/Keychains/log
 CERTIFICATE_NAME=`security find-certificate -c $TEAM_ID | grep -e "alis" | sed 's/    "alis"<blob>="//g' | sed 's/"//g'`
 echo "Signing Identity: '$CERTIFICATE_NAME'"
 
-codesign -s "$CERTIFICATE_NAME" ./generate_appcast
+# We are resigning generate_appcast so that we can allow it to be run without a password prompt (`security set-generic-password-partition-list` is doing that)
+codesign -s "$CERTIFICATE_NAME" -f ./generate_appcast
 codesign -dv ./generate_appcast
 
 echo "----- Add Private Key ----"

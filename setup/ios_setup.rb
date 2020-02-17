@@ -61,7 +61,7 @@ private_lane :smf_super_build do |options|
     use_default_match_config: build_variant_config[:match].nil?,
     match_read_only: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:read_only],
     match_type: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:type],
-    extensions_suffixes: @smf_fastlane_config[:extensions_suffixes],
+    extensions_suffixes: !build_variant_config[:extensions_suffixes].nil? ? build_variant_config[:extensions_suffixes] : @smf_fastlane_config[:extensions_suffixes],
     build_variant: build_variant
   )
 
@@ -124,11 +124,16 @@ end
 # Danger
 
 private_lane :smf_super_pipeline_danger do |options|
-  smf_danger
+
+  jira_ticket_base_url = options[:jira_ticket_base_url]
+
+  smf_danger(
+    ticket_base_url: jira_ticket_base_url
+  )
 end
 
 lane :smf_pipeline_danger do |options|
-  smf_super_pipeline_danger
+  smf_super_pipeline_danger(options)
 end
 
 ########## ADDITIONAL LANES USED FOR BUILDING ##########

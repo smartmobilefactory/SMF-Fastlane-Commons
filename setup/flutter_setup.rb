@@ -1,22 +1,3 @@
-########## PULLREQUEST CHECK LANES ##########
-
-# Update Jenkinsfile
-
-private_lane :smf_shared_super_generate_files do |options|
-
-  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
-
-  smf_update_generated_files(
-      branch: options[:branch],
-      build_variant: build_variant
-  )
-end
-
-lane :smf_shared_generate_files do |options|
-  smf_shared_super_generate_files(options)
-end
-
-
 # Setup Dependencies - pod install & `sh generate.sh` (optional: Phrase App)
 
 private_lane :smf_super_shared_setup_dependencies do |options|
@@ -57,6 +38,37 @@ lane :smf_setup_dependencies_build do |options|
 end
 
 
+# Update Jenkinsfile
+
+private_lane :smf_shared_super_generate_files do |options|
+
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+
+  smf_update_generated_files(
+      branch: options[:branch],
+      build_variant: build_variant
+  )
+end
+
+lane :smf_shared_generate_files do |options|
+  smf_shared_super_generate_files(options)
+end
+
+
+# Create Git Tag
+
+private_lane :smf_super_pipeline_create_git_tag do |options|
+
+  build_variant = options[:build_variant]
+  build_number = smf_get_build_number_of_app
+  smf_create_git_tag(build_variant: build_variant, build_number: build_number)
+end
+
+lane :smf_pipeline_create_git_tag do |options|
+  smf_super_pipeline_create_git_tag(options)
+end
+
+
 # Build
 
 private_lane :smf_super_ios_build do |options|
@@ -74,7 +86,7 @@ private_lane :smf_super_ios_build do |options|
       use_default_match_config: build_variant_ios_config[:match].nil?,
       match_read_only: build_variant_ios_config[:match].nil? ? nil : build_variant_ios_config[:match][:read_only],
       match_type: build_variant_ios_config[:match].nil? ? nil : build_variant_ios_config[:match][:type],
-      extensions_suffixes: @smf_fastlane_config[:extensions_suffixes],
+      extensions_suffixes: !build_variant_config[:extensions_suffixes].nil? ? build_variant_config[:extensions_suffixes] : @smf_fastlane_config[:extensions_suffixes],
       build_variant: build_variant
   )
   smf_build_ios_app(
@@ -125,41 +137,6 @@ lane :smf_android_build do |options|
 end
 
 
-# Linter
-
-private_lane :smf_super_linter do |options|
-  sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} analyze || true")
-end
-
-lane :smf_linter do |options|
-  smf_super_linter(options)
-end
-
-
-# Run Unit Tests
-
-private_lane :smf_super_run_unit_tests do |options|
-  sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} test")
-end
-
-lane :smf_run_unit_tests do |options|
-  smf_super_run_unit_tests(options)
-end
-
-
-# Danger
-
-private_lane :smf_super_shared_pipeline_danger do |options|
-  smf_danger(options)
-end
-
-lane :smf_shared_pipeline_danger do |options|
-  smf_super_shared_pipeline_danger(options)
-end
-
-
-########## ADDITIONAL LANES USED FOR BUILDING ##########
-
 # Generate Changelog
 
 private_lane :smf_super_generate_changelog do |options|
@@ -171,34 +148,6 @@ end
 
 lane :smf_generate_changelog do |options|
   smf_super_generate_changelog(options)
-end
-
-
-# Increment Build Number
-
-private_lane :smf_super_pipeline_increment_build_number do |options|
-
-  smf_increment_build_number(
-      current_build_number: smf_get_build_number_of_app
-  )
-end
-
-lane :smf_pipeline_increment_build_number do |options|
-  smf_super_pipeline_increment_build_number(options)
-end
-
-
-# Create Git Tag
-
-private_lane :smf_super_pipeline_create_git_tag do |options|
-
-  build_variant = options[:build_variant]
-  build_number = smf_get_build_number_of_app
-  smf_create_git_tag(build_variant: build_variant, build_number: build_number)
-end
-
-lane :smf_pipeline_create_git_tag do |options|
-  smf_super_pipeline_create_git_tag(options)
 end
 
 
@@ -234,24 +183,25 @@ private_lane :smf_super_pipeline_android_upload_to_appcenter do |options|
   build_variant = options[:build_variant]
   build_variant_config_android = @smf_fastlane_config[:build_variants][build_variant.to_sym][:android]
   appcenter_app_id = smf_get_appcenter_id(build_variant, 'android')
+  hockey_app_id = smf_get_hockey_id(build_variant, 'android')
   destinations = build_variant_config_android[:appcenter_destinations]
 
   # Upload APK to AppCenter
   apk_path = smf_get_file_path(smf_get_apk_file_regex(build_variant))
-  smf_android_upload_to_appcenter(    
-    destinations: destinations,
-    build_variant: build_variant,    
-    apk_path: apk_path,
-    app_id: appcenter_app_id 
+  smf_android_upload_to_appcenter(
+      destinations: destinations,
+      build_variant: build_variant,
+      apk_path: apk_path,
+      app_id: appcenter_app_id
   ) if apk_path != '' && !appcenter_app_id.nil?
 
   # Upload AAB to AppCenter
   aab_path = smf_get_file_path(smf_get_aab_file_regex(build_variant))
   smf_android_upload_to_appcenter(
-    destinations: destinations,
-    build_variant: build_variant,
-    aab_path: aab_path,
-    app_id: appcenter_app_id
+      destinations: destinations,
+      build_variant: build_variant,
+      aab_path: aab_path,
+      app_id: appcenter_app_id
   ) if aab_path != '' && !appcenter_app_id.nil?
 
 end
@@ -271,10 +221,10 @@ private_lane :smf_super_pipeline_ios_upload_to_appcenter do |options|
 
   # Upload the IPA to AppCenter
   smf_ios_upload_to_appcenter(
-    destinations: destinations,
-    app_id: appcenter_app_id,
-    escaped_filename: build_variant_config[:flavor].gsub(' ', "\ "),
-    path_to_ipa_or_app: smf_get_file_path(app_file_regex)
+      destinations: destinations,
+      app_id: appcenter_app_id,
+      escaped_filename: build_variant_config[:flavor].gsub(' ', "\ "),
+      path_to_ipa_or_app: smf_get_file_path(app_file_regex)
   ) if !appcenter_app_id.nil?
 end
 
@@ -340,12 +290,66 @@ end
 private_lane :smf_super_send_slack_notification do |options|
 
   build_variant = options[:build_variant]
+  slack_channel = @smf_fastlane_config[:project][:slack_channel]
 
   smf_send_default_build_success_notification(
-      name: smf_get_default_name_of_app(build_variant)
+      name: smf_get_default_name_of_app(build_variant),
+      slack_channel: slack_channel
   )
 end
 
 lane :smf_send_slack_notification do |options|
   smf_super_send_slack_notification(options)
 end
+
+
+# Run Unit Tests
+
+private_lane :smf_super_run_unit_tests do |options|
+  sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} test")
+end
+
+lane :smf_run_unit_tests do |options|
+  smf_super_run_unit_tests(options)
+end
+
+# Increment Build Number
+
+private_lane :smf_super_pipeline_increment_build_number do |options|
+
+  smf_increment_build_number(
+      current_build_number: smf_get_build_number_of_app
+  )
+end
+
+lane :smf_pipeline_increment_build_number do |options|
+  smf_super_pipeline_increment_build_number(options)
+end
+
+
+# Linter
+
+private_lane :smf_super_linter do |options|
+  sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} analyze || true")
+end
+
+lane :smf_linter do |options|
+  smf_super_linter(options)
+end
+
+
+# Danger
+
+private_lane :smf_super_shared_pipeline_danger do |options|
+
+  jira_ticket_base_url = options[:jira_ticket_base_url]
+
+  smf_danger(
+    ticket_base_url: jira_ticket_base_url
+  )
+end
+
+lane :smf_shared_pipeline_danger do |options|
+  smf_super_shared_pipeline_danger(options)
+end
+

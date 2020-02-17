@@ -58,18 +58,24 @@ def smf_get_default_name_of_app(build_variant)
   build_number = smf_get_build_number_of_app
   project_name = @smf_fastlane_config[:project][:project_name]
 
-  version_number = smf_get_version_number(build_variant)
-  if version_number.nil?
-    version_number = ''
-  else
-    version_number += ' '
-  end
+  if !build_variant.nil?
+    version_number = smf_get_version_number(build_variant)
 
-  "#{project_name} #{build_variant.upcase} #{version_number}(#{build_number})"
+    if version_number.nil?
+      version_number = ''
+    else
+      version_number += ' '
+    end
+
+    return "#{project_name} #{build_variant.upcase} #{version_number}(#{build_number})"
+  else
+    return project_name
+  end
 end
 
 # Uses Config file to access project name. Should be changed in the future.
 def smf_get_default_name_of_pod(build_variant)
+
   version = ''
   if !build_variant.nil?
     podspec_path = @smf_fastlane_config[:build_variants][build_variant.to_sym][:podspec_path]
@@ -139,11 +145,24 @@ end
 
 def smf_path_to_ipa_or_app(build_variant)
 
-  escaped_filename = @smf_fastlane_config[:build_variants][build_variant.to_sym][:scheme].gsub(' ', "\ ")
+  if !ENV['APP_NAME'].nil?
+    UI.message("Using app name: #{ENV['APP_NAME']} from Info.plist to construct .app path")
+    return smf_workspace_dir + "/build/#{ENV['APP_NAME']}.app"
+  end
 
-  app_path = smf_workspace_dir + "/build/#{escaped_filename}.ipa.zip"
-  app_path = smf_workspace_dir + "/build/#{escaped_filename}.ipa" unless File.exist?(app_path)
-  app_path = smf_workspace_dir + "/build/#{escaped_filename}.app" unless File.exist?(app_path)
+  app_path = ''
+
+  Dir.foreach(smf_workspace_dir + '/build') do |filename|
+  
+    file_exists = filename.end_with?('.ipa.zip')
+    file_exists = filename.end_with?('.ipa') unless file_exists
+    file_exists = filename.end_with?('.app') unless file_exists
+    
+    if file_exists
+      app_path = smf_workspace_dir + '/build/' + filename
+      break
+    end
+  end
 
   unless File.exist?(app_path)
     app_path = lane_context[SharedValues::IPA_OUTPUT_PATH]
@@ -152,6 +171,20 @@ def smf_path_to_ipa_or_app(build_variant)
   end
 
   app_path
+end
+
+def smf_rename_app_file(build_variant)
+
+  app_file_path = smf_path_to_ipa_or_app(build_variant)
+  info_plist_path=File.join(app_file_path,"/Contents/Info.plist")
+
+  app_name= sh("defaults read #{info_plist_path} CFBundleName").gsub("\n", '')
+  ENV['APP_NAME'] = app_name
+
+  new_app_file_path = smf_path_to_ipa_or_app(build_variant)
+
+  UI.message("Renaming #{app_file_path} to #{new_app_file_path}")
+  File.rename(app_file_path, new_app_file_path)
 end
 
 def smf_path_to_dmg(build_variant)
@@ -228,10 +261,35 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
     target = build_variant_config[:target]
     scheme = build_variant_config[:scheme]
 
-    version_number = get_version_number(
-        xcodeproj: "#{smf_get_project_name}.xcodeproj",
-        target: (target != nil ? target : scheme)
-    )
+    begin
+      # First we try to get the version number from the plist via fastlane
+      version_number = get_version_number(
+          xcodeproj: "#{smf_get_project_name}.xcodeproj",
+          target: (target != nil ? target : scheme),
+          configuration: build_variant_config[:xcconfig_name].nil? ? nil : build_variant_config[:xcconfig_name][:archive]
+      )
+    rescue
+      begin
+          # Depending on the project configuration, we might have the version number as a variable in the plist
+          # If that's the case, fastlane won't manage to get it, and we'll endup here.
+          # The next strategy is to check for MARKETING_VERSION in the build configuration
+          UI.message("Fastlane was not able to determine project version. Checking now for MARKETING_VERSION in the build settings")
+
+          # First we make sure that we are using the correct Xcode version
+          required_xcode_version = @smf_fastlane_config[:project][:xcode_version]
+          smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
+
+          workspacePath = "#{smf_workspace_dir}/#{smf_get_project_name}.xcworkspace"
+          buildConfigurationString = `xcodebuild -workspace "#{workspacePath}" -scheme "#{scheme}" -configuration "#{build_variant_config[:xcconfig_name][:archive]}" -showBuildSettings -json`
+          buildConfigurationJSON = JSON.parse(buildConfigurationString)
+          version_number = buildConfigurationJSON.first['buildSettings']["MARKETING_VERSION"]
+          UI.message("Found MARKETING_VERSION in the build settings: #{version_number}")
+      rescue StandardError => e
+          raise "Cannot find marketing version #{e}"
+      rescue
+          raise "Cannot find marketing version"
+      end
+    end
   when :ios_framework
     version_number = version_get_podspec(path: podspec_path)
   when :android
@@ -242,28 +300,27 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
   end
-
+  UI.message("Use #{version_number} as version number.")
   version_number
 end
 
-def smf_extract_bump_type_from_pr_body(pr_body)
+def smf_extract_bump_type_from_pr_body
 
-  matches = pr_body.match(/## Build.+## Jira Ticket/m)
+  pr_body = ENV['PR_BODY']
 
-  if matches.nil?
-    UI.messsage("There are no selectable bump types in the PRs description!")
-    return nil
+  matches = pr_body.scan(/- \[x\] \*\*([nothing|patch|minor|major]+)\*\*/) unless pr_body.nil?
+
+  if matches.nil? || matches.empty?
+    UI.error("No bump type selected!")
+    return 'NO_BUMP_TYPE_ERROR'
   end
 
-  text = matches[0]
-  groups = text.scan(/- \[x\] \*\*([a-z]+)\*\*/m)
-
-  if groups.size != 1
-    UI.error("Multiple bump types checkmarked in PR description!")
-    return ''
+  if matches.size > 1
+    UI.error("More then one bump types checkmarked in PR description!")
+    return 'MULTIPLE_BUMP_TYPES_ERROR'
   end
 
-  bump_type = groups.first.first
+  bump_type = matches.first.first
 
   if !bump_type.nil?
     if $POD_DEFAULT_VARIANTS.include?(bump_type)

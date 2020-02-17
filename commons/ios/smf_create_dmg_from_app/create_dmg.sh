@@ -94,7 +94,7 @@ SRCFOLDER=${APPDIR}/${APPFULLNAME}
 if [ $CREATE_DMG = true ]; then
     rm -rf ${SRCFOLDER}
 	mkdir -p ${SRCFOLDER}
-	cp -r ${APPPATH} ${SRCFOLDER}
+	cp -R ${APPPATH} ${SRCFOLDER}
 	cd ${SRCFOLDER}
 	ln -s /Applications .
 	cd ..
@@ -109,8 +109,8 @@ fi
 # Code Sign
 #
 
-if [ -n $CODE_SIGN_ID ]; then
-	codesign -s $CODE_SIGN_ID ${APPDIR}/${NAME}.dmg
+if [ -n "$CODE_SIGN_ID" ]; then
+	codesign -s "$CODE_SIGN_ID" ${APPDIR}/${NAME}.dmg
 	if [ $? -gt 0 ]; then
 		echo "Abort: Error code signing the DMG"
 		exit 1

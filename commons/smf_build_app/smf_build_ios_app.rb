@@ -45,7 +45,7 @@ private_lane :smf_build_ios_app do |options|
       include_bitcode: (upload_itc && upload_bitcode),
       export_options: { iCloudContainerEnvironment: icloud_environment },
       skip_package_ipa: skip_package_ipa,
-      xcpretty_formatter: "/Library/Ruby/Gems/2.3.0/gems/xcpretty-json-formatter-0.1.0/lib/json_formatter.rb"
+      xcpretty_formatter: _smf_get_xcpretty_formatter_path
   )
 end
 
@@ -82,5 +82,19 @@ def smf_is_using_old_build_system
 
   return true if (contents.match(regex) != nil)
 
+end
+
+def _smf_get_xcpretty_formatter_path
+  # Because currently bundler is printing a lot of gem warnings, we have to take the last line of the output which actually is the correct path we want
+  path = sh('xcpretty-json-formatter').split("\n").last
+
+  if path.nil?
+    UI.message('Error getting path to xcpretty-json-formatter. Seems like the Gem (https://github.com/marcelofabri/xcpretty-json-formatter) is not (corrrectly) installed!')
+    raise 'Error getting path to xcpretty-json-formatter'
+  else
+    UI.message("Found path to xcpretty-formatter: #{path}")
+  end
+
+  path
 end
 

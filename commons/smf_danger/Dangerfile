@@ -2,6 +2,8 @@ require 'json'
 
 if ENV['MULTIPLE_BUMP_TYPES_ERROR'] == 'true'
     warn("⛔️ You have selected <b>multiple</b> \"bump types\" in the description of this PR. Please select only one!")
+elsif ENV['NO_BUMP_TYPE_ERROR'] == 'true'
+    warn("⛔️ You <b>didn't</b> select a \"bump type\" in the description of this PR. Please select one!")
 elsif !ENV['POD_VERSION'].nil?
     message("Upcoming Build Version is <b>#{ENV['POD_VERSION']}</b>")
 end
@@ -14,9 +16,13 @@ end
 can_merge = github.pr_json["mergeable"]
 warn("This PR cannot be merged yet.", sticky: false) unless can_merge
 
-## TODOs:
-todoist.warn_for_todos
-todoist.print_todos_table
+begin
+  ## TODOs:
+  todoist.warn_for_todos
+  todoist.print_todos_table
+rescue
+  message("Todoist could not be executed")
+end
 
 ## LINT:
 JSON.parse(ENV["DANGER_ANDROID_LINT_PATHS"]).each do |lint_path|
@@ -60,7 +66,17 @@ JSON.parse(ENV["DANGER_JUNIT_PATHS"]).each do |junit_tests_dir|
   end
 end
 
-## JIRA:
-JSON.parse(ENV["DANGER_JIRA_KEYS"]).each do |key|
-  jira.check(key: key["key"], url: key["url"], search_commits: true)
+## JIRA TICKETS
+jira_tickets = JSON.parse(ENV["DANGER_JIRA_TICKETS"])["ticket_urls"]
+
+if jira_tickets.nil? || jira_tickets.empty? then
+    warn("Unable to find any Jira Tickets related to this Pull Request, are there any?")
+else
+    ticket_message = "Jira Tickets related to this Pull Request: <br>"
+
+    jira_tickets.each do | ticket_url |
+        ticket_message += "#{ticket_url}<br>"
+    end
+
+    message(ticket_message)
 end

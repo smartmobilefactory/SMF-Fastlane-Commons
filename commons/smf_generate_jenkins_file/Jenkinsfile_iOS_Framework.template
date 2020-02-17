@@ -6,4 +6,8 @@
 
 _build_variants = __BUILD_VARIANTS__
 
-iOSFramework(_build_variants)
+_build_parameters = [
+	'build_variants': _build_variants
+]
+
+iOSFramework(_build_parameters)

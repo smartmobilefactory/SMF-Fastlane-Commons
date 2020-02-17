@@ -39,7 +39,8 @@ private_lane :smf_generate_jenkins_file do |options|
   end
 
   jenkinsFileData = jenkinsFileData.gsub("#{BUILD_VARIANTS_PATTERN}", JSON.dump(possible_build_variants))
-  jenkinsFileData = _smf_insert_custom_credentials(jenkinsFileData)
+
+  jenkinsFileData = _smf_insert_custom_credentials(jenkinsFileData) unless @platform == :macos
 
   File.write("#{smf_workspace_dir}/Jenkinsfile", jenkinsFileData)
 end
