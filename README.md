@@ -39,11 +39,11 @@ end
 *example_setup.rb*
 ```
 private_lane :smf_super_example_lane_in_setup do |options|
-	# Read values from config.json or jenkins here
-        value = @smf_fastlane_config[:value_key]
-	example_lane(
-		test_value: value
-	)
+    # Read values from config.json or jenkins here
+    value = @smf_fastlane_config[:value_key]
+    example_lane(
+        test_value: value
+    )
 end
 
 lane :smf_example_lane_in_setup do |options|
