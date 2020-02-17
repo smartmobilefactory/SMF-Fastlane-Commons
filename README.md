@@ -7,10 +7,10 @@ In the 'setup' directory we placed a setup file for every platform. In these set
 
 To keep up this structure we follow the following guidelines.
 
-* [Add or update a lane](#Add or update a lane)
-* [Passing Naming of lanes and functions to lanes](#Naming of lanes and functions)
-* [Passing values to lanes](#Passing values to lanes)
-* [Frequently used variables](#Frequently used variables)
+* [Add or update a lane](#Add-or-update-a-lane)
+* [Passing Naming of lanes and functions to lanes](#Naming-of-lanes-and-functions)
+* [Passing values to lanes](#Passing-values-to-lanes)
+* [Frequently used variables](#Frequently-used-variables)
 * [Constants](#Constants)
 
 ## Add or update a lane
@@ -53,7 +53,7 @@ end
 ```
 
 ## Frequently used variables
-**@smf_fastlane_config**: [Access the config.json](#Passing values to lanes).
+**@smf_fastlane_config**: [Access the config.json](#Passing-values-to–lanes).
 **@platform**: Helps us finding out for which platform we are running fastlane.
 **@fastlane_commons_dir_path**: Represents the path to the fastlane-smf-commons in the project.
 **smf_workspace_dir**: Is a function which returns the workspace directory and is often used to get the path to sth.
