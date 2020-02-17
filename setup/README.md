@@ -147,7 +147,7 @@ These lanes install pods if a podfile is present in the project. They also check
 This lane downloads the provisioning profiles and builds the app and saves the IPA. :floppy_disk:
 
 #### `smf_unit_tests`
-This lane run unit tests.
+This lane runs unit tests.
 
 #### `smf_linter`
 This lane runs lint tasks like swift lint.
@@ -170,7 +170,7 @@ This lane runs lint tasks like swift lint.
 This lane uploads the symbolication files to sentry. :arrow_up:
 
 #### `smf_upload_to_appcenter`
-This lane uploads the IPA to App Center if a `appcenter_id` is given for the build variant in the Config.json. :arrow_up:
+This lane uploads the IPA to App Center if an `appcenter_id` is given for the build variant in the Config.json. :arrow_up:
 ```
  "live": {
        "variant": "productionRelease",
@@ -229,7 +229,7 @@ This lane runs lint tasks like klint.
 [See this lane in Common Setup](#smf_pipeline_create_git_tag)
 
 #### `smf_upload_to_appcenter`
-This lane uploads the apk to App Center if a `appcenter_id` is defined for the build variant Config.json. :arrow_up:
+This lane uploads the apk to App Center if an `appcenter_id` is defined for the build variant Config.json. :arrow_up:
 ```
  "live": {
        "variant": "productionRelease",
