@@ -35,7 +35,7 @@ def _smf_dependency_report_android
       license = value['licenses'][0]['license'] unless value['licenses'].nil? || value['licenses'].empty?
 
       dependencies.append({
-        'name' => value['dependency'].sub(":#{value['version']}", ""),
+        'name' => value['dependency'].sub(":#{value['version']}", ''),
         'version' => value['version'],
         'license' => license
       })
