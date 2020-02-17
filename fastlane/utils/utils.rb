@@ -49,11 +49,6 @@ def smf_get_appcenter_id(build_variant, platform = nil)
   appcenter_id
 end
 
-def smf_get_hockey_id(build_variant, platform = nil)
-  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
-  hockeyapp_id = platform.nil? ? build_variant_config[:hockeyapp_id] : build_variant_config[platform.to_sym][:hockeyapp_id]
-end
-
 def smf_get_keystore_folder(build_variant)
 
   @smf_fastlane_config[:build_variants][build_variant.to_sym][:keystore]

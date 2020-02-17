@@ -141,7 +141,6 @@ private_lane :smf_super_upload_to_appcenter do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
   apk_file_regex = smf_get_apk_file_regex(build_variant)
   appcenter_app_id = smf_get_appcenter_id(build_variant)
-  hockey_app_id = smf_get_hockey_id(build_variant)
   destinations = build_variant_config[:appcenter_destinations]
 
   # Upload to AppCenter
