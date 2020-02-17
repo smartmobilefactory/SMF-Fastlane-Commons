@@ -40,7 +40,7 @@ end
 ```
 private_lane :smf_super_example_lane_in_setup do |options|
 	# Read values from config.json or jenkins here
-    value = @smf_fastlane_config[:value_key]
+        value = @smf_fastlane_config[:value_key]
 	example_lane(
 		test_value: value
 	)
@@ -53,11 +53,11 @@ end
 ```
 
 ## Frequently used variables
-**@smf_fastlane_config**: [Access the config.json](#Passing-values-to–lanes).
-**@platform**: Helps us finding out for which platform we are running fastlane.
-**@fastlane_commons_dir_path**: Represents the path to the fastlane-smf-commons in the project.
-**smf_workspace_dir**: Is a function which returns the workspace directory and is often used to get the path to sth.
-*Example*
+**@smf_fastlane_config**: [Access the config.json](#Passing-values-to-lanes).  
+**@platform**: Helps us finding out for which platform we are running fastlane.  
+**@fastlane_commons_dir_path**: Represents the path to the fastlane-smf-commons in the project.  
+**smf_workspace_dir**: Is a function which returns the workspace directory and is often used to get the path to sth.  
+###*Example*
 ```
 def smf_import_commons
 
