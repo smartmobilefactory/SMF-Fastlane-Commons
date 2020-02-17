@@ -17,7 +17,7 @@ To keep up this structure we follow the following guidelines.
 If we edit a lane's parameter we always **update the README** and if we do major changes to a lane we should **update the README in the setup directory**. 
 
 ## Naming of lanes and functions
-Every lane and function we define starts with **smf\_**, because we want to see the distinguish our code from the Fastlane code. If we use a function just in one file we mark it with **_** to make clear that it is only used in this file. Otherwise, we put it in the **utils.rb** file.
+Every lane and function we define starts with **smf\_**, because we want to see the distinguish our code from the Fastlane code. If we use a function just in one file we mark it with **_** to make clear that it is **only used in this file**. Otherwise, we put it in the **utils.rb** file.
 ```
 def _smf_helper(parameter1, parameter2)
     parameter1
@@ -74,6 +74,6 @@ def smf_import_commons
   ...
 end
 ```
-Note: Prefer *single quotes over double quotes*.
+Note: Prefer **single quotes over double quotes**.
 ## Constants
 We define globally used constants in the 'Constants.rb' file. Local constants should be initialized at the beginning of the lane.
