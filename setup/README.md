@@ -121,7 +121,7 @@ This lane increments the build number. :chart_with_upwards_trend: To get the cur
 This lane creates a tag on GitHub which is build using the following pattern: *build/\<build variant\>/\<build number\>*.
 
 #### `smf_send_slack_notification`
-This lanes sends the default build success notification to Slack. :envelope::white_check_mark:
+This lane sends the default build success notification to Slack. :envelope::white_check_mark:
       
       
       
