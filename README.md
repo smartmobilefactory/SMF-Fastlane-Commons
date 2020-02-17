@@ -3,7 +3,7 @@
 # Get Started
 The SMF-Fastlane-Commons are a set of all Fastlane lanes we use for our PR checks and builds 👷‍♀️👷‍♂️
 
-In the 'setup' directory we placed a setup file for every platform. In these setup files we put all lanes that are called by Jenkins. The defined lanes call the common lanes, which we place in the 'commons' directory. There you can find all lanes we use. Each lane has it's own directory and a README for better understanding 💡 Platform specific lanes will be Subdirectories of the corresponding directory like 'ios'.
+In the 'setup' directory we placed a setup file for every platform. In these setup files we put all lanes that are called by Jenkins. The defined lanes call the common lanes, which we place in the 'commons' directory. There you can find all lanes we use. Each lane has it's own directory and a README for better understanding 💡 Platform specific lanes will be subdirectories of the corresponding directory like 'ios'.
 
 To keep up this structure we follow the following guidelines.
 
@@ -17,16 +17,15 @@ To keep up this structure we follow the following guidelines.
 If we edit a lane's parameter we always **update the README** and if we do major changes to a lane we should **update the README in the setup directory**. 
 
 ## Naming of lanes and functions
-Every lane and function we define starts with **smf\_**, because want to see the distinguish our code from the Fastlane code. If we use a function just in one file we mark it with **_** to make clear that it is only used in this file. Otherwise, we put it in the **utils.rb** file.
+Every lane and function we define starts with **smf\_**, because we want to see the distinguish our code from the Fastlane code. If we use a function just in one file we mark it with **_** to make clear that it is only used in this file. Otherwise, we put it in the **utils.rb** file.
 ```
 def _smf_helper(parameter1, parameter2)
-    # Returns parameter1, super helpful!
     parameter1
 end
-
 ```
+Returns parameter1, super helpful! **No 'return' needed** 😎
 ## Passing values to lanes
- We pass values e.g. from the **config.json** or jenkins are passed as parameters. We assign **all parameters to variables** at the beginning of a lane.
+ We pass values e.g. from the **config.json** or jenkins as parameters. We assign **all parameters to variables** at the beginning of a lane.
 ### Example
 *example_lane.rb*
 ```
@@ -47,17 +46,17 @@ private_lane :smf_super_example_lane_in_setup do |options|
 end
 
 lane :smf_example_lane_in_setup do |options|
-    # Remove () if you do not pass parameters
     smf_super_example_lane_in_setup
 end
 ```
+**Remove ()** if you do not pass parameters 🧐
 
 ## Frequently used variables
 **@smf_fastlane_config**: [Access the config.json](#Passing-values-to-lanes).  
 **@platform**: Helps us finding out for which platform we are running fastlane.  
 **@fastlane_commons_dir_path**: Represents the path to the fastlane-smf-commons in the project.  
 **smf_workspace_dir**: Is a function which returns the workspace directory and is often used to get the path to sth.  
-###*Example*
+### Example
 ```
 def smf_import_commons
 
@@ -70,12 +69,11 @@ def smf_import_commons
     @fastlane_commons_dir_path = "#{smf_workspace_dir}/.idea/.fastlane-smf-commons"
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
-    # Prefer single quotes over double quotes.
     raise 'Unknown Platform'
   end
   ...
 end
 ```
-
+Note: Prefer *single quotes over double quotes*.
 ## Constants
 We define globally used constants in the 'Constants.rb' file. Local constants should be initialized at the beginning of the lane.
