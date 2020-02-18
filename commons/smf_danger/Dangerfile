@@ -41,12 +41,13 @@ end
 ## CHECKSTYLE:
 JSON.parse(ENV["DANGER_CHECKSTYLE_PATHS"]).each do |checkstyle_path|
   # REMOVE AFTER TESTING
-  message("current dir: #{Dir.pwd}")
-  message("path: #{checkstyle_path}")
+  puts("current dir: #{Dir.pwd}")
+  puts("path: #{checkstyle_path}")
+  puts("report: #{checkstyle_path.sub("#{Dir.pwd}/", '')}")
   if !checkstyle_path.nil?
     if File.exist?(checkstyle_path)
       checkstyle_format.base_path = Dir.pwd
-      checkstyle_format.report checkstyle_path
+      checkstyle_format.report checkstyle_path.sub("#{Dir.pwd}/", '')
     else
       fail("Checkstyle task is set but there is no report file")
     end
