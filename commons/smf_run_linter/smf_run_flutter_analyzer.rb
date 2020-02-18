@@ -8,16 +8,14 @@ private_lane :smf_run_flutter_analyzer do |options|
 end
 
 def _smf_flutter_analyzer_output_to_xml(output)
-  lines = output.split(/\n/)
-
   # Only lines containing a '•' are relevant for analyzer output.
-  lines = lines.select {|l| l.include? '•' }
+  lines = output.split(/\n/).select { |l| l.include? '•' }
+
   builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml|
-    xml.checkstyle {
+    xml.checkstyle(version: "4.3") {
       lines.each do |l|
         parts = l.split(/ • /)
-        xml.file {
-          xml.name parts[2].split(/:/)[0]
+        xml.file(name: parts[2].split(/:/)[0]) {
           xml.error(line: parts[2].split(/:/)[1], column: parts[2].split(/:/)[2], severity: parts[0].strip, message: parts[1], source: parts[3])
         }
       end
