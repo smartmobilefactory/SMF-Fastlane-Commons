@@ -41,8 +41,8 @@ end
 ## CHECKSTYLE:
 JSON.parse(ENV["DANGER_CHECKSTYLE_PATHS"]).each do |checkstyle_path|
   # REMOVE AFTER TESTING
-  puts("current dir: #{Dir.pwd}")
-  puts("path: #{checkstyle_path}")
+  message("current dir: #{Dir.pwd}")
+  message("path: #{checkstyle_path}")
   if !checkstyle_path.nil?
     if File.exist?(checkstyle_path)
       checkstyle_format.base_path = Dir.pwd
