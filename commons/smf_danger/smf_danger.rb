@@ -24,6 +24,11 @@ private_lane :smf_danger do |options|
 
   ENV['DANGER_ANDROID_LINT_PATHS'] = JSON.dump(lint_paths)
   ENV['DANGER_JUNIT_PATHS'] = JSON.dump(junit_result_paths)
+  # REMOVE AFTER TESTING
+  checkstyle_paths.each do |path|
+    UI.message("#{path}")
+  end
+  UI.message("#{JSON.dump(checkstyle_paths)}")
   ENV['DANGER_CHECKSTYLE_PATHS'] = JSON.dump(checkstyle_paths)
 
   if (@platform == :ios_framework && !bump_type.nil?)

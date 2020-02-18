@@ -12,9 +12,6 @@ def _smf_flutter_analyzer_output_to_xml(output)
 
   # Only lines containing a '•' are relevant for analyzer output.
   lines = lines.select {|l| l.include? '•' }
-  lines.each do |l|
-    UI.message("#{l}")
-  end
   builder = Nokogiri::XML::Builder.new(encoding: 'UTF-8') do |xml|
     xml.checkstyle {
       lines.each do |l|
