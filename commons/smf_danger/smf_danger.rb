@@ -55,7 +55,7 @@ end
 def _smf_find_paths_of(filename)
   paths = []
   Dir["#{smf_workspace_dir}/**/#{filename}"].each do |file|
-    paths.append(File.expand_path(file))
+    paths.push(File.expand_path(file))
   end
   paths
 end
