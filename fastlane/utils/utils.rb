@@ -7,6 +7,14 @@ def smf_get_file_path(file_regex)
   path
 end
 
+def smf_get_file_paths(file_regex)
+  paths = []
+  Dir["#{smf_workspace_dir}/**/#{file_regex}"].each do |file|
+    paths.append(File.expand_path(file))
+  end
+  paths
+end
+
 def smf_get_ouput_file_regex(build_variant)
   case @platform
   when :android
