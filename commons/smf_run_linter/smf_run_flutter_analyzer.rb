@@ -2,7 +2,6 @@ private_lane :smf_run_flutter_analyzer do |options|
   FLUTTER_ANALYZER_OUTPUT_PATH = "#{smf_workspace_dir}/flutter_analyzer.xml"
   flutter_analyzer_output = sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} analyze || true").to_s
   flutter_analyzer_file = File.new(FLUTTER_ANALYZER_OUTPUT_PATH, 'w+')
-  UI.message("output: #{flutter_analyzer_output}")
   flutter_analyzer_xml = _smf_flutter_analyzer_output_to_xml(flutter_analyzer_output)
 
   File.write(flutter_analyzer_file, flutter_analyzer_xml)
@@ -10,6 +9,9 @@ end
 
 def _smf_flutter_analyzer_output_to_xml(output)
   lines = output.split(/\n/)
+
+  # Only lines containing a '•' are relevant for analyzer output.
+  lines = lines.select {|l| l.include? '•' }
   lines.each do |l|
     UI.message("#{l}")
   end
