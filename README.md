@@ -3,7 +3,7 @@
 # Get Started
 The SMF-Fastlane-Commons are a set of all Fastlane lanes we use for our PR checks and builds 👷‍♀️👷‍♂️
 
-In the 'setup' directory we placed a setup file for every platform. In these setup files we put all lanes that are called by Jenkins. The defined lanes call the common lanes, which we place in the 'commons' directory. There you can find all lanes we use. Each lane has it's own directory and a README for better understanding 💡 Platform specific lanes will be subdirectories of the corresponding directory like 'ios'.
+In the 'setup' directory we placed a setup file for every platform. In these setup files we put all lanes that are called by Jenkins. The defined lanes call the common tools, which we place in the 'commons' directory. There you can find all lanes we use. Each lane has it's own directory and a README for better understanding 💡 Platform specific lanes will be subdirectories of the corresponding directory like 'ios'.
 
 To keep up this structure we follow the following guidelines.
 
