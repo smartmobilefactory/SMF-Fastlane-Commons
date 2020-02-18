@@ -1,5 +1,5 @@
 private_lane :smf_run_flutter_analyzer do |options|
-  FLUTTER_ANALYZER_OUTPUT_PATH = "#{smf_workspace_dir}/flutter_analyzer.xml"
+  FLUTTER_ANALYZER_OUTPUT_PATH = "#{smf_workspace_dir}/build/flutter_analyzer.xml"
   flutter_analyzer_output = sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} analyze || true").to_s
   flutter_analyzer_file = File.new(FLUTTER_ANALYZER_OUTPUT_PATH, 'w+')
   flutter_analyzer_xml = _smf_flutter_analyzer_output_to_xml(flutter_analyzer_output)
