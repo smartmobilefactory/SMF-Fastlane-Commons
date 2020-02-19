@@ -12,6 +12,7 @@ private_lane :smf_super_shared_setup_dependencies do |options|
 
   sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} doctor")
   sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} packages get")
+  ENV['CI_FLUTTER_PATH'] = smf_get_flutter_binary_path
   generate_sh_file = "#{smf_workspace_dir}/generate.sh"
   if File.exist?(generate_sh_file)
     sh("cd #{smf_workspace_dir}; sh generate.sh")
