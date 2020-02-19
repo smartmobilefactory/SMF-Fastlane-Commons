@@ -58,3 +58,12 @@ Example:
 ```
 smf_run_swift_lint
 ```
+
+## smf_run_flutter_analyzer
+
+This lane runs the flutter command 'analyze' and saves the output to a .xml file.
+
+Example:
+```
+smf_run_flutter_analyzer
+```

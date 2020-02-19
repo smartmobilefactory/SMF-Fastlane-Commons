@@ -329,7 +329,7 @@ end
 # Linter
 
 private_lane :smf_super_linter do |options|
-  sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} analyze || true")
+  smf_run_flutter_analyzer(options)
 end
 
 lane :smf_linter do |options|

@@ -20,6 +20,7 @@ private_lane :smf_danger do |options|
 
   _smf_find_paths_of('ktlint.xml').each { |path| checkstyle_paths.push(path) }
   _smf_find_paths_of('detekt.xml').each { |path| checkstyle_paths.push(path) }
+  _smf_find_paths_of('flutter_analyzer.xml').each { |path| checkstyle_paths.push(path) }
 
   ENV['DANGER_ANDROID_LINT_PATHS'] = JSON.dump(lint_paths)
   ENV['DANGER_JUNIT_PATHS'] = JSON.dump(junit_result_paths)
@@ -41,20 +42,20 @@ private_lane :smf_danger do |options|
   end
 
   _smf_create_jira_ticket_links(
-    ticket_base_url
+      ticket_base_url
   )
 
   danger(
-    github_api_token: ENV[$DANGER_GITHUB_TOKEN_KEY],
-    dangerfile: "#{File.expand_path(File.dirname(__FILE__))}/Dangerfile",
-    verbose: true
+      github_api_token: ENV[$DANGER_GITHUB_TOKEN_KEY],
+      dangerfile: "#{File.expand_path(File.dirname(__FILE__))}/Dangerfile",
+      verbose: true
   )
 end
 
 def _smf_find_paths_of(filename)
   paths = []
   Dir["#{smf_workspace_dir}/**/#{filename}"].each do |file|
-    paths.append(File.expand_path(file))
+    paths.push(File.expand_path(file))
   end
   paths
 end
@@ -71,10 +72,10 @@ end
 def _smf_create_jira_ticket_links(ticket_base_url)
 
   contexts_to_search = {
-    'pull request title' => ENV['PR_TITLE'],
-    'pull request body' => ENV['PR_BODY'],
-    'commits' => ENV['COMMITS'].nil? ? nil : ENV['COMMITS'].gsub('[', '').gsub(']', '').split(', '),
-    'branch name' => ENV['CHANGE_BRANCH']
+      'pull request title' => ENV['PR_TITLE'],
+      'pull request body' => ENV['PR_BODY'],
+      'commits' => ENV['COMMITS'].nil? ? nil : ENV['COMMITS'].gsub('[', '').gsub(']', '').split(', '),
+      'branch name' => ENV['CHANGE_BRANCH']
   }
 
   default_ticket_base_url = ticket_base_url.nil? ? 'https://smartmobilefactory.atlassian.net/' : ticket_base_url
@@ -83,7 +84,7 @@ def _smf_create_jira_ticket_links(ticket_base_url)
 
   ticket_urls = []
 
-  tickets.each do | ticket |
+  tickets.each do |ticket|
     ticket_urls << "<a href='#{default_ticket_base_url}#{ticket}'>#{ticket}</a>"
   end unless tickets.nil?
 
@@ -95,7 +96,7 @@ def _smf_find_tickets_in(string, string_context)
   if string.nil?
     UI.error("Can't look for Jira Tickets in #{string_context}, content is nil!")
     return []
-   end
+  end
 
   min_ticket_name_length = 2
   max_ticket_name_length = 14
@@ -107,7 +108,9 @@ def _smf_find_tickets_in(string, string_context)
   regex = /[A-Z]{#{min_ticket_name_length},#{max_ticket_name_length}}-[0-9]{#{min_ticket_number_length},#{max_ticket_number_length}}/
   tickets = string.scan(regex)
 
-  if !tickets.empty? then UI.message("Found #{tickets} in #{string_context}") end
+  if !tickets.empty? then
+    UI.message("Found #{tickets} in #{string_context}")
+  end
 
   return tickets.uniq
 end
@@ -129,6 +132,6 @@ def _smf_find_jira_tickets(contexts_to_search)
       tickets.concat(_smf_find_tickets_in(content, context)).uniq
     end
   end
-  
+
   tickets.uniq
 end
