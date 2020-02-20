@@ -43,6 +43,18 @@ def smf_get_project_name
   @smf_fastlane_config[:project][:project_name]
 end
 
+def smf_get_appcenter_destination_groups(build_variant, additional_destinations)
+  destinations = additional_destinations
+  if build_variant.downcase.include? "alpha"
+    if destinations.nil?
+      destinations = "All-Alphas-2eff8581,Collaborators"
+    else
+      destinations = "#{destinations},All-Alphas-2eff8581,Collaborators"
+    end
+  end
+  destinations
+end
+
 def smf_get_appcenter_id(build_variant, platform = nil)
 
   if @platform == :ios
