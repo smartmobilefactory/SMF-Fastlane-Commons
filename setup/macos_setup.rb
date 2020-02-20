@@ -251,7 +251,7 @@ private_lane :smf_super_upload_to_appcenter do |options|
 
   # Upload the IPA to AppCenter
   smf_ios_upload_to_appcenter(
-    destinations: destinations,
+    destinations: smf_get_appcenter_destination_groups(build_variant, destinations),
     build_variant: build_variant,
     build_number: smf_get_build_number_of_app,
     app_id: appcenter_app_id,

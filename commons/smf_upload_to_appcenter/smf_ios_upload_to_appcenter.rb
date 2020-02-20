@@ -6,7 +6,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
   escaped_filename = options[:escaped_filename]
   path_to_ipa_or_app = options[:path_to_ipa_or_app]
   is_mac_app = !options[:is_mac_app].nil? ? options[:is_mac_app] : false
-  destinations = options[:destinations].nil? ? 'Collaborators' : options[:destinations]
+  destinations = options[:destinations]
   sparkle_xml_name = options[:sparkle_xml_name]
   upload_sparkle = options[:upload_sparkle]
 

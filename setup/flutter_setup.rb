@@ -189,7 +189,7 @@ private_lane :smf_super_pipeline_android_upload_to_appcenter do |options|
   # Upload APK to AppCenter
   apk_path = smf_get_file_path(smf_get_apk_file_regex(build_variant))
   smf_android_upload_to_appcenter(
-      destinations: destinations,
+      destinations: smf_get_appcenter_destination_groups(build_variant, destinations),
       build_variant: build_variant,
       apk_path: apk_path,
       app_id: appcenter_app_id
@@ -198,7 +198,7 @@ private_lane :smf_super_pipeline_android_upload_to_appcenter do |options|
   # Upload AAB to AppCenter
   aab_path = smf_get_file_path(smf_get_aab_file_regex(build_variant))
   smf_android_upload_to_appcenter(
-      destinations: destinations,
+      destinations: smf_get_appcenter_destination_groups(build_variant, destinations),
       build_variant: build_variant,
       aab_path: aab_path,
       app_id: appcenter_app_id

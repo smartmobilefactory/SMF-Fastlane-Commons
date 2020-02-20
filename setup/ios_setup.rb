@@ -225,7 +225,7 @@ private_lane :smf_super_upload_to_appcenter do |options|
 
   # Upload the IPA to AppCenter
   smf_ios_upload_to_appcenter(
-    destinations: destinations,
+    destinations: smf_get_appcenter_destination_groups(build_variant, destinations),
     app_id: appcenter_app_id,
     escaped_filename: build_variant_config[:scheme].gsub(' ', "\ "),
     path_to_ipa_or_app: smf_path_to_ipa_or_app(build_variant)
