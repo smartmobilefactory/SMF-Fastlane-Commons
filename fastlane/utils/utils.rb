@@ -55,7 +55,7 @@ def smf_get_appcenter_destination_groups(build_variant, additional_destinations)
   end
 
   destinations.push('Collaborators')
-  destinations.join(',')
+  destinations.uniq.join(',')
 end
 
 def smf_get_appcenter_id(build_variant, platform = nil)
