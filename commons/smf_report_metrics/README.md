@@ -1,4 +1,4 @@
-# smf_dependency_report
+# smf_report_metrics
 
 This lane reports project metrics to MetaDB
 
