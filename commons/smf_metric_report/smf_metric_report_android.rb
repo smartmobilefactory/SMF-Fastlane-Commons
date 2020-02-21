@@ -32,12 +32,12 @@ def smf_general_dependency_report_android
   dependencies = []
   dependencies.append({
     'name' => 'androidTargetSdk',
-    'version' => report['targetSdkVersion']
+    'version' => report['targetSdkVersion'].to_s
   })
 
   dependencies.append({
     'name' => 'androidMinSdk',
-    'version' => report['minSdkVersion']
+    'version' => report['minSdkVersion'].to_s
   })
 
   apiData = {
@@ -59,22 +59,22 @@ def smf_development_dependency_report_android
   dependencies = []
   dependencies.append({
     'name' => 'androidCompileSdk',
-    'version' => report['compileSdkVersion']
+    'version' => report['compileSdkVersion'].to_s
   })
 
   dependencies.append({
     'name' => 'kotlin',
-    'version' => report['kotlinVersion']
+    'version' => report['kotlinVersion'].to_s
   })
 
   dependencies.append({
     'name' => 'androidGradlePlugin',
-    'version' => report['gradleVersion']
+    'version' => report['gradleVersion'].to_s
   })
 
   dependencies.append({
     'name' => 'androidBuildTools',
-    'version' => report['gradleVersion']
+    'version' => report['gradleVersion'].to_s
   })
 
   apiData = {
