@@ -13,17 +13,17 @@ private_lane :smf_report_metrics do |options|
   begin
     case @platform
     when :android
-      dependencyReport.push(prepare_api_data.call(smf_general_dependency_report_android))
-      dependencyReport.push(prepare_api_data.call(smf_development_dependency_report_android))
-      dependencyReport.push(prepare_api_data.call(smf_dependency_report_android))
+      dependencyReports.push(prepare_api_data.call(smf_general_dependency_report_android))
+      dependencyReports.push(prepare_api_data.call(smf_development_dependency_report_android))
+      dependencyReports.push(prepare_api_data.call(smf_dependency_report_android))
     when :ios
       report = smf_dependency_report_cocoapods
       report['project_type'] = 'iOS'
-      dependencyReport.push(prepare_api_data.call(report))
+      dependencyReports.push(prepare_api_data.call(report))
     when :macos
       report = smf_dependency_report_cocoapods
       report['project_type'] = 'macOS'
-      dependencyReport.push(prepare_api_data.call(report))
+      dependencyReports.push(prepare_api_data.call(report))
     else
       UI.message("The platform \"#{@platform}\" does not support metric reports")
     end
