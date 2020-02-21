@@ -112,7 +112,7 @@ end
 private_lane :smf_super_report do |options|
   build_variant = options[:build_variant]
 
-  smf_dependency_report(build_variant: build_variant, meta_db_project_name: meta_db_project_name)
+  smf_report_metrics(build_variant: build_variant, meta_db_project_name: meta_db_project_name)
 end
 
 lane :smf_report do |options|
