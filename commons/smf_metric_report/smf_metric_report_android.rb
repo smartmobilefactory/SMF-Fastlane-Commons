@@ -74,7 +74,7 @@ def smf_development_dependency_report_android
 
   dependencies.append({
     'name' => 'androidBuildTools',
-    'version' => report['gradleVersion'].to_s
+    'version' => report['buildToolsVersion'].to_s
   })
 
   apiData = {
