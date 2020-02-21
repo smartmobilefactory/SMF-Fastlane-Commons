@@ -27,8 +27,9 @@ def smf_general_dependency_report_android
   gradle(task: 'createProjectJson')
 
   apiData = []
-  report = JSON.parse(File.read(smf_get_file_path('Project.json')), :symbolize_names => false)
+  report = JSON.parse(File.read(smf_get_file_path('.MetaJSON/Project.json')), :symbolize_names => false)
   
+  dependencies = []
   dependencies.append({
     'name' => 'androidTargetSdk',
     'version' => report['targetSdkVersion']
@@ -53,7 +54,9 @@ def smf_development_dependency_report_android
   gradle(task: 'createProjectJson')
 
   apiData = []
-  report = JSON.parse(File.read(smf_get_file_path('Project.json')), :symbolize_names => false)
+  report = JSON.parse(File.read(smf_get_file_path('.MetaJSON/Project.json')), :symbolize_names => false)
+
+  dependencies = []
   dependencies.append({
     'name' => 'androidCompileSdk',
     'version' => report['compileSdkVersion']
