@@ -27,8 +27,8 @@ private_lane :smf_report_metrics do |options|
     else
       UI.message("The platform \"#{@platform}\" does not support metric reports")
     end
-  rescue
-    UI.message('Platform dependencies could not be reported')
+  rescue Exception => ex
+    UI.message("Platform dependencies could not be reported: #{ex.message}")
   end
 
   dependencyReports.each { |value|
