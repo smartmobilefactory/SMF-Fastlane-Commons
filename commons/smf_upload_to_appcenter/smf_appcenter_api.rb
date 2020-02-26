@@ -75,5 +75,6 @@ def smf_appcenter_create_webhook(app_name, owner_name, webhookdata)
   http.use_ssl = true
   response = http.request(request)
 
+  UI.message("Create Webhooks status: #{response.code}, #{JSON.parse(response.body).to_json}")
   response.code == '200'
 end
