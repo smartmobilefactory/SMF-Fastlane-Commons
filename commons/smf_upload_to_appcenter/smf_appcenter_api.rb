@@ -67,7 +67,7 @@ end
 def smf_appcenter_create_webhook(app_name, owner_name, webhookdata)
   uri = URI.parse("https://appcenter.ms/api/v0.1/apps/#{owner_name}/#{app_name}/alerts_webhooks")
   request = Net::HTTP::Post.new(uri.request_uri)
-  request['accept'] = 'application/json'
+  request['Content-Type'] = 'application/json'
   request['X-API-Token'] = ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY]
   request.body = webhookdata.to_json
 
