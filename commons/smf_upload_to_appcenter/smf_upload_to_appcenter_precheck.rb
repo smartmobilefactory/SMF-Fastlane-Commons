@@ -5,8 +5,8 @@ private_lane :smf_upload_to_appcenter_precheck do |options|
 
   webhookData = {
     'name' => 'SmfHub',
-    'url' => 'https://us-central1-smf-hub.cloudfunctions.net/appcenter'
-    'enabled' => true
+    'url' => 'https://us-central1-smf-hub.cloudfunctions.net/appcenter',
+    'enabled' => true,
     'event_types' => ['NewAppRelease']
   }
 
