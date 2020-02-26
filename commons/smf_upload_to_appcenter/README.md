@@ -29,11 +29,11 @@ smf_android_upload_to_appcenter(
 )
 ```
 
-## get_app_details
+## smf_appcenter_get_app_details
 This method takes the *app_id* and requests all apps from the AppCenter API. Further, the app which has the relevant *app_id* will be searched and the app name and the owner name will be returned. If there is no app which has a matching app id an exception will be raised.  
 
 ### Example
 Get the app name and the owner name of the app which has the app id *"eg21g21-21g1g-12g13b3-2121"*.
 ```
-get_app_details("eg21g21-21g1g-12g13b3-2121")
+app_name, owner_name, owner_id = smf_appcenter_get_app_details("eg21g21-21g1g-12g13b3-2121")
 ```
