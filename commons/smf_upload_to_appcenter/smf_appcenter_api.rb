@@ -79,7 +79,7 @@ def smf_appcenter_create_webhook(app_name, owner_name, webhookdata)
   response.code == '200'
 end
 
-def smf_appcenter_destribute_to_groups(app_id, app_name, owner_name, destinations_groups)
+def smf_appcenter_notify_destination_groups(app_id, app_name, owner_name, destinations_groups)
   api_token = ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY]
   destination_type = "group"
 
