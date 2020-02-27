@@ -22,8 +22,9 @@ def smf_appcenter_get_app_details(app_id)
   app_name = project_app['name']
   owner_name = project_app['owner']['name']
   owner_id = project_app['owner']['id']
+  app_id = project_app['id']
   UI.message("app_name: #{app_name}, owner_name: #{owner_name}")
-  [app_name, owner_name, owner_id]
+  [app_id, app_name, owner_name, owner_id]
 end
 
 #
@@ -78,32 +79,33 @@ def smf_appcenter_create_webhook(app_name, owner_name, webhookdata)
   response.code == '200'
 end
 
-def smf_appcenter_destribute_to_groups(app_name, owner_name, destinations_groups)
+def smf_appcenter_destribute_to_groups(app_id, app_name, owner_name, destinations_groups)
   api_token = ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY]
   destination_type = "group"
 
-  release_id = appcenter_fetch_version_number(
-    api_token: api_token,
-    app_name: app_name,
-    owner_name: owner_name
-  )['id']
-
-  mandatory_update = false
-  notify_testers = false
-
-  destinations_array = destinations_groups.split(',')
+  destinations_array = destinations_groups.split(',').drop(1)
 
   destinations_array.each do |destination_name|
-    sleep 20
     destination = Helper::AppcenterHelper.get_destination(api_token, owner_name, app_name, destination_type, destination_name)
     if destination
       destination_id = destination['id']
-      distributed_release = Helper::AppcenterHelper.add_to_destination(api_token, owner_name, app_name, release_id, destination_type, destination_id, mandatory_update, notify_testers)
-      if distributed_release
-        UI.success("Release '#{release_id}' (#{distributed_release['short_version']}) was successfully distributed to #{destination_type} \"#{destination_name}\"")
-      else
-        UI.error("Release '#{release_id}' was not found for destination '#{destination_name}'")
-      end
+
+      uri = URI.parse($SMF_APPCENTER_WEBHOOK_URL)
+      request = Net::HTTP::Post.new(uri.request_uri)
+      request['Content-Type'] = 'application/json'
+      request['X-API-Token'] = ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY]
+      request.body = {
+        "installable" => true,
+        "app_id" => app_id,
+        "distribution_group_id" => destination_id,
+        "app_display_name" => app_name
+      }.to_json
+
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = true
+      response = http.request(request)
+
+      UI.error("notified #{destination_type} '#{destination_name}' about the new release")
     else
       UI.error("#{destination_type} '#{destination_name}' was not found")
     end

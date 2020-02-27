@@ -5,7 +5,7 @@ private_lane :smf_android_upload_to_appcenter do |options|
   app_id = options[:app_id]
   destinations = options[:destinations]
 
-  app_name, owner_name, owner_id = smf_appcenter_get_app_details(app_id)
+  app_id, app_name, owner_name, owner_id = smf_appcenter_get_app_details(app_id)
   smf_upload_to_appcenter_precheck(
     app_name: app_name,
     owner_name: owner_name
@@ -22,6 +22,7 @@ private_lane :smf_android_upload_to_appcenter do |options|
         app_name: app_name,
         file: aab_path,
         destination_type: 'store',
+        destinations: destinations,
         notify_testers: true,
         release_notes: smf_read_changelog
     )
@@ -31,13 +32,13 @@ private_lane :smf_android_upload_to_appcenter do |options|
         owner_name: owner_name,
         app_name: app_name,
         file: apk_path,
+        destinations: destinations,
         notify_testers: true,
         release_notes: smf_read_changelog
     )
   end
 
-  smf_appcenter_destribute_to_groups(app_name, owner_name, destinations)
-
+  smf_appcenter_notify_destination_groups(app_id, app_name, owner_name, destinations)
   #smf_create_appcenter_push(
   #  app_owner: owner_id,
   #  app_display_name: app_name,
