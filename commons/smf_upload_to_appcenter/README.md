@@ -38,6 +38,14 @@ smf_upload_to_appcenter_precheck(
 )
 ```
 
+## smf_appcenter_notify_destination_groups
+Notify firebase appcenter webhook about the new release.
+AppCenter itself webhooks only called for the first destination group.
+
+```
+smf_appcenter_notify_destination_groups(app_id, app_name, owner_name, destinations)
+```
+
 ## smf_appcenter_get_app_details
 This method takes the *app_id* and requests all apps from the AppCenter API. Further, the app which has the relevant *app_id* will be searched and the app name and the owner name will be returned. If there is no app which has a matching app id an exception will be raised.  
 
