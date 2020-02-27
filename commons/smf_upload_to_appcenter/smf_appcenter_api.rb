@@ -94,7 +94,7 @@ def smf_appcenter_destribute_to_groups(app_name, owner_name, destinations_groups
   destinations_array = destinations_groups.split(',')
 
   destinations_array.each do |destination_name|
-    sleep 10
+    sleep 20
     destination = Helper::AppcenterHelper.get_destination(api_token, owner_name, app_name, destination_type, destination_name)
     if destination
       destination_id = destination['id']
