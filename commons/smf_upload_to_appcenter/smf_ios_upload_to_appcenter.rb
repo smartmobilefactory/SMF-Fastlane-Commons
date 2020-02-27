@@ -82,4 +82,5 @@ private_lane :smf_ios_upload_to_appcenter do |options|
         release_notes: smf_read_changelog
     )
   end
+  smf_appcenter_notify_destination_groups(app_id, app_name, owner_name, destinations)
 end

@@ -81,7 +81,7 @@ end
 
 def smf_appcenter_notify_destination_groups(app_id, app_name, owner_name, destinations_groups)
   api_token = ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY]
-  destination_type = "group"
+  destination_type = 'group'
 
   destinations_array = destinations_groups.split(',').drop(1)
 
@@ -105,7 +105,7 @@ def smf_appcenter_notify_destination_groups(app_id, app_name, owner_name, destin
       http.use_ssl = true
       response = http.request(request)
 
-      UI.error("notified #{destination_type} '#{destination_name}' about the new release")
+      UI.success("additionally notified #{destination_type} '#{destination_name}' about the new release")
     else
       UI.error("#{destination_type} '#{destination_name}' was not found")
     end
