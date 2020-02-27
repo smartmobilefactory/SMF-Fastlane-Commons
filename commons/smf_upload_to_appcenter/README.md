@@ -30,11 +30,13 @@ smf_android_upload_to_appcenter(
 ```
 
 ## smf_upload_to_appcenter_precheck
-Check is webhooks are enabled for the app. Create it is needed.
+- Check is webhooks are enabled for the app. Create it is needed.
+- Check if the app is in all required destination groups. Tries to add the app the the required groups if needed.
 ```
 smf_upload_to_appcenter_precheck(
         app_name: 'Android-CI-Playground',
-        owner_name: 'SMF-Development-Organization'
+        owner_name: 'SMF-Development-Organization',
+        destinations: 'Collaborators,MY_GROUP'
 )
 ```
 
