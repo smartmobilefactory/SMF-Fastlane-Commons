@@ -46,7 +46,7 @@ end
 def smf_get_appcenter_destination_groups(build_variant, additional_destinations)
   destinations = []
 
-  unless additional_destinations.nil?s
+  unless additional_destinations.nil?
     destinations = destinations + additional_destinations.split(',')
   end
 
