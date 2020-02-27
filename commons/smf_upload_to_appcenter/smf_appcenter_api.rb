@@ -79,6 +79,24 @@ def smf_appcenter_create_webhook(app_name, owner_name, webhookdata)
   response.code == '200'
 end
 
+def smf_appcenter_add_app_to_destination_group(app_name, owner_name, destination_name)
+  uri = URI.parse("https://appcenter.ms/api/v0.1/orgs/#{owner_name}/distribution_groups/#{destination_name}/apps")
+  request = Net::HTTP::Post.new(uri.request_uri)
+  request['Content-Type'] = 'application/json'
+  request['X-API-Token'] = ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY]
+  request.body = {
+    "apps" => [{
+      "name" => app_name
+    }]
+  }.to_json
+
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = true
+  response = http.request(request)
+
+  response.code == '200' || response.code == '204'
+end
+
 #
 # notify firebase appcenter webhook
 # AppCenter itself webhooks only called for the first destination group
