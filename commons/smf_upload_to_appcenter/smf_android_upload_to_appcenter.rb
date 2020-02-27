@@ -16,7 +16,7 @@ private_lane :smf_android_upload_to_appcenter do |options|
 
   UI.message('Upload android app to AppCenter.')
   if !aab_path.nil?
-    appcenter_upload(
+    release = appcenter_upload(
         api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
         owner_name: owner_name,
         app_name: app_name,
@@ -26,7 +26,7 @@ private_lane :smf_android_upload_to_appcenter do |options|
         release_notes: smf_read_changelog
     )
   else
-    appcenter_upload(
+    release = appcenter_upload(
         api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
         owner_name: owner_name,
         app_name: app_name,
@@ -36,7 +36,7 @@ private_lane :smf_android_upload_to_appcenter do |options|
     )
   end
 
-  smf_appcenter_destribute_to_groups(app_name, owner_name, destinations)
+  smf_appcenter_destribute_to_groups(app_name, owner_name, JSON.parse(release)['id'], destinations)
 
   #smf_create_appcenter_push(
   #  app_owner: owner_id,
