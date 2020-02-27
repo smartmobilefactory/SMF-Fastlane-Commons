@@ -79,6 +79,10 @@ def smf_appcenter_create_webhook(app_name, owner_name, webhookdata)
   response.code == '200'
 end
 
+#
+# notify firebase appcenter webhook
+# AppCenter itself webhooks only called for the first destination group
+#
 def smf_appcenter_notify_destination_groups(app_id, app_name, owner_name, destinations_groups)
   api_token = ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY]
   destination_type = 'group'
