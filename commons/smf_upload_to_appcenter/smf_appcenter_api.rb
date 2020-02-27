@@ -78,13 +78,20 @@ def smf_appcenter_create_webhook(app_name, owner_name, webhookdata)
   response.code == '200'
 end
 
-def smf_appcenter_destribute_to_groups(app_name, owner_name, release_id, destinations_groups)
+def smf_appcenter_destribute_to_groups(app_name, owner_name, destinations_groups)
   api_token = ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY]
   destination_type = "group"
+
+  release_id = appcenter_fetch_version_number(
+    api_token: api_token,
+    app_name: app_name,
+    owner_name: owner_name
+  )['id']
 
   destinations_array = destinations_groups.split(',')
 
   destinations_array.each do |destination_name|
+    sleep 10
     destination = Helper::AppcenterHelper.get_destination(api_token, owner_name, app_name, destination_type, destination_name)
     if destination
       destination_id = destination['id']
@@ -97,6 +104,5 @@ def smf_appcenter_destribute_to_groups(app_name, owner_name, release_id, destina
     else
       UI.error("#{destination_type} '#{destination_name}' was not found")
     end
-    sleep 10
   end
 end
