@@ -50,11 +50,11 @@ def smf_get_appcenter_destination_groups(build_variant, additional_destinations)
     destinations = destinations + additional_destinations.split(',')
   end
 
-  destinations.push('Collaborators')
-
   if build_variant.downcase.include? 'alpha'
     destinations.push('All-Alphas-2eff8581')
   end
+
+  destinations.push('Collaborators')
 
   destinations.uniq.join(',')
 end
