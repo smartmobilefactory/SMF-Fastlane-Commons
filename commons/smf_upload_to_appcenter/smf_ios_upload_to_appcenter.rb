@@ -10,7 +10,11 @@ private_lane :smf_ios_upload_to_appcenter do |options|
   sparkle_xml_name = options[:sparkle_xml_name]
   upload_sparkle = options[:upload_sparkle]
 
-  app_name, owner_name, owner_id = get_app_details(app_id)
+  app_id, app_name, owner_name, owner_id = smf_appcenter_get_app_details(app_id)
+  smf_upload_to_appcenter_precheck(
+    app_name: app_name,
+    owner_name: owner_name
+  )
 
   dsym_path = "#{smf_workspace_dir}/build/#{escaped_filename}.app.dSYM.zip"
   UI.message("Constructed the dsym path \"#{dsym_path}\"")
@@ -78,4 +82,5 @@ private_lane :smf_ios_upload_to_appcenter do |options|
         release_notes: smf_read_changelog
     )
   end
+  smf_appcenter_notify_destination_groups(app_id, app_name, owner_name, destinations)
 end
