@@ -77,3 +77,26 @@ def smf_appcenter_create_webhook(app_name, owner_name, webhookdata)
 
   response.code == '200'
 end
+
+def smf_appcenter_destribute_to_groups(app_name, owner_name, destinations_groups)
+  api_token = ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY]
+  destination_type = "group"
+
+  destinations_array = destinations_groups.split(',')
+
+  destinations_array.each do |destination_name|
+    destination = Helper::AppcenterHelper.get_destination(api_token, owner_name, app_name, destination_type, destination_name)
+    if destination
+      destination_id = destination['id']
+      distributed_release = Helper::AppcenterHelper.add_to_destination(api_token, owner_name, app_name, release_id, destination_type, destination_id, mandatory_update, notify_testers)
+      if distributed_release
+        UI.success("Release '#{release_id}' (#{distributed_release['short_version']}) was successfully distributed to #{destination_type} \"#{destination_name}\"")
+      else
+        UI.error("Release '#{release_id}' was not found for destination '#{destination_name}'")
+      end
+    else
+      UI.error("#{destination_type} '#{destination_name}' was not found")
+    end
+    sleep 10
+  end
+end
