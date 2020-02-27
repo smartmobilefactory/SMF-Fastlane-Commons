@@ -88,6 +88,9 @@ def smf_appcenter_destribute_to_groups(app_name, owner_name, destinations_groups
     owner_name: owner_name
   )['id']
 
+  mandatory_update = false
+  notify_testers = false
+
   destinations_array = destinations_groups.split(',')
 
   destinations_array.each do |destination_name|
