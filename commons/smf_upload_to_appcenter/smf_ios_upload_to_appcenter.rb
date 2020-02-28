@@ -13,7 +13,8 @@ private_lane :smf_ios_upload_to_appcenter do |options|
   app_id, app_name, owner_name, owner_id = smf_appcenter_get_app_details(app_id)
   smf_upload_to_appcenter_precheck(
     app_name: app_name,
-    owner_name: owner_name
+    owner_name: owner_name,
+    destinations: destinations
   )
 
   dsym_path = "#{smf_workspace_dir}/build/#{escaped_filename}.app.dSYM.zip"

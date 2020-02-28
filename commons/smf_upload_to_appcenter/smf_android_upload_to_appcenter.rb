@@ -8,7 +8,8 @@ private_lane :smf_android_upload_to_appcenter do |options|
   app_id, app_name, owner_name, owner_id = smf_appcenter_get_app_details(app_id)
   smf_upload_to_appcenter_precheck(
     app_name: app_name,
-    owner_name: owner_name
+    owner_name: owner_name,
+    destinations: destinations
   )
 
   UI.important('APK path is null.') if apk_path.nil?
