@@ -64,11 +64,14 @@ def _smf_prepare_sparkle_xml_for_upload(build_variant, sparkle_xml_name, release
   sparkle_xml_path = "#{smf_workspace_dir}/build/#{sparkle_xml_name}"
   doc = File.open(sparkle_xml_path) { |f| Nokogiri::XML(f) }
   description = doc.at_css('rss channel item description')
-  description.add_next_sibling("<sparkle:releaseNotesLink>#{html_url}</sparkle:releaseNotesLink>")
-  description.remove
-  doc.xpath('//text()').find_all { |t| t.to_s.strip == '' }.map(&:remove)
 
-  File.open(sparkle_xml_path, 'w+') do |f|
-    f.write(doc)
+  unless description.nil?
+    description.add_next_sibling("<sparkle:releaseNotesLink>#{html_url}</sparkle:releaseNotesLink>")
+    description.remove
+    doc.xpath('//text()').find_all { |t| t.to_s.strip == '' }.map(&:remove)
+
+    File.open(sparkle_xml_path, 'w+') do |f|
+      f.write(doc)
+    end
   end
 end
