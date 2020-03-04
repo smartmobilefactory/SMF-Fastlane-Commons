@@ -9,6 +9,7 @@ private_lane :smf_owasp_report do |options|
     case @platform
     when :android
       report = smf_owasp_report_android
+      UI.message("OWASP REPORT: #{report.to_json}")
     else
       UI.message("The platform \"#{@platform}\" does not support owasp reports")
     end
