@@ -16,6 +16,7 @@ def smf_dependency_report_cocoapods
 
     # converts dependency version from "= 3.13.1" to "3.13.1"
     absoluteVersionMatch = version.match(/[^\d]*(\d.*)/)
+    packageIdMatch = package['id'].match(/pkg:maven\/(.*)@(.*)/)
     if absoluteVersionMatch
       version = absoluteVersionMatch[1]
     end
