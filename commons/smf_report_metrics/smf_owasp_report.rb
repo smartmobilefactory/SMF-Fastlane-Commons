@@ -35,7 +35,7 @@ def _smf_parse_owsap_report
               packageIdMatch = package['id'].match(/pkg:maven\/(.*)@(.*)/)
 
               # example: AFNetworking/Security:3.2.1
-              fileNameMatch = package['fileName'].match(/(.*):(.*)/)
+              fileNameMatch = dependency['fileName'].match(/(.*):(.*)/)
               if packageIdMatch
                   report.append({
                       'id' => packageIdMatch[1].gsub('/', ':'),
