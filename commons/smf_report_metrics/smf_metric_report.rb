@@ -75,26 +75,3 @@ def _smf_send_dependency_report(report)
 
   UI.message("dependency data was reported:\n#{res.body}")
 end
-
-lane :check_owasp do |options|
-    report = []
-    owasp_report = JSON.parse(File.read(smf_get_file_path('dependency-check-report.json')), :symbolize_names => false)
-    owasp_report['dependencies'].each { |dependency|
-        if !dependency['vulnerabilities'].empty?
-            vulnerabilityNames = dependency['vulnerabilities'].map { |it| it['name'] }
-            dependency['packages'].each { |package|
-                # example: pkg:maven/com.squareup.okhttp3/okhttp@3.10.0",
-                packageIdMatch = package['id'].match(/pkg:maven\/(.*)@(.*)/)
-                if packageIdMatch
-                    report.append({
-                        'id' => packageIdMatch[1].gsub('/', ':'),
-                        'vulnerabilities' => vulnerabilityNames
-                    })
-                end
-            }
-        end
-    }
-    UI.message("REPORT: #{report.to_json}")
-    report
-end
-
