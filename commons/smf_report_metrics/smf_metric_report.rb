@@ -4,7 +4,7 @@ private_lane :smf_report_metrics do |options|
 end
 
 private_lane :smf_owasp_report do |options|
-
+  project_name = options[:meta_db_project_name]
   begin
     case @platform
     when :android
