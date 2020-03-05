@@ -1,4 +1,31 @@
 private_lane :smf_report_metrics do |options|
+  smf_report_depencencies(options)
+  smf_owasp_report(options)
+end
+
+private_lane :smf_owasp_report do |options|
+  project_name = options[:meta_db_project_name]
+  begin
+    case @platform
+    when :android
+      report = smf_owasp_report_android
+    when :ios, :macos
+      report = smf_owsap_report_cocoapods
+    else
+      UI.message("The platform \"#{@platform}\" does not support owasp reports")
+    end
+    UI.message("OWASP REPORT: #{report.to_json}")
+  rescue Exception => ex
+    UI.message("Platform dependencies could not be reported: #{ex.message}")
+    smf_send_diagnostic_message(
+      title: "#{project_name} smf_owasp_report failed",
+      message: "#{ex.message}, #{ex}"
+    )
+  end
+  # TODO report owasp report to metadb
+end
+
+private_lane :smf_report_depencencies do |options|
 
   build_variant = options[:build_variant]
   project_name = options[:meta_db_project_name]
@@ -29,6 +56,10 @@ private_lane :smf_report_metrics do |options|
     end
   rescue Exception => ex
     UI.message("Platform dependencies could not be reported: #{ex.message}")
+    smf_send_diagnostic_message(
+      title: "#{project_name} report dependencies failed",
+      message: "#{ex.message}, #{ex}"
+    )
   end
 
   dependencyReports.each { |value|
