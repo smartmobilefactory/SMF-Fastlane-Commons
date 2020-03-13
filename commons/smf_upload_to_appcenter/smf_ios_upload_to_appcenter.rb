@@ -45,6 +45,8 @@ private_lane :smf_ios_upload_to_appcenter do |options|
       appcenter_upload(
           api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
           owner_name: owner_name,
+          build_number: build_number,
+          version: version_number,
           app_name: app_name,
           file: app_path,
           dsym: dsym_path,
