@@ -20,7 +20,7 @@ def smf_dependency_report_cocoapods
       version = absoluteVersionMatch[1]
     end
 
-    dependencies.append({
+    dependencies.push({
         'name' => dependency[1],
         'version' => version
     })
