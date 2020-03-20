@@ -37,8 +37,9 @@ end
 
 def smf_dependency_report_fetch_cocoapods_licences(dependencies)
   dependencies.each { |value| 
+    name = value['name'].split('/')[0]
     begin
-      uri = URI.parse("https://metrics.cocoapods.org/api/v1/pods/#{value['name']}")
+      uri = URI.parse("https://metrics.cocoapods.org/api/v1/pods/#{name}")
       request = Net::HTTP::Get.new(uri.request_uri)
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = true
@@ -47,10 +48,10 @@ def smf_dependency_report_fetch_cocoapods_licences(dependencies)
         data = JSON.parse(response.body)
         value['license'] = data['cocoadocs']['license_short_name']
       else
-        UI.message("Failed to query pod details for #{value['name']}, #{response.code}: #{response.message}")
+        UI.message("Failed to query pod details for #{name}, #{response.code}: #{response.message}")
       end
     rescue Exception => ex
-      UI.message("Failed to query pod details for #{value['name']}, #{ex.message}")
+      UI.message("Failed to query pod details for #{name}, #{ex.message}")
     end
   }
 
