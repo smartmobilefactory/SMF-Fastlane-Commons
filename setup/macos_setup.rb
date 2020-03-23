@@ -3,12 +3,18 @@
 
 # Update Files
 
-private_lane :smf_super_generate_files do
-  smf_update_generated_files
+private_lane :smf_super_generate_files do |options|
+  smf_update_generated_files(options)
 end
 
-lane :smf_generate_files do
-  smf_super_generate_files
+lane :smf_generate_files do |options|
+  sparkle_package_creater_data = {
+    :file => _smf_spc_jenkinsfile_path,
+    :template => _smf_spc_template_path,
+    :remove_multibuilds => true
+  }
+
+  smf_super_generate_files([sparkle_package_creater_data])
 end
 
 
