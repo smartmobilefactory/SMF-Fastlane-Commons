@@ -11,7 +11,6 @@ end
 def smf_workspace_dir
   path = "#{Dir.pwd}"
   path = path.chomp('/fastlane') if path.end_with?('/fastlane')
-  path = path.chomp('/Sparkle-Package-Creator') if path.end_with?('/Sparkle-Package-Creator')
 end
 
 def smf_import_commons
