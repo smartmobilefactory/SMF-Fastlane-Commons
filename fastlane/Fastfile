@@ -2,6 +2,7 @@
 
 def smf_import_all(path)
   Dir["#{path}/**/*.rb"].each do |file|
+    UI.message("Importing #{file}")
     import(file)
   end
 end
