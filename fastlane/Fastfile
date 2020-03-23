@@ -1,6 +1,7 @@
 @fastlane_commons_dir_path = File.expand_path(File.dirname(__FILE__))
 
 def smf_import_all(path)
+  UI.message("Importing files in dir #{path}")
   Dir["#{path}/**/*.rb"].each do |file|
     UI.message("Importing #{file}")
     import(file)
