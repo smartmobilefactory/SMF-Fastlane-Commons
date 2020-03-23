@@ -313,11 +313,3 @@ end
 lane :smf_send_slack_notification do |options|
   smf_super_send_slack_notification(options)
 end
-
-
-############## SPARKLE PACKAGE CREATOR ##########
-# This lane is only used for the sparkle package creator
-#
-lane :smf_create_sparkle_package do |options|
-  UI.message("Running sparkle package creator")
-end
