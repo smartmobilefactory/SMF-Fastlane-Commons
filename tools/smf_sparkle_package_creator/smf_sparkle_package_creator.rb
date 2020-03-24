@@ -1,6 +1,8 @@
 
 lane :smf_create_sparkle_package do |options|
   UI.message("Starting sparkle package creator...")
+
+  UI.message("Input file is at: #{options[:dmg_path]}")
 =begin
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
