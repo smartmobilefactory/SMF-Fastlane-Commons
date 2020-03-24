@@ -10,7 +10,7 @@ lane :smf_create_sparkle_package do |options|
   target_directory = File.join(smf_workspace_dir, "sparkle_package/")
 
   Dir.mkdir(target_directory)
-  `cp #{input_dmg_path} #{File.join(target_directory, input_dmg_path)}`
+  `cp #{input_dmg_path} #{File.join(target_directory, File.basename(input_dmg_path))}`
 
   smf_upload_with_sparkle(
     build_variant: build_variant,
