@@ -85,6 +85,7 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
       git_url: git_url,
       git_branch: team_id,
       keychain_name: "jenkins.keychain",
-      keychain_password: ENV[$KEYCHAIN_JENKINS_ENV_KEY]
+      keychain_password: ENV[$KEYCHAIN_JENKINS_ENV_KEY],
+      template_name: template_name
   )
 end
