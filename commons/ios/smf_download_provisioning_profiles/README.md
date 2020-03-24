@@ -21,7 +21,8 @@ smf_download_provisioning_profiles(
   use_default_match_config: false,                                                  # If no properties aree given in the config.json this should be set to true so the default settings are used for enterprise alpha/beta builds.
   match_read_only: true,                                                            # If enabled match only reads existing profiles and signing certificates and does not create new ones or updates any existing ones.
   match_type: "appstore",                                                           # The type can be one of the following values: "appstore", "adhoc", "development", "enterprise"
-  extensions_suffixes: <???>                                                        # Undocumented property??
-  build_variant: "alpha"                                                            # the build variant of the current build
+  extensions_suffixes: <???>,                                                       # Undocumented property??
+  build_variant: "alpha",                                                           # the build variant of the current build
+  template_name: "Contact Note Field Access beta"                                   # Entitlement that can be choosen while creating a Provisioning Profile
 )
 ```

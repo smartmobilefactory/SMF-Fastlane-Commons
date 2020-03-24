@@ -11,6 +11,7 @@ private_lane :smf_download_provisioning_profiles do |options|
   match_type = options[:match_type]
   extensions_suffixes = options[:extensions_suffixes]
   build_variant = options[:build_variant]
+  template_name = options[:template_name]
 
   team_id(team_id)
 
@@ -32,7 +33,8 @@ private_lane :smf_download_provisioning_profiles do |options|
         read_only: (match_type.nil? ? match_read_only : false),
         extensions_suffixes: extensions_suffixes,
         apple_id: apple_id,
-        team_id: team_id
+        team_id: team_id,
+        template_name: template_name
     )
 
   elsif (build_variant.match(/alpha/) != nil || build_variant.match(/beta/) != nil || build_variant.match(/example/) != nil)
@@ -44,7 +46,8 @@ private_lane :smf_download_provisioning_profiles do |options|
           read_only: (match_type.nil? ? match_read_only : false),
           extensions_suffixes: extensions_suffixes,
           apple_id: apple_id,
-          team_id: team_id
+          team_id: team_id,
+          template_name: template_name
       )
     end
   end
@@ -58,6 +61,7 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
   extensions_suffixes = options[:extensions_suffixes]
   apple_id = options[:apple_id]
   team_id = options[:team_id]
+  template_name = options[:template_name]
 
   identifiers = [app_identifier]
   git_url = $FASTLANE_MATCH_REPO_URL
