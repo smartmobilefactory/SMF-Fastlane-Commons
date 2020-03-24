@@ -21,7 +21,7 @@ end
 
 # "CONSTANTS"
 def _smf_spc_template_path
-  File.join(smf_workspace_dir,"#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/Jenkinsfile_Sparkle_Package_Creator.template")
+  "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/Jenkinsfile_Sparkle_Package_Creator.template"
 end
 
 def _smf_spc_jenkinsfile_path
