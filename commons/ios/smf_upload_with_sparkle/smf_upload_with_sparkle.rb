@@ -49,7 +49,7 @@ private_lane :smf_upload_with_sparkle do |options|
 
   sh "#{@fastlane_commons_dir_path}/commons/ios/smf_upload_with_sparkle/sparkle.sh #{ENV['LOGIN']} #{sparkle_private_key} #{update_dir} #{sparkle_version} #{sparkle_signing_team}"
 
-  _smf_prepare_sparkle_xml_for_upload(build_variant, sparkle_xml_name, release_notes_name)
+  #_smf_prepare_sparkle_xml_for_upload(build_variant, sparkle_xml_name, release_notes_name)
 
   unless sparkle_upload_url.nil? || sparkle_upload_user.nil?
     appcast_xml = "#{update_dir}#{sparkle_xml_name}"
