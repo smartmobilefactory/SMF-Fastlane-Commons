@@ -17,7 +17,6 @@ private_lane :smf_upload_with_sparkle do |options|
 
   # Optional
   source_dmg_path = options[:source_dmg_path]
-  custom_app_name = options[:custom_app_name]
   target_directory = options[:target_directory]
 
   if sparkle_private_key.nil? || ENV[sparkle_private_key].nil?
@@ -36,7 +35,7 @@ private_lane :smf_upload_with_sparkle do |options|
     raise("DMG file #{dmg_path} does not exit. Nothing to upload.")
   end
 
-  app_name = custom_app_name.nil? ? "#{sparkle_dmg_path}#{scheme}.dmg" : custom_app_name
+  app_name = "#{sparkle_dmg_path}#{scheme}.dmg"
 
   unless sparkle_upload_url.nil? || sparkle_upload_user.nil?
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{update_dir}#{release_notes_name} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}#{release_notes_name}")
