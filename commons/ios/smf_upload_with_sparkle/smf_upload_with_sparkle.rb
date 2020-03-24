@@ -15,13 +15,18 @@ private_lane :smf_upload_with_sparkle do |options|
   sparkle_xml_name = options[:sparkle_xml_name]
   sparkle_private_key = options[:sparkle_private_key]
 
+  # Optional
+  source_dmg_path = options[:source_dmg_path]
+  custom_app_name = options[:custom_app_name]
+  target_directory = options[:target_directory]
+
   if sparkle_private_key.nil? || ENV[sparkle_private_key].nil?
     UI.error('Sparkle private key is either not set in the Config.json, or there is no credential stored in Jenkins')
     raise 'Error none existing private key credential'
   end
 
-  dmg_path = smf_path_to_dmg(build_variant)
-  update_dir = "#{smf_workspace_dir}/build/"
+  dmg_path = source_dmg_path.nil? ? smf_path_to_dmg(build_variant) : source_dmg_path
+  update_dir = target_directory.nil? ? "#{smf_workspace_dir}/build/" : target_directory
 
   release_notes = smf_read_changelog(html: true)
   release_notes_name = "#{scheme}.html"
@@ -31,7 +36,7 @@ private_lane :smf_upload_with_sparkle do |options|
     raise("DMG file #{dmg_path} does not exit. Nothing to upload.")
   end
 
-  app_name = "#{sparkle_dmg_path}#{scheme}.dmg"
+  app_name = custom_app_name.nil? ? "#{sparkle_dmg_path}#{scheme}.dmg" : custom_app_name
 
   unless sparkle_upload_url.nil? || sparkle_upload_user.nil?
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{update_dir}#{release_notes_name} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}#{release_notes_name}")
