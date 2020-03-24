@@ -34,11 +34,9 @@ def _smf_update_jenkins_file
 end
 
 def _smf_generated_file_changed?(path)
-  path = path.sub(smf_workspace_dir, '')
+  path = path.sub(smf_workspace_dir + '/', '')
   file_changed = false
   Dir.chdir(smf_workspace_dir) do
-    UI.message("#{`git status --porcelain`}")
-    UI.message("Checking agains: #{path}")
     file_changed = `git status --porcelain`.include?(path)
   end
 
