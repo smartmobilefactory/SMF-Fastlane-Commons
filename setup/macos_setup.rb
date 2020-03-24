@@ -14,7 +14,7 @@ lane :smf_generate_files do |options|
     :remove_multibuilds => true
   }
 
-  smf_super_generate_files([sparkle_package_creater_data])
+  smf_super_generate_files(files_to_update: [sparkle_package_creater_data])
 end
 
 
