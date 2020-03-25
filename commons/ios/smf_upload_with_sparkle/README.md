@@ -15,6 +15,8 @@ smf_upload_with_sparkle(
     sparkle_signing_team: <>,
     sparkle_xml_name: <>,
     sparkle_private_key: <>
+    source_dmg_path: <path to custom .dmg>                      # Optional see section "Sparkle Package Creator"
+    target_directory: <directory where to store the appcast>    # Optional see section "Sparkle Package Creator"
 )
 ``` 
 
@@ -32,7 +34,7 @@ If you want to add a custom Credential for the sparkle upload, follow these step
             ..., 
             "<env_variable_name_for_credential>": {                         \
                 "jenkins_credential_name" : "new_jenkins_credential_key",   |____ this section should be added
-                "type" : "<credential type>"                                |       # tpye is optional and defaults to 'string'
+                "type" : "<credential type>"                                |       # type is optional and defaults to 'string'
             },                                                              /
     },
     "build_variants" : { ... }

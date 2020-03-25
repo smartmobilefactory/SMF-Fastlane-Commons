@@ -32,8 +32,7 @@ lane :smf_create_sparkle_package do |options|
     sparkle_signing_team: sparkle_config[:sparkle_signing_team],
     sparkle_private_key: sparkle_config[:signing_key],
     source_dmg_path: input_dmg_path,
-    target_directory: target_directory,
-    use_custom_info_plist_path: true
+    target_directory: target_directory
   )
   package_name = _smf_sparkle_package_name(project_name, build_variant, build_number)
   package_path = _smf_zip_sparkle_package(target_directory, package_name)
