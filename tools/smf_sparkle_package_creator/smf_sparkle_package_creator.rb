@@ -66,12 +66,14 @@ def _smf_create_github_release_and_upload_asset(asset_path, project_name, build_
     "target_commitish" => "master",
     "name" => release_name,
     "body" => description,
-    "draft" => true, # true for testing SET TO FALSE BEFORE MERGE
+    "draft" => false,
     "prerelease" => false
   }
 
+
   release_data = JSON.generate(release)
   request_url = "https://api.github.com/repos/#{OWNER}/#{REPO}/releases"
+  UI.message("Creating release...")
   response_data = `curl -X POST #{request_url} -H "Content-Type:application/json" -H "Authorization: token #{ENV[$SMF_GITHUB_TOKEN_ENV_KEY]}" -d #{release_data.dump}`
 
   response = JSON.parse(response_data, symbolize_names: true)
@@ -88,6 +90,7 @@ def _smf_create_github_release_and_upload_asset(asset_path, project_name, build_
 
   release_id = response[:id]
   assets_url = "https://uploads.github.com/repos/#{OWNER}/#{REPO}/releases/#{release_id}/assets?name=#{File.basename(asset_path)}"
+  UI.message("Attaching sparkle package to release ...")
   response_data = `curl -X POST #{assets_url} --data-binary @"#{asset_path}" -H "Authorization: token #{ENV[$SMF_GITHUB_TOKEN_ENV_KEY]}" -H "Content-Type: application/octet-stream"`
   response = JSON.parse(response_data, symbolize_names: true)
 
