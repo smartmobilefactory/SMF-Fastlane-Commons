@@ -18,6 +18,7 @@ private_lane :smf_upload_with_sparkle do |options|
   # Optional
   source_dmg_path = options[:source_dmg_path]
   target_directory = options[:target_directory]
+  use_custom_info_plist_path = options[:use_custom_info_plist_path].nil? ? false : options[:use_custom_info_plist_path]
 
   if sparkle_private_key.nil? || ENV[sparkle_private_key].nil?
     UI.message("Sparkle key: #{sparkle_private_key}")
@@ -49,7 +50,15 @@ private_lane :smf_upload_with_sparkle do |options|
 
   sh "#{@fastlane_commons_dir_path}/commons/ios/smf_upload_with_sparkle/sparkle.sh #{ENV['LOGIN']} #{sparkle_private_key} #{update_dir} #{sparkle_version} #{sparkle_signing_team}"
 
-  #_smf_prepare_sparkle_xml_for_upload(build_variant, sparkle_xml_name, release_notes_name)
+  if use_custom_info_plist_path == true
+    sh("hdiutil attach #{source_dmg_path}")
+    app_name = File.basename(source_dmg_path).sub('.dmg', '')
+    info_plist_path = "/Volumes/#{app_name}/#{app_name}.app/Contents/Info.plist"
+    _smf_prepare_sparkle_xml_for_upload(build_variant, sparkle_xml_name, release_notes_name, info_plist_path)
+    sh("hdiutil detach /Volumes/#{app_name}")
+  else
+    _smf_prepare_sparkle_xml_for_upload(build_variant, sparkle_xml_name, release_notes_name)
+  end
 
   unless sparkle_upload_url.nil? || sparkle_upload_user.nil?
     appcast_xml = "#{update_dir}#{sparkle_xml_name}"
@@ -58,10 +67,10 @@ private_lane :smf_upload_with_sparkle do |options|
   end
 end
 
-def _smf_prepare_sparkle_xml_for_upload(build_variant, sparkle_xml_name, release_notes_name)
+def _smf_prepare_sparkle_xml_for_upload(build_variant, sparkle_xml_name, release_notes_name, info_plist = nil)
   UI.message('Prepare sparkle xml file for upload.')
   # Read SUFeedUrl to get URL
-  info_plist_path = File.join(smf_path_to_ipa_or_app(build_variant), '/Contents/Info.plist')
+  info_plist_path = info_plist.nil? ? File.join(smf_path_to_ipa_or_app(build_variant), '/Contents/Info.plist') : info_plist
   su_feed_url = sh("defaults read #{info_plist_path} SUFeedURL").gsub("\n", '')
 
   # set releaseNotesLink to URL of the .html file, which contains the release notes
