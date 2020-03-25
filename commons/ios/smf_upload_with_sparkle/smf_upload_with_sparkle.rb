@@ -55,7 +55,7 @@ private_lane :smf_upload_with_sparkle do |options|
     sh("hdiutil attach #{source_dmg_path}")
     app_name = File.basename(source_dmg_path).sub('.dmg', '')
     info_plist_path = "/Volumes/#{app_name}/#{app_name}.app/Contents/Info.plist"
-    xml_path = FIle.join(target_directory, sparkle_xml_name)
+    xml_path = File.join(target_directory, sparkle_xml_name)
     _smf_prepare_sparkle_xml_for_upload(build_variant, sparkle_xml_name, release_notes_name, info_plist_path, xml_path)
     sh("hdiutil detach /Volumes/#{app_name}")
   else
