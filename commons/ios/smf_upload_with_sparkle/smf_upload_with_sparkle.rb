@@ -70,7 +70,7 @@ private_lane :smf_upload_with_sparkle do |options|
 end
 
 def _smf_prepare_sparkle_xml_for_upload(build_variant, sparkle_xml_name, release_notes_name, info_plist = nil, xml_path = nil)
-  UI.message('Prepare sparkle xml file for upload.')
+  UI.message('Prepare sparkle xml file.')
   # Read SUFeedUrl to get URL
   info_plist_path = info_plist.nil? ? File.join(smf_path_to_ipa_or_app(build_variant), '/Contents/Info.plist') : info_plist
   su_feed_url = sh("defaults read #{info_plist_path} SUFeedURL").gsub("\n", '')
