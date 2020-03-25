@@ -7,12 +7,11 @@ lane :smf_create_sparkle_package do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
   sparkle_config = build_variant_config[:sparkle]
   input_dmg_path = File.join(smf_workspace_dir, options[:dmg_path])
-  target_directory = File.join(smf_workspace_dir, "build/")
+  target_directory = File.join(smf_workspace_dir, "sparkle_package/")
 
   unless Dir.exist?(target_directory)
     Dir.mkdir(target_directory)
   end
-  
   sh("cp #{input_dmg_path} #{File.join(target_directory, File.basename(input_dmg_path))}")
   input_dmg_path = File.join(target_directory, File.basename(input_dmg_path))
 
