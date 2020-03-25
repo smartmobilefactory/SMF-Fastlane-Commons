@@ -78,6 +78,8 @@ def _smf_create_github_release_and_upload_asset(asset_path, project_name, build_
 
   response = JSON.parse(response_data, symbolize_names: true)
 
+  UI.message("Response: #{response}")
+
   if response.nil?
     error_message = "An error occured creating the relase"
     UI.error(error_message)
@@ -93,7 +95,7 @@ def _smf_create_github_release_and_upload_asset(asset_path, project_name, build_
   UI.message("Attaching sparkle package to release ...")
   response_data = `curl -X POST #{assets_url} --data-binary @"#{asset_path}" -H "Authorization: token #{ENV[$SMF_GITHUB_TOKEN_ENV_KEY]}" -H "Content-Type: application/octet-stream"`
   response = JSON.parse(response_data, symbolize_names: true)
-
+  UI.message("Response: #{response}")
   if response.nil?
     error_message = "An error occured uploading the asset"
     UI.error(error_message)
