@@ -19,10 +19,7 @@ smf_run_gradle_lint_task(
 
 ### Example for junit task
 ```
-smf_run_junit_task(
-    junit_task: '',     #JUnit task to be executed
-    modules: []         # Optional, see *smf_danger_module_config* for further information
-)
+smf_run_junit_task
 ```
 
 ### Example for klint
