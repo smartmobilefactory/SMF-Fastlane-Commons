@@ -48,7 +48,7 @@ end
 # Run Unit Tests
 
 private_lane :smf_super_run_unit_tests do |options|
-  smf_run_junit_task(options)
+  smf_run_junit_task
 end
 
 lane :smf_run_unit_tests do |options|
