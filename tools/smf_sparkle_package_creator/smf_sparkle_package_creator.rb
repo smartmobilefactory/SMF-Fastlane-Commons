@@ -45,7 +45,7 @@ lane :smf_create_sparkle_package do |options|
   package_name = _smf_sparkle_package_name(project_name, build_variant, build_number)
   package_path = _smf_zip_sparkle_package(target_directory, package_name)
 
-  #_smf_create_github_release_and_upload_asset(package_path, project_name, build_variant, build_number)
+  _smf_create_github_release_and_upload_asset(package_path, project_name, build_variant, build_number)
 end
 
 
