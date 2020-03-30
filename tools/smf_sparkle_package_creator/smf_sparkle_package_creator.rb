@@ -11,7 +11,13 @@ lane :smf_create_sparkle_package do |options|
   input_dmg_path = File.join(smf_workspace_dir, options[:dmg_path])
   target_directory = File.join(smf_workspace_dir, "sparkle_package/")
   project_name = @smf_fastlane_config[:project][:project_name]
-  build_number = smf_get_build_number_of_app
+
+  # get buildnumber from info-plist
+  sh("hdiutil attach #{source_dmg_path}")
+  app_name = File.basename(source_dmg_path).sub('.dmg', '')
+  info_plist_path = "/Volumes/#{app_name}/#{app_name}.app/Contents/Info.plist"
+  build_number = sh("defaults read #{info_plist_path} CFBundleVersion").gsub("\n", '')
+  sh("hdiutil detach /Volumes/#{app_name}")
 
   if sparkle_config.nil?
     UI.error("There is no sparkle entry for the build variant: #{build_variant}")
@@ -35,6 +41,7 @@ lane :smf_create_sparkle_package do |options|
     source_dmg_path: input_dmg_path,
     target_directory: target_directory
   )
+
   package_name = _smf_sparkle_package_name(project_name, build_variant, build_number)
   package_path = _smf_zip_sparkle_package(target_directory, package_name)
 
@@ -70,7 +77,6 @@ def _smf_create_github_release_and_upload_asset(asset_path, project_name, build_
     "draft" => false,
     "prerelease" => false
   }
-
 
   release_data = JSON.generate(release)
   request_url = "https://api.github.com/repos/#{OWNER}/#{REPO}/releases"
