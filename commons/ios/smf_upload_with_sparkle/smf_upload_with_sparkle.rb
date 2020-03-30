@@ -22,8 +22,6 @@ private_lane :smf_upload_with_sparkle do |options|
   use_custom_info_plist_path = !source_dmg_path.nil?
 
   if sparkle_private_key.nil? || ENV[sparkle_private_key].nil?
-    UI.message("Sparkle key: #{sparkle_private_key}")
-    UI.message("Inhalt: #{ENV[sparkle_private_key]}")
     UI.error('Sparkle private key is either not set in the Config.json, or there is no credential stored in Jenkins')
     raise 'Error none existing private key credential'
   end
@@ -59,7 +57,9 @@ private_lane :smf_upload_with_sparkle do |options|
     _smf_prepare_sparkle_xml_for_upload(build_variant, sparkle_xml_name, release_notes_name, info_plist_path, xml_path)
     sh("hdiutil detach /Volumes/#{app_name}")
   else
-    _smf_prepare_sparkle_xml_for_upload(build_variant, sparkle_xml_name, release_notes_name)
+    sparkle_xml_path = "#{smf_workspace_dir}/build/#{sparkle_xml_name}"
+    info_plist_path = File.join(smf_path_to_ipa_or_app(build_variant), '/Contents/Info.plist')
+    _smf_prepare_sparkle_xml_for_upload(build_variant, sparkle_xml_name, release_notes_name, info_plist_path, sparkle_xml_path)
   end
 
   unless sparkle_upload_url.nil? || sparkle_upload_user.nil?
@@ -69,16 +69,13 @@ private_lane :smf_upload_with_sparkle do |options|
   end
 end
 
-def _smf_prepare_sparkle_xml_for_upload(build_variant, sparkle_xml_name, release_notes_name, info_plist = nil, xml_path = nil)
+def _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, sparkle_xml_path)
   UI.message('Prepare sparkle xml file.')
   # Read SUFeedUrl to get URL
-  info_plist_path = info_plist.nil? ? File.join(smf_path_to_ipa_or_app(build_variant), '/Contents/Info.plist') : info_plist
   su_feed_url = sh("defaults read #{info_plist_path} SUFeedURL").gsub("\n", '')
 
   # set releaseNotesLink to URL of the .html file, which contains the release notes
   html_url = su_feed_url.gsub(/[^\/]+$/,release_notes_name)
-
-  sparkle_xml_path = xml_path.nil? ? "#{smf_workspace_dir}/build/#{sparkle_xml_name}" : xml_path
   doc = File.open(sparkle_xml_path) { |f| Nokogiri::XML(f) }
   description = doc.at_css('rss channel item description')
 
