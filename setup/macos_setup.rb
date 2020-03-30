@@ -8,15 +8,14 @@ private_lane :smf_super_generate_files do |options|
 end
 
 lane :smf_generate_files do |options|
-  sparkle_package_creater_data = {
+  sparkle_package_creator_data = {
     :file => _smf_spc_jenkinsfile_path,
     :template => _smf_spc_template_path,
     :remove_multibuilds => true
   }
 
-  smf_super_generate_files(files_to_update: [sparkle_package_creater_data])
+  smf_super_generate_files(files_to_update: [sparkle_package_creator_data])
 end
-
 
 # Setup Dependencies
 
