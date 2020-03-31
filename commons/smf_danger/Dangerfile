@@ -80,3 +80,5 @@ else
 
   message(ticket_message)
 end
+
+xcode_summary.report 'xcodebuild.json'
