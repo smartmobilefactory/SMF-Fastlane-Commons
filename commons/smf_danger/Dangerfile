@@ -81,4 +81,5 @@ else
   message(ticket_message)
 end
 
+xcode_summary.inline_mode = true
 xcode_summary.report 'build/reports/errors.json'
