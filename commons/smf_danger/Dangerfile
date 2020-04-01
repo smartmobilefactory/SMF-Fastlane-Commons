@@ -82,5 +82,7 @@ else
 end
 
 xcode_summary.inline_mode = true
-xcode_summary.ignored_files = '*[^.swift]'
+xcode_summary.ignored_results { |result|
+    result.scan(/.*\.swift.*/).isEmpty?
+}
 xcode_summary.report 'build/reports/errors.json'
