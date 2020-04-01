@@ -83,3 +83,5 @@ end
 
 xcode_summary.inline_mode = true
 xcode_summary.report 'build/reports/errors.json'
+
+warn("This is an inline test message test", file: "AppDelegate.swift", line: 27)
