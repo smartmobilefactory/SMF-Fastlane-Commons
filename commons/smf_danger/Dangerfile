@@ -84,7 +84,7 @@ end
 xcode_summary.inline_mode = true
 xcode_summary.ignored_results { |result|
     puts("Path is: #{result.location.file_path} and matches: #{File.fnmatch('*[^.swift]*', result.location.file_path)}") unless result.location.nil?
-    return File.fnmatch('*[^.swift]*', result.location.file_path) unless result.location.nil?
+    return File.fnmatch('*[^.swift]', result.location.file_path) unless result.location.nil?
 
     puts("Messaeg is: #{result.message} and macthes: #{result.message.scan(/.*\.swift.*/).empty?}")
     result.message.scan(/.*\.swift.*/).empty?
