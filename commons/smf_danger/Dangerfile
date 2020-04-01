@@ -81,12 +81,18 @@ else
   message(ticket_message)
 end
 
+## XCODE WARNINGS
 xcode_summary.inline_mode = true
-xcode_summary.ignored_results { |result|
-    puts("Path is: #{result.location.file_path} and matches: #{File.fnmatch('*[^.swift]*', result.location.file_path)}") unless result.location.nil?
-    return File.fnmatch('*[^.swift]', result.location.file_path) unless result.location.nil?
+xcode_summary.ignored_files = 'Pods/**'
 
-    puts("Messaeg is: #{result.message} and macthes: #{result.message.scan(/.*\.swift.*/).empty?}")
-    result.message.scan(/.*\.swift.*/).empty?
+xcode_summary.ignored_results { |result|
+
+    if result.location.nil?
+        puts("Message is: #{result.message} and macthes: #{result.message.scan(/.*\.swift.*/).empty?}")
+        result.message.scan(/.*\.swift.*/).empty?
+    else
+        puts("Path is: #{result.location.file_path} and matches: #{File.fnmatch('*[^.swift]', result.location.file_path)}")
+        File.fnmatch('*[^.swift]', result.location.file_path)
+    end
 }
 xcode_summary.report 'build/reports/errors.json'
