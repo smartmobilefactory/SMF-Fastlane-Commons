@@ -84,6 +84,6 @@ end
 xcode_summary.inline_mode = true
 xcode_summary.ignored_results { |result|
     return File.fnmatch('*[^.swift]*', result.location.file_path) unless result.location.nil?
-    result.message.scan(/.*\.swift.*/).isEmpty?
+    result.message.scan(/.*\.swift.*/).empty?
 }
 xcode_summary.report 'build/reports/errors.json'
