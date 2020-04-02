@@ -30,8 +30,8 @@ def _check_common_project_setup_files
   current_submodule_branch = `cd #{sudmodule_directory}; git rev-parse --abbrev-ref HEAD`.gsub("\n", '')
   UI.message("Current submodule branch: #{current_submodule_branch}")
   ENV['DANGER_COMMON_PROJECT_SETUP_FILES_WRONG_BRANCH'] = current_submodule_branch unless current_submodule_branch == 'master'
-  current_head_commit = `cd #{sudmodule_directory}; git rev-parse HEAD`.gsub("\n", '')
-  remote_head_commit = `cd #{sudmodule_directory}; git rev-parse origin/#{current_submodule_branch}`.gsub("\n", '')
+  current_head_commit = `cd #{sudmodule_directory}; git rev-parse master`.gsub("\n", '')
+  remote_head_commit = `cd #{sudmodule_directory}; git rev-parse origin/master`.gsub("\n", '')
   UI.message("Current head commit: #{current_head_commit}")
   UI.message("Current remt commit: #{remote_head_commit}")
   ENV['DANGER_COMMON_PROJECT_SETUP_FILES_UPDATED'] = 'true' unless current_head_commit == remote_head_commit
