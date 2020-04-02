@@ -6,14 +6,18 @@ private_lane :smf_build_precheck do |options|
 
   case @platform
   when :ios
+    _check_common_project_setup_files
     perform_build_precheck_ios(upload_itc, itc_apple_id)
     perform_build_precheck_for_pods_spec_repo_url(
       pods_spec_repo
     )
   when :ios_framework
+    _check_common_project_setup_files
     perform_build_precheck_for_pods_spec_repo_url(
       pods_spec_repo
     )
+  when :macos
+    _check_common_project_setup_files
   when :flutter
     perform_build_precheck_ios(upload_itc, itc_apple_id)
   else
@@ -21,7 +25,7 @@ private_lane :smf_build_precheck do |options|
   end
 end
 
-def check_common_project_setup_files
+def _check_common_project_setup_files
   sudmodule_directory = File.join(smf_workspace_dir, 'Submodules/SMF-iOS-CommonProjectSetupFiles')
   current_submodule_branch = `cd #{sudmodule_directory}; git rev-parse --abbrev-ref HEAD`.gsub("\n", '')
   ENV['DANGER_COMMON_PROJECT_SETUP_FILES_WRONG_BRANCH'] = current_submodule_branch unless current_submodule_branch == 'master'
