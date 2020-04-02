@@ -28,7 +28,7 @@ end
 def _check_common_project_setup_files
   submodule_directory = File.join(smf_workspace_dir, 'Submodules/SMF-iOS-CommonProjectSetupFiles')
 
-  current_head_commit = `cd #{submodule_directory}; git rev-parse master`.gsub("\n", '')
+  current_head_commit = `cd #{submodule_directory}; git rev-parse HEAD`.gsub("\n", '')
   remote_head_commit = `cd #{submodule_directory}; git rev-parse origin/master`.gsub("\n", '')
 
   ENV['DANGER_COMMON_PROJECT_SETUP_FILES_OUTDATED'] = 'true' unless current_head_commit == remote_head_commit
