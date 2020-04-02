@@ -16,7 +16,7 @@ if ENV['DANGER_COMMON_PROJECT_SETUP_FILES_WRONG_BRANCH'].nil? == false
   warn("The SMF-iOS-CommonProjectSetupFiles current branch is: '#{current_branch}', consider updating it to master !")
 end
 
-if ENV['DANGER_COMMON_PROJECT_SETUP_FILES_OUTDATED'] = 'true'
+if ENV['DANGER_COMMON_PROJECT_SETUP_FILES_OUTDATED'] == 'true'
   puts("UP to DATE IS: #{ENV['DANGER_COMMON_PROJECT_SETUP_FILES_UPDATED']}")
   warn('The SMF-iOS-CommonProjectSetupFiles are not up to date with origin/master !')
 end
