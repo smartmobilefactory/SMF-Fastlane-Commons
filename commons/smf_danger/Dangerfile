@@ -9,8 +9,9 @@ elsif !ENV['POD_VERSION'].nil?
 end
 
 ## COMMON PROJECT SETUP FILES CHECK
-puts("Is outdated: #{ENV['DANGER_COMMON_PROJECT_SETUP_FILES_OUTDATED']}")
-if ENV['DANGER_COMMON_PROJECT_SETUP_FILES_OUTDATED'] == 'true'
+`printenv`
+puts("Is outdated: #{ENV['COMMON_PROJECT_SETUP_FILES_OUTDATED']}")
+if ENV['COMMON_PROJECT_SETUP_FILES_OUTDATED'] == 'true'
   warn('The SMF-iOS-CommonProjectSetupFiles are not up to date with origin/master !')
 end
 
