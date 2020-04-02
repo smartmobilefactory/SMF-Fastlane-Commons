@@ -28,6 +28,8 @@ end
 def _check_common_project_setup_files
   submodule_directory = File.join(smf_workspace_dir, 'Submodules/SMF-iOS-CommonProjectSetupFiles')
 
+  return unless Dir.exist?(submodule_directory)
+
   current_head_commit = `cd #{submodule_directory}; git rev-parse HEAD`.gsub("\n", '')
   remote_head_commit = `cd #{submodule_directory}; git rev-parse origin/master`.gsub("\n", '')
 
