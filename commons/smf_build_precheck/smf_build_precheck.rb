@@ -35,8 +35,9 @@ def _check_common_project_setup_files
 
   UI.message("Current: #{current_head_commit}")
   UI.message("Other: #{remote_head_commit}")
-
-  ENV['DANGER_COMMON_PROJECT_SETUP_FILES_OUTDATED'] = 'true' unless current_head_commit == remote_head_commit
+  if current_head_commit != remote_head_commit
+    ENV['DANGER_COMMON_PROJECT_SETUP_FILES_OUTDATED'] = 'true'
+  end
 end
 
 def perform_build_precheck_ios(upload_itc, itc_apple_id)
