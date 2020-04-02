@@ -28,12 +28,12 @@ end
 def _check_common_project_setup_files
   sudmodule_directory = File.join(smf_workspace_dir, 'Submodules/SMF-iOS-CommonProjectSetupFiles')
   current_submodule_branch = `cd #{sudmodule_directory}; git rev-parse --abbrev-ref HEAD`.gsub("\n", '')
-  UI.message("Current submodule branch: #{current_submodule_branch}")
+  UI.message("Current CommonProjectSetupFiles branch: #{current_submodule_branch}")
   ENV['DANGER_COMMON_PROJECT_SETUP_FILES_WRONG_BRANCH'] = current_submodule_branch if current_submodule_branch != 'master'
   current_head_commit = `cd #{sudmodule_directory}; git rev-parse master`.gsub("\n", '')
   remote_head_commit = `cd #{sudmodule_directory}; git rev-parse origin/master`.gsub("\n", '')
-  UI.message("Current head commit: #{current_head_commit}")
-  UI.message("Current remt commit: #{remote_head_commit}")
+  UI.message("Current CommonProjectSetupFiles head commit: #{current_head_commit}")
+  UI.message("Current CommonProjectSetupFiles remote commit: #{remote_head_commit}")
   ENV['DANGER_COMMON_PROJECT_SETUP_FILES_OUTDATED'] = 'true' if current_head_commit != remote_head_commit
 end
 
