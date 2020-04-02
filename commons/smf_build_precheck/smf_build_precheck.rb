@@ -14,7 +14,6 @@ private_lane :smf_build_precheck do |options|
     perform_build_precheck_for_pods_spec_repo_url(
       pods_spec_repo
     )
-  when :macos
   when :flutter
     perform_build_precheck_ios(upload_itc, itc_apple_id)
   else
