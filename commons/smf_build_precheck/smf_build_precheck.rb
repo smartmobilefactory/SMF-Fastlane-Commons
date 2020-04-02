@@ -36,6 +36,7 @@ def _check_common_project_setup_files
   UI.message("Current: #{current_head_commit}")
   UI.message("Other: #{remote_head_commit}")
   if current_head_commit != remote_head_commit
+    UI.message("Setting it to true")
     ENV['DANGER_COMMON_PROJECT_SETUP_FILES_OUTDATED'] = 'true'
   end
 end
