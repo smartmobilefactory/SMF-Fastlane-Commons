@@ -3,14 +3,13 @@
 
 # Update Files
 
-private_lane :smf_super_generate_files do
-  smf_update_generated_files
+private_lane :smf_super_generate_files do |options|
+  smf_update_generated_files(options)
 end
 
-lane :smf_generate_files do
+lane :smf_generate_files do |options|
   smf_super_generate_files
 end
-
 
 # Setup Dependencies
 

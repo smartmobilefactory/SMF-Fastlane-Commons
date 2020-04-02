@@ -15,13 +15,19 @@ private_lane :smf_upload_with_sparkle do |options|
   sparkle_xml_name = options[:sparkle_xml_name]
   sparkle_private_key = options[:sparkle_private_key]
 
+  # Optional
+  source_dmg_path = options[:source_dmg_path]
+  target_directory = options[:target_directory]
+
+  use_custom_info_plist_path = !source_dmg_path.nil?
+
   if sparkle_private_key.nil? || ENV[sparkle_private_key].nil?
     UI.error('Sparkle private key is either not set in the Config.json, or there is no credential stored in Jenkins')
     raise 'Error none existing private key credential'
   end
 
-  dmg_path = smf_path_to_dmg(build_variant)
-  update_dir = "#{smf_workspace_dir}/build/"
+  dmg_path = source_dmg_path.nil? ? smf_path_to_dmg(build_variant) : source_dmg_path
+  update_dir = target_directory.nil? ? "#{smf_workspace_dir}/build/" : target_directory
 
   release_notes = smf_read_changelog(html: true)
   release_notes_name = "#{scheme}.html"
@@ -43,7 +49,18 @@ private_lane :smf_upload_with_sparkle do |options|
 
   sh "#{@fastlane_commons_dir_path}/commons/ios/smf_upload_with_sparkle/sparkle.sh #{ENV['LOGIN']} #{sparkle_private_key} #{update_dir} #{sparkle_version} #{sparkle_signing_team}"
 
-  _smf_prepare_sparkle_xml_for_upload(build_variant, sparkle_xml_name, release_notes_name)
+  if use_custom_info_plist_path == true
+    sh("hdiutil attach #{source_dmg_path}")
+    app_name = File.basename(source_dmg_path).sub('.dmg', '')
+    info_plist_path = "/Volumes/#{app_name}/#{app_name}.app/Contents/Info.plist"
+    xml_path = File.join(target_directory, sparkle_xml_name)
+    _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, xml_path)
+    sh("hdiutil detach /Volumes/#{app_name}")
+  else
+    sparkle_xml_path = "#{smf_workspace_dir}/build/#{sparkle_xml_name}"
+    info_plist_path = File.join(smf_path_to_ipa_or_app(build_variant), '/Contents/Info.plist')
+    _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, sparkle_xml_path)
+  end
 
   unless sparkle_upload_url.nil? || sparkle_upload_user.nil?
     appcast_xml = "#{update_dir}#{sparkle_xml_name}"
@@ -52,16 +69,13 @@ private_lane :smf_upload_with_sparkle do |options|
   end
 end
 
-def _smf_prepare_sparkle_xml_for_upload(build_variant, sparkle_xml_name, release_notes_name)
-  UI.message('Prepare sparkle xml file for upload.')
+def _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, sparkle_xml_path)
+  UI.message('Prepare sparkle xml file.')
   # Read SUFeedUrl to get URL
-  info_plist_path = File.join(smf_path_to_ipa_or_app(build_variant), '/Contents/Info.plist')
   su_feed_url = sh("defaults read #{info_plist_path} SUFeedURL").gsub("\n", '')
 
   # set releaseNotesLink to URL of the .html file, which contains the release notes
   html_url = su_feed_url.gsub(/[^\/]+$/,release_notes_name)
-
-  sparkle_xml_path = "#{smf_workspace_dir}/build/#{sparkle_xml_name}"
   doc = File.open(sparkle_xml_path) { |f| Nokogiri::XML(f) }
   description = doc.at_css('rss channel item description')
 

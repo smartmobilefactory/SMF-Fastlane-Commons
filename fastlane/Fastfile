@@ -35,6 +35,7 @@ def smf_import_commons
   fastlane_dir_path = "#{@fastlane_commons_dir_path}/fastlane"
   smf_import_all("#{fastlane_dir_path}/utils")
   smf_import_all("#{@fastlane_commons_dir_path}/commons")
+  smf_import_all("#{@fastlane_commons_dir_path}/tools")
 
   case @platform
   when :ios

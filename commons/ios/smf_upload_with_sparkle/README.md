@@ -8,15 +8,19 @@ Uploads the .dmg to Sparkle.
 smf_upload_with_sparkle(
     build_variant: "alpha",                     # The currently building build variant
     scheme: <scheme>,                         
-    sparkle_dmg_path: <path to file>,           # The Path to the .dmg file
-    sparkle_upload_user: <>,
-    sparkle_upload_url: <>,
+    sparkle_dmg_path: <path to file>,           # Optional: the Path to the .dmg file, needed for upload
+    sparkle_upload_user: <>,                    # Optional: needed for upload
+    sparkle_upload_url: <>,                     # Optional: needed for upload
     sparkle_version: <>,
     sparkle_signing_team: <>,
     sparkle_xml_name: <>,
     sparkle_private_key: <>
+    source_dmg_path: <path to custom .dmg>                      # Optional see section "Sparkle Package Creator"
+    target_directory: <directory where to store the appcast>    # Optional see section "Sparkle Package Creator"
 )
 ``` 
+### Sparkle Package Creator
+This lane is also used by the sparkle package creator tool. Therefore the upload url and user are set to nil to prevent the lane from uploading. A custom source path for the app's dmg is given. The appcast, html etc is then created at the given target directory.
 
 ### Custom Sparkle Credentials for MacOS-Apps
 
@@ -32,7 +36,7 @@ If you want to add a custom Credential for the sparkle upload, follow these step
             ..., 
             "<env_variable_name_for_credential>": {                         \
                 "jenkins_credential_name" : "new_jenkins_credential_key",   |____ this section should be added
-                "type" : "<credential type>"                                |       # tpye is optional and defaults to 'string'
+                "type" : "<credential type>"                                |       # type is optional and defaults to 'string'
             },                                                              /
     },
     "build_variants" : { ... }

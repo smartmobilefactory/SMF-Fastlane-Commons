@@ -24,9 +24,14 @@ FLUTTER_APP_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Flutter.template'
 
 private_lane :smf_generate_jenkins_file do |options|
 
-  jenkins_file_template_path = _smf_jenkins_file_template_path
+  custom_jenkinsfile_template = options[:custom_jenkinsfile_template]
+  custom_jenkinsfile_path = options[:custom_jenkinsfile_path]
+  remove_multibuild_variants = options[:remove_multibuild_variants].nil? ? false : options[:remove_multibuild_variants]
+
+  jenkins_file_template_path = custom_jenkinsfile_template.nil? ? _smf_jenkins_file_template_path : custom_jenkinsfile_template
   jenkinsFileData = File.read(jenkins_file_template_path)
-  possible_build_variants = _smf_possible_build_variants
+  possible_build_variants = remove_multibuild_variants ? @smf_fastlane_config[:build_variants].keys.map(&:to_s) : _smf_possible_build_variants
+  jenkinsfile_path = custom_jenkinsfile_path.nil? ? "#{smf_workspace_dir}/Jenkinsfile" : custom_jenkinsfile_path
 
   UI.message("Generating Jenkinsfile with template at: #{jenkins_file_template_path}")
 
@@ -42,7 +47,7 @@ private_lane :smf_generate_jenkins_file do |options|
 
   jenkinsFileData = _smf_insert_custom_credentials(jenkinsFileData) unless @platform == :macos
 
-  File.write("#{smf_workspace_dir}/Jenkinsfile", jenkinsFileData)
+  File.write(jenkinsfile_path, jenkinsFileData)
 end
 
 def _smf_jenkins_file_template_path
