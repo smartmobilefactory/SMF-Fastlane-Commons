@@ -9,7 +9,6 @@ elsif !ENV['POD_VERSION'].nil?
 end
 
 ## COMMON PROJECT SETUP FILES CHECK
-output = `printenv`
 puts(output)
 puts("Is outdated: #{ENV['COMMON_PROJECT_SETUP_FILES_OUTDATED']}")
 if ENV['COMMON_PROJECT_SETUP_FILES_OUTDATED'] == 'true'

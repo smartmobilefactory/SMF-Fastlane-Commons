@@ -6,38 +6,19 @@ private_lane :smf_build_precheck do |options|
 
   case @platform
   when :ios
-    _check_common_project_setup_files
     perform_build_precheck_ios(upload_itc, itc_apple_id)
     perform_build_precheck_for_pods_spec_repo_url(
       pods_spec_repo
     )
   when :ios_framework
-    _check_common_project_setup_files
     perform_build_precheck_for_pods_spec_repo_url(
       pods_spec_repo
     )
   when :macos
-    _check_common_project_setup_files
   when :flutter
     perform_build_precheck_ios(upload_itc, itc_apple_id)
   else
     UI.message("Build Precheck: Nothing reportable found")
-  end
-end
-
-def _check_common_project_setup_files
-  submodule_directory = File.join(smf_workspace_dir, 'Submodules/SMF-iOS-CommonProjectSetupFiles')
-
-  return unless Dir.exist?(submodule_directory)
-
-  current_head_commit = `cd #{submodule_directory}; git rev-parse HEAD`.gsub("\n", '')
-  remote_head_commit = `cd #{submodule_directory}; git rev-parse origin/master`.gsub("\n", '')
-
-  UI.message("Current: #{current_head_commit}")
-  UI.message("Other: #{remote_head_commit}")
-  if current_head_commit != remote_head_commit
-    UI.message("Setting it to true")
-    ENV['COMMON_PROJECT_SETUP_FILES_OUTDATED'] = 'true'
   end
 end
 
