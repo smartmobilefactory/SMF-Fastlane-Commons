@@ -8,6 +8,16 @@ elsif !ENV['POD_VERSION'].nil?
   message("Upcoming Build Version is <b>#{ENV['POD_VERSION']}</b>")
 end
 
+## COMMON PROJECT SETUP FILES CHECK
+if !ENV['DANGER_COMMON_PROJECT_SETUP_FILES_WRONG_BRANCH'].nil?
+  current_branch = ENV['DANGER_COMMON_PROJECT_SETUP_FILES_WRONG_BRANCH']
+  warn("The SMF-iOS-CommonProjectSetupFiles current branch is: '#{current_branch}', consider updating it to master !")
+end
+
+if ENV['DANGER_COMMON_PROJECT_SETUP_FILES_UPDATED'] = 'true'
+  warn('The SMF-iOS-CommonProjectSetupFiles are not up to date with origin/master !')
+end
+
 ## WARNINGS:
 if (github.pr_body + github.pr_title).include?("WIP")
   warn("Pull Request is Work in Progress")

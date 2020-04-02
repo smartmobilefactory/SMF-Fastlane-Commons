@@ -21,6 +21,15 @@ private_lane :smf_build_precheck do |options|
   end
 end
 
+def check_common_project_setup_files
+  sudmodule_directory = File.join(smf_workspace_dir, 'Submodules/SMF-iOS-CommonProjectSetupFiles')
+  current_submodule_branch = `cd #{sudmodule_directory}; git rev-parse --abbrev-ref HEAD`.gsub("\n", '')
+  ENV['DANGER_COMMON_PROJECT_SETUP_FILES_WRONG_BRANCH'] = current_submodule_branch unless current_submodule_branch == 'master'
+  current_head_commit = `cd #{sudmodule_directory}; git rev-parse HEAD`.gsub("\n", '')
+  remote_head_commit = `cd #{sudmodule_directory}; git rev-parse origin/#{current_submodule_branch}`.gsub("\n", '')
+  ENV['DANGER_COMMON_PROJECT_SETUP_FILES_UPDATED'] = 'true' unless current_head_commit == remote_head_commit
+end
+
 def perform_build_precheck_ios(upload_itc, itc_apple_id)
 
   if upload_itc == true && itc_apple_id.nil?
