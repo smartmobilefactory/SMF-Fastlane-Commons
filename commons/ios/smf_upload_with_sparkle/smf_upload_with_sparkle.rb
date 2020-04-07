@@ -80,7 +80,7 @@ def _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, spa
   description = doc.at_css('rss channel item description')
 
   if description.nil?
-    item = doc.at_css('rss channel item')
+    item = doc.at_css('rss channel item title')
     item.add_next_sibling("<sparkle:releaseNotesLink>#{html_url}</sparkle:releaseNotesLink>")
   else
     description.add_next_sibling("<sparkle:releaseNotesLink>#{html_url}</sparkle:releaseNotesLink>")
