@@ -18,7 +18,6 @@ private_lane :smf_notarize do |options|
     package: dmg_path,
     bundle_id: bundle_id,
     username: username,
-    asc_provider: custom_provider.nil? ? asc_provider : custom_provider,
-    print_log: false
+    asc_provider: custom_provider.nil? ? asc_provider : custom_provider
   )
 end
