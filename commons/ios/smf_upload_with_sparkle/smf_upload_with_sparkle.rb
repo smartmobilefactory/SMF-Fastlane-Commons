@@ -79,13 +79,17 @@ def _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, spa
   doc = File.open(sparkle_xml_path) { |f| Nokogiri::XML(f) }
   description = doc.at_css('rss channel item description')
 
-  unless description.nil?
+  if description.nil? {
+    item = doc.at_css('rss channel item')
+    item.add_next_sibling("<sparkle:releaseNotesLink>#{html_url}</sparkle:releaseNotesLink>")
+  } else {
     description.add_next_sibling("<sparkle:releaseNotesLink>#{html_url}</sparkle:releaseNotesLink>")
     description.remove
-    doc.xpath('//text()').find_all { |t| t.to_s.strip == '' }.map(&:remove)
+  }
 
-    File.open(sparkle_xml_path, 'w+') do |f|
-      f.write(doc)
-    end
+  doc.xpath('//text()').find_all { |t| t.to_s.strip == '' }.map(&:remove)
+
+  File.open(sparkle_xml_path, 'w+') do |f|
+    f.write(doc)
   end
 end
