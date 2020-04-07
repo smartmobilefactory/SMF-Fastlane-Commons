@@ -41,6 +41,8 @@ private_lane :smf_danger do |options|
     end
   end
 
+  _check_common_project_setup_files
+
   _smf_create_jira_ticket_links(
       ticket_base_url
   )
@@ -50,6 +52,19 @@ private_lane :smf_danger do |options|
       dangerfile: "#{File.expand_path(File.dirname(__FILE__))}/Dangerfile",
       verbose: true
   )
+end
+
+def _check_common_project_setup_files
+  submodule_directory = File.join(smf_workspace_dir, 'Submodules/SMF-iOS-CommonProjectSetupFiles')
+
+  return unless Dir.exist?(submodule_directory)
+
+  current_head_commit = `cd #{submodule_directory}; git rev-parse HEAD`.gsub("\n", '')
+  remote_head_commit = `cd #{submodule_directory}; git rev-parse origin/master`.gsub("\n", '')
+
+  if current_head_commit != remote_head_commit
+    ENV['COMMON_PROJECT_SETUP_FILES_OUTDATED'] = 'true'
+  end
 end
 
 def _smf_find_paths_of(filename)

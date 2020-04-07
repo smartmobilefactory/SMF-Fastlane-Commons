@@ -8,6 +8,11 @@ elsif !ENV['POD_VERSION'].nil?
   message("Upcoming Build Version is <b>#{ENV['POD_VERSION']}</b>")
 end
 
+## COMMON PROJECT SETUP FILES CHECK
+if ENV['COMMON_PROJECT_SETUP_FILES_OUTDATED'] == 'true'
+  warn('The SMF-iOS-CommonProjectSetupFiles are not up to date with origin/master !')
+end
+
 ## WARNINGS:
 if (github.pr_body + github.pr_title).include?("WIP")
   warn("Pull Request is Work in Progress")
