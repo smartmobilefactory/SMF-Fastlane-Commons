@@ -82,16 +82,19 @@ else
 end
 
 ## XCODE WARNINGS
-xcode_summary.inline_mode = true
-xcode_summary.ignored_files = 'Pods/**'
 
-xcode_summary.ignored_results { |result|
+if File.exist?('build/reports/errors.json')
+  xcode_summary.inline_mode = true
+  xcode_summary.ignored_files = 'Pods/**'
 
-    if result.location.nil?
-        result.message.scan(/.*\.swift.*/).empty?
-    else
-        File.fnmatch('*[^.swift]', result.location.file_path)
-    end
-}
+  xcode_summary.ignored_results { |result|
 
-xcode_summary.report 'build/reports/errors.json'
+      if result.location.nil?
+          result.message.scan(/.*\.swift.*/).empty?
+      else
+          File.fnmatch('*[^.swift]', result.location.file_path)
+      end
+  }
+
+  xcode_summary.report 'build/reports/errors.json'
+end
