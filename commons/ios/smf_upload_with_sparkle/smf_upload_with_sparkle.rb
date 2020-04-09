@@ -7,6 +7,11 @@ private_lane :smf_upload_with_sparkle do |options|
 
   build_variant = options[:build_variant]
   scheme = options[:scheme]
+  # TODO: we need to make sure the rest of the system knows about that
+  # - Doc Config.json
+  # - Make sure all the smf_upload_with_sparkle specify it
+  #  - Check if the default value is necessary
+  create_intermediate_folder = (options[:create_release_specific_folder] ?? false)
   sparkle_dmg_path = options[:sparkle_dmg_path]
   sparkle_upload_user = options[:sparkle_upload_user]
   sparkle_upload_url = options[:sparkle_upload_url]
@@ -39,10 +44,6 @@ private_lane :smf_upload_with_sparkle do |options|
 
   app_name = "#{sparkle_dmg_path}#{scheme}.dmg"
 
-  unless sparkle_upload_url.nil? || sparkle_upload_user.nil?
-    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{update_dir}#{release_notes_name} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}#{release_notes_name}")
-    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{dmg_path} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{app_name}")
-  end
   # Create appcast
   UI.message("Using '#{sparkle_private_key}' as private sparkle 🔑")
   sparkle_private_key = ENV[sparkle_private_key]
@@ -63,9 +64,24 @@ private_lane :smf_upload_with_sparkle do |options|
   end
 
   unless sparkle_upload_url.nil? || sparkle_upload_user.nil?
+
     appcast_xml = "#{update_dir}#{sparkle_xml_name}"
     appcast_upload_name = sparkle_xml_name
+    if create_intermediate_folder == true
+      # We put the package elements in a folder, and upload the folder
+      intermediate_directory_path = _smf_create_intermediate_directory(update_dir, info_plist_path)
+      sh("mv #{dmg_path} #{intermediate_directory_path}")
+      sh("mv #{appcast_xml} #{intermediate_directory_path}")
+      sh("mv #{update_dir}#{release_notes_name} #{intermediate_directory_path}")
+      # TODO: test this !
+      sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} -r #{intermediate_directory_path} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}#")
+    else
+      # We upload the three elements directly
+    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{update_dir}#{release_notes_name} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}#{release_notes_name}")
+    # TODO: WTF here with the destination path. WHY DOES IT WORK ????
+    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{dmg_path} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{app_name}")
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{appcast_xml} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}#{appcast_upload_name}")
+    end
   end
 end
 
@@ -95,5 +111,27 @@ def _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, spa
 
   File.open(sparkle_xml_path, 'w+') do |f|
     f.write(doc)
+  end
+end
+
+def _smf_create_intermediate_directory(base_directory, info_plist_path)
+  begin
+    UI.message('Prepare Sparkle intermediate directory.')
+    app_name = sh("defaults read #{info_plist_path} CFBundleName").gsub("\n", '')
+    version_number = sh("defaults read #{info_plist_path} CFBundleShortVersionString").gsub("\n", '')
+    build_number = sh("defaults read #{info_plist_path} CFBundleVersion").gsub("\n", '')
+    # To prevent any risk of duplicate folders on the server side, we add the current timestamp
+    timestamp = Time.now.to_i
+    
+    directory_name = app_name + "-" + version_number + "-" + build_number + "-" timestamp.to_s
+    intermediate_directory_path = "#{base_directory}#{directory_name}"
+    UI.message("Will create Sparkle intermediate directory at path: #{intermediate_directory_path}.") 
+    Dir.mkdir(intermediate_directory_path)
+    UI.message("Did create Sparkle intermediate directory at path: #{intermediate_directory_path}.") 
+    
+    intermediate_directory_path
+  rescue => exception
+    UI.message("Encountered an error while creating sparkle intermediate directory: #{exception.message}.") 
+    raise "Cannot create Sparkle intermediate directory. Interrupting process..."
   end
 end
