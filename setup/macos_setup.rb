@@ -246,7 +246,6 @@ private_lane :smf_super_upload_to_appcenter do |options|
   appcenter_app_id = smf_get_appcenter_id(build_variant)
   destinations = build_variant_config[:appcenter_destinations]
   sparkle_config = build_variant_config[:sparkle]
-  sparkle_upload_to_appcenter = sparkle_config.nil? ? false : sparkle_config[:upload_to_appcenter]
   sparkle_xml_name = sparkle_config.nil? ? nil : sparkle_config[:xml_name]
 
   # Upload the IPA to AppCenter
