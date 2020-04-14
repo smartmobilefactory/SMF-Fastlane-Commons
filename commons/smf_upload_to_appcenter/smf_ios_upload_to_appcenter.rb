@@ -38,7 +38,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
       # Upload a .app.zip file to App Center because this is the only accepted zip format by App Center.
       # The app has to be in the .zip file because otherwise the meta data of the project will not be detected by App Center.
       package_path = "#{app_path}.zip".sub('.dmg', '.app')
-      sh "cd \"#{File.dirname(app_path)}\"; zip -r -q \"#{package_path}\" \"./#{escaped_filename}.app\" \"./#{escaped_filename}.dmg\" \"./#{escaped_filename}.html\" \"./#{sparkle_xml_name}\""
+      sh "cd \"#{File.dirname(app_path)}\"; zip -r -q \"#{package_path}\" \"./#{File.basename(path_to_ipa_or_app)}\" \"./#{File.basename(app_path)}\" \"./#{escaped_filename}.html\" \"./#{sparkle_xml_name}\""
       app_path = package_path
 
       UI.message('Upload mac app Sparkle package to AppCenter.')

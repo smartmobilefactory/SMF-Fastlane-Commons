@@ -78,14 +78,22 @@ def _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, spa
   html_url = su_feed_url.gsub(/[^\/]+$/,release_notes_name)
   doc = File.open(sparkle_xml_path) { |f| Nokogiri::XML(f) }
   description = doc.at_css('rss channel item description')
+  releaseNotesLinkNode = "<sparkle:releaseNotesLink>#{html_url}</sparkle:releaseNotesLink>"
 
-  unless description.nil?
-    description.add_next_sibling("<sparkle:releaseNotesLink>#{html_url}</sparkle:releaseNotesLink>")
+  if description.nil?
+    # In case the description is not there, we get the title and insert the release link right after it
+    # The title will always be present
+    item = doc.at_css('rss channel item title')
+    item.add_next_sibling(releaseNotesLinkNode)
+  else
+    # In case the description is there, we replace it by the releaseNoteLink
+    description.add_next_sibling(releaseNotesLinkNode)
     description.remove
-    doc.xpath('//text()').find_all { |t| t.to_s.strip == '' }.map(&:remove)
+  end
 
-    File.open(sparkle_xml_path, 'w+') do |f|
-      f.write(doc)
-    end
+  doc.xpath('//text()').find_all { |t| t.to_s.strip == '' }.map(&:remove)
+
+  File.open(sparkle_xml_path, 'w+') do |f|
+    f.write(doc)
   end
 end
