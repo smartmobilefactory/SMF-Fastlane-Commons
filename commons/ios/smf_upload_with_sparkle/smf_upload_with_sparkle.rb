@@ -9,8 +9,13 @@ private_lane :smf_upload_with_sparkle do |options|
   scheme = options[:scheme]
   # TODO: we need to make sure the rest of the system knows about that
   # - Doc Config.json
-  # - Make sure all the smf_upload_with_sparkle specify it
-  #  - Check if the default value is necessary
+  # - Make sure all the smf_upload_with_sparkle specify it (OK)
+  #  - Check if the default value is necessary (YES)
+  # - Get rid of sparkle.uploadToAppcenter
+  # - Test mechanism with Alpha build
+  # - Adapt all live builds to use this mechanism
+  # - cleanup my tests on strato's CI
+  # - Cleanup tests here (look for TODO)
   create_intermediate_folder = (options[:create_release_specific_folder] ?? false)
   sparkle_dmg_path = options[:sparkle_dmg_path]
   sparkle_upload_user = options[:sparkle_upload_user]

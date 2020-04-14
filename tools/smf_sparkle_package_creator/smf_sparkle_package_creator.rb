@@ -33,6 +33,7 @@ lane :smf_create_sparkle_package do |options|
 
   smf_upload_with_sparkle(
     build_variant: build_variant,
+    create_intermediate_folder: sparkle_config[:create_intermediate_folder],
     scheme: build_variant_config[:scheme],
     sparkle_version: sparkle_config[:sparkle_version],
     sparkle_signing_team: sparkle_config[:sparkle_signing_team],
