@@ -74,12 +74,13 @@ private_lane :smf_upload_with_sparkle do |options|
     appcast_upload_name = sparkle_xml_name
     if create_intermediate_folder == true
       # We put the package elements in a folder, and upload the folder
+      # We are copying instead of moving because other lanes might depend on the original path
       intermediate_directory_path = _smf_create_intermediate_directory(update_dir, info_plist_path)
-      sh("mv #{dmg_path} #{intermediate_directory_path}")
-      sh("mv #{appcast_xml} #{intermediate_directory_path}")
-      sh("mv #{update_dir}#{release_notes_name} #{intermediate_directory_path}")
+      sh("cp #{dmg_path} #{intermediate_directory_path}")
+      sh("cp #{appcast_xml} #{intermediate_directory_path}")
+      sh("cp #{update_dir}#{release_notes_name} #{intermediate_directory_path}")
       # TODO: test this !
-      sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} -r #{intermediate_directory_path} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}#")
+      sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} -r #{intermediate_directory_path} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
     else
       # We upload the three elements directly
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{update_dir}#{release_notes_name} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}#{release_notes_name}")
