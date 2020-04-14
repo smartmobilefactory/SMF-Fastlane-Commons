@@ -258,7 +258,7 @@ private_lane :smf_super_upload_to_appcenter do |options|
     escaped_filename: build_variant_config[:scheme].gsub(' ', "\ "),
     path_to_ipa_or_app: smf_path_to_ipa_or_app(build_variant),
     is_mac_app: true,
-    podspec_path: build_variant_config[:podspec_path]
+    podspec_path: build_variant_config[:podspec_path],
     sparkle_xml_name: sparkle_xml_name
   ) if !appcenter_app_id.nil?
 
