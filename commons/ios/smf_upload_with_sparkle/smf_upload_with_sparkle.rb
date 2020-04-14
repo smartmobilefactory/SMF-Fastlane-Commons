@@ -11,11 +11,12 @@ private_lane :smf_upload_with_sparkle do |options|
   # - Doc Config.json
   # - Make sure all the smf_upload_with_sparkle specify it (OK)
   #  - Check if the default value is necessary (YES)
-  # - Get rid of sparkle.uploadToAppcenter
-  # - Test mechanism with Alpha build
-  # - Adapt all live builds to use this mechanism
+  # - Get rid of sparkle.uploadToAppcenter (OK)
+  # - Test mechanism with Alpha build (OK)
+  # - Adapt all live builds to use this mechanism (OK)
   # - cleanup my tests on strato's CI
-  # - Cleanup tests here (look for TODO)
+  # - Cleanup tests here (look for TODO) (OK)
+  # - Update documentation on Confluence
   create_intermediate_folder = options[:create_intermediate_folder].nil? ? false : options[:create_intermediate_folder]
   sparkle_dmg_path = options[:sparkle_dmg_path]
   sparkle_upload_user = options[:sparkle_upload_user]
@@ -79,12 +80,10 @@ private_lane :smf_upload_with_sparkle do |options|
       sh("cp #{dmg_path} #{intermediate_directory_path}")
       sh("cp #{appcast_xml} #{intermediate_directory_path}")
       sh("cp #{update_dir}#{release_notes_name} #{intermediate_directory_path}")
-      # TODO: test this !
       sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} -r #{intermediate_directory_path} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
     else
       # We upload the three elements directly
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{update_dir}#{release_notes_name} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}#{release_notes_name}")
-    # TODO: WTF here with the destination path. WHY DOES IT WORK ????
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{dmg_path} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{app_name}")
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{appcast_xml} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}#{appcast_upload_name}")
     end

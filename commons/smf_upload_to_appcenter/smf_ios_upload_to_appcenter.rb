@@ -42,8 +42,7 @@ private_lane :smf_ios_upload_to_appcenter do |options|
       version: version_number,
       file: app_path,
       dsym: dsym_path,
-      # TODO: Put it back to true
-      notify_testers: false,
+      notify_testers: true,
       destinations: destinations,
       release_notes: smf_read_changelog
     )
