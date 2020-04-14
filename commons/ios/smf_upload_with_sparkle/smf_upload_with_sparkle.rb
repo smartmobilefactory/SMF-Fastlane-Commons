@@ -16,7 +16,7 @@ private_lane :smf_upload_with_sparkle do |options|
   # - Adapt all live builds to use this mechanism
   # - cleanup my tests on strato's CI
   # - Cleanup tests here (look for TODO)
-  create_intermediate_folder = (options[:create_release_specific_folder] ?? false)
+  create_intermediate_folder = options[:create_release_specific_folder].nil? ? false : options[:create_release_specific_folder])
   sparkle_dmg_path = options[:sparkle_dmg_path]
   sparkle_upload_user = options[:sparkle_upload_user]
   sparkle_upload_url = options[:sparkle_upload_url]
@@ -128,7 +128,7 @@ def _smf_create_intermediate_directory(base_directory, info_plist_path)
     # To prevent any risk of duplicate folders on the server side, we add the current timestamp
     timestamp = Time.now.to_i
     
-    directory_name = app_name + "-" + version_number + "-" + build_number + "-" timestamp.to_s
+    directory_name = app_name + "-" + version_number + "-" + build_number + "-" + timestamp.to_s
     intermediate_directory_path = "#{base_directory}#{directory_name}"
     UI.message("Will create Sparkle intermediate directory at path: #{intermediate_directory_path}.") 
     Dir.mkdir(intermediate_directory_path)
