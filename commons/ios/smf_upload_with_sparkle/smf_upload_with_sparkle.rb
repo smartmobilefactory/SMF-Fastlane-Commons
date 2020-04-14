@@ -16,7 +16,7 @@ private_lane :smf_upload_with_sparkle do |options|
   # - Adapt all live builds to use this mechanism
   # - cleanup my tests on strato's CI
   # - Cleanup tests here (look for TODO)
-  create_intermediate_folder = options[:create_release_specific_folder].nil? ? false : options[:create_release_specific_folder])
+  create_intermediate_folder = options[:create_release_specific_folder].nil? ? false : options[:create_release_specific_folder]
   sparkle_dmg_path = options[:sparkle_dmg_path]
   sparkle_upload_user = options[:sparkle_upload_user]
   sparkle_upload_url = options[:sparkle_upload_url]
