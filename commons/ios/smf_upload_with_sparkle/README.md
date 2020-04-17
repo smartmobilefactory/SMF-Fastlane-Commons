@@ -7,6 +7,7 @@ Uploads the .dmg to Sparkle.
 ```
 smf_upload_with_sparkle(
     build_variant: "alpha",                     # The currently building build variant
+    create_intermediate_folder: <bool>          # Optional (defaults to false): If true, the package will be uploaded in a release specific folder (Used to upload pre-releases). If false, it will be uploaded directly in `sparkle_upload_url.sparkle_dmg_path`
     scheme: <scheme>,                         
     sparkle_dmg_path: <path to file>,           # Optional: the Path to the .dmg file, needed for upload
     sparkle_upload_user: <>,                    # Optional: needed for upload
