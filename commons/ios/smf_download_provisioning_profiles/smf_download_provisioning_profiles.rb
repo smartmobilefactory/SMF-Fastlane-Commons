@@ -12,6 +12,7 @@ private_lane :smf_download_provisioning_profiles do |options|
   extensions_suffixes = options[:extensions_suffixes]
   build_variant = options[:build_variant]
   template_name = options[:template_name]
+  force = options[:force]
 
   team_id(team_id)
 
@@ -34,7 +35,8 @@ private_lane :smf_download_provisioning_profiles do |options|
         extensions_suffixes: extensions_suffixes,
         apple_id: apple_id,
         team_id: team_id,
-        template_name: template_name
+        template_name: template_name,
+        force: force
     )
 
   elsif (build_variant.match(/alpha/) != nil || build_variant.match(/beta/) != nil || build_variant.match(/example/) != nil)
@@ -47,7 +49,8 @@ private_lane :smf_download_provisioning_profiles do |options|
           extensions_suffixes: extensions_suffixes,
           apple_id: apple_id,
           team_id: team_id,
-          template_name: template_name
+          template_name: template_name,
+          force: force
       )
     end
   end
@@ -62,6 +65,9 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
   apple_id = options[:apple_id]
   team_id = options[:team_id]
   template_name = options[:template_name]
+
+  force = options[:force]
+  force = force.nil? ? !template_name.nil? : force
 
   identifiers = [app_identifier]
   git_url = $FASTLANE_MATCH_REPO_URL
@@ -86,6 +92,7 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
       git_branch: team_id,
       keychain_name: "jenkins.keychain",
       keychain_password: ENV[$KEYCHAIN_JENKINS_ENV_KEY],
-      template_name: template_name
+      template_name: template_name,
+      force: force
   )
 end

@@ -24,5 +24,11 @@ smf_download_provisioning_profiles(
   extensions_suffixes: <???>,                                                       # Undocumented property??
   build_variant: "alpha",                                                           # the build variant of the current build
   template_name: "Contact Note Field Access beta"                                   # Entitlement that can be choosen while creating a Provisioning Profile
+  force: false                                                                      # Optional: Renew the provisioning profiles every time you run match
 )
 ```
+#### Special Parameter Infos:
+
+| Parameter | Optional | Default | Info |
+| :----: | :----: | :----: | :--- |
+| force | `true`| `false` | Renew the provisioning profiles every time you run match, if this is nil/not set and the `template_name` parameter **is** set, force will be set to **true**. |
