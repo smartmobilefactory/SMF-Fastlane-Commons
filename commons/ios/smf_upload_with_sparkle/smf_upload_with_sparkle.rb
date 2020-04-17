@@ -126,7 +126,7 @@ def _smf_create_intermediate_directory(base_directory, info_plist_path)
     
     intermediate_directory_path
   rescue => exception
-    UI.message("Encountered an error while creating sparkle intermediate directory: #{exception.message}.") 
+    UI.error("Encountered an error while creating sparkle intermediate directory: #{exception.message}.") 
     raise "Cannot create Sparkle intermediate directory. Interrupting process..."
   end
 end
