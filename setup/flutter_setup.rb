@@ -85,11 +85,12 @@ private_lane :smf_super_ios_build do |options|
       use_wildcard_signing: build_variant_ios_config[:use_wildcard_signing],
       bundle_identifier: build_variant_ios_config[:bundle_identifier],
       use_default_match_config: build_variant_ios_config[:match].nil?,
-      match_read_only: build_variant_ios_config[:match].nil? ? nil : build_variant_ios_config[:match][:read_only],
-      match_type: build_variant_ios_config[:match].nil? ? nil : build_variant_ios_config[:match][:type],
-      template_name: build_variant_ios_config[:match].nil? ? nil : build_variant_ios_config[:match][:template_name],
+      match_read_only: build_variant_ios_config.dig(:match, :read_only),
+      match_type: build_variant_ios_config.dig(:match, :type),
+      template_name: build_variant_ios_config.dig(:match, :template_name),
       extensions_suffixes: !build_variant_config[:extensions_suffixes].nil? ? build_variant_config[:extensions_suffixes] : @smf_fastlane_config[:extensions_suffixes],
-      build_variant: build_variant
+      build_variant: build_variant,
+      force: build_variant_config.dig(:match, :force)
   )
   smf_build_ios_app(
       skip_export: options[:skip_export].nil? ? false : options[:skip_export],

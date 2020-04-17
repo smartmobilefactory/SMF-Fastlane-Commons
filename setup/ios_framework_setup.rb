@@ -72,11 +72,12 @@ private_lane :smf_pod_super_unit_tests do |options|
           use_wildcard_signing: build_variant_config[:use_wildcard_signing],
           bundle_identifier: build_variant_config[:bundle_identifier],
           use_default_match_config: build_variant_config[:match].nil?,
-          match_read_only: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:read_only],
-          match_type: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:type],
-          template_name: build_variant_config[:match].nil? ? nil : build_variant_config[:match][:template_name],
+          match_read_only: build_variant_config.dig(:match, :read_only),
+          match_type: build_variant_config.dig(:match,:type),
+          template_name: build_variant_config.dig(:match, :template_name),
           extensions_suffixes: !build_variant_config[:extensions_suffixes].nil? ? build_variant_config[:extensions_suffixes] : @smf_fastlane_config[:extensions_suffixes],
-          build_variant: variant
+          build_variant: variant,
+          force: build_variant_config.dig(:match, :force)
       )
     end
 
