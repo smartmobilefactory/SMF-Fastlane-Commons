@@ -69,12 +69,12 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
   force = options[:force]
   force = force.nil? ? !template_name.nil? : force
 
-  identifiers = [app_identifier]
   git_url = $FASTLANE_MATCH_REPO_URL
 
+  extension_identifiers = []
   if extensions_suffixes
     extensions_suffixes.each do |extension_suffix|
-      identifiers << "#{app_identifier}.#{extension_suffix}"
+      extension_identifiers << "#{app_identifier}.#{extension_suffix}"
     end
   end
 
@@ -85,7 +85,7 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
   match(
       type: type,
       readonly: read_only,
-      app_identifier: identifiers,
+      app_identifier: [app_identifier],
       username: apple_id,
       team_id: team_id,
       git_url: git_url,
@@ -95,4 +95,17 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
       template_name: template_name,
       force: force
   )
+
+  match(
+    type: type,
+    readonly: read_only,
+    app_identifier: extension_identifiers,
+    username: apple_id,
+    team_id: team_id,
+    git_url: git_url,
+    git_branch: team_id,
+    keychain_name: "jenkins.keychain",
+    keychain_password: ENV[$KEYCHAIN_JENKINS_ENV_KEY],
+    force: force
+  ) unless extension_identifiers.empty?
 end
