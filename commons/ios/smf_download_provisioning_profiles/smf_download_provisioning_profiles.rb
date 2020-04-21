@@ -12,6 +12,7 @@ private_lane :smf_download_provisioning_profiles do |options|
   extensions_suffixes = options[:extensions_suffixes]
   build_variant = options[:build_variant]
   template_name = options[:template_name]
+  force = options[:force]
 
   team_id(team_id)
 
@@ -34,7 +35,8 @@ private_lane :smf_download_provisioning_profiles do |options|
         extensions_suffixes: extensions_suffixes,
         apple_id: apple_id,
         team_id: team_id,
-        template_name: template_name
+        template_name: template_name,
+        force: force
     )
 
   elsif (build_variant.match(/alpha/) != nil || build_variant.match(/beta/) != nil || build_variant.match(/example/) != nil)
@@ -47,7 +49,8 @@ private_lane :smf_download_provisioning_profiles do |options|
           extensions_suffixes: extensions_suffixes,
           apple_id: apple_id,
           team_id: team_id,
-          template_name: template_name
+          template_name: template_name,
+          force: force
       )
     end
   end
@@ -63,12 +66,15 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
   team_id = options[:team_id]
   template_name = options[:template_name]
 
-  identifiers = [app_identifier]
+  force = options[:force]
+  force = force.nil? ? !template_name.nil? : force
+
   git_url = $FASTLANE_MATCH_REPO_URL
 
+  extension_identifiers = []
   if extensions_suffixes
     extensions_suffixes.each do |extension_suffix|
-      identifiers << "#{app_identifier}.#{extension_suffix}"
+      extension_identifiers << "#{app_identifier}.#{extension_suffix}"
     end
   end
 
@@ -79,13 +85,27 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
   match(
       type: type,
       readonly: read_only,
-      app_identifier: identifiers,
+      app_identifier: [app_identifier],
       username: apple_id,
       team_id: team_id,
       git_url: git_url,
       git_branch: team_id,
       keychain_name: "jenkins.keychain",
       keychain_password: ENV[$KEYCHAIN_JENKINS_ENV_KEY],
-      template_name: template_name
+      template_name: template_name,
+      force: force
   )
+
+  match(
+    type: type,
+    readonly: read_only,
+    app_identifier: extension_identifiers,
+    username: apple_id,
+    team_id: team_id,
+    git_url: git_url,
+    git_branch: team_id,
+    keychain_name: "jenkins.keychain",
+    keychain_password: ENV[$KEYCHAIN_JENKINS_ENV_KEY],
+    force: force
+  ) unless extension_identifiers.empty?
 end
