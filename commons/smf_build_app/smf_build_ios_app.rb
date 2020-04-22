@@ -30,12 +30,6 @@ private_lane :smf_build_ios_app do |options|
 
   smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
 
-  export_options = {
-    :iCloudContainerEnvironment => icloud_environment
-  }
-
-  export_options[:export_method] = export_method unless export_method.nil?
-
   gym(
       clean: clean_project,
       workspace: !workspace.nil? ? workspace : "#{project_name}.xcworkspace",
@@ -43,13 +37,14 @@ private_lane :smf_build_ios_app do |options|
       configuration: xcconfig_name,
       codesigning_identity: code_signing_identity,
       output_directory: 'build',
+      export_method: export_method,
       xcargs: smf_xcargs_for_build_system,
       archive_path: "build/",
       derived_data_path: "build/derivedData/",
       output_name: output_name,
       include_symbols: true,
       include_bitcode: (upload_itc && upload_bitcode),
-      export_options: export_options,
+      export_options: { iCloudContainerEnvironment: icloud_environment },
       skip_package_ipa: skip_package_ipa,
       xcpretty_formatter: _smf_get_xcpretty_formatter_path
   )
