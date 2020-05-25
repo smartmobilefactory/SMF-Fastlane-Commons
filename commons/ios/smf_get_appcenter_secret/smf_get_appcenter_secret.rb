@@ -63,21 +63,21 @@ private_lane :smf_get_appcenter_secret_diagnostic_wrapper do |options|
 
   appcenter_secret_dynamically = ''
 
-  # begin
-  #   appcenter_secret_dynamically = smf_get_appcenter_secret(
-  #     build_variant: build_variant
-  #   )
-  # rescue => exception
-  #   smf_send_diagnostic_message(
-  #     title: 'Dynamic appcenter secret extraction',
-  #     message: "Error while dynamically extracting the appcenter secret: #{exception}, #{message_extension}"
-  #   )
-  #   next
-  # end
-
   correct_appcenter_secret = @smf_fastlane_config[:build_variants][build_variant.to_sym][:appcenter_id]
   UI.message("Appcenter ID: #{correct_appcenter_secret}")
-  UI.message("Config: #{@smf_fastlane_config}")
+
+  begin
+    appcenter_secret_dynamically = smf_get_appcenter_secret(
+      build_variant: build_variant
+    )
+  rescue => exception
+    smf_send_diagnostic_message(
+      title: 'Dynamic appcenter secret extraction',
+      message: "Error while dynamically extracting the appcenter secret: #{exception}, #{message_extension}"
+    )
+    
+    return correct_appcenter_secret
+  end
 
   if correct_appcenter_secret != appcenter_secret_dynamically
     smf_send_diagnostic_message(
