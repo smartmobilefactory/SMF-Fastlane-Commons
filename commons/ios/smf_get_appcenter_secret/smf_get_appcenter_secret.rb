@@ -76,7 +76,7 @@ private_lane :smf_get_appcenter_secret_diagnostic_wrapper do |options|
       message: "Error while dynamically extracting the appcenter secret: #{exception}, #{message_extension}"
     )
     
-    return correct_appcenter_secret
+    correct_appcenter_secret
   end
 
   if correct_appcenter_secret != appcenter_secret_dynamically
