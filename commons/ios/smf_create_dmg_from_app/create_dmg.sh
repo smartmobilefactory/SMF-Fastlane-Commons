@@ -73,16 +73,16 @@ while [ $# -gt 0 ]; do
 	esac
 done
 
-if [ -z $APPPATH ]; then
+if [ -z "$APPPATH" ]; then
 	usage
 fi
 
-INFO_PLIST=$APPPATH/Contents/Info.plist
-NAME=$(defaults read $INFO_PLIST CFBundleName)
+INFO_PLIST="$APPPATH"/Contents/Info.plist
+NAME=$(defaults read "$INFO_PLIST" CFBundleName)
 VOLNAME=$NAME
-VERSION=$(defaults read $INFO_PLIST CFBundleShortVersionString)
-SHORT_VERSION=$(defaults read $INFO_PLIST CFBundleVersion)
-APPDIR=$(dirname $APPPATH)
+VERSION=$(defaults read "$INFO_PLIST" CFBundleShortVersionString)
+SHORT_VERSION=$(defaults read "$INFO_PLIST" CFBundleVersion)
+APPDIR=$(dirname "$APPPATH")
 APPVERSION=${VERSION}-${SHORT_VERSION}
 APPFULLNAME=${NAME}-${APPVERSION}
 SRCFOLDER=${APPDIR}/${APPFULLNAME}
