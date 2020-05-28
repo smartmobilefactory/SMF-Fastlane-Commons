@@ -15,7 +15,7 @@ lane :smf_create_sparkle_package do |options|
   # get buildnumber from info-plist
   sh("hdiutil attach #{input_dmg_path}")
   app_name = File.basename(input_dmg_path).sub('.dmg', '')
-  info_plist_path = "/Volumes/#{app_name}/#{app_name}.app/Contents/Info.plist"
+  info_plist_path = "/Volumes/#{app_name}/#{app_name}.app/Contents/Info.plist".gsub(' ', "\ ")
   build_number = sh("defaults read #{info_plist_path} CFBundleVersion").gsub("\n", '')
   sh("hdiutil detach /Volumes/#{app_name}")
 
