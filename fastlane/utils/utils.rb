@@ -382,3 +382,41 @@ def smf_get_flutter_binary_path
 
   return flutter_binary_path
 end
+
+def smf_find_ticket_tags_in(string)
+
+  if string.nil?
+    return []
+  end
+
+  min_ticket_name_length = 2
+  max_ticket_name_length = 14
+
+  min_ticket_number_length = 1
+  max_ticket_number_length = 8
+
+  # This regex matches anything that starts with 2 or 14 captial letters, followed by a dash followed by 1 to 8 digits
+  regex = /[A-Z]{#{min_ticket_name_length},#{max_ticket_name_length}}-[0-9]{#{min_ticket_number_length},#{max_ticket_number_length}}/
+  tickets = string.scan(regex)
+
+  return tickets.uniq
+end
+
+def smf_find_jira_ticket_tags_in_pr(pr_data)
+
+  tickets = []
+
+  pr_data.each do |section, content|
+    if section == :commits
+      if !content.nil? then
+        content.each do |message|
+          tickets.concat(smf_find_ticket_tags_in(message)).uniq
+        end
+      end
+    else
+      tickets.concat(smf_find_ticket_tags_in(content)).uniq
+    end
+  end
+
+  tickets.uniq
+end
