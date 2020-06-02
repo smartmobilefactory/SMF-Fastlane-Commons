@@ -38,7 +38,7 @@ private_lane :smf_upload_with_sparkle do |options|
     raise("DMG file #{dmg_path} does not exit. Nothing to upload.")
   end
 
-  app_name = "#{sparkle_dmg_path}#{scheme}.dmg"
+  app_name = File.basename(dmg_path).sub('.dmg', '')
 
   # Create appcast
   UI.message("Using '#{sparkle_private_key}' as private sparkle 🔑")
@@ -47,15 +47,14 @@ private_lane :smf_upload_with_sparkle do |options|
   sh "#{@fastlane_commons_dir_path}/commons/ios/smf_upload_with_sparkle/sparkle.sh #{ENV['LOGIN']} #{sparkle_private_key} #{update_dir} #{sparkle_version} #{sparkle_signing_team}"
 
   if use_custom_info_plist_path == true
-    sh("hdiutil attach #{source_dmg_path}")
-    app_name = File.basename(source_dmg_path).sub('.dmg', '')
-    info_plist_path = "/Volumes/#{app_name}/#{app_name}.app/Contents/Info.plist"
+    sh("hdiutil attach #{dmg_path}")
+    info_plist_path = "/Volumes/#{app_name}/#{app_name}.app/Contents/Info.plist".shellescape
     xml_path = File.join(target_directory, sparkle_xml_name)
     _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, xml_path)
     sh("hdiutil detach /Volumes/#{app_name}")
   else
     sparkle_xml_path = "#{smf_workspace_dir}/build/#{sparkle_xml_name}"
-    info_plist_path = File.join(smf_path_to_ipa_or_app(build_variant), '/Contents/Info.plist')
+    info_plist_path = File.join(smf_path_to_ipa_or_app(build_variant), '/Contents/Info.plist').shellescape
     _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, sparkle_xml_path)
   end
 
@@ -67,15 +66,15 @@ private_lane :smf_upload_with_sparkle do |options|
       # We put the package elements in a folder, and upload the folder
       # We are copying instead of moving because other lanes might depend on the original path
       intermediate_directory_path = _smf_create_intermediate_directory(update_dir, info_plist_path)
-      sh("cp #{dmg_path} #{intermediate_directory_path}")
-      sh("cp #{appcast_xml} #{intermediate_directory_path}")
-      sh("cp #{update_dir}#{release_notes_name} #{intermediate_directory_path}")
+      sh("cp #{dmg_path.shellescape} #{intermediate_directory_path}")
+      sh("cp #{appcast_xml.shellescape} #{intermediate_directory_path}")
+      sh("cp #{update_dir.shellescape}#{release_notes_name} #{intermediate_directory_path}")
       sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} -r #{intermediate_directory_path} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
     else
       # We upload the three elements directly
-    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{update_dir}#{release_notes_name} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}#{release_notes_name}")
-    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{dmg_path} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{app_name}")
-    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{appcast_xml} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}#{appcast_upload_name}")
+    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{update_dir.shellescape}#{release_notes_name} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
+    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{dmg_path.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
+    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{appcast_xml.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
     end
   end
 end

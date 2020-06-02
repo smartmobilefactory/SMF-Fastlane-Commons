@@ -73,16 +73,16 @@ while [ $# -gt 0 ]; do
 	esac
 done
 
-if [ -z $APPPATH ]; then
+if [ -z "$APPPATH" ]; then
 	usage
 fi
 
-INFO_PLIST=$APPPATH/Contents/Info.plist
-NAME=$(defaults read $INFO_PLIST CFBundleName)
+INFO_PLIST="$APPPATH"/Contents/Info.plist
+NAME=$(defaults read "$INFO_PLIST" CFBundleName)
 VOLNAME=$NAME
-VERSION=$(defaults read $INFO_PLIST CFBundleShortVersionString)
-SHORT_VERSION=$(defaults read $INFO_PLIST CFBundleVersion)
-APPDIR=$(dirname $APPPATH)
+VERSION=$(defaults read "$INFO_PLIST" CFBundleShortVersionString)
+SHORT_VERSION=$(defaults read "$INFO_PLIST" CFBundleVersion)
+APPDIR=$(dirname "$APPPATH")
 APPVERSION=${VERSION}-${SHORT_VERSION}
 APPFULLNAME=${NAME}-${APPVERSION}
 SRCFOLDER=${APPDIR}/${APPFULLNAME}
@@ -92,13 +92,13 @@ SRCFOLDER=${APPDIR}/${APPFULLNAME}
 #
 
 if [ $CREATE_DMG = true ]; then
-    rm -rf ${SRCFOLDER}
-	mkdir -p ${SRCFOLDER}
-	cp -R ${APPPATH} ${SRCFOLDER}
-	cd ${SRCFOLDER}
+    rm -rf "${SRCFOLDER}"
+	mkdir -p "${SRCFOLDER}"
+	cp -R "${APPPATH}" "${SRCFOLDER}"
+	cd "${SRCFOLDER}"
 	ln -s /Applications .
 	cd ..
-	hdiutil create ${NAME}.dmg -fs HFS+ -format UDZO -volname ${VOLNAME} -srcfolder ${SRCFOLDER}
+	hdiutil create "${NAME}".dmg -fs HFS+ -format UDZO -volname "${VOLNAME}" -srcfolder "${SRCFOLDER}"
 	if [ $? -gt 0 ]; then
 		echo "Abort: Error creating DMG"
 		exit 1
@@ -110,7 +110,7 @@ fi
 #
 
 if [ -n "$CODE_SIGN_ID" ]; then
-	codesign -s "$CODE_SIGN_ID" ${APPDIR}/${NAME}.dmg
+	codesign -s "$CODE_SIGN_ID" "${APPDIR}"/"${NAME}".dmg
 	if [ $? -gt 0 ]; then
 		echo "Abort: Error code signing the DMG"
 		exit 1
