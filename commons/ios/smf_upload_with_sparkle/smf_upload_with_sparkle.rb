@@ -38,7 +38,8 @@ private_lane :smf_upload_with_sparkle do |options|
     raise("DMG file #{dmg_path} does not exit. Nothing to upload.")
   end
 
-  app_name = "#{sparkle_dmg_path}#{scheme}.dmg"
+  #app_name = "#{sparkle_dmg_path}#{scheme}.dmg"
+  app_name = File.basename(source_dmg_path).sub('.dmg', '')
 
   # Create appcast
   UI.message("Using '#{sparkle_private_key}' as private sparkle 🔑")
@@ -48,7 +49,7 @@ private_lane :smf_upload_with_sparkle do |options|
 
   if use_custom_info_plist_path == true
     sh("hdiutil attach #{source_dmg_path}")
-    app_name = File.basename(source_dmg_path).sub('.dmg', '')
+    #app_name = File.basename(source_dmg_path).sub('.dmg', '')
     info_plist_path = "/Volumes/#{app_name}/#{app_name}.app/Contents/Info.plist".shellescape
     xml_path = File.join(target_directory, sparkle_xml_name)
     _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, xml_path)
@@ -74,7 +75,7 @@ private_lane :smf_upload_with_sparkle do |options|
     else
       # We upload the three elements directly
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{update_dir.shellescape}#{release_notes_name} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path.shellescape}#{release_notes_name}")
-    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{dmg_path.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{app_name.shellescape}")
+    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{dmg_path.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path.shellescape}#{app_name.shellescape}.dmg")
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{appcast_xml.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path.shellescape}#{appcast_upload_name}")
     end
   end
