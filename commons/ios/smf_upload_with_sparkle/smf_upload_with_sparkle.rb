@@ -74,9 +74,9 @@ private_lane :smf_upload_with_sparkle do |options|
       sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} -r #{intermediate_directory_path} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/'#{sparkle_dmg_path.shellescape}'")
     else
       # We upload the three elements directly
-    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{update_dir.shellescape}#{release_notes_name} '#{sparkle_upload_user}'@#{sparkle_upload_url}:'/#{sparkle_dmg_path.shellescape}#{release_notes_name}'")
-    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{dmg_path.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:'/#{sparkle_dmg_path.shellescape}#{app_name.shellescape}.dmg'")
-    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{appcast_xml.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:'/#{sparkle_dmg_path.shellescape}#{appcast_upload_name}'")
+    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{update_dir.shellescape}#{release_notes_name} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path.shellescape}")
+    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{dmg_path.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path.shellescape}")
+    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{appcast_xml.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path.shellescape}")
     end
   end
 end
