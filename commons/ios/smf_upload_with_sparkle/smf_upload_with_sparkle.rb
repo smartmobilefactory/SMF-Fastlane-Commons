@@ -67,15 +67,15 @@ private_lane :smf_upload_with_sparkle do |options|
       # We put the package elements in a folder, and upload the folder
       # We are copying instead of moving because other lanes might depend on the original path
       intermediate_directory_path = _smf_create_intermediate_directory(update_dir, info_plist_path)
-      sh("cp #{dmg_path} #{intermediate_directory_path}")
-      sh("cp #{appcast_xml} #{intermediate_directory_path}")
-      sh("cp #{update_dir}#{release_notes_name} #{intermediate_directory_path}")
-      sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} -r #{intermediate_directory_path} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
+      sh("cp #{dmg_path.shellescape} #{intermediate_directory_path}")
+      sh("cp #{appcast_xml.shellescape} #{intermediate_directory_path}")
+      sh("cp #{update_dir.shellescape}#{release_notes_name} #{intermediate_directory_path}")
+      sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} -r #{intermediate_directory_path} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path.shellescape}")
     else
       # We upload the three elements directly
-    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{update_dir}#{release_notes_name} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}#{release_notes_name}")
-    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{dmg_path} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{app_name}")
-    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{appcast_xml} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}#{appcast_upload_name}")
+    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{update_dir.shellescape}#{release_notes_name} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path.shellescape}#{release_notes_name}")
+    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{dmg_path.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{app_name.shellescape}")
+    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{appcast_xml.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path.shellescape}#{appcast_upload_name}")
     end
   end
 end
