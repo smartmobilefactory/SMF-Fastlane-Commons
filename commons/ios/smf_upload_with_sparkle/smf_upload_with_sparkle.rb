@@ -39,7 +39,7 @@ private_lane :smf_upload_with_sparkle do |options|
   end
 
   #app_name = "#{sparkle_dmg_path}#{scheme}.dmg"
-  app_name = File.basename(source_dmg_path).sub('.dmg', '')
+  app_name = File.basename(dmg_path).sub('.dmg', '')
 
   # Create appcast
   UI.message("Using '#{sparkle_private_key}' as private sparkle 🔑")
@@ -48,7 +48,7 @@ private_lane :smf_upload_with_sparkle do |options|
   sh "#{@fastlane_commons_dir_path}/commons/ios/smf_upload_with_sparkle/sparkle.sh #{ENV['LOGIN']} #{sparkle_private_key} #{update_dir} #{sparkle_version} #{sparkle_signing_team}"
 
   if use_custom_info_plist_path == true
-    sh("hdiutil attach #{source_dmg_path}")
+    sh("hdiutil attach #{dmg_path}")
     #app_name = File.basename(source_dmg_path).sub('.dmg', '')
     info_plist_path = "/Volumes/#{app_name}/#{app_name}.app/Contents/Info.plist".shellescape
     xml_path = File.join(target_directory, sparkle_xml_name)
