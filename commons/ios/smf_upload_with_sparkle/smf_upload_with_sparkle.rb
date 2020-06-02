@@ -38,7 +38,6 @@ private_lane :smf_upload_with_sparkle do |options|
     raise("DMG file #{dmg_path} does not exit. Nothing to upload.")
   end
 
-  #app_name = "#{sparkle_dmg_path}#{scheme}.dmg"
   app_name = File.basename(dmg_path).sub('.dmg', '')
 
   # Create appcast
@@ -49,7 +48,6 @@ private_lane :smf_upload_with_sparkle do |options|
 
   if use_custom_info_plist_path == true
     sh("hdiutil attach #{dmg_path}")
-    #app_name = File.basename(source_dmg_path).sub('.dmg', '')
     info_plist_path = "/Volumes/#{app_name}/#{app_name}.app/Contents/Info.plist".shellescape
     xml_path = File.join(target_directory, sparkle_xml_name)
     _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, xml_path)
