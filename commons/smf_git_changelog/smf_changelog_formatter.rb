@@ -59,8 +59,8 @@ def _smf_normal_tickets_section(tickets, changelog_format)
   section = _smf_section_header('Tickets:', changelog_format)
   section += FORMAT_ELEMENTS[changelog_format][:section][:body][:prefix]
 
-  tickets[:internal].sort_by! { |ticket| ticket[:tag] }
-  tickets[:internal].each do |ticket|
+  tickets[:normal].sort_by! { |ticket| ticket[:tag] }
+  tickets[:normal].each do |ticket|
     related = _smf_linked_tickets_string(ticket[:linked_tickets], changelog_format)
     ticket_linked =
       FORMAT_ELEMENTS[changelog_format][:bullet_point][:prefix] +
