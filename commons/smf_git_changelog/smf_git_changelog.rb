@@ -61,8 +61,8 @@ private_lane :smf_git_changelog do |options|
   changelog = "#{changelog[0..20_000]}#{'\\n...'}" if changelog.length > 20_000
   changelog = changelog.split("\n")
 
-  html_changelog = _smf_generate_html_changelog(changelog, tickets)
-  markdown_changelog = _smf_generate_markdown_changelog(changelog, tickets)
+  html_changelog = _smf_generate_changelog(changelog, tickets, :html)
+  markdown_changelog = _smf_generate_changelog(changelog, tickets, :markdown)
 
   smf_write_changelog(
     changelog: markdown_changelog,
@@ -91,130 +91,6 @@ def _smf_changelog_html_temp_path
   "#{@fastlane_commons_dir_path}/#{$CHANGELOG_TEMP_FILE_HTML}"
 end
 
-def _smf_generate_markdown_changelog(changelog, tickets)
-  standard_changelog = changelog.join("\n")
-  spacer = "\n\n--------------------------------------------\n"
-
-  internal_tickets_changelog = "Internal Tickets:\n\n"
-
-  tickets[:internal].sort_by! {|ticket| ticket[:tag]}
-  tickets[:internal].each do |ticket|
-
-    related = _smf_internal_related_tickets_markdown(ticket[:internal_related])
-    ticket_linked = '- ' + _smf_ticket_to_markdown_link(ticket) + related + "\n"
-    internal_tickets_changelog += ticket_linked
-  end
-
-  external_tickets_changelog = "\nExternal Tickets:\n\n"
-
-  tickets[:external].sort_by! {|ticket| ticket[:tag]}
-  tickets[:external].each do |ticket|
-    ticket_linked = '- ' + _smf_ticket_to_markdown_link(ticket) + "\n"
-    external_tickets_changelog += ticket_linked
-  end
-
-  unknown_tickets_changelog = "\nUnknown Tickets:\n\n"
-
-  tickets[:unknown].sort_by! {|ticket| ticket[:tag]}
-  tickets[:unknown].each do |ticket|
-    ticket_tag_markdown = "- #{ticket[:tag]}\n"
-    unknown_tickets_changelog += ticket_tag_markdown
-  end
-
-
-  spacer = "" if tickets[:internal].empty? and tickets[:external].empty?
-  internal_tickets_changelog = '' if tickets[:internal].empty?
-  external_tickets_changelog = '' if tickets[:external].empty?
-  unknown_tickets_changelog = '' if tickets[:unknown].empty?
-
-  standard_changelog + spacer + internal_tickets_changelog + external_tickets_changelog + unknown_tickets_changelog
-
-end
-
-def _smf_generate_html_changelog(changelog, tickets)
-
-  standard_changelog = "<ul>#{changelog.map {|commit| "<li>#{commit.gsub('- ', '')}</li>"}.join('')}</ul>"
-  spacer = '<hr>'
-
-  internal_tickets_changelog = '<h4>Internal Tickets:</h4><ul>'
-
-  tickets[:internal].sort_by! {|ticket| ticket[:tag]}
-  tickets[:internal].each do |ticket|
-
-    related = _smf_internal_related_tickets_html(ticket[:internal_related])
-    ticket_linked = '<li>' + _smf_ticket_to_html_link(ticket) + related + '</li>'
-    internal_tickets_changelog += ticket_linked
-  end
-
-  internal_tickets_changelog += '</ul>'
-
-  external_ticket_changelog = '<h4>External Tickets:</h4><ul>'
-
-  tickets[:external].sort_by! {|ticket| ticket[:tag]}
-  tickets[:external].each do |ticket|
-    ticket_linked = '<li>' + _smf_ticket_to_html_link(ticket) + '</li>'
-    external_ticket_changelog += ticket_linked
-  end
-
-  external_ticket_changelog += '</ul>'
-
-  unknown_tickets_changelog = '<h4>Unknown Tickets:</h4><ul>'
-
-  tickets[:unknown].sort_by! {|ticket| ticket[:tag]}
-  tickets[:unknown].each do |ticket|
-    ticket_tag_html = "<li>#{ticket[:tag]}</li>"
-    unknown_tickets_changelog += ticket_tag_html
-  end
-
-  spacer = "" if tickets[:internal].empty? and tickets[:external].empty?
-  internal_tickets_changelog = '' if tickets[:internal].empty?
-  external_ticket_changelog = '' if tickets[:external].empty?
-  unknown_tickets_changelog = '' if tickets[:unknown].empty?
-
-  standard_changelog + spacer + internal_tickets_changelog + external_ticket_changelog + unknown_tickets_changelog
-
-end
-
-def _smf_internal_related_tickets_html(related_tickets)
-  return '' if related_tickets.empty?
-
-  related = ' (linked issues: '
-  related_tickets.each do |related_ticket|
-    related += _smf_ticket_to_html_link(related_ticket, false) + ', '
-  end
-
-  related.chop.chop + ')'
-end
-
-def _smf_internal_related_tickets_markdown(related_tickets)
-  return '' if related_tickets.empty?
-
-  related = ' (linked issues: '
-  related_tickets.each do |related_ticket|
-    related += _smf_ticket_to_markdown_link(related_ticket, false) + ', '
-  end
-
-  related.chop.chop + ')'
-end
-
-def _smf_ticket_to_html_link(ticket, use_title = true)
-  ticket_string = "#{ticket[:tag]}"
-
-  return ticket_string if ticket[:title].nil?
-
-  ticket_string += ": #{ticket[:title]}" if use_title
-  "<a href=\"#{ticket[:link]}\">#{ticket_string}</a>"
-end
-
-def _smf_ticket_to_markdown_link(ticket, use_title = true)
-  ticket_string = "#{ticket[:tag]}"
-
-  return ticket_string if ticket[:title].nil?
-
-  ticket_string += ": #{ticket[:title]}" if use_title
-  "[#{ticket_string}](#{ticket[:link]})"
-end
-
 def _smf_remote_repo_name
   File.basename(`git config --get remote.origin.url`.strip).gsub('.git', '')
 end
@@ -222,49 +98,50 @@ end
 def _smf_generate_tickets(changelog)
 
   tickets = {
-    :internal => [],
-    :external => [],
-    :unknown => []
+    normal: [],
+    linked: [],
+    unknown: []
   }
 
   return tickets if changelog.nil?
 
+  ticket_tags = []
+
+  # find all ticket tags
   changelog.each do |commit_message|
     # find ticket tags in the commit message itself
-    ticket_tags = smf_find_ticket_tags_in(commit_message)
+    ticket_tags += smf_find_ticket_tags_in(commit_message)
     # if the commit message was a merge, check the corresponding PR
     ticket_tags += _smf_find_ticket_tags_in_related_pr(commit_message)
-
-    ticket_tags.uniq.each do |ticket_tag|
-      title = _smf_fetch_ticket_summary_for(ticket_tag)
-
-      if title.nil?
-        unknown_ticket = {:tag => ticket_tag}
-        tickets[:unknown].push(unknown_ticket)
-        next
-      end
-
-      link = File.join($JIRA_BASE_URL, 'browse', ticket_tag)
-
-      # get related internal and external tickets
-      related_tickets = _smf_fetch_related_tickets_for(ticket_tag)
-
-      internal_related = related_tickets[:internal]
-
-      new_ticket = {
-        :tag => ticket_tag,
-        :link => link,
-        :title => title,
-        :internal_related => internal_related
-      }
-
-      tickets[:internal].push(new_ticket)
-      tickets[:external].concat(related_tickets[:external])
-    end
   end
 
-  tickets[:internal].uniq!
-  tickets[:external].uniq!
+  ticket_tags.uniq.each do |ticket_tag|
+    title = _smf_fetch_ticket_summary_for(ticket_tag)
+
+    if title.nil?
+      unknown_ticket = { tag: ticket_tag }
+      tickets[:unknown].push(unknown_ticket)
+      next
+    end
+
+    link = File.join($JIRA_BASE_URL, 'browse', ticket_tag)
+
+    # get linked
+    linked_tickets = _smf_fetch_linked_tickets_for(ticket_tag)
+
+    new_ticket = {
+      tag: ticket_tag,
+      link: link,
+      title: title,
+      linked_tickets: linked_tickets
+    }
+
+    tickets[:normal].push(new_ticket)
+    tickets[:linked].concat(linked_tickets)
+  end
+
+  tickets[:normal].uniq!
+  tickets[:linked].uniq!
   tickets[:unknown].uniq!
 
   tickets
@@ -304,7 +181,7 @@ def _smf_https_get_request(url, auth_type, credentials)
 
   return nil if res.code != '200'
 
-  JSON.parse(res.body, {:symbolize_names => true})
+  JSON.parse(res.body, {symbolize_names: true})
 end
 
 # Get the ticket title from jira
@@ -320,17 +197,14 @@ def _smf_fetch_ticket_summary_for(ticket_tag)
   res.dig(:fields, :summary)
 end
 
-def _smf_fetch_related_tickets_for(ticket_tag)
+def _smf_fetch_linked_tickets_for(ticket_tag)
   res = _smf_https_get_request(
     File.join($JIRA_BASE_URL, 'rest/api/latest/issue', ticket_tag, 'remotelink'),
     :basic,
     ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
   )
 
-  related_tickets = {
-    :external => [],
-    :internal => []
-  }
+  related_tickets = []
 
   return related_tickets if res.nil?
 
@@ -342,15 +216,10 @@ def _smf_fetch_related_tickets_for(ticket_tag)
 
     ticket[:tag] = File.basename(ticket[:link])
     ticket[:title] = ticket_data.dig(:object, :title)
-
-    if ticket[:link].include?($JIRA_BASE_URL)
-      related_tickets[:internal].push(ticket)
-    else
-      related_tickets[:external].push(ticket)
-    end
+    related_tickets.push(ticket)
   end
 
-  related_tickets
+  related_tickets.uniq
 end
 
 # get PR body, title and commits for a certain
@@ -385,9 +254,9 @@ def _smf_fetch_pull_request_data(pr_number)
   end
 
   pr_data = {
-    :body => body,
-    :title => title,
-    :commits => commits
+    body: body,
+    title: title,
+    commits: commits
   }
 
   pr_data
