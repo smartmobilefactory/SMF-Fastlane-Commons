@@ -93,9 +93,9 @@ end
 
 def _smf_generate_markdown_changelog(changelog, tickets)
   standard_changelog = changelog.join("\n")
-  spacer = "\n\n--------------------------------------\n"
+  spacer = "\n\n--------------------------------------------\n"
 
-  internal_tickets_changelog = "**Internal Tickets:**\n\n"
+  internal_tickets_changelog = "Internal Tickets:\n\n"
 
   tickets[:internal].sort_by! {|ticket| ticket[:tag]}
   tickets[:internal].each do |ticket|
@@ -105,7 +105,7 @@ def _smf_generate_markdown_changelog(changelog, tickets)
     internal_tickets_changelog += ticket_linked
   end
 
-  external_ticket_changelog = "\n**External Tickets:**\n\n"
+  external_ticket_changelog = "\nExternal Tickets:\n\n"
 
   tickets[:external].sort_by! {|ticket| ticket[:tag]}
   tickets[:external].each do |ticket|
