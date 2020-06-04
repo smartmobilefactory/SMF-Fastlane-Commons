@@ -17,6 +17,7 @@ smf_git_changelog(
 #### Stored Result
 The author's name will be removed and the first letter of the message will be capitalized.
 Further, commits made by *SMFHUDSONCHECKOUT* will be ignored.
+Then the changelog is serached for ticket tags. These tags are then used to generate a second changelog section which contains all tickets related to this release.
 <img width="663" alt="Screenshot 2019-08-13 at 09 06 41" src="https://user-images.githubusercontent.com/40039883/62922459-b11c7400-bdab-11e9-938a-0e20dd5e0bcd.png">
 
 ## Collect commit messages
