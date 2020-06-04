@@ -180,12 +180,18 @@ end
 
 def _smf_ticket_to_html_link(ticket, use_title = true)
   ticket_string = "#{ticket[:tag]}"
+
+  return ticket_string if ticket[:title].nil?
+
   ticket_string += ": #{ticket[:title]}" if use_title
   "<a href=\"#{ticket[:link]}\">#{ticket_string}</a>"
 end
 
 def _smf_ticket_to_markdown_link(ticket, use_title = true)
   ticket_string = "#{ticket[:tag]}"
+  
+  return ticket_string if ticket[:title].nil?
+
   ticket_string += ": #{ticket[:title]}" if use_title
   "[#{ticket_string}](#{ticket[:link]})"
 end
@@ -267,27 +273,33 @@ def _smf_https_get_request(url, auth_type, credentials)
   end
 
   res = https.request(req)
-  res = JSON.parse(res.body, {:symbolize_names => true})
+  begin
+    res = JSON.parse(res.body, {:symbolize_names => true})
+  rescue
+    return nil
+  end
 
   res
 end
 
-# Get the ticket titel from jira
+# Get the ticket title from jira
 def _smf_fetch_ticket_summary_for(ticket_tag)
   res = _smf_https_get_request(
     "https://smartmobilefactory.atlassian.net/rest/api/latest/issue/#{ticket_tag}",
     :basic,
-    ENV[$JIRA_DEV_ACCESS_CREDENTIALS].split(':') # TODO: USE CREDENITAL CORRECTLY
+    ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
   )
 
-  return res.dig(:fields, :summary)
+  return nil if res.nil?
+
+  res.dig(:fields, :summary)
 end
 
 def _smf_fetch_related_tickets_for(ticket_tag)
   res = _smf_https_get_request(
     "https://smartmobilefactory.atlassian.net/rest/api/latest/issue/#{ticket_tag}/remotelink",
     :basic,
-    ENV[$JIRA_DEV_ACCESS_CREDENTIALS].split(':') # TODO: USE CREDENITAL CORRECTLY
+    ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
   )
 
   related_tickets = {
@@ -316,7 +328,7 @@ def _smf_fetch_related_tickets_for(ticket_tag)
   related_tickets
 end
 
-# get PR body, titel and commits for a certain
+# get PR body, title and commits for a certain
 def _smf_fetch_pull_request_data(pr_number)
   repo_name = _smf_remote_repo_name
   base_url = "https://api.github.com/repos/smartmobilefactory/#{repo_name}/pulls/#{pr_number}"
@@ -349,7 +361,7 @@ def _smf_fetch_pull_request_data(pr_number)
 
   pr_data = {
     :body => body,
-    :titel => title,
+    :title => title,
     :commits => commits
   }
 
