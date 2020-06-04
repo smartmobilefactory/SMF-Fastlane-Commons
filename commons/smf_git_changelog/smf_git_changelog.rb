@@ -277,7 +277,7 @@ def _smf_fetch_ticket_summary_for(ticket_tag)
   res = _smf_https_get_request(
     "https://smartmobilefactory.atlassian.net/rest/api/latest/issue/#{ticket_tag}",
     :basic,
-    ENV[$JIRA_DEV_ACCESS_TOKEN].split('/') # TODO: USE CREDENITAL CORRECTLY
+    ENV[$JIRA_DEV_ACCESS_TOKEN].split(':') # TODO: USE CREDENITAL CORRECTLY
   )
 
   return res.dig(:fields, :summary)
@@ -287,7 +287,7 @@ def _smf_fetch_related_tickets_for(ticket_tag)
   res = _smf_https_get_request(
     "https://smartmobilefactory.atlassian.net/rest/api/latest/issue/#{ticket_tag}/remotelink",
     :basic,
-    ENV[$JIRA_DEV_ACCESS_TOKEN].split('/') # TODO: USE CREDENITAL CORRECTLY
+    ENV[$JIRA_DEV_ACCESS_TOKEN].split(':') # TODO: USE CREDENITAL CORRECTLY
   )
 
   related_tickets = {
