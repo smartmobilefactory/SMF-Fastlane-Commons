@@ -105,19 +105,29 @@ def _smf_generate_markdown_changelog(changelog, tickets)
     internal_tickets_changelog += ticket_linked
   end
 
-  external_ticket_changelog = "\nExternal Tickets:\n\n"
+  external_tickets_changelog = "\nExternal Tickets:\n\n"
 
   tickets[:external].sort_by! {|ticket| ticket[:tag]}
   tickets[:external].each do |ticket|
     ticket_linked = '- ' + _smf_ticket_to_markdown_link(ticket) + "\n"
-    external_ticket_changelog += ticket_linked
+    external_tickets_changelog += ticket_linked
   end
+
+  unknown_tickets_changelog = "\nUnknown Tickets:\n\n"
+
+  tickets[:unknown].sort_by! {|ticket| ticket[:tag]}
+  tickets[:unknown].each do |ticket|
+    ticket_tag_markdown = "- #{ticket[:tag]}\n"
+    unknown_tickets_changelog += ticket_tag_markdown
+  end
+
 
   spacer = "" if tickets[:internal].empty? and tickets[:external].empty?
   internal_tickets_changelog = '' if tickets[:internal].empty?
-  external_ticket_changelog = '' if tickets[:external].empty?
+  external_tickets_changelog = '' if tickets[:external].empty?
+  unknown_tickets_changelog = '' if tickets[:unknown].empty?
 
-  standard_changelog + spacer + internal_tickets_changelog + external_ticket_changelog
+  standard_changelog + spacer + internal_tickets_changelog + external_tickets_changelog + unknown_tickets_changelog
 
 end
 
@@ -148,18 +158,27 @@ def _smf_generate_html_changelog(changelog, tickets)
 
   external_ticket_changelog += '</ul>'
 
-  spacer = "" if tickets[:internal].empty? and tickets[:external].empty?
-  internal_tickets_changelog = "" if tickets[:internal].empty?
-  external_ticket_changelog = "" if tickets[:external].empty?
+  unknown_tickets_changelog = '<h4>Unknown Tickets:</h4><ul>'
 
-  standard_changelog + spacer + internal_tickets_changelog + external_ticket_changelog
+  tickets[:unknown].sort_by! {|ticket| ticket[:tag]}
+  tickets[:unknown].each do |ticket|
+    ticket_tag_html = "<li>#{ticket[:tag]}</li>"
+    unknown_tickets_changelog += ticket_tag_html
+  end
+
+  spacer = "" if tickets[:internal].empty? and tickets[:external].empty?
+  internal_tickets_changelog = '' if tickets[:internal].empty?
+  external_ticket_changelog = '' if tickets[:external].empty?
+  unknown_tickets_changelog = '' if tickets[:unknown].empty?
+
+  standard_changelog + spacer + internal_tickets_changelog + external_ticket_changelog + unknown_tickets_changelog
 
 end
 
 def _smf_internal_related_tickets_html(related_tickets)
   return '' if related_tickets.empty?
 
-  related = ' ('
+  related = ' (linked issues: '
   related_tickets.each do |related_ticket|
     related += _smf_ticket_to_html_link(related_ticket, false) + ', '
   end
@@ -170,7 +189,7 @@ end
 def _smf_internal_related_tickets_markdown(related_tickets)
   return '' if related_tickets.empty?
 
-  related = ' ('
+  related = ' (linked issues: '
   related_tickets.each do |related_ticket|
     related += _smf_ticket_to_markdown_link(related_ticket, false) + ', '
   end
@@ -189,7 +208,7 @@ end
 
 def _smf_ticket_to_markdown_link(ticket, use_title = true)
   ticket_string = "#{ticket[:tag]}"
-  
+
   return ticket_string if ticket[:title].nil?
 
   ticket_string += ": #{ticket[:title]}" if use_title
@@ -204,7 +223,8 @@ def _smf_generate_tickets(changelog)
 
   tickets = {
     :internal => [],
-    :external => []
+    :external => [],
+    :unknown => []
   }
 
   return tickets if changelog.nil?
@@ -217,7 +237,14 @@ def _smf_generate_tickets(changelog)
 
     ticket_tags.uniq.each do |ticket_tag|
       title = _smf_fetch_ticket_summary_for(ticket_tag)
-      link = "https://smartmobilefactory.atlassian.net/browse/#{ticket_tag}"
+
+      if title.nil?
+        unknown_ticket = {:tag => ticket_tag}
+        tickets[:unknown].push(unknown_ticket)
+        next
+      end
+
+      link = File.join(ENV[$JIRA_TICKET_BASE_URL], 'browse', ticket_tag)
 
       # get related internal and external tickets
       related_tickets = _smf_fetch_related_tickets_for(ticket_tag)
@@ -238,6 +265,7 @@ def _smf_generate_tickets(changelog)
 
   tickets[:internal].uniq!
   tickets[:external].uniq!
+  tickets[:unknown].uniq!
 
   tickets
 end
@@ -282,7 +310,7 @@ end
 # Get the ticket title from jira
 def _smf_fetch_ticket_summary_for(ticket_tag)
   res = _smf_https_get_request(
-    "https://smartmobilefactory.atlassian.net/rest/api/latest/issue/#{ticket_tag}",
+    File.join(ENV[$JIRA_TICKET_BASE_URL], 'rest/api/latest/issue', ticket_tag),
     :basic,
     ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
   )
@@ -294,7 +322,7 @@ end
 
 def _smf_fetch_related_tickets_for(ticket_tag)
   res = _smf_https_get_request(
-    "https://smartmobilefactory.atlassian.net/rest/api/latest/issue/#{ticket_tag}/remotelink",
+    File.join(ENV[$JIRA_TICKET_BASE_URL], 'rest/api/latest/issue', ticket_tag, 'remotelink'),
     :basic,
     ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
   )
@@ -315,7 +343,7 @@ def _smf_fetch_related_tickets_for(ticket_tag)
     ticket[:tag] = File.basename(ticket[:link])
     ticket[:title] = ticket_data.dig(:object, :title)
 
-    if ticket[:link].include?('https://smartmobilefactory.atlassian.net')
+    if ticket[:link].include?(ENV[$JIRA_TICKET_BASE_URL])
       related_tickets[:internal].push(ticket)
     else
       related_tickets[:external].push(ticket)
