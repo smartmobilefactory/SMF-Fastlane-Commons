@@ -116,7 +116,7 @@ def _smf_generate_changelog(changelog, tickets, changelog_format)
   linked_tickets = _smf_linked_tickets_section(tickets, changelog_format)
   unknown_tickets = _smf_unknown_tickets_section(tickets, changelog_format)
 
-  spacer = '' if tickets[:normal].empty? and tickets[:linked_tickets].empty? and tickets[:unknown].empty?
+  spacer = '' if tickets[:normal].empty? and tickets[:linked].empty? and tickets[:unknown].empty?
   normal_tickets = '' if tickets[:normal].empty?
   linked_tickets = '' if tickets[:linked].empty?
   unknown_tickets = '' if tickets[:unknown].empty?
