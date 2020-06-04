@@ -3,12 +3,12 @@ FORMAT_ELEMENTS = {
     spacer: '<hr>',
     bullet_point: {
       prefix: '<li>',
-      posfix: '</li>'
+      postfix: '</li>'
     },
     section: {
       header: {
         prefix: '<h4>',
-        posfix: '</h4>'
+        postfix: '</h4>'
       },
       body: {
         prefix: '<ul>',
@@ -21,13 +21,17 @@ FORMAT_ELEMENTS = {
     spacer: "\n\n--------------------------------------------",
     bullet_point: {
       prefix: '- ',
-      posfix: "\n"
+      postfix: "\n"
     },
     section: {
       header: {
         prefix: "\n",
-        posfix: "\n\n"
+        postfix: "\n\n"
       },
+      body: {
+        prefix: '',
+        postfix: ''
+      }
     }
   }
 }.freeze
