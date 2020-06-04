@@ -56,7 +56,7 @@ end
 
 def _smf_normal_tickets_section(tickets, changelog_format)
 
-  section += _smf_section_header('Tickets:', changelog_format)
+  section = _smf_section_header('Tickets:', changelog_format)
   section += FORMAT_ELEMENTS[changelog_format][:section][:body][:prefix]
 
   tickets[:internal].sort_by! { |ticket| ticket[:tag] }
@@ -75,7 +75,7 @@ def _smf_normal_tickets_section(tickets, changelog_format)
 end
 
 def _smf_linked_tickets_section(tickets, changelog_format)
-  section += _smf_section_header('Linked Tickets:', changelog_format)
+  section = _smf_section_header('Linked Tickets:', changelog_format)
   section += FORMAT_ELEMENTS[changelog_format][:section][:body][:prefix]
 
   tickets[:linked].sort_by! { |ticket| ticket[:tag] }
@@ -92,7 +92,7 @@ def _smf_linked_tickets_section(tickets, changelog_format)
 end
 
 def _smf_unknown_tickets_section(tickets, changelog_format)
-  section += _smf_section_header('Unknown Tickets:', changelog_format)
+  section = _smf_section_header('Unknown Tickets:', changelog_format)
   section += FORMAT_ELEMENTS[changelog_format][:section][:body][:prefix]
 
   tickets[:unknown].sort_by! { |ticket| ticket[:tag] }
