@@ -244,7 +244,7 @@ def _smf_generate_tickets(changelog)
         next
       end
 
-      link = File.join(ENV[$JIRA_BASE_URL], 'browse', ticket_tag)
+      link = File.join($JIRA_BASE_URL, 'browse', ticket_tag)
 
       # get related internal and external tickets
       related_tickets = _smf_fetch_related_tickets_for(ticket_tag)
@@ -310,7 +310,7 @@ end
 # Get the ticket title from jira
 def _smf_fetch_ticket_summary_for(ticket_tag)
   res = _smf_https_get_request(
-    File.join(ENV[$JIRA_BASE_URL], 'rest/api/latest/issue', ticket_tag),
+    File.join($JIRA_BASE_URL, 'rest/api/latest/issue', ticket_tag),
     :basic,
     ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
   )
@@ -322,7 +322,7 @@ end
 
 def _smf_fetch_related_tickets_for(ticket_tag)
   res = _smf_https_get_request(
-    File.join(ENV[$JIRA_BASE_URL], 'rest/api/latest/issue', ticket_tag, 'remotelink'),
+    File.join($JIRA_BASE_URL, 'rest/api/latest/issue', ticket_tag, 'remotelink'),
     :basic,
     ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
   )
@@ -343,7 +343,7 @@ def _smf_fetch_related_tickets_for(ticket_tag)
     ticket[:tag] = File.basename(ticket[:link])
     ticket[:title] = ticket_data.dig(:object, :title)
 
-    if ticket[:link].include?(ENV[$JIRA_BASE_URL])
+    if ticket[:link].include?($JIRA_BASE_URL)
       related_tickets[:internal].push(ticket)
     else
       related_tickets[:external].push(ticket)
