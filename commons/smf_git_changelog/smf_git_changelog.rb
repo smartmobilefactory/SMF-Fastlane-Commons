@@ -273,13 +273,10 @@ def _smf_https_get_request(url, auth_type, credentials)
   end
 
   res = https.request(req)
-  begin
-    res = JSON.parse(res.body, {:symbolize_names => true})
-  rescue
-    return nil
-  end
 
-  res
+  return nil if res.code != '200'
+
+  JSON.parse(res.body, {:symbolize_names => true})
 end
 
 # Get the ticket title from jira
@@ -307,12 +304,10 @@ def _smf_fetch_related_tickets_for(ticket_tag)
     :internal => []
   }
 
-  return related_tickets if res.nil? || res.empty?
+  return related_tickets if res.nil?
 
   res.each do |ticket_data|
     ticket = {}
-
-    UI.message("Ticket Data:\n#{ticket_data}")
 
     ticket[:link] = ticket_data.dig(:object, :url)
     next if ticket[:link].nil?
