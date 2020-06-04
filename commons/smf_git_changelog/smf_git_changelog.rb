@@ -307,10 +307,12 @@ def _smf_fetch_related_tickets_for(ticket_tag)
     :internal => []
   }
 
-  return related_tickets if res.nil? or res.empty?
+  return related_tickets if res.nil? || res.empty?
 
   res.each do |ticket_data|
     ticket = {}
+
+    UI.message("Ticket Data:\n#{ticket_data}")
 
     ticket[:link] = ticket_data.dig(:object, :url)
     next if ticket[:link].nil?
