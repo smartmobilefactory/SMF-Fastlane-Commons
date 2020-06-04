@@ -17,7 +17,7 @@ smf_git_changelog(
 #### Stored Result
 The author's name will be removed and the first letter of the message will be capitalized.
 Further, commits made by *SMFHUDSONCHECKOUT* will be ignored.
-Then the changelog is serached for ticket tags. These tags are then used to generate a second changelog section which contains all tickets related to this release.
+Then the changelog is searched for ticket tags. These tags are then used to generate a second changelog section which contains all tickets related to this release.
 To conveniently format the changelog, there are some helper functions in the `smf_changelog_formatter.rb` file.
 
 ## Collect commit messages
