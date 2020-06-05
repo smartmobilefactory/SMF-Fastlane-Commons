@@ -230,6 +230,8 @@ def _smf_fetch_linked_tickets_for(ticket_tag, base_url)
     ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
   )
 
+  UI.message("Result linked: #{res}")
+
   related_tickets = []
 
   return related_tickets if res.nil?
