@@ -127,6 +127,7 @@ def _smf_generate_tickets(changelog)
     fetched_data = _smf_fetch_ticket_data_for(ticket_tag)
     title = fetched_data[:title]
     base_url = fetched_data[:base_url]
+    linked_issues = fetched_data[:linked_tickets]
 
     if base_url.nil?
       unknown_ticket = { tag: ticket_tag }
@@ -136,8 +137,9 @@ def _smf_generate_tickets(changelog)
 
     link = File.join(base_url, 'browse', ticket_tag)
 
-    # get linked
-    linked_tickets = _smf_fetch_linked_tickets_for(ticket_tag, base_url)
+    linked_tickets = linked_issues
+    # get remote links and check them for tickets
+    linked_tickets += _smf_fetch_remote_tickets_for(ticket_tag, base_url)
 
     new_ticket = {
       tag: ticket_tag,
@@ -155,6 +157,35 @@ def _smf_generate_tickets(changelog)
   tickets[:unknown].uniq!
 
   tickets
+end
+
+def _smf_extract_linked_issues(ticket_data, base_url)
+  linked_issues = []
+
+  return nil if ticket_data.nil? || base_url.nil?
+
+  issues = ticket_data.dig(:fields, :issuelinks)
+
+  return nil if issues.nil?
+
+  issues.each do |issue_data|
+    linked_issues.push(_smf_extract_issue(issue_data, :outwardIssue, base_url))
+    linked_issues.push(_smf_extract_issue(issue_data, :inwardIssue, base_url))
+  end
+
+  linked_issues.compact
+end
+
+def _smf_extract_issue(issue_data, type, base_url)
+  ticket = {}
+  issue = issue_data[type]
+  return nil if issue.nil?
+
+  ticket[:title] = issue.dig(:fields, :summary)
+  ticket[:tag] = issue[:key]
+  ticket[:link] = File.join(base_url, 'browse', ticket[:tag])
+
+  ticket
 end
 
 def _smf_find_ticket_tags_in_related_pr(commit_message)
@@ -217,11 +248,12 @@ def _smf_fetch_ticket_data_for(ticket_tag)
   }
 
   result[:title] = res.dig(:fields, :summary) unless res.nil?
+  result[:linked_tickets] = _smf_extract_linked_issues(res, base_url)
 
   result
 end
 
-def _smf_fetch_linked_tickets_for(ticket_tag, base_url)
+def _smf_fetch_remote_tickets_for(ticket_tag, base_url)
   res = _smf_https_get_request(
     File.join(base_url, 'rest/api/latest/issue', ticket_tag, 'remotelink'),
     :basic,
