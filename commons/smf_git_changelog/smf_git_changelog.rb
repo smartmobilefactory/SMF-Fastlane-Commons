@@ -198,7 +198,7 @@ end
 def _smf_fetch_ticket_data_for(ticket_tag)
   res = nil
   base_url = nil
-
+  UI.message("Base urls: #{smf_atlassian_base_urls}") # TODO: Remove after debugging
   smf_atlassian_base_urls.each do |url|
     res = _smf_https_get_request(
       File.join(url, 'rest/api/latest/issue', ticket_tag),
@@ -209,16 +209,16 @@ def _smf_fetch_ticket_data_for(ticket_tag)
     unless res.nil?
       base_url = url
       break
-
     end
   end
 
-  return nil if res.nil?
-
   result = {
-    title: res.dig(:fields, :summary),
     base_url: base_url
   }
+
+  result[:title] = res.dig(:fields, :summary) unless res.nil?
+
+  UI.message("Result: #{JSON.pretty_generate(result)}")  # TODO: Remove after debugging
 
   result
 end
