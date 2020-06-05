@@ -242,7 +242,17 @@ def _smf_fetch_linked_tickets_for(ticket_tag, base_url)
     ticket[:link] = ticket_data.dig(:object, :url)
     next if ticket[:link].nil?
 
-    ticket[:tag] = File.basename(ticket[:link])
+    # This is to check whether the link is actually a ticket
+    regex = Regexp.new('browse\/(' + _smf_jira_ticket_regex_string + ')')
+    ticket_tags = ticket[:link].scan(regex)
+    next if ticket_tag.empty?
+
+    begin
+      ticket[:tag] = ticket_tags.first.first
+    rescue
+      next
+    end
+
     ticket[:title] = ticket_data.dig(:object, :title)
     related_tickets.push(ticket)
   end
