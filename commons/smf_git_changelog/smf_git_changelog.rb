@@ -222,7 +222,7 @@ def _smf_fetch_linked_tickets_for(ticket_tag)
   related_tickets.uniq
 end
 
-# get PR body, title and commits for a certain
+# get PR body, title and commits for a certain pull request
 def _smf_fetch_pull_request_data(pr_number)
   repo_name = _smf_remote_repo_name
   base_url = "https://api.github.com/repos/smartmobilefactory/#{repo_name}/pulls/#{pr_number}"

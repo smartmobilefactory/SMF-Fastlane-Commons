@@ -18,7 +18,7 @@ FORMAT_ELEMENTS = {
 
   },
   markdown: {
-    spacer: "\n\n--------------------------------------------",
+    spacer: "\n\n----",
     bullet_point: {
       prefix: '- ',
       postfix: "\n"
@@ -42,10 +42,17 @@ def _smf_standard_changelog(changelog, changelog_format)
   if changelog_format == :markdown
     standard_changelog = changelog.join("\n")
   elsif changelog_format == :html
-    standard_changelog = "<ul>#{changelog.map {|commit| "<li>#{commit.gsub('- ', '')}</li>"}.join('')}</ul>"
+    standard_changelog =
+      FORMAT_ELEMENTS[:html][:section][:body][:prefix] +
+      changelog.map { |commit|
+        FORMAT_ELEMENTS[:html][:bullet_point][:prefix] +
+        commit.gsub('- ', '') +
+        FORMAT_ELEMENTS[:html][:bullet_point][:postfix]
+      }.join('')
+    FORMAT_ELEMENTS[:html][:section][:body][:postfix]
   end
 
-  return standard_changelog
+  standard_changelog
 end
 
 def _smf_section_header(title, changelog_format)
