@@ -145,7 +145,7 @@ def _smf_generate_tickets(changelog)
       tag: ticket_tag,
       link: link,
       title: title,
-      linked_tickets: linked_tickets
+      linked_tickets: linked_tickets.uniq
     }
 
     tickets[:normal].push(new_ticket)
