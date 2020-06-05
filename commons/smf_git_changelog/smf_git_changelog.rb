@@ -72,6 +72,14 @@ end
 
 ############################## HELPER ##############################
 
+private_lane :smf_super_atlassian_base_urls do
+  [$JIRA_BASE_URL]
+end
+
+lane :smf_atlassian_base_urls do
+  smf_super_atlassian_base_urls
+end
+
 def _smf_should_commit_be_ignored_in_changelog(commit_message, regexes_to_match)
   regexes_to_match.each do |regex|
     if commit_message.match(regex)
@@ -116,24 +124,28 @@ def _smf_generate_tickets(changelog)
   end
 
   ticket_tags.uniq.each do |ticket_tag|
-    title = _smf_fetch_ticket_summary_for(ticket_tag)
+    fetched_data = _smf_fetch_ticket_data_for(ticket_tag)
+    title = fetched_data[:title]
+    base_url = fetched_data[:base_url]
+    linked_issues = fetched_data[:linked_tickets]
 
-    if title.nil?
+    if base_url.nil?
       unknown_ticket = { tag: ticket_tag }
       tickets[:unknown].push(unknown_ticket)
       next
     end
 
-    link = File.join($JIRA_BASE_URL, 'browse', ticket_tag)
+    link = File.join(base_url, 'browse', ticket_tag)
 
-    # get linked
-    linked_tickets = _smf_fetch_linked_tickets_for(ticket_tag)
+    linked_tickets = linked_issues
+    # get remote links and check them for tickets
+    linked_tickets += _smf_fetch_remote_tickets_for(ticket_tag, base_url)
 
     new_ticket = {
       tag: ticket_tag,
       link: link,
       title: title,
-      linked_tickets: linked_tickets
+      linked_tickets: linked_tickets.uniq
     }
 
     tickets[:normal].push(new_ticket)
@@ -145,6 +157,35 @@ def _smf_generate_tickets(changelog)
   tickets[:unknown].uniq!
 
   tickets
+end
+
+def _smf_extract_linked_issues(ticket_data, base_url)
+  linked_issues = []
+
+  return nil if ticket_data.nil? || base_url.nil?
+
+  issues = ticket_data.dig(:fields, :issuelinks)
+
+  return nil if issues.nil?
+
+  issues.each do |issue_data|
+    linked_issues.push(_smf_extract_issue(issue_data, :outwardIssue, base_url))
+    linked_issues.push(_smf_extract_issue(issue_data, :inwardIssue, base_url))
+  end
+
+  linked_issues.compact
+end
+
+def _smf_extract_issue(issue_data, type, base_url)
+  ticket = {}
+  issue = issue_data[type]
+  return nil if issue.nil?
+
+  ticket[:title] = issue.dig(:fields, :summary)
+  ticket[:tag] = issue[:key]
+  ticket[:link] = File.join(base_url, 'browse', ticket[:tag])
+
+  ticket
 end
 
 def _smf_find_ticket_tags_in_related_pr(commit_message)
@@ -185,24 +226,41 @@ def _smf_https_get_request(url, auth_type, credentials)
 end
 
 # Get the ticket title from jira
-def _smf_fetch_ticket_summary_for(ticket_tag)
-  res = _smf_https_get_request(
-    File.join($JIRA_BASE_URL, 'rest/api/latest/issue', ticket_tag),
-    :basic,
-    ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
-  )
+def _smf_fetch_ticket_data_for(ticket_tag)
+  res = nil
+  base_url = nil
 
-  return nil if res.nil?
+  smf_atlassian_base_urls.each do |url|
+    res = _smf_https_get_request(
+      File.join(url, 'rest/api/latest/issue', ticket_tag),
+      :basic,
+      ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
+    )
 
-  res.dig(:fields, :summary)
+    unless res.nil?
+      base_url = url
+      break
+    end
+  end
+
+  result = {
+    base_url: base_url
+  }
+
+  result[:title] = res.dig(:fields, :summary) unless res.nil?
+  result[:linked_tickets] = _smf_extract_linked_issues(res, base_url)
+
+  result
 end
 
-def _smf_fetch_linked_tickets_for(ticket_tag)
+def _smf_fetch_remote_tickets_for(ticket_tag, base_url)
   res = _smf_https_get_request(
-    File.join($JIRA_BASE_URL, 'rest/api/latest/issue', ticket_tag, 'remotelink'),
+    File.join(base_url, 'rest/api/latest/issue', ticket_tag, 'remotelink'),
     :basic,
     ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
   )
+
+  UI.message("Result linked: #{res}")
 
   related_tickets = []
 
@@ -214,7 +272,17 @@ def _smf_fetch_linked_tickets_for(ticket_tag)
     ticket[:link] = ticket_data.dig(:object, :url)
     next if ticket[:link].nil?
 
-    ticket[:tag] = File.basename(ticket[:link])
+    # This is to check whether the link is actually a ticket
+    regex = Regexp.new('browse\/(' + _smf_jira_ticket_regex_string + ')')
+    ticket_tags = ticket[:link].scan(regex)
+    next if ticket_tag.empty?
+
+    begin
+      ticket[:tag] = ticket_tags.first.first
+    rescue
+      next
+    end
+
     ticket[:title] = ticket_data.dig(:object, :title)
     related_tickets.push(ticket)
   end
