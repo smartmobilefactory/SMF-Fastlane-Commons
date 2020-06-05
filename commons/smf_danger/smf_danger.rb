@@ -87,15 +87,15 @@ end
 def _smf_create_jira_ticket_links(ticket_base_url)
 
   contexts_to_search = {
-      'pull request title' => ENV['PR_TITLE'],
-      'pull request body' => ENV['PR_BODY'],
-      'commits' => ENV['COMMITS'].nil? ? nil : ENV['COMMITS'].gsub('[', '').gsub(']', '').split(', '),
-      'branch name' => ENV['CHANGE_BRANCH']
+      :titel => ENV['PR_TITLE'],
+      :body => ENV['PR_BODY'],
+      :commits => ENV['COMMITS'].nil? ? nil : ENV['COMMITS'].gsub('[', '').gsub(']', '').split(', '),
+      :branch_name => ENV['CHANGE_BRANCH']
   }
 
   default_ticket_base_url = ticket_base_url.nil? ? 'https://smartmobilefactory.atlassian.net/' : ticket_base_url
   default_ticket_base_url += 'browse/'
-  tickets = _smf_find_jira_tickets(contexts_to_search)
+  tickets = smf_find_jira_ticket_tags_in_pr(contexts_to_search)
 
   ticket_urls = []
 
@@ -104,49 +104,4 @@ def _smf_create_jira_ticket_links(ticket_base_url)
   end unless tickets.nil?
 
   ENV['DANGER_JIRA_TICKETS'] = "{ \"ticket_urls\" : #{ticket_urls} }"
-end
-
-def _smf_find_tickets_in(string, string_context)
-
-  if string.nil?
-    UI.error("Can't look for Jira Tickets in #{string_context}, content is nil!")
-    return []
-  end
-
-  min_ticket_name_length = 2
-  max_ticket_name_length = 14
-
-  min_ticket_number_length = 1
-  max_ticket_number_length = 8
-
-  # This regex matches anything that starts with 2 or 14 captial letters, followed by a dash followed by 1 to 8 digits
-  regex = /[A-Z]{#{min_ticket_name_length},#{max_ticket_name_length}}-[0-9]{#{min_ticket_number_length},#{max_ticket_number_length}}/
-  tickets = string.scan(regex)
-
-  if !tickets.empty? then
-    UI.message("Found #{tickets} in #{string_context}")
-  end
-
-  return tickets.uniq
-end
-
-def _smf_find_jira_tickets(contexts_to_search)
-
-  tickets = []
-
-  contexts_to_search.each do |context, content|
-    if context == 'commits'
-      if !content.nil? then
-        content.each do |message|
-          tickets.concat(_smf_find_tickets_in(message, "commit message")).uniq
-        end
-      else
-        UI.error("Can't look for Jira Tickets in commits, no commits available!")
-      end
-    else
-      tickets.concat(_smf_find_tickets_in(content, context)).uniq
-    end
-  end
-
-  tickets.uniq
 end

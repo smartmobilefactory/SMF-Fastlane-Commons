@@ -17,7 +17,8 @@ smf_git_changelog(
 #### Stored Result
 The author's name will be removed and the first letter of the message will be capitalized.
 Further, commits made by *SMFHUDSONCHECKOUT* will be ignored.
-<img width="663" alt="Screenshot 2019-08-13 at 09 06 41" src="https://user-images.githubusercontent.com/40039883/62922459-b11c7400-bdab-11e9-938a-0e20dd5e0bcd.png">
+Then the changelog is searched for ticket tags. These tags are then used to generate a second changelog section which contains all tickets related to this release.
+To conveniently format the changelog, there are some helper functions in the `smf_changelog_formatter.rb` file.
 
 ## Collect commit messages
 The commit messages will be collected by fetching the git commits between the last tag and *HEAD*. If an app is built the last tag is the tag which contains the *build_variant*. If a library is built, the parameter *is_library* must be set to true. In this case the last tag is the last one which starts with *releases/*. Merges are excluded.
