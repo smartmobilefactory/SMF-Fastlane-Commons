@@ -72,6 +72,14 @@ end
 
 ############################## HELPER ##############################
 
+private_lane :smf_super_atlassian_base_urls do
+  [$JIRA_BASE_URL]
+end
+
+lane :smf_atlassian_base_urls do
+  smf_super_atlassian_base_urls
+end
+
 def _smf_should_commit_be_ignored_in_changelog(commit_message, regexes_to_match)
   regexes_to_match.each do |regex|
     if commit_message.match(regex)
@@ -116,18 +124,20 @@ def _smf_generate_tickets(changelog)
   end
 
   ticket_tags.uniq.each do |ticket_tag|
-    title = _smf_fetch_ticket_summary_for(ticket_tag)
+    fetched_data = _smf_fetch_ticket_data_for(ticket_tag)
+    title = fetched_data[:title]
+    base_url = fetched_data[:base_url]
 
-    if title.nil?
+    if base_url.nil?
       unknown_ticket = { tag: ticket_tag }
       tickets[:unknown].push(unknown_ticket)
       next
     end
 
-    link = File.join($JIRA_BASE_URL, 'browse', ticket_tag)
+    link = File.join(base_url, 'browse', ticket_tag)
 
     # get linked
-    linked_tickets = _smf_fetch_linked_tickets_for(ticket_tag)
+    linked_tickets = _smf_fetch_linked_tickets_for(ticket_tag, base_url)
 
     new_ticket = {
       tag: ticket_tag,
@@ -185,21 +195,37 @@ def _smf_https_get_request(url, auth_type, credentials)
 end
 
 # Get the ticket title from jira
-def _smf_fetch_ticket_summary_for(ticket_tag)
-  res = _smf_https_get_request(
-    File.join($JIRA_BASE_URL, 'rest/api/latest/issue', ticket_tag),
-    :basic,
-    ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
-  )
+def _smf_fetch_ticket_data_for(ticket_tag)
+  res = nil
+  base_url = nil
+
+  smf_atlassian_base_urls.each do |url|
+    res = _smf_https_get_request(
+      File.join(url, 'rest/api/latest/issue', ticket_tag),
+      :basic,
+      ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
+    )
+
+    unless res.nil?
+      base_url = url
+      break
+
+    end
+  end
 
   return nil if res.nil?
 
-  res.dig(:fields, :summary)
+  result = {
+    title: res.dig(:fields, :summary),
+    base_url: base_url
+  }
+
+  result
 end
 
-def _smf_fetch_linked_tickets_for(ticket_tag)
+def _smf_fetch_linked_tickets_for(ticket_tag, base_url)
   res = _smf_https_get_request(
-    File.join($JIRA_BASE_URL, 'rest/api/latest/issue', ticket_tag, 'remotelink'),
+    File.join(base_url, 'rest/api/latest/issue', ticket_tag, 'remotelink'),
     :basic,
     ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
   )
