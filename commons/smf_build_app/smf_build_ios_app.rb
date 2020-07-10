@@ -46,6 +46,7 @@ private_lane :smf_build_ios_app do |options|
       export_options: { iCloudContainerEnvironment: icloud_environment },
       export_method: export_method,
       skip_package_ipa: skip_package_ipa,
+      skip_package_pkg: true
       xcpretty_formatter: _smf_get_xcpretty_formatter_path
   )
 end
