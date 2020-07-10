@@ -10,6 +10,7 @@ Example Call:
 ```
 smf_build_ios_app(
     skip_package_ipa: false,                                # Set to true to skip package ipa
+    skip_package_pkg: true,                                 # Defaults to true, if you want to package a pkg, set it to false in the Config.json
     bulk_deploy_params: {index: 0, count: 4},               # Hashmap which holds how many build variants are build and which one the current one is (index)
     scheme: "DGB Alpha",                                    # The scheme name as you see it in XCode
     should_clean_project: true,                             # If disabled, xcodebuild won't be told to clean before building an app.
