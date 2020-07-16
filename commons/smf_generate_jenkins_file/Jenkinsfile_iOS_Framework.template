@@ -2,7 +2,7 @@
 // Automatically generated. Do not edit.
 //
 
-@Library('jenkins-pipeline-commons@migration_fastlane_commons') _
+@Library('jenkins-pipeline-commons@master') _
 
 _build_variants = __BUILD_VARIANTS__
 
