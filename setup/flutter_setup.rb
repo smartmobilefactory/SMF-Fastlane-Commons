@@ -77,6 +77,7 @@ private_lane :smf_super_ios_build do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
   build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant.to_sym][:ios]
 
+  smf_setup_correct_xcode_executable_for_build(required_xcode_version: @smf_fastlane_config[:project][:xcode_version])
   sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} build ios --release --no-codesign --flavor #{build_variant}")
 
   smf_download_provisioning_profiles(
