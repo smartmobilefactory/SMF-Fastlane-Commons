@@ -4,6 +4,7 @@ private_lane :smf_build_ios_app do |options|
 
   # Parameter
   skip_package_ipa = (options[:skip_export].nil? ? false : options[:skip_export])
+  skip_package_pkg = (options[:skip_package_pkg].nil? ? true : options[:skip_package_pkg])
   bulk_deploy_params = options[:bulk_deploy_params]
   scheme = options[:scheme]
   should_clean_project = options[:should_clean_project]
@@ -44,7 +45,9 @@ private_lane :smf_build_ios_app do |options|
       include_symbols: true,
       include_bitcode: (upload_itc && upload_bitcode),
       export_options: { iCloudContainerEnvironment: icloud_environment },
+      export_method: export_method,
       skip_package_ipa: skip_package_ipa,
+      skip_package_pkg: skip_package_pkg,
       xcpretty_formatter: _smf_get_xcpretty_formatter_path
   )
 end
