@@ -78,7 +78,8 @@ private_lane :smf_super_build do |options|
     upload_itc: build_variant_config[:upload_itc].nil? ? false : build_variant_config[:upload_itc],
     upload_bitcode: build_variant_config[:upload_bitcode].nil? ? true : build_variant_config[:upload_bitcode],
     export_method: build_variant_config[:export_method],
-    icloud_environment: smf_get_icloud_environment(build_variant.to_sym)
+    icloud_environment: smf_get_icloud_environment(build_variant.to_sym),
+    catalyst_platform: build_variant_config[:is_catalyst] ? 'macos' : nil
   )
 end
 
