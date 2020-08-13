@@ -13,6 +13,8 @@ private_lane :smf_notarize do |options|
   asc_provider = options[:asc_provider]
   custom_provider  = options[:custom_provider]
 
+  unlock_keychain(path: "login.keychain", password: ENV[$KEYCHAIN_LOGIN_ENV_KEY])
+  unlock_keychain(path: "jenkins.keychain", password: ENV[$KEYCHAIN_JENKINS_ENV_KEY])
 
   notarize(
     package: dmg_path,
