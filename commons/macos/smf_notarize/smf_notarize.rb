@@ -16,6 +16,9 @@ private_lane :smf_notarize do |options|
   unlock_keychain(path: "login.keychain", password: ENV[$KEYCHAIN_LOGIN_ENV_KEY])
   unlock_keychain(path: "jenkins.keychain", password: ENV[$KEYCHAIN_JENKINS_ENV_KEY])
 
+  apple_id_account = CredentialsManager::AccountManager.new(user: "development@smfhq.com")
+  ENV['FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD'] = apple_id_account.password
+
   notarize(
     package: dmg_path,
     bundle_id: bundle_id,
