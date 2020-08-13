@@ -13,11 +13,12 @@ private_lane :smf_notarize do |options|
   asc_provider = options[:asc_provider]
   custom_provider  = options[:custom_provider]
 
-  unlock_keychain(path: "login.keychain", password: ENV[$KEYCHAIN_LOGIN_ENV_KEY])
-  unlock_keychain(path: "jenkins.keychain", password: ENV[$KEYCHAIN_JENKINS_ENV_KEY])
+  smf_setup_correct_xcode_executable_for_build(required_xcode_version: "11.2.1")
 
-  apple_id_account = CredentialsManager::AccountManager.new(user: "development@smfhq.com")
-  ENV['FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD'] = apple_id_account.password
+  if smf_is_keychain_enabled
+    unlock_keychain(path: "login.keychain", password: ENV[$KEYCHAIN_LOGIN_ENV_KEY])
+    unlock_keychain(path: "jenkins.keychain", password: ENV[$KEYCHAIN_JENKINS_ENV_KEY])
+  end
 
   notarize(
     package: dmg_path,
