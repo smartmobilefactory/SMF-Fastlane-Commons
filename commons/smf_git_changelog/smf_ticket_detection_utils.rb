@@ -27,10 +27,10 @@ def smf_generate_tickets(changelog)
 
   ticket_tags.uniq.each do |ticket_tag|
     # If the found tag is not really a ticket but a reference to a PR like 'PR-123' create a PR reference tag
-    related_pr_tag = _smf_is_tag_pr_reference(ticket_tag)
+    related_pr_tag = _smf_make_pr_reference(ticket_tag)
 
     unless related_pr_tag.nil?
-      tickets[:pr].push(related_pr_tag)
+      tickets[:pr].push(related_pr_tag) unless related_pr_tag[:link].nil?
       next
     end
 
@@ -74,8 +74,7 @@ def _smf_make_pr_reference(ticket_tag)
   pr_number = ticket_tag.scan(/^PR-([0-9]+)$/)
   return nil if pr_number.empty?
 
-  repo_name = smf_remote_repo_name
-  pr_url = "https://github.com/smartmobilefactory/#{repo_name}/pull/#{pr_number}"
+  pr_url = _smf_fetch_pull_request_data(pr_number)
   new_ticket = {
     tag: ticket_tag,
     link: pr_url
