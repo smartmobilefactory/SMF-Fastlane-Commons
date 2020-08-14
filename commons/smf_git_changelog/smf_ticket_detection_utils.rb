@@ -127,7 +127,7 @@ def smf_find_jira_ticket_tags_in_pr(pr_data)
 end
 
 def _smf_filter_blacklisted_tickets(tickets)
-  filtered_tickets = tickets.filter { |ticket|
+  filtered_tickets = tickets.select { |ticket|
     not_on_blacklist = true
     TICKET_BLACKLIST.each { |blacklist_entry|
       not_on_blacklist = not_on_blacklist && ticket.scan(blacklist_entry).empty?
