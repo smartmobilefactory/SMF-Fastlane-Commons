@@ -13,7 +13,7 @@ def smf_generate_tickets_from_tags(ticket_tags)
     unknown: []
   }
 
-  return tickets if tags.nil?
+  return tickets if ticket_tags.nil?
 
   ticket_tags.uniq.each do |ticket_tag|
     # If the found tag is not really a ticket but a reference to a PR like 'PR-123' create a PR reference tag
