@@ -9,7 +9,7 @@ def smf_generate_tickets(changelog)
   tickets = {
     normal: [],
     linked: [],
-    related_pr: [],
+    pr: [],
     unknown: []
   }
 
@@ -26,6 +26,14 @@ def smf_generate_tickets(changelog)
   end
 
   ticket_tags.uniq.each do |ticket_tag|
+    # If the found tag is not really a ticket but a reference to a PR like 'PR-123' create a PR reference tag
+    related_pr_tag = _smf_is_tag_pr_reference(ticket_tag)
+
+    unless related_pr_tag.nil?
+      tickets[:pr].push(related_pr_tag)
+      next
+    end
+
     fetched_data = _smf_fetch_ticket_data_for(ticket_tag)
     title = fetched_data[:title]
     base_url = fetched_data[:base_url]
@@ -56,9 +64,24 @@ def smf_generate_tickets(changelog)
 
   tickets[:normal].uniq!
   tickets[:linked].uniq!
+  tickets[:pr].uniq!
   tickets[:unknown].uniq!
 
   tickets
+end
+
+def _smf_make_pr_reference(ticket_tag)
+  pr_number = ticket_tag.scan(/^PR-([0-9]+)$/)
+  return nil if pr_number.empty?
+
+  repo_name = smf_remote_repo_name
+  pr_url = "https://github.com/smartmobilefactory/#{repo_name}/pull/#{pr_number}"
+  new_ticket = {
+    tag: ticket_tag,
+    link: pr_url
+  }
+
+  new_ticket
 end
 
 def smf_jira_ticket_regex_string

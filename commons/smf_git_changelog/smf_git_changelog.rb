@@ -99,7 +99,7 @@ def _smf_changelog_html_temp_path
   "#{@fastlane_commons_dir_path}/#{$CHANGELOG_TEMP_FILE_HTML}"
 end
 
-def _smf_remote_repo_name
+def smf_remote_repo_name
   File.basename(`git config --get remote.origin.url`.strip).gsub('.git', '')
 end
 
@@ -216,7 +216,7 @@ end
 
 # get PR body, title and commits for a certain pull request
 def _smf_fetch_pull_request_data(pr_number)
-  repo_name = _smf_remote_repo_name
+  repo_name = smf_remote_repo_name
   base_url = "https://api.github.com/repos/smartmobilefactory/#{repo_name}/pulls/#{pr_number}"
 
   pull_request = _smf_https_get_request(
