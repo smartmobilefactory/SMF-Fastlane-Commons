@@ -31,6 +31,9 @@ end
 
 The array returned by `smf_atlassian_base_urls` is then used during the 'ticket lookup process'. For each found ticket tag, an API call is triggered using the provided base urls until a request is successful. This url is then used to create the ticket link and to get more detailed information about the ticket itself. If all API calls fail, the ticket is presented in the changelog's 'Unknown Tickets' section.
 
+#### Ticket name blacklist
+In the file `smf_ticket_detection_utils.rb`, an array is defined (`TICKET_BLACKLIST`) which contains regex's to match ticket names which should be ignored. For example the regex `UTF-*` prevents strings containing something like `UTF-16` from being counted as a valid ticket tag.
+
 ## Collect commit messages
 The commit messages will be collected by fetching the git commits between the last tag and *HEAD*. If an app is built the last tag is the tag which contains the *build_variant*. If a library is built, the parameter *is_library* must be set to true. In this case the last tag is the last one which starts with *releases/*. Merges are excluded.
 

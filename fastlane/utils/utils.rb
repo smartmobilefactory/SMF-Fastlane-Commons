@@ -383,44 +383,24 @@ def smf_get_flutter_binary_path
   return flutter_binary_path
 end
 
-def _smf_jira_ticket_regex_string
-  min_ticket_name_length = 2
-  max_ticket_name_length = 14
+# Helper function for basci https requests
+def _smf_https_get_request(url, auth_type, credentials)
+  uri = URI(url)
 
-  min_ticket_number_length = 1
-  max_ticket_number_length = 8
+  https = Net::HTTP.new(uri.host, uri.port)
+  https.use_ssl = true
 
-  # This regex matches anything that starts with 2 or 14 captial letters, followed by a dash followed by 1 to 8 digits
-  "[A-Z]{#{min_ticket_name_length},#{max_ticket_name_length}}-[0-9]{#{min_ticket_number_length},#{max_ticket_number_length}}"
-end
-
-def smf_find_ticket_tags_in(string)
-
-  if string.nil?
-    return []
+  req = Net::HTTP::Get.new(uri)
+  if auth_type == :basic
+    credentials = credentials.split(':')
+    req.basic_auth(credentials[0], credentials[1])
+  elsif auth_type == :token
+    req['Authorization'] = "token #{credentials}"
   end
 
-  regex = Regexp.new(_smf_jira_ticket_regex_string)
-  tickets = string.scan(regex)
+  res = https.request(req)
 
-  tickets.uniq
-end
+  return nil if res.code != '200'
 
-def smf_find_jira_ticket_tags_in_pr(pr_data)
-
-  tickets = []
-
-  pr_data.each do |section, content|
-    if section == :commits
-      if !content.nil? then
-        content.each do |message|
-          tickets.concat(smf_find_ticket_tags_in(message)).uniq
-        end
-      end
-    else
-      tickets.concat(smf_find_ticket_tags_in(content)).uniq
-    end
-  end
-
-  tickets.uniq
+  JSON.parse(res.body, {symbolize_names: true})
 end
