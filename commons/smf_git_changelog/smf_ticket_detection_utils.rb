@@ -71,14 +71,17 @@ def smf_generate_tickets(changelog)
 end
 
 def _smf_make_pr_reference(ticket_tag)
-  pr_number = ticket_tag.scan(/^PR-([0-9]+)$/)
-  return nil if pr_number.empty?
+  UI.message("Making pr tag for: #{ticket_tag}")
+  pr_number_matches = ticket_tag.scan(/^PR-([0-9]+)$/)
+  return nil if pr_number_matches.empty?
 
-  pr_url = _smf_fetch_pull_request_data(pr_number)
+  pr_url = _smf_fetch_pull_request_data(pr_number_matches.first.first)
   new_ticket = {
     tag: ticket_tag,
     link: pr_url
   }
+
+  UI.message("Created pr tag: #{new_ticket}")
 
   new_ticket
 end
