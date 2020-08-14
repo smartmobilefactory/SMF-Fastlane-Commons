@@ -4,7 +4,7 @@ TICKET_BLACKLIST = [
 ]
 
 
-def smf_generate_tickets(changelog)
+def smf_generate_tickets_from_tags(ticket_tags)
 
   tickets = {
     normal: [],
@@ -13,17 +13,7 @@ def smf_generate_tickets(changelog)
     unknown: []
   }
 
-  return tickets if changelog.nil?
-
-  ticket_tags = []
-
-  # find all ticket tags
-  changelog.each do |commit_message|
-    # find ticket tags in the commit message itself
-    ticket_tags += _smf_find_ticket_tags_in(commit_message)
-    # if the commit message was a merge, check the corresponding PR
-    ticket_tags += _smf_find_ticket_tags_in_related_pr(commit_message)
-  end
+  return tickets if tags.nil?
 
   ticket_tags.uniq.each do |ticket_tag|
     # If the found tag is not really a ticket but a reference to a PR like 'PR-123' create a PR reference tag
@@ -70,12 +60,29 @@ def smf_generate_tickets(changelog)
   tickets
 end
 
+def smf_generate_tickets_from_changelog(changelog)
+
+  return nil if changelog.nil?
+
+  ticket_tags = []
+
+  # find all ticket tags
+  changelog.each do |commit_message|
+    # find ticket tags in the commit message itself
+    ticket_tags += _smf_find_ticket_tags_in(commit_message)
+    # if the commit message was a merge, check the corresponding PR
+    ticket_tags += _smf_find_ticket_tags_in_related_pr(commit_message)
+  end
+
+  smf_generate_tickets_from_tags(ticket_tags)
+end
+
 def _smf_make_pr_reference(ticket_tag)
   UI.message("Making pr tag for: #{ticket_tag}")
   pr_number_matches = ticket_tag.scan(/^PR-([0-9]+)$/)
   return nil if pr_number_matches.empty?
 
-  pr_url = _smf_fetch_pull_request_data(pr_number_matches.first.first)
+  pr_url = _smf_fetch_pull_request_data(pr_number_matches.first.first).dig(:pr_url)
   new_ticket = {
     tag: ticket_tag,
     link: pr_url

@@ -55,7 +55,7 @@ private_lane :smf_git_changelog do |options|
   end
 
   # Limit the size of changelog as it's crashes if it's too long
-  tickets = smf_generate_tickets(cleaned_changelog_messages.uniq)
+  tickets = smf_generate_tickets_from_changelog(cleaned_changelog_messages.uniq)
 
   changelog = cleaned_changelog_messages.uniq.join("\n")
   changelog = "#{changelog[0..20_000]}#{'\\n...'}" if changelog.length > 20_000
@@ -228,9 +228,11 @@ def _smf_fetch_pull_request_data(pr_number)
   begin
     title = pull_request.dig(:title)
     body = pull_request.dig(:body)
+    pr_url = pull_request.dig(:html_url)
   rescue
     title = nil
     body = nil
+    pr_url = nil
   end
 
   commits = _smf_https_get_request(
@@ -248,7 +250,8 @@ def _smf_fetch_pull_request_data(pr_number)
   pr_data = {
     body: body,
     title: title,
-    commits: commits
+    commits: commits,
+    pr_url: pr_url
   }
 
   pr_data

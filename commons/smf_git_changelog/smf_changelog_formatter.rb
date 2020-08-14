@@ -135,8 +135,8 @@ def _smf_unknown_tickets_section(tickets, changelog_format)
 end
 
 def _smf_generate_changelog(changelog, tickets, changelog_format)
-  standard_changelog = _smf_standard_changelog(changelog, changelog_format)
-  spacer = FORMAT_ELEMENTS[changelog_format][:spacer]
+  standard_changelog = changelog.nil? ? '' : _smf_standard_changelog(changelog, changelog_format)
+  spacer = changelog.nil? ? '' : FORMAT_ELEMENTS[changelog_format][:spacer]
 
   normal_tickets = _smf_normal_tickets_section(tickets, changelog_format)
   linked_tickets = _smf_linked_tickets_section(tickets, changelog_format)
