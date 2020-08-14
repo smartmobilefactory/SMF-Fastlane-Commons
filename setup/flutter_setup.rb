@@ -344,11 +344,7 @@ end
 
 private_lane :smf_super_shared_pipeline_danger do |options|
 
-  jira_ticket_base_url = options[:jira_ticket_base_url]
-
-  smf_danger(
-    ticket_base_url: jira_ticket_base_url
-  )
+  smf_danger
 end
 
 lane :smf_shared_pipeline_danger do |options|

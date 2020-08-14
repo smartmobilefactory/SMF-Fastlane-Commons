@@ -72,18 +72,11 @@ JSON.parse(ENV["DANGER_JUNIT_PATHS"]).each do |junit_tests_dir|
 end
 
 ## JIRA TICKETS
-jira_tickets = JSON.parse(ENV["DANGER_JIRA_TICKETS"])["ticket_urls"]
 
-if jira_tickets.nil? || jira_tickets.empty? then
+if ENV["DANGER_JIRA_TICKETS"].nil? || ENV["DANGER_JIRA_TICKETS"].empty? then
   warn("Unable to find any Jira Tickets related to this Pull Request, are there any?")
 else
-  ticket_message = "Jira Tickets related to this Pull Request: <br>"
-
-  jira_tickets.each do |ticket_url|
-    ticket_message += "#{ticket_url}<br>"
-  end
-
-  message(ticket_message)
+  message(ENV["DANGER_JIRA_TICKETS"])
 end
 
 ## XCODE WARNINGS
