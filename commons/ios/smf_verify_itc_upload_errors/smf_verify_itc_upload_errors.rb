@@ -18,7 +18,7 @@ private_lane :smf_verify_itc_upload_errors do |options|
 
   version_number = smf_get_version_number(build_variant)
 
-  build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
+  build_number = (get_build_number(xcodeproj: "#{project_name}.xcodeproj").to_i + 1).to_s
 
   unlock_keychain(path: 'login.keychain', password: ENV['LOGIN'])
   unlock_keychain(path: 'jenkins.keychain', password: ENV['JENKINS'])
