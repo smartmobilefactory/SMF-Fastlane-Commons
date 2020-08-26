@@ -103,7 +103,14 @@ def smf_remote_repo_name
   File.basename(`git config --get remote.origin.url`.strip).gsub('.git', '')
 end
 
+def smf_remote_repo_owner
+  remote_url = `git config --get remote.origin.url`.strip
+  result = remote_url.scan(/git@github.com:(.+)\//)
 
+  return nil? if result.first.nil?
+
+  result.first.first
+end
 
 def _smf_extract_linked_issues(ticket_data, base_url)
   linked_issues = []
@@ -217,7 +224,10 @@ end
 # get PR body, title and commits for a certain pull request
 def _smf_fetch_pull_request_data(pr_number)
   repo_name = smf_remote_repo_name
-  base_url = "https://api.github.com/repos/smartmobilefactory/#{repo_name}/pulls/#{pr_number}"
+  repo_owner = smf_remote_repo_owner
+  repo_owner = 'smartmobilefactory' if repo_owner.nil?
+  
+  base_url = "https://api.github.com/repos/#{repo_owner}/#{repo_name}/pulls/#{pr_number}"
 
   pull_request = _smf_https_get_request(
     base_url,
