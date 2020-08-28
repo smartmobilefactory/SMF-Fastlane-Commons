@@ -30,7 +30,8 @@ private_lane :smf_generate_jenkins_file do |options|
 
   jenkins_file_template_path = custom_jenkinsfile_template.nil? ? _smf_jenkins_file_template_path : custom_jenkinsfile_template
   jenkinsFileData = File.read(jenkins_file_template_path)
-  possible_build_variants = remove_multibuild_variants ? @smf_fastlane_config[:build_variants].keys.map(&:to_s) : _smf_possible_build_variants
+  possible_build_variants = _smf_possible_build_variants(remove_multibuild_variants)
+  UI.message("Generated build_variants: #{possible_build_variants}")
   jenkinsfile_path = custom_jenkinsfile_path.nil? ? "#{smf_workspace_dir}/Jenkinsfile" : custom_jenkinsfile_path
 
   UI.message("Generating Jenkinsfile with template at: #{jenkins_file_template_path}")
@@ -75,7 +76,7 @@ def _smf_jenkins_file_template_path
   path
 end
 
-def _smf_possible_build_variants
+def _smf_possible_build_variants(remove_multi_build_variants)
   build_variants = @smf_fastlane_config[:build_variants].keys.map(&:to_s)
   possible_build_variants = []
 
@@ -91,6 +92,8 @@ def _smf_possible_build_variants
       possible_build_variants.push("#{platform}_#{build_variant}")
     end
   end
+
+  return possible_build_variants if remove_multi_build_variants == true
 
   ['Live', 'Beta', 'Alpha'].each do |kind|
     kind_variants = build_variants.select do |variant|
