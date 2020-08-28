@@ -77,16 +77,30 @@ end
 
 def _smf_possible_build_variants
   build_variants = @smf_fastlane_config[:build_variants].keys.map(&:to_s)
+  possible_build_variants = []
+
+  # check if the project is a catalyst project and generate build_variants for every
+  # given platform
+  build_variants.each do |build_variant|
+    alt_platforms = @smf_fastlane_config.dig(build_variant.to_sym, :alt_platform)
+
+    possible_build_variants.push(build_variant)
+    next if alt_platforms.nil?
+
+    alt_platforms.each_key do |platform|
+      possible_build_variants.push("#{platform}_#{build_variant}")
+    end
+  end
 
   ['Live', 'Beta', 'Alpha'].each do |kind|
     kind_variants = build_variants.select do |variant|
       variant.downcase.include? kind.downcase
     end
 
-    build_variants.insert(0, kind) if kind_variants.length > 1
+    possible_build_variants.insert(0, kind) if kind_variants.length > 1
   end
 
-  build_variants
+  possible_build_variants
 end
 
 def _smf_insert_custom_credentials(jenkinsFile)
