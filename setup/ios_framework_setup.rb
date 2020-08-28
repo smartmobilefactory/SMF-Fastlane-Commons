@@ -130,6 +130,23 @@ lane :smf_pod_danger do |options|
   smf_pod_super_danger(options)
 end
 
+############ REPORTING LANES ############
+
+private_lane :smf_pod_super_reporting do |options|
+
+  build_variant_config = @smf_fastlane_config[:build_variants][:framework]
+
+  smf_ios_push_test_results(
+    project_name: "TODO",
+    branch: "TODO",
+    platform: "TODO"
+  )
+end
+
+lane :smf_pod_reporting do |options|
+  smf_pod_super_reporting(options)
+end
+
 ############ POD PUBLISH LANES ############
 
 # Setup Workspace
