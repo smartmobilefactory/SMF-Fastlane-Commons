@@ -14,6 +14,7 @@ CUSTOM_IOS_CREDENTIALS = [
 IOS_APP_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_iOS.template'
 POD_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_iOS_Framework.template'
 MACOS_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_macOS.template'
+CATALYST_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Catalyst.template'
 
 # Android Templates
 ANDROID_APP_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Android.template'
@@ -68,6 +69,8 @@ def _smf_jenkins_file_template_path
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{POD_TEMPLATE_JENKINS_FILE}"
   when :macos
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{MACOS_TEMPLATE_JENKINS_FILE}"
+  when :catalyst
+    path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{CATALYST_TEMPLATE_JENKINS_FILE}"
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
