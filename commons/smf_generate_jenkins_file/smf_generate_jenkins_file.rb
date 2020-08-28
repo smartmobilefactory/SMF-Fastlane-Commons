@@ -83,7 +83,7 @@ def _smf_possible_build_variants(remove_multi_build_variants)
   # check if the project is a catalyst project and generate build_variants for every
   # given platform
   build_variants.each do |build_variant|
-    alt_platforms = @smf_fastlane_config.dig(build_variant.to_sym, :alt_platform)
+    alt_platforms = @smf_fastlane_config.dig(:build_variants, build_variant.to_sym, :alt_platform)
     UI.message("alt_platforms: #{alt_platforms} for build_variant: #{build_variant}")
     possible_build_variants.push(build_variant)
     next if alt_platforms.nil?
