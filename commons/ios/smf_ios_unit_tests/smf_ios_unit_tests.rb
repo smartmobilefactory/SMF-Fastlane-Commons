@@ -35,6 +35,7 @@ private_lane :smf_ios_unit_tests do |options|
         configuration: unit_test_xcconfig_name,
         code_coverage: true,
         code_coverage: true,
+        derived_data_path: "build/derivedData/",
         output_directory: 'build',
         output_types: "html,junit,json-compilation-database",
         output_files: "report.html,report.junit,report.json"
