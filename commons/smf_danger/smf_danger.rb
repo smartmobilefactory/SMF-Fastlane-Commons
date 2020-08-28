@@ -3,7 +3,6 @@ private_lane :smf_danger do |options|
   checkstyle_paths = []
   podspec_path = options[:podspec_path]
   bump_type = options[:bump_type]
-  ticket_base_url = options[:ticket_base_url]
 
   if File.exist?(smf_swift_lint_output_path)
     checkstyle_paths.push(smf_swift_lint_output_path)
@@ -43,9 +42,7 @@ private_lane :smf_danger do |options|
 
   _check_common_project_setup_files
 
-  _smf_create_jira_ticket_links(
-      ticket_base_url
-  )
+  _smf_create_jira_ticket_links
 
   danger(
       github_api_token: ENV[$DANGER_GITHUB_TOKEN_KEY],
@@ -84,7 +81,7 @@ def _smf_find_paths_of_files_in_directory(directory, file_type = '')
   paths
 end
 
-def _smf_create_jira_ticket_links(ticket_base_url)
+def _smf_create_jira_ticket_links
 
   contexts_to_search = {
       :titel => ENV['PR_TITLE'],
@@ -93,15 +90,10 @@ def _smf_create_jira_ticket_links(ticket_base_url)
       :branch_name => ENV['CHANGE_BRANCH']
   }
 
-  default_ticket_base_url = ticket_base_url.nil? ? 'https://smartmobilefactory.atlassian.net/' : ticket_base_url
-  default_ticket_base_url += 'browse/'
-  tickets = smf_find_jira_ticket_tags_in_pr(contexts_to_search)
+  ticket_tags = smf_find_jira_ticket_tags_in_pr(contexts_to_search)
+  tickets = smf_generate_tickets_from_tags(ticket_tags)
 
-  ticket_urls = []
+  html_formatted_tickets = _smf_generate_changelog(nil, tickets, :html)
 
-  tickets.each do |ticket|
-    ticket_urls << "<a href='#{default_ticket_base_url}#{ticket}'>#{ticket}</a>"
-  end unless tickets.nil?
-
-  ENV['DANGER_JIRA_TICKETS'] = "{ \"ticket_urls\" : #{ticket_urls} }"
+  ENV['DANGER_JIRA_TICKETS'] = html_formatted_tickets
 end

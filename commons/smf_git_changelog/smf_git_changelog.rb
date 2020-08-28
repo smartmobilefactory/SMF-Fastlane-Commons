@@ -55,7 +55,7 @@ private_lane :smf_git_changelog do |options|
   end
 
   # Limit the size of changelog as it's crashes if it's too long
-  tickets = _smf_generate_tickets(cleaned_changelog_messages.uniq)
+  tickets = smf_generate_tickets_from_changelog(cleaned_changelog_messages.uniq)
 
   changelog = cleaned_changelog_messages.uniq.join("\n")
   changelog = "#{changelog[0..20_000]}#{'\\n...'}" if changelog.length > 20_000
@@ -99,64 +99,17 @@ def _smf_changelog_html_temp_path
   "#{@fastlane_commons_dir_path}/#{$CHANGELOG_TEMP_FILE_HTML}"
 end
 
-def _smf_remote_repo_name
+def smf_remote_repo_name
   File.basename(`git config --get remote.origin.url`.strip).gsub('.git', '')
 end
 
-def _smf_generate_tickets(changelog)
+def smf_remote_repo_owner
+  remote_url = `git config --get remote.origin.url`.strip
+  result = remote_url.scan(/git@github.com:(.+)\//)
 
-  tickets = {
-    normal: [],
-    linked: [],
-    unknown: []
-  }
+  return nil? if result.first.nil?
 
-  return tickets if changelog.nil?
-
-  ticket_tags = []
-
-  # find all ticket tags
-  changelog.each do |commit_message|
-    # find ticket tags in the commit message itself
-    ticket_tags += smf_find_ticket_tags_in(commit_message)
-    # if the commit message was a merge, check the corresponding PR
-    ticket_tags += _smf_find_ticket_tags_in_related_pr(commit_message)
-  end
-
-  ticket_tags.uniq.each do |ticket_tag|
-    fetched_data = _smf_fetch_ticket_data_for(ticket_tag)
-    title = fetched_data[:title]
-    base_url = fetched_data[:base_url]
-    linked_issues = fetched_data[:linked_tickets]
-
-    if base_url.nil?
-      unknown_ticket = { tag: ticket_tag }
-      tickets[:unknown].push(unknown_ticket)
-      next
-    end
-
-    link = File.join(base_url, 'browse', ticket_tag)
-
-    linked_tickets = linked_issues
-    # get remote links and check them for tickets
-    linked_tickets += _smf_fetch_remote_tickets_for(ticket_tag, base_url)
-
-    new_ticket = {
-      tag: ticket_tag,
-      link: link,
-      title: title,
-      linked_tickets: linked_tickets.uniq
-    }
-
-    tickets[:normal].push(new_ticket)
-    tickets[:linked].concat(linked_tickets)
-  end
-
-  tickets[:normal].uniq!
-  tickets[:linked].uniq!
-  tickets[:unknown].uniq!
-
-  tickets
+  result.first.first
 end
 
 def _smf_extract_linked_issues(ticket_data, base_url)
@@ -199,134 +152,5 @@ def _smf_find_ticket_tags_in_related_pr(commit_message)
   ticket_tags = smf_find_jira_ticket_tags_in_pr(pr_data)
 
   ticket_tags
-end
-
-############################## API REQUESTS ##############################
-
-# Helper function for basci https requests
-def _smf_https_get_request(url, auth_type, credentials)
-  uri = URI(url)
-
-  https = Net::HTTP.new(uri.host, uri.port)
-  https.use_ssl = true
-
-  req = Net::HTTP::Get.new(uri)
-  if auth_type == :basic
-    credentials = credentials.split(':')
-    req.basic_auth(credentials[0], credentials[1])
-  elsif auth_type == :token
-    req['Authorization'] = "token #{credentials}"
-  end
-
-  res = https.request(req)
-
-  return nil if res.code != '200'
-
-  JSON.parse(res.body, {symbolize_names: true})
-end
-
-# Get the ticket title from jira
-def _smf_fetch_ticket_data_for(ticket_tag)
-  res = nil
-  base_url = nil
-
-  smf_atlassian_base_urls.each do |url|
-    res = _smf_https_get_request(
-      File.join(url, 'rest/api/latest/issue', ticket_tag),
-      :basic,
-      ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
-    )
-
-    unless res.nil?
-      base_url = url
-      break
-    end
-  end
-
-  result = {
-    base_url: base_url
-  }
-
-  result[:title] = res.dig(:fields, :summary) unless res.nil?
-  result[:linked_tickets] = _smf_extract_linked_issues(res, base_url)
-
-  result
-end
-
-def _smf_fetch_remote_tickets_for(ticket_tag, base_url)
-  res = _smf_https_get_request(
-    File.join(base_url, 'rest/api/latest/issue', ticket_tag, 'remotelink'),
-    :basic,
-    ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
-  )
-
-  UI.message("Result linked: #{res}")
-
-  related_tickets = []
-
-  return related_tickets if res.nil?
-
-  res.each do |ticket_data|
-    ticket = {}
-
-    ticket[:link] = ticket_data.dig(:object, :url)
-    next if ticket[:link].nil?
-
-    # This is to check whether the link is actually a ticket
-    regex = Regexp.new('browse\/(' + _smf_jira_ticket_regex_string + ')')
-    ticket_tags = ticket[:link].scan(regex)
-    next if ticket_tag.empty?
-
-    begin
-      ticket[:tag] = ticket_tags.first.first
-    rescue
-      next
-    end
-
-    ticket[:title] = ticket_data.dig(:object, :title)
-    related_tickets.push(ticket)
-  end
-
-  related_tickets.uniq
-end
-
-# get PR body, title and commits for a certain pull request
-def _smf_fetch_pull_request_data(pr_number)
-  repo_name = _smf_remote_repo_name
-  base_url = "https://api.github.com/repos/smartmobilefactory/#{repo_name}/pulls/#{pr_number}"
-
-  pull_request = _smf_https_get_request(
-    base_url,
-    :token,
-    ENV[$SMF_GITHUB_TOKEN_ENV_KEY]
-  )
-
-  begin
-    title = pull_request.dig(:title)
-    body = pull_request.dig(:body)
-  rescue
-    title = nil
-    body = nil
-  end
-
-  commits = _smf_https_get_request(
-    base_url + '/commits',
-    :token,
-    ENV[$SMF_GITHUB_TOKEN_ENV_KEY]
-  )
-
-  begin
-    commits = commits.map {|commit| commit.dig(:commit, :message)}.compact.uniq
-  rescue
-    commits = nil
-  end
-
-  pr_data = {
-    body: body,
-    title: title,
-    commits: commits
-  }
-
-  pr_data
 end
 

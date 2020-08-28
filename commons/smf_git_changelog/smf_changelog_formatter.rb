@@ -81,6 +81,25 @@ def _smf_normal_tickets_section(tickets, changelog_format)
   section
 end
 
+def _smf_related_prs_section(tickets, changelog_format)
+
+  section = _smf_section_header("Related Pull Requests:", changelog_format)
+  section += FORMAT_ELEMENTS[changelog_format][:section][:body][:prefix]
+
+  tickets[:pr].sort_by! { |pr_tag| pr_tag[:tag] }
+  tickets[:pr].each do |pr|
+    ticket_linked =
+      FORMAT_ELEMENTS[changelog_format][:bullet_point][:prefix] +
+      _smf_ticket_to_link(pr, changelog_format, false) +
+      FORMAT_ELEMENTS[changelog_format][:bullet_point][:postfix]
+    section += ticket_linked
+  end
+
+  section += FORMAT_ELEMENTS[changelog_format][:section][:body][:postfix]
+
+  section
+end
+
 def _smf_linked_tickets_section(tickets, changelog_format)
   section = _smf_section_header('Linked Tickets:', changelog_format)
   section += FORMAT_ELEMENTS[changelog_format][:section][:body][:prefix]
@@ -116,19 +135,24 @@ def _smf_unknown_tickets_section(tickets, changelog_format)
 end
 
 def _smf_generate_changelog(changelog, tickets, changelog_format)
-  standard_changelog = _smf_standard_changelog(changelog, changelog_format)
-  spacer = FORMAT_ELEMENTS[changelog_format][:spacer]
+  standard_changelog = changelog.nil? ? '' : _smf_standard_changelog(changelog, changelog_format)
+  spacer = changelog.nil? ? '' : FORMAT_ELEMENTS[changelog_format][:spacer]
 
   normal_tickets = _smf_normal_tickets_section(tickets, changelog_format)
   linked_tickets = _smf_linked_tickets_section(tickets, changelog_format)
+  related_prs = _smf_related_prs_section(tickets, changelog_format)
   unknown_tickets = _smf_unknown_tickets_section(tickets, changelog_format)
 
-  spacer = '' if tickets[:normal].empty? and tickets[:linked].empty? and tickets[:unknown].empty?
+  spacer = '' if tickets[:normal].empty? and
+                tickets[:linked].empty? and
+                tickets[:unknown].empty? and
+                tickets[:pr].empty?
   normal_tickets = '' if tickets[:normal].empty?
   linked_tickets = '' if tickets[:linked].empty?
+  related_prs = '' if tickets[:pr].empty?
   unknown_tickets = '' if tickets[:unknown].empty?
 
-  standard_changelog + spacer + normal_tickets + linked_tickets + unknown_tickets
+  standard_changelog + spacer + normal_tickets + linked_tickets + related_prs + unknown_tickets
 end
 
 def _smf_linked_tickets_string(related_tickets, changelog_format)
