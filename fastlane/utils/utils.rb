@@ -232,7 +232,7 @@ end
 
 def smf_get_version_number(build_variant = nil, podspec_path = nil)
   build_variant_config = build_variant.nil? ? nil : smf_config_get(build_variant)
-
+  UI.message("Build_variant config: #{build_variant_config}")
   case @platform
   when :ios, :macos, :apple
     target = build_variant_config[:target]
