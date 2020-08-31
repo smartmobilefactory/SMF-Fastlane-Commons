@@ -231,7 +231,7 @@ def smf_get_tag_of_app(build_variant, build_number)
 end
 
 def smf_get_version_number(build_variant = nil, podspec_path = nil)
-  raise "Cannot find marketing version" if build_variant.nil? ?
+  raise "Cannot find marketing version" if build_variant.nil?
 
   case @platform
   when :ios, :macos, :apple
