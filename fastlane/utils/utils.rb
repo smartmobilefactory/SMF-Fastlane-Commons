@@ -67,7 +67,10 @@ def smf_get_appcenter_id(build_variant, platform = nil)
     )
   else
     appcenter_id = smf_config_get(build_variant, :appcenter_id)
-    appcenter_id = smf_config_get(build_variant, platform.to_sym, :appcenter_id) unless appcenter_id.nil?
+
+    if appcenter_id.nil? && !platform.nil?
+      appcenter_id = smf_config_get(build_variant, platform.to_sym, :appcenter_id)
+    end
   end
 
   appcenter_id
