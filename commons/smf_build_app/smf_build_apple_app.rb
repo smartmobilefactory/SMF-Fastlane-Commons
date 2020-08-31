@@ -25,8 +25,6 @@ private_lane :smf_build_apple_app do |options|
     catalyst_platform = 'macos' if smf_is_catalyst_mac_build(build_variant)
   end
 
-  UI.message("export_mehtod is nil: #{export_method.nil?}")
-
   output_name = scheme
 
   # Check if the project defined if the build should be cleaned. Other wise the default behavior is used based on the whether the archiving is a bulk operation.
