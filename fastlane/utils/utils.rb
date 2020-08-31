@@ -243,7 +243,7 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
       version_number = get_version_number(
           xcodeproj: "#{smf_get_project_name}.xcodeproj",
           target: (target != nil ? target : scheme),
-          configuration: build_variant_config[:xcconfig_name].nil? ? nil : build_variant_config[:xcconfig_name][:archive]
+          configuration: build_variant_config[:xcconfig_name].nil? ? 'Release' : build_variant_config[:xcconfig_name][:archive]
       )
     rescue
       begin
@@ -257,7 +257,8 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
           smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
 
           workspacePath = "#{smf_workspace_dir}/#{smf_get_project_name}.xcworkspace"
-          buildConfigurationString = `xcodebuild -workspace "#{workspacePath}" -scheme "#{scheme}" -configuration "#{build_variant_config[:xcconfig_name][:archive]}" -showBuildSettings -json`
+          archive = build_variant_config.dig(:xcconfig_name, :archive)
+          buildConfigurationString = `xcodebuild -workspace "#{workspacePath}" -scheme "#{scheme}" -configuration "#{archive}" -showBuildSettings -json`
           buildConfigurationJSON = JSON.parse(buildConfigurationString)
           version_number = buildConfigurationJSON.first['buildSettings']["MARKETING_VERSION"]
           UI.message("Found MARKETING_VERSION in the build settings: #{version_number}")
