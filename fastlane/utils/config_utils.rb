@@ -29,9 +29,9 @@ end
 # access helper to get the correct config.json entry for a given
 # platform and build variant
 def smf_config_get(build_variant, *keys)
-  build_variant = build_variant.to_sym
   return @smf_fastlane_config.dig(*keys) if build_variant.nil?
 
+  build_variant = build_variant.to_sym
   build_variant_config = @smf_fastlane_config[:build_variants].dig(build_variant)
   return nil if build_variant_config.nil?
 
