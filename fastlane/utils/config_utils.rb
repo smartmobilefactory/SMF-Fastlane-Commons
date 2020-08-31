@@ -58,19 +58,22 @@ def smf_get_icloud_environment(build_variant)
 
   case @platform
   when :ios, :ios_framework, :macos, :apple
-    icloud_environment = @smf_fastlane_config.dig(
+    config_icloud_environment = @smf_fastlane_config.dig(
       :build_variants,
       build_variant,
       :icloud_environment
     )
 
+    return config_icloud_environment unless config_icloud_environment.nil?
   when :flutter
-    icloud_environment = @smf_fastlane_config.dig(
+    config_icloud_environment = @smf_fastlane_config.dig(
       :build_variants,
       build_variant,
       :ios,
       :icloud_environment
     )
+
+    return config_icloud_environment unless config_icloud_environment.nil?
   end
 
   icloud_environment
