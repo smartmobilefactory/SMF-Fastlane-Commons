@@ -29,7 +29,7 @@ private_lane :smf_download_provisioning_profiles do |options|
     if (match_read_only == nil || allowed_types.include?(match_type) == false)
       raise 'The fastlane match entries in the Config.json file are incomplete. Set `readonly` and `type` for the `match` Key.'
     end
-´
+
     smf_download_provisioning_profile_using_match(
       app_identifier: app_identifier,
       type: match_type,
