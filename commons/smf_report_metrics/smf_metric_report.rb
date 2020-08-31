@@ -4,12 +4,12 @@ private_lane :smf_report_metrics do |options|
 end
 
 private_lane :smf_owasp_report do |options|
-  project_name = options[:meta_db_project_name]
+  project_name = options[:smf_get_meta_db_project_name]
   begin
     case @platform
     when :android
       report = smf_owasp_report_android
-    when :ios, :macos
+    when :ios, :macos, :apple
       report = smf_owsap_report_cocoapods
     else
       UI.message("The platform \"#{@platform}\" does not support owasp reports")
@@ -28,7 +28,7 @@ end
 private_lane :smf_report_depencencies do |options|
 
   build_variant = options[:build_variant]
-  project_name = options[:meta_db_project_name]
+  project_name = options[:smf_get_meta_db_project_name]
   dependencyReports = []
 
   prepare_api_data = ->(data) {
@@ -50,6 +50,10 @@ private_lane :smf_report_depencencies do |options|
     when :macos
       report = smf_dependency_report_cocoapods
       report['project_type'] = 'macOS'
+      dependencyReports.push(prepare_api_data.call(report))
+    when :apple
+      report = smf_dependency_report_cocoapods
+      report['project_type'] = smf_is_catalyst_mac_build(build_variant) ?'macOS' : 'iOS'
       dependencyReports.push(prepare_api_data.call(report))
     else
       UI.message("The platform \"#{@platform}\" does not support metric reports")
