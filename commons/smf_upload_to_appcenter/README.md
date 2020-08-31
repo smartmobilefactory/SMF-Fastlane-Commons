@@ -13,7 +13,6 @@ smf_ios_upload_to_appcenter(
         escaped_filename: <escaped filename>,   # Needed only for iOS
         path_to_ipa_or_app: <path to ipa>,      # Needed only for iOS
         is_mac_app: false,                      # Optional, false by default
-        sparkle_xml_name: 'test.xml',           # Needed only for macOS
 )
 ```
 
