@@ -58,6 +58,8 @@ private_lane :smf_super_build do |options|
 
   platform = smf_is_mac_build(build_variant) ? 'macos' : 'ios'
 
+  UI.message("DEBUG: platform: #{platform}, team_id: #{smf_config_get(build_variant, :team_id)}, is_mac_catalys: #{smf_is_mac_build(build_variant)}")
+
   smf_download_provisioning_profiles(
     team_id: smf_config_get(build_variant, :team_id),
     apple_id: smf_config_get(build_variant, :apple_id),
