@@ -1,6 +1,6 @@
 ### Build iOS App
 
-Builds the iOS app by first ensuring the correct xcode version and then using gym to actually build the app.
+Builds the iOS/macOS app by first ensuring the correct xcode version and then using gym to actually build the app.
 
 NOTE: The smf_download_provisioning_profiles lane has to be called before calling this lane.
 
@@ -8,7 +8,7 @@ NOTE: The smf_download_provisioning_profiles lane has to be called before callin
 Example Call:
 
 ```
-smf_build_ios_app(
+smf_build_apple_app(
     skip_package_ipa: false,                                # Set to true to skip package ipa
     skip_package_pkg: true,                                 # Defaults to true, if you want to package a pkg, set it to false in the Config.json
     bulk_deploy_params: {index: 0, count: 4},               # Hashmap which holds how many build variants are build and which one the current one is (index)
@@ -23,6 +23,7 @@ smf_build_ios_app(
     export_method: false,                                   # The Xcode archive export method to use. This needs to be set for special cases only.
     icloud_environment: "Development",                      # ("Development" or "Production"): If the app uses iCloud capabilities, this has to be set accordingly for each target.           
     workspace: <path to workspace>                          # Optional, by default the *project_name*.xcworkspace will be used
+    build_variant: alpha                                    # Used to determine catalyst platform
 )
 
 ```

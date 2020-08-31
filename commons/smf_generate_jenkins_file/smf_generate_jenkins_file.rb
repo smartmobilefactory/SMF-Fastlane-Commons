@@ -14,7 +14,7 @@ CUSTOM_IOS_CREDENTIALS = [
 IOS_APP_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_iOS.template'
 POD_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_iOS_Framework.template'
 MACOS_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_macOS.template'
-CATALYST_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Catalyst.template'
+APPLE_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Apple.template'
 
 # Android Templates
 ANDROID_APP_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Android.template'
@@ -69,14 +69,23 @@ def _smf_jenkins_file_template_path
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{POD_TEMPLATE_JENKINS_FILE}"
   when :macos
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{MACOS_TEMPLATE_JENKINS_FILE}"
-  when :catalyst
-    path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{CATALYST_TEMPLATE_JENKINS_FILE}"
+  when :apple
+    path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{APPLE_TEMPLATE_JENKINS_FILE}"
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
   end
 
   path
+end
+
+def _smf_build_variant_platform_prefix_mapping(platform)
+  case platform.to_s
+  when 'macOS'
+    return $CATALYST_MAC_BUILD_VARIANT_PREFIX
+  end
+
+  nil
 end
 
 def _smf_possible_build_variants(remove_multi_build_variants)
@@ -86,14 +95,14 @@ def _smf_possible_build_variants(remove_multi_build_variants)
   # check if the project is a catalyst project and generate build_variants for every
   # given platform
   build_variants.each do |build_variant|
-    alt_platforms = @smf_fastlane_config.dig(:build_variants, build_variant.to_sym, :alt_platform)
-    UI.message("alt_platforms: #{alt_platforms} for build_variant: #{build_variant}")
+    alt_platforms = @smf_fastlane_config.dig(:build_variants, build_variant.to_sym, :alt_platforms)
+
     possible_build_variants.push(build_variant)
     next if alt_platforms.nil?
 
     alt_platforms.each_key do |platform|
-      UI.message("Platform: #{platform}")
-      possible_build_variants.push("#{platform}_#{build_variant}")
+      build_variant_prefix = _smf_build_variant_platform_prefix_mapping(platform)
+      possible_build_variants.push("#{build_variant_prefix}#{build_variant}")
     end
   end
 
@@ -113,7 +122,7 @@ end
 def _smf_insert_custom_credentials(jenkinsFile)
   jenkinsFileData = jenkinsFile
   case @platform
-  when :ios, :macos
+  when :ios, :macos, :apple
     for custom_credential in CUSTOM_IOS_CREDENTIALS
       if @smf_fastlane_config[:project][:custom_credentials] && @smf_fastlane_config[:project][:custom_credentials][custom_credential.to_sym]
         custom_credential_key = @smf_fastlane_config[:project][:custom_credentials][custom_credential.to_sym]

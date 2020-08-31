@@ -11,7 +11,7 @@ private_lane :smf_upload_to_testflight do |options|
   itc_team_id = options[:itc_team_id]
   username = !options[:apple_id].nil? ? options[:apple_id] : 'development@smfhq.com'
   itc_apple_id = options[:itc_apple_id]
-  skip_waiting_for_build_processing = options[:skip_waiting_for_build_processing]
+  skip_waiting_for_build_processing = options[:skip_waiting_for_build_processing] == true
 
   ENV["FASTLANE_ITC_TEAM_ID"] = itc_team_id
 
@@ -30,7 +30,7 @@ private_lane :smf_upload_to_testflight do |options|
       team_id: itc_team_id,
       username: username,
       skip_waiting_for_build_processing: skip_waiting_for_build_processing,
-      ipa: smf_path_to_ipa_or_app(options[:build_variant]).gsub('.zip', '')
+      ipa: smf_path_to_ipa_or_app.gsub('.zip', '')
   )
 end
 

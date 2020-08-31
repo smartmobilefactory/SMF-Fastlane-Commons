@@ -54,7 +54,9 @@ private_lane :smf_super_build do |options|
   build_variant = smf_build_variant(options)
 
   extension_suffixes = smf_config_get(build_variant, :extensions_suffixes)
-  extension_suffixes = smf_config_get(nil , :extensions_suffixes) if extension_suffixes.nil?
+  extension_suffixes = smf_config_get(nil, :extensions_suffixes) if extension_suffixes.nil?
+
+  platform = smf_is_mac_build(build_variant) ? 'macos' : 'ios'
 
   smf_download_provisioning_profiles(
     team_id: smf_config_get(build_variant, :team_id),
@@ -67,12 +69,13 @@ private_lane :smf_super_build do |options|
     template_name: smf_config_get(build_variant, :match, :template_name),
     extensions_suffixes: extension_suffixes,
     build_variant: build_variant,
-    force: smf_config_get(build_variant, :match, :force)
+    force: smf_config_get(build_variant, :match, :force),
+    platform: platform
   )
 
   skip_export = options[:skip_export].nil? ? false : options[:skip_export]
 
-  smf_build_ios_app(
+  smf_build_apple_app(
     skip_export: skip_export,
     scheme: smf_config_get(build_variant, :scheme),
     should_clean_project: smf_config_get(build_variant, :should_clean_project),
@@ -91,13 +94,12 @@ lane :smf_build do |options|
   smf_super_build(options)
 end
 
-
 # Unit-Tests
 
 private_lane :smf_super_unit_tests do |options|
 
   build_variant = smf_build_variant(options)
-  testing_for_mac = smf_is_catalyst_mac_build(options)
+  testing_for_mac = smf_is_mac_build(options)
 
   smf_ios_unit_tests(
     project_name: smf_config_get(nil, :project, :project_name),
@@ -192,6 +194,37 @@ lane :smf_pipeline_create_git_tag do |options|
   smf_super_pipeline_create_git_tag(options)
 end
 
+# Create DMG and run Gatekeeper
+
+private_lane :smf_super_create_dmg_and_gatekeeper do |options|
+
+  build_variant = smf_build_variant(options)
+
+  next unless smf_is_mac_build(build_variant)
+
+  dmg_path = smf_create_dmg_from_app(
+    build_variant: build_variant,
+    team_id: smf_config_get(build_variant, :team_id),
+    code_signing_identity: smf_config_get(build_variant, :code_signing_identity)
+  )
+
+  should_notarize = smf_config_get(build_variant, :notarize) && smf_is_mac_build(build_variant)
+
+  smf_notarize(
+    should_notarize: should_notarize,
+    dmg_path: dmg_path,
+    bundle_id: smf_config_get(build_variant, :bundle_identifier),
+    username: smf_config_get(build_variant, :apple_id),
+    asc_provider: smf_config_get(build_variant, :team_id),
+    custom_provider: smf_config_get(build_variant, :notarization_custom_provider)
+  )
+
+end
+
+lane :smf_create_dmg_and_gatekeeper do |options|
+  smf_super_create_dmg_and_gatekeeper(options)
+end
+
 
 # Upload Dsyms
 
@@ -214,6 +247,31 @@ lane :smf_upload_dsyms do |options|
   smf_super_upload_dsyms(options)
 end
 
+# Uplaod to Sparkle
+
+private_lane :smf_super_pipeline_upload_with_sparkle do |options|
+
+  build_variant = smf_build_variant(options)
+  next unless smf_is_mac_build(build_variant)
+
+  smf_upload_with_sparkle(
+    build_variant: build_variant,
+    create_intermediate_folder: smf_config_get(build_variant, :sparkle, :create_intermediate_folder),
+    scheme: smf_config_get(build_variant, :scheme),
+    sparkle_dmg_path: smf_config_get(build_variant, :sparkle, :dmg_path),
+    sparkle_upload_user: smf_config_get(build_variant, :sparkle, :upload_user),
+    sparkle_upload_url: smf_config_get(build_variant, :sparkle, :upload_url),
+    sparkle_version: smf_config_get(build_variant, :sparkle, :sparkle_version),
+    sparkle_signing_team: smf_config_get(build_variant, :sparkle, :sparkle_signing_team),
+    sparkle_xml_name: smf_config_get(build_variant, :sparkle, :xml_name),
+    sparkle_private_key: smf_config_get(build_variant, :sparkle, :signing_key)
+  ) if smf_config_get(build_variant, :use_sparkle) == true
+end
+
+lane :smf_pipeline_upload_with_sparkle do |options|
+  smf_super_pipeline_upload_with_sparkle(options)
+end
+
 
 # Upload to AppCenter
 
@@ -221,15 +279,19 @@ private_lane :smf_super_upload_to_appcenter do |options|
   build_variant = smf_build_variant(options)
 
   appcenter_app_id = smf_get_appcenter_id(build_variant)
-  destinations = build_variant_config[:appcenter_destinations]
+  destinations = smf_config_get(build_variant, :appcenter_destinations)
 
   # Upload the IPA to AppCenter
   smf_ios_upload_to_appcenter(
     destinations: smf_get_appcenter_destination_groups(build_variant, destinations),
+    build_variant: build_variant,
+    build_number: smf_get_build_number_of_app,
     app_id: appcenter_app_id,
     escaped_filename: smf_config_get(build_variant, :scheme).gsub(' ', "\ "),
-    path_to_ipa_or_app: smf_path_to_ipa_or_app
-  ) if !appcenter_app_id.nil?
+    path_to_ipa_or_app: smf_path_to_ipa_or_app,
+    is_mac_app: smf_is_mac_build(build_variant),
+    podspec_path: smf_config_get(build_variant, :podspec_path)
+  ) unless appcenter_app_id.nil?
 end
 
 lane :smf_upload_to_appcenter do |options|
@@ -240,20 +302,21 @@ end
 # Upload to iTunes
 
 private_lane :smf_super_upload_to_itunes do |options|
+  build_variant = smf_build_variant(options)
 
-  build_variant_config = @smf_fastlane_config[:build_variants][options[:build_variant].to_sym]
-  slack_channel = @smf_fastlane_config[:project][:slack_channel]
+  slack_channel = smf_config_get(nil, :project, :slack_channel)
+  xcode_version = smf_config_get(nil, :project, :xcode_version)
 
   smf_upload_to_testflight(
-    build_variant: options[:build_variant],
-    apple_id: build_variant_config[:apple_id],
-    itc_team_id: build_variant_config[:itc_team_id],
-    itc_apple_id: build_variant_config[:itc_apple_id],
-    skip_waiting_for_build_processing: build_variant_config[:itc_skip_waiting].nil? ? false : build_variant_config[:itc_skip_waiting],
+    build_variant: build_variant,
+    apple_id: smf_config_get(build_variant, :apple_id),
+    itc_team_id: smf_config_get(build_variant, :itc_team_id),
+    itc_apple_id: smf_config_get(build_variant, :itc_apple_id),
+    skip_waiting_for_build_processing: smf_config_get(build_variant, :itc_skip_waiting),
     slack_channel: slack_channel,
-    bundle_identifier: build_variant_config[:bundle_identifier],
-    upload_itc: build_variant_config[:upload_itc],
-    required_xcode_version: @smf_fastlane_config[:project][:xcode_version]
+    bundle_identifier: smf_config_get(build_variant, :bundle_identifier),
+    upload_itc: smf_config_get(build_variant, :upload_itc),
+    required_xcode_version: xcode_version
   )
 end
 
@@ -267,15 +330,17 @@ end
 private_lane :smf_super_push_git_tag_release do |options|
 
   local_branch = options[:local_branch]
-  build_variant = options[:build_variant]
+  build_variant = smf_build_variant(options)
 
   changelog = smf_read_changelog
 
   smf_git_pull(local_branch)
   smf_push_to_git_remote(local_branch: local_branch)
 
+  project_name = smf_config_get(nil, :project, :project_name)
+
   # Create the GitHub release
-  build_number = get_build_number(xcodeproj: "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj")
+  build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
   smf_create_github_release(
     build_number: build_number,
     tag: smf_get_tag_of_app(build_variant, build_number),
@@ -294,8 +359,8 @@ end
 
 private_lane :smf_super_send_slack_notification do |options|
 
-  build_variant = options[:build_variant]
-  slack_channel = @smf_fastlane_config[:project][:slack_channel]
+  build_variant = smf_build_variant(options)
+  slack_channel = smf_config_get(nil, :project, :slack_channel)
 
   smf_send_default_build_success_notification(
     name: smf_get_default_name_of_app(build_variant),

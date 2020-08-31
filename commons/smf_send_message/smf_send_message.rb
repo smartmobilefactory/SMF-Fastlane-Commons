@@ -7,7 +7,7 @@ private_lane :smf_send_message do |options|
   content = message.length < 4000 ? message : "#{message[0..4000]}... (maximum length reached)"
 
   case @platform
-  when :ios, :ios_framework, :macos
+  when :ios, :ios_framework, :macos, :apple
     ci_error_log = smf_ci_ios_error_log
   when :android
     ci_error_log = ci_android_error_log
