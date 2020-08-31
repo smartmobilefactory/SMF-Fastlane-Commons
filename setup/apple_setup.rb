@@ -99,7 +99,7 @@ end
 private_lane :smf_super_unit_tests do |options|
 
   build_variant = smf_build_variant(options)
-  testing_for_mac = smf_is_mac_build(options)
+  testing_for_mac = smf_is_mac_build(build_variant)
 
   smf_ios_unit_tests(
     project_name: smf_config_get(nil, :project, :project_name),
