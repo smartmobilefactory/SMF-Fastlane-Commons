@@ -66,8 +66,8 @@ def smf_get_appcenter_id(build_variant, platform = nil)
       build_variant: build_variant
     )
   else
-    build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
-    appcenter_id = platform.nil? ? build_variant_config[:appcenter_id] : build_variant_config[platform.to_sym][:appcenter_id]
+    appcenter_id = smf_config_get(build_variant, platform.to_sym, :appcenter_id)
+    appcenter_id = smf_config_get(build_variant, :appcenter_id) if appcenter_id.nil?
   end
 
   appcenter_id
