@@ -32,19 +32,20 @@ def smf_config_get(build_variant, *keys)
   return @smf_fastlane_config.dig(*keys) if build_variant.nil?
 
   build_variant = build_variant.to_sym
-  build_variant_config = @smf_fastlane_config[:build_variants].dig(build_variant)
-  return nil if build_variant_config.nil?
+  build_variants = @smf_fastlane_config[:build_variants]
+  return nil if build_variants.nil?
 
   case @platform
   when :apple
     if smf_is_catalyst_mac_build(build_variant)
-      value = build_variant_config.dig(:alt_platforms, :macOS, *keys)
-      return build_variant_config.dig(:alt_platforms, :macOS, *keys) unless value.nil?
+      build_variant = build_variant.to_s.gsub($CATALYST_MAC_BUILD_VARIANT_PREFIX, '').to_sym
+      value = build_variants.dig(build_variant, :alt_platforms, :macOS, *keys)
+      return value unless value.nil?
     end
 
-    return build_variant_config.dig(*keys)
+    return build_variants.dig(build_variant, *keys)
   when :ios, :macos, :ios_framework, :android, :flutter
-    build_variant_config.dig(*keys)
+    build_variants.dig(build_variant, *keys)
   else
     return nil
   end
