@@ -231,19 +231,22 @@ def smf_get_tag_of_app(build_variant, build_number)
 end
 
 def smf_get_version_number(build_variant = nil, podspec_path = nil)
-  build_variant_config = build_variant.nil? ? nil : smf_config_get(build_variant)
-  UI.message("Build_variant config: #{build_variant_config}")
+  raise "Cannot find marketing version" if build_variant.nil? ?
+
   case @platform
   when :ios, :macos, :apple
-    target = build_variant_config[:target]
-    scheme = build_variant_config[:scheme]
+    target = smf_config_get(build_variant, :target)
+    scheme = smf_config_get(build_variant, :scheme)
+    configuration = smf_config_get(build_variant, :xcconfig_name, :archive)
+    configuration = 'Release' if configuration.nil?
+
     UI.message("DEBUG: scheme: #{scheme}")
     begin
       # First we try to get the version number from the plist via fastlane
       version_number = get_version_number(
           xcodeproj: "#{smf_get_project_name}.xcodeproj",
-          target: (target != nil ? target : scheme),
-          configuration: build_variant_config[:xcconfig_name].nil? ? 'Release' : build_variant_config[:xcconfig_name][:archive]
+          target: (target.nil? ? scheme : target),
+          configuration: configuration
       )
     rescue
       begin
@@ -253,12 +256,11 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
           UI.message("Fastlane was not able to determine project version. Checking now for MARKETING_VERSION in the build settings")
 
           # First we make sure that we are using the correct Xcode version
-          required_xcode_version = @smf_fastlane_config[:project][:xcode_version]
+          required_xcode_version = smf_config_get(nil, :project, :xcode_version)
           smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
 
           workspacePath = "#{smf_workspace_dir}/#{smf_get_project_name}.xcworkspace"
-          archive = build_variant_config.dig(:xcconfig_name, :archive)
-          buildConfigurationString = `xcodebuild -workspace "#{workspacePath}" -scheme "#{scheme}" -configuration "#{archive}" -showBuildSettings -json`
+          buildConfigurationString = `xcodebuild -workspace "#{workspacePath}" -scheme "#{scheme}" -configuration "#{configuration}" -showBuildSettings -json`
           buildConfigurationJSON = JSON.parse(buildConfigurationString)
           version_number = buildConfigurationJSON.first['buildSettings']["MARKETING_VERSION"]
           UI.message("Found MARKETING_VERSION in the build settings: #{version_number}")
