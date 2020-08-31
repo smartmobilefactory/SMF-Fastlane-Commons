@@ -237,7 +237,7 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
   when :ios, :macos, :apple
     target = build_variant_config[:target]
     scheme = build_variant_config[:scheme]
-
+    UI.message("DEBUG: scheme: #{scheme}")
     begin
       # First we try to get the version number from the plist via fastlane
       version_number = get_version_number(
