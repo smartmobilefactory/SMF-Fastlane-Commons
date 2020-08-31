@@ -67,7 +67,7 @@ def smf_get_appcenter_id(build_variant, platform = nil)
     )
   else
     appcenter_id = smf_config_get(build_variant, :appcenter_id)
-    appcenter_id = smf_config_get(build_variant, platform.to_sym, :appcenter_id) if unless platform.nil?
+    appcenter_id = smf_config_get(build_variant, platform.to_sym, :appcenter_id) unless platform.nil?
   end
 
   appcenter_id
@@ -231,7 +231,7 @@ def smf_get_tag_of_app(build_variant, build_number)
 end
 
 def smf_get_version_number(build_variant = nil, podspec_path = nil)
-  build_variant_config = build_variant.nil? ? nil : @smf_fastlane_config[:build_variants][build_variant.to_sym]
+  build_variant_config = build_variant.nil? ? nil : smf_config_get(build_variant)
 
   case @platform
   when :ios, :macos, :apple
