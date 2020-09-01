@@ -109,7 +109,7 @@ def _smf_possible_build_variants(remove_multi_build_variants)
   return possible_build_variants if remove_multi_build_variants == true
 
   ['Live', 'Beta', 'Alpha'].each do |kind|
-    kind_variants = build_variants.select do |variant|
+    kind_variants = possible_build_variants.select do |variant|
       variant.downcase.include? kind.downcase
     end
 
