@@ -11,7 +11,7 @@ private_lane :smf_notarize do |options|
   bundle_id = options[:bundle_id]
   username = options[:username]
   asc_provider = options[:asc_provider]
-  custom_provider  = options[:custom_provider]
+  custom_provider = options[:custom_provider]
 
 
   notarize(
