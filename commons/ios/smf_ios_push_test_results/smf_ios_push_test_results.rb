@@ -32,8 +32,4 @@ private_lane :smf_ios_push_test_results do |options|
   #   ],
   #   "majorDimension": "ROWS"
   # }
-
-  # 4)
-  # Upload the .xcresult directory(ies) (and a JSON with metadata about the build) to Dropbox (or Google Drive)
-  # This will be used in the future when our analyse gets more advanced...
 end
