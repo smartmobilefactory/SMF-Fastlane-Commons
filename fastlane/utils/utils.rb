@@ -134,7 +134,37 @@ def smf_get_build_number_of_app
   build_number
 end
 
+def smf_path_to_app_file
+
+  if !ENV['APP_NAME'].nil?
+    UI.message("Using app name: #{ENV['APP_NAME']} from Info.plist to construct .app path")
+    return smf_workspace_dir + "/build/#{ENV['APP_NAME']}.app"
+  end
+
+  app_path = ''
+
+  Dir.foreach(smf_workspace_dir + '/build') do |filename|
+
+    file_exists = filename.end_with?('.app')
+
+    if file_exists
+      app_path = smf_workspace_dir + '/build/' + filename
+      break
+    end
+  end
+
+  unless File.exist?(app_path)
+    app_path = lane_context[SharedValues::IPA_OUTPUT_PATH]
+
+    UI.message("Using \"#{app_path}\" as app_path as no file exists at the constructed path.")
+  end
+
+  app_path
+end
+
 def smf_path_to_ipa_or_app
+
+  UI.message("DEBUG_IPA: #{lane_context[SharedValues::IPA_OUTPUT_PATH]}")
 
   if !ENV['APP_NAME'].nil?
     UI.message("Using app name: #{ENV['APP_NAME']} from Info.plist to construct .app path")
