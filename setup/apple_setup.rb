@@ -73,11 +73,10 @@ private_lane :smf_super_build do |options|
     platform: platform
   )
 
-  skip_export = options[:skip_export].nil? ? false : options[:skip_export]
-
   smf_build_apple_app(
     build_variant: build_variant,
-    skip_export: skip_export,
+    skip_export: options[:skip_export],
+    skip_package_pkg: smf_config_get(build_variant,:skip_package_pkg),
     scheme: smf_config_get(build_variant, :scheme),
     should_clean_project: smf_config_get(build_variant, :should_clean_project),
     required_xcode_version: smf_config_get(nil, :project, :xcode_version),
