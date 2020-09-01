@@ -53,7 +53,7 @@ private_lane :smf_report_depencencies do |options|
       dependencyReports.push(prepare_api_data.call(report))
     when :apple
       report = smf_dependency_report_cocoapods
-      report['project_type'] = smf_is_catalyst_mac_build(build_variant) ?'macOS' : 'iOS'
+      report['project_type'] = smf_is_catalyst_mac_build(build_variant) ? 'macOS' : 'iOS'
       dependencyReports.push(prepare_api_data.call(report))
     else
       UI.message("The platform \"#{@platform}\" does not support metric reports")

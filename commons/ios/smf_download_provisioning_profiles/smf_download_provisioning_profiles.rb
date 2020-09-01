@@ -45,7 +45,7 @@ private_lane :smf_download_provisioning_profiles do |options|
   elsif (!build_variant.match(/alpha/).nil? ||
         !build_variant.match(/beta/).nil? ||
         !build_variant.match(/example/).nil?) &&
-        platform != :macos
+        platform != 'macos'
           regex = /com\.smartmobilefactory\.enterprise/
           if bundle_identifier.match(regex) != nil
             smf_download_provisioning_profile_using_match(

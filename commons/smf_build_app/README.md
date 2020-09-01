@@ -23,7 +23,7 @@ smf_build_apple_app(
     export_method: false,                                   # The Xcode archive export method to use. This needs to be set for special cases only.
     icloud_environment: "Development",                      # ("Development" or "Production"): If the app uses iCloud capabilities, this has to be set accordingly for each target.           
     workspace: <path to workspace>                          # Optional, by default the *project_name*.xcworkspace will be used
-    build_variant: alpha                                    # Used to determine catalyst platform
+    build_variant: <build_variant>                                    # Used to determine catalyst platform
 )
 
 ```
