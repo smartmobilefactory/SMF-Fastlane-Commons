@@ -240,7 +240,6 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
     configuration = smf_config_get(build_variant, :xcconfig_name, :archive)
     configuration = 'Release' if configuration.nil?
 
-    UI.message("DEBUG: scheme: #{scheme}")
     begin
       # First we try to get the version number from the plist via fastlane
       version_number = get_version_number(
