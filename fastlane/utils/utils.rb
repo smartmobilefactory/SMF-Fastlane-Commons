@@ -141,7 +141,7 @@ def smf_path_to_app_file
     return smf_workspace_dir + "/build/#{ENV['APP_NAME']}.app"
   end
 
-  app_path = ''
+  app_path = nil
 
   Dir.foreach(smf_workspace_dir + '/build') do |filename|
 
@@ -153,18 +153,10 @@ def smf_path_to_app_file
     end
   end
 
-  unless File.exist?(app_path)
-    app_path = lane_context[SharedValues::IPA_OUTPUT_PATH]
-
-    UI.message("Using \"#{app_path}\" as app_path as no file exists at the constructed path.")
-  end
-
   app_path
 end
 
 def smf_path_to_ipa_or_app
-
-  UI.message("DEBUG_IPA: #{lane_context[SharedValues::IPA_OUTPUT_PATH]}")
 
   if !ENV['APP_NAME'].nil?
     UI.message("Using app name: #{ENV['APP_NAME']} from Info.plist to construct .app path")
@@ -172,17 +164,14 @@ def smf_path_to_ipa_or_app
   end
 
   app_path = ''
-  UI.message("Available: #{`cd #{smf_workspace_dir}/build; ls`}")
-  Dir.foreach(smf_workspace_dir + '/build') do |filename|
 
-    UI.message("Looking at #{filename}")
+  Dir.foreach(smf_workspace_dir + '/build') do |filename|
     file_exists = filename.end_with?('.ipa.zip')
     file_exists = filename.end_with?('.ipa') unless file_exists
     file_exists = filename.end_with?('.app') unless file_exists
     
     if file_exists
       app_path = smf_workspace_dir + '/build/' + filename
-      UI.message("Chose: #{app_path}")
       break
     end
   end
