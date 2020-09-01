@@ -203,7 +203,6 @@ private_lane :smf_super_create_dmg_and_gatekeeper do |options|
   next unless smf_is_mac_build(build_variant)
 
   dmg_path = smf_create_dmg_from_app(
-    build_variant: build_variant,
     team_id: smf_config_get(build_variant, :team_id),
     code_signing_identity: smf_config_get(build_variant, :code_signing_identity)
   )

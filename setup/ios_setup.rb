@@ -226,7 +226,7 @@ private_lane :smf_super_upload_to_appcenter do |options|
     destinations: smf_get_appcenter_destination_groups(build_variant, destinations),
     app_id: appcenter_app_id,
     escaped_filename: build_variant_config[:scheme].gsub(' ', "\ "),
-    path_to_ipa_or_app: smf_path_to_ipa_or_app(build_variant)
+    path_to_ipa_or_app: smf_path_to_ipa_or_app
   ) if !appcenter_app_id.nil?
 end
 

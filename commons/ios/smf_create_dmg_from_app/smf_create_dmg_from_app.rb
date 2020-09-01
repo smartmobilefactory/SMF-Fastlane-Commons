@@ -1,7 +1,6 @@
 
 private_lane :smf_create_dmg_from_app do |options|
 
-  build_variant = options[:build_variant]
   team_id = options[:team_id]
   code_signing_identity = options[:code_signing_identity]
 

@@ -142,15 +142,17 @@ def smf_path_to_ipa_or_app
   end
 
   app_path = ''
-
+  UI.message("Available: #{`cd #{smf_workspace_dir}/build; ls`}")
   Dir.foreach(smf_workspace_dir + '/build') do |filename|
-  
+
+    UI.message("Looking at #{filename}")
     file_exists = filename.end_with?('.ipa.zip')
     file_exists = filename.end_with?('.ipa') unless file_exists
     file_exists = filename.end_with?('.app') unless file_exists
     
     if file_exists
       app_path = smf_workspace_dir + '/build/' + filename
+      UI.message("Chose: #{app_path}")
       break
     end
   end
