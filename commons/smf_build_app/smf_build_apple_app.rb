@@ -2,6 +2,10 @@ private_lane :smf_build_apple_app do |options|
 
   UI.important("Creating the Xcode archive")
 
+  # clean build directory
+  UI.message('Cleaning build directory')
+  `rm -rf #{smf_workspace_dir}/build`
+
   # Parameter
   skip_package_ipa = (options[:skip_export].nil? ? false : options[:skip_export])
   skip_package_pkg = (options[:skip_package_pkg].nil? ? true : options[:skip_package_pkg])
