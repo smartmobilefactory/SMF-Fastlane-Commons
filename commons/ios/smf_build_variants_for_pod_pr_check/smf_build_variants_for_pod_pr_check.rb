@@ -22,7 +22,7 @@ private_lane :smf_build_variants_for_pod_pr_check do
     matching_build_variants = [alpha_build_variant]
   end
 
-  matching_build_variants = matching_build_variants.first
+  matching_build_variants = [matching_build_variants.first]
   UI.important("Found matching build variants: #{matching_build_variants} for PR check.")
 
   matching_build_variants
