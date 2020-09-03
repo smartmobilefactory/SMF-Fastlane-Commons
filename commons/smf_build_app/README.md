@@ -1,4 +1,4 @@
-### Build iOS App
+### Build Apple App
 
 Builds the iOS/macOS app by first ensuring the correct xcode version and then using gym to actually build the app.
 
@@ -41,4 +41,3 @@ smf_build_android_app(
 )
 
 ```
-
