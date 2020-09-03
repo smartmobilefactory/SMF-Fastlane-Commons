@@ -61,7 +61,7 @@ end
 def smf_import_commons
 
   case @platform
-  when :ios, :ios_framework, :macos
+  when :ios, :ios_framework, :macos, :apple
     @fastlane_commons_dir_path = "#{smf_workspace_dir}/.fastlane-smf-commons"
   when :android
     @fastlane_commons_dir_path = "#{smf_workspace_dir}/.idea/.fastlane-smf-commons"
