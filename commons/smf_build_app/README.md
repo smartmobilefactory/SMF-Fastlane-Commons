@@ -1,6 +1,6 @@
 ### Build Apple App
 
-Builds the iOS/macOS app by first ensuring the correct xcode version and then using gym to actually build the app.
+Builds the Apple(iOS/macOS) app by first ensuring the correct xcode version and then using gym to actually build the app.
 
 NOTE: The smf_download_provisioning_profiles lane has to be called before calling this lane.
 
