@@ -246,7 +246,7 @@ lane :smf_upload_dsyms do |options|
   smf_super_upload_dsyms(options)
 end
 
-# Uplaod to Sparkle
+# Upload to Sparkle
 
 private_lane :smf_super_pipeline_upload_with_sparkle do |options|
 
