@@ -3,7 +3,7 @@ private_lane :smf_build_variants_for_pod_pr_check do |options|
   matching_build_variants = []
   all_build_variants = @smf_fastlane_config[:build_variants].keys.map(&:to_s)
 
-  # Check for alpha in build variants of hte Config.json and returns the first one found.
+  # Check for alpha in build variants of the Config.json and returns the first one found.
   alpha_build_variant = all_build_variants.detect { |variant| variant.match(/.*alpha.*/) }
 
   # If a specific build_variant has been specified in the pipeline use it instead of the other ones.
