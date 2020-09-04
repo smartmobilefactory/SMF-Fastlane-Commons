@@ -133,14 +133,7 @@ end
 ############ REPORTING LANES ############
 
 private_lane :smf_pod_super_reporting do |options|
-
-  build_variant_config = @smf_fastlane_config[:build_variants][:framework]
-
-  smf_ios_push_test_results(
-    project_name: "TODO",
-    branch: "TODO",
-    platform: "TODO"
-  )
+  smf_ios_push_test_results(options)
 end
 
 # TODO: add this in the documentation somewhere?
