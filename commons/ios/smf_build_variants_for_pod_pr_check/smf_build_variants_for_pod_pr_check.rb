@@ -14,7 +14,7 @@ private_lane :smf_build_variants_for_pod_pr_check do |options|
   if !options[:build_variant].nil?
     matching_build_variants = [options[:build_variant]] # make an array out of it
   # If there is no alpha return all build variants which contain 'example' or 'unittests'.
-  if alpha_build_variant.nil?
+  elsif alpha_build_variant.nil?
     matching_build_variants = _smf_build_variants_matching(/.*example.*/, all_build_variants)
 
     if matching_build_variants.empty?
