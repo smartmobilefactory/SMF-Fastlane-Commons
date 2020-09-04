@@ -1,9 +1,5 @@
 private_lane :smf_build_variants_for_pod_pr_check do |options|
 
-  #####
-  #TODO: Check if this works without any given paramters (pipeline: PR check)
-  #####
-
   matching_build_variants = []
   all_build_variants = @smf_fastlane_config[:build_variants].keys.map(&:to_s)
 
