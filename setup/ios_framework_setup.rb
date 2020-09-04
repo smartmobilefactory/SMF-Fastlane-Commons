@@ -56,7 +56,7 @@ end
 
 private_lane :smf_pod_super_unit_tests do |options|
 
-  build_variants_for_pr_check = smf_build_variants_for_pod_pr_check
+  build_variants_for_pr_check = smf_build_variants_for_pod_pr_check(options)
   build_variants_for_pr_check.each { |variant|
 
     build_variant_config = @smf_fastlane_config[:build_variants][variant.to_sym]
