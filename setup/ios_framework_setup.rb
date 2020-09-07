@@ -133,7 +133,16 @@ end
 ############ REPORTING LANES ############
 
 private_lane :smf_pod_super_reporting do |options|
-  smf_ios_push_test_results(options)
+
+  project_name = @smf_fastlane_config.dig(:project, :project_name)
+  build_variant_config = @smf_fastlane_config.dig(:build_variants, options[build_variant.to_sym])
+  platform = build_variant_config.dig(:platform).nil? ? 'iOS' : build_variant_config.dig(:platform)
+
+  smf_ios_push_test_results(
+    project_name: project_name,
+    branch: options[:branch_name],
+    platform: platform
+  )
 end
 
 # TODO: add this in the documentation somewhere?

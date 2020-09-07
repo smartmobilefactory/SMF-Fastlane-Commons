@@ -1,4 +1,5 @@
 $METAJSON_TEMP_FOLDERNAME = '.MetaJSON-temp'
+$XCRESULT_DIR = 'build/derivedData/Logs/Test'
 
 # Environmental variables keys
 $SMF_CHANGELOG_ENV_HTML_KEY = 'SMF_CHANGELOG_HTML'
