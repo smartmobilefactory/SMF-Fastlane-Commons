@@ -140,7 +140,7 @@ private_lane :smf_pod_super_reporting do |options|
   platform = build_variant_config.dig(:platform)
   if platform.nil?
     platform = 'iOS'
-  elif platform.include?('mac')
+  elsif platform.include?('mac')
     platform = 'macOS'
   end
 
