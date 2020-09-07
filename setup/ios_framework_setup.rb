@@ -136,7 +136,13 @@ private_lane :smf_pod_super_reporting do |options|
 
   project_name = @smf_fastlane_config.dig(:project, :project_name)
   build_variant_config = @smf_fastlane_config.dig(:build_variants, options[build_variant.to_sym])
-  platform = build_variant_config.dig(:platform).nil? ? 'iOS' : build_variant_config.dig(:platform)
+
+  platform = build_variant_config.dig(:platform)
+  if platform.nil?
+    platform = 'iOS'
+  elif platform.include?('mac')
+    platform = 'macOS'
+  end
 
   smf_ios_push_test_results(
     project_name: project_name,
