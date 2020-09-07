@@ -32,7 +32,7 @@ private_lane :smf_ios_push_test_results do |options|
   xcresult_file_names.each do |filename|
     json_result_string = `xcrun xccov view --report --json #{File.join(xcresult_dir, filename)}`
     line_coverage_scan = json_result_string.scan(/lineCoverage":([0-9.]+)/)
-    UI.message("Scan: #{line_coverage_scan}")
+
     unless line_coverage_scan.nil? || line_coverage_scan.empty?
       line_coverage_results[platform.to_s] = line_coverage_scan.first.first
     end
