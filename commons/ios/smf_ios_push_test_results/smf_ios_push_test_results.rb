@@ -36,8 +36,8 @@ private_lane :smf_ios_push_test_results do |options|
     lines_of_code_scan = json_result_string.scan(/coveredLines":([0-9]+)/)
 
     entry_data = {
-      :branch => branch
-     # :platform => platform.to_s
+      :branch => branch,
+      :platform => platform.to_s
     }
 
     unless line_coverage_scan.nil? || line_coverage_scan.empty?
