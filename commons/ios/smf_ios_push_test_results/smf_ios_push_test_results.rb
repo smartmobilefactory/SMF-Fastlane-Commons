@@ -51,10 +51,10 @@ private_lane :smf_ios_push_test_results do |options|
   client_secret = ENV[$REPORTING_GOOGLE_SHEETS_CLIENT_SECRET_KEY]
   refresh_token = ENV[$REPORTING_GOOGLE_SHEETS_REFRESH_TOKEN_KEY]
 
-  form_data = "client_id=#{client_id}&client_secret=#{client_secret}&refresh_token=#{refresh_token}&grant_type=refresh_token"
+  data = "client_id=#{client_id}&client_secret=#{client_secret}&refresh_token=#{refresh_token}&grant_type=refresh_token"
 
   request = Net::HTTP::Post.new(access_token_uri)
-  request.set_form_data(form_data)
+  request.body = data
 
   response = Net::HTTP.start(access_token_uri.hostname, access_token_uri.port, use_ssl: true ) do |client|
     client.request(request)
