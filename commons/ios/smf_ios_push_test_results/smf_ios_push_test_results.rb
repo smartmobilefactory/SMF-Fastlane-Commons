@@ -46,6 +46,28 @@ private_lane :smf_ios_push_test_results do |options|
   # https://accounts.google.com/o/oauth2/token + params
   # Parse the result to get a valid access_token
   # curl -d "client_id=$client_id&client_secret=$client_secret&refresh_token=$refresh_token&grant_type=refresh_token" https://accounts.google.com/o/oauth2/token
+  access_token_uri = URI.parse('https://accounts.google.com/o/oauth2/token')
+  client_id = ENV[$REPORTING_GOOGLE_SHEETS_CLIENT_ID_KEY]
+  client_secret = ENV[$REPORTING_GOOGLE_SHEETS_CLIENT_SECRET_KEY]
+  refresh_token = ENV[$REPORTING_GOOGLE_SHEETS_REFRESH_TOKEN_KEY]
+
+  form_data = "client_id=#{client_id}&client_secret=#{client_secret}&refresh_token=#{refresh_token}&grant_type=refresh_token"
+
+  request = Net::HTTP::Post.new(access_token_uri)
+  request.use_ssl = true
+  request.set_form_data(form_data)
+
+  response = Net::HTTP.start(access_token_uri.hostname, access_token_uri.port) do |client|
+    client.request(request)
+  end
+
+  case response
+  when Net::HTTPSuccess
+    UI.message("Received: #{response.body}")
+  else
+    UI.message("Error fetching refres htoken for google api: #{response.message}")
+    raise 'Error fetching refresh token'
+  end
 
   # 3)
   # Using the new access_token,
