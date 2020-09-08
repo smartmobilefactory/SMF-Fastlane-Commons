@@ -1,11 +1,13 @@
+require 'date'
+
 private_lane :smf_ios_push_test_results do |options|
 
   project_name = options[:project_name]
   branch = options[:branch]
   platform = options[:platform]
 
-  UI.important("Upcoming feature...")
-=begin
+  sheet_entries = []
+
   ### 1)
   # Use xcode to generate a json report from the .xcresult
   # Depending on the configuration multiple test results could be available
@@ -34,13 +36,20 @@ private_lane :smf_ios_push_test_results do |options|
     json_result_string = `xcrun xccov view --report --json #{File.join(xcresult_dir, filename)}`
     line_coverage_scan = json_result_string.scan(/lineCoverage":([0-9.]+)/)
 
-    unless line_coverage_scan.nil? || line_coverage_scan.empty?
-      line_coverage_results[platform.to_s] = line_coverage_scan.first.first
-    end
+    next if line_coverage_scan.nil? || line_coverage_scan.empty?
+
+    entry_data = {
+      :branch => branch,
+      :platform => platform.to_s,
+      :test_coverage => line_coverage_scan.first.first.to_f
+    }
+
+    new_entry = _smf_create_spreadsheet_entry(project_name, entry_data)
+    sheet_entries.push(new_entry) unless new_entry.nil?
   end
 
   UI.message("Extracted: #{line_coverage_results}")
-=end
+
   # 2)
   # Refresh Access Token for the Google API using the dedicated endpoint and credentials available in Jenkins
   # POST:
@@ -68,10 +77,14 @@ private_lane :smf_ios_push_test_results do |options|
     client.request(request)
   end
 
-  UI.message("RESPONSE: #{response.body}")
   case response
   when Net::HTTPSuccess
-    UI.message("Received: #{response.body}")
+    begin
+      body = JSON.parse(response.body)
+      bearer_token = body.dig('access_token')
+    rescue
+      raise 'Error parsing response body'
+    end
   else
     UI.message("Error fetching refresh token for google api: #{response.message}")
     raise 'Error fetching refresh token'
@@ -90,4 +103,63 @@ private_lane :smf_ios_push_test_results do |options|
   #   ],
   #   "majorDimension": "ROWS"
   # }
+  sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_DOC_ID_KEY]
+  sheet_name = $REPORTING_GOOGLE_SHEETS_SHEET_NAME
+  sheet_uri = URI.parse"https://sheets.googleapis.com/v4/spreadsheets/#{sheet_id}/values/#{sheet_name}:append"
+
+  request = Net::HTTP::Post.new(sheet_uri)
+  request.set_form_data('valueInputOption=USER_ENTERED' => 'USER_ENTERED')
+  request['Authorization'] = "Bearer #{bearer_token}"
+  request['Content-Type'] = 'application/json'
+
+  values = []
+
+  sheet_entries.each do |entry|
+    values.push(_smf_spreadsheet_entry_to_line(entry))
+  end
+
+  data = {
+    'values' => values,
+    'majorDimension' => 'ROWS'
+  }
+
+  request.body = data.to_json
+
+  response = Net::HTTP.start(sheet_uri.hostname, sheet_uri.port, use_ssl: true ) do |client|
+    client.request(request)
+  end
+
+  UI.message("DEBUG: #{data}")
+  case response
+  when Net::HTTPSuccess
+    UI.message("Successfully added new data to spread sheet")
+  else
+    UI.message("Error uploading new data to spreadsheet: #{response.message}")
+    raise 'Error uploading new data to spreadsheet'
+  end
+
+end
+
+def _smf_spreadsheet_entry_to_line(entry)
+  [entry[:date], entry[:repo], entry[:branch], entry[:platform], entry[:test_coverage]]
+end
+
+def _smf_create_spreadsheet_entry(repo, data)
+  return nil if repo.nil?
+
+  today = Date.today.to_s
+  entry = {
+    :date => today,
+    :repo => repo
+  }
+
+  entry[:branch] = _smf_unwrap_value(data[:branch])
+  entry[:platform] = _smf_unwrap_value(data[:platform])
+  entry[:test_coverage] = _smf_unwrap_value(data[:test_coverage])
+
+  entry
+end
+
+def _smf_unwrap_value(value)
+  value.nil? ? '' : value
 end
