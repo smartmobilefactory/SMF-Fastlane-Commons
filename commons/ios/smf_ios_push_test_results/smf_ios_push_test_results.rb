@@ -33,9 +33,8 @@ private_lane :smf_ios_push_test_results do |options|
   xcresult_file_names.each do |filename|
     json_result_string = `xcrun xccov view --report --json #{File.join(xcresult_dir, filename)}`
     line_coverage_scan = json_result_string.scan(/lineCoverage":([0-9.]+)/)
-    #lines_of_code_scan = json_result_string.scan(/lineCoverage":([0-9.]+)/)
-    UI.message(json_result_string)
-    raise "debugg"
+    lines_of_code_scan = json_result_string.scan(/coveredLines":([0-9]+)/)
+
     entry_data = {
       :branch => branch,
       :platform => platform.to_s
@@ -45,7 +44,9 @@ private_lane :smf_ios_push_test_results do |options|
       entry_data[:test_coverage] = line_coverage_scan.first.first.to_f
     end
 
-
+    unless lines_of_code_scan.nil? || lines_of_code_scan.empty?
+      entry_data[:covered_lines] = lines_of_code_scan.first.first.to_i
+    end
 
     new_entry = _smf_create_spreadsheet_entry(project_name, entry_data)
     sheet_entries.push(new_entry) unless new_entry.nil?
@@ -137,7 +138,7 @@ private_lane :smf_ios_push_test_results do |options|
 end
 
 def _smf_spreadsheet_entry_to_line(entry)
-  [entry[:date], entry[:repo], entry[:branch], entry[:platform], entry[:test_coverage]]
+  [entry[:date], entry[:repo], entry[:branch], entry[:platform], entry[:test_coverage], entry[:covered_lines]]
 end
 
 def _smf_create_spreadsheet_entry(repo, data)
@@ -152,6 +153,7 @@ def _smf_create_spreadsheet_entry(repo, data)
   entry[:branch] = _smf_unwrap_value(data[:branch])
   entry[:platform] = _smf_unwrap_value(data[:platform])
   entry[:test_coverage] = _smf_unwrap_value(data[:test_coverage])
+  entry[:covered_lines] = _smf_unwrap_value(data[:covered_lines])
 
   entry
 end
