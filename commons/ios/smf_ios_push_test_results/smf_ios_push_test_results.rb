@@ -52,6 +52,7 @@ private_lane :smf_ios_push_test_results do |options|
   refresh_token = ENV[$REPORTING_GOOGLE_SHEETS_REFRESH_TOKEN_KEY]
 
   request = Net::HTTP::Get.new(access_token_uri)
+  request['Content-Type'] = 'application/x-www-form-urlencoded'
   request.set_form_data(
     'client_id' => client_id,
     'client_secret' => client_secret,
@@ -63,11 +64,12 @@ private_lane :smf_ios_push_test_results do |options|
     client.request(request)
   end
 
+  UI.message("RESPONSE: #{response}")
   case response
   when Net::HTTPSuccess
     UI.message("Received: #{response.body}")
   else
-    UI.message("Error fetching refres htoken for google api: #{response.message}")
+    UI.message("Error fetching refresh token for google api: #{response.message}")
     raise 'Error fetching refresh token'
   end
 
