@@ -30,8 +30,6 @@ private_lane :smf_ios_push_test_results do |options|
     next
   end
 
-  line_coverage_results = {}
-
   xcresult_file_names.each do |filename|
     json_result_string = `xcrun xccov view --report --json #{File.join(xcresult_dir, filename)}`
     line_coverage_scan = json_result_string.scan(/lineCoverage":([0-9.]+)/)
@@ -48,8 +46,6 @@ private_lane :smf_ios_push_test_results do |options|
     sheet_entries.push(new_entry) unless new_entry.nil?
   end
 
-  UI.message("Extracted: #{line_coverage_results}")
-
   # 2)
   # Refresh Access Token for the Google API using the dedicated endpoint and credentials available in Jenkins
   # POST:
@@ -60,10 +56,6 @@ private_lane :smf_ios_push_test_results do |options|
   client_id = ENV[$REPORTING_GOOGLE_SHEETS_CLIENT_ID_KEY]
   client_secret = ENV[$REPORTING_GOOGLE_SHEETS_CLIENT_SECRET_KEY]
   refresh_token = ENV[$REPORTING_GOOGLE_SHEETS_REFRESH_TOKEN_KEY]
-
-  UI.message("client_id is nil #{client_id.nil?}")
-  UI.message("client_secret is nil #{client_secret.nil?}")
-  UI.message("refresh_token is nil #{refresh_token.nil?}")
 
   request = Net::HTTP::Post.new(access_token_uri)
   request.set_form_data(
@@ -108,9 +100,10 @@ private_lane :smf_ios_push_test_results do |options|
   sheet_uri = URI.parse"https://sheets.googleapis.com/v4/spreadsheets/#{sheet_id}/values/#{sheet_name}:append"
 
   request = Net::HTTP::Post.new(sheet_uri)
-  request.set_form_data('valueInputOption=USER_ENTERED' => 'USER_ENTERED')
+  request.content_type = 'application/json'
+  request.set_form_data('valueInputOption' => 'USER_ENTERED')
   request['Authorization'] = "Bearer #{bearer_token}"
-  request['Content-Type'] = 'application/json'
+
 
   values = []
 
@@ -120,7 +113,7 @@ private_lane :smf_ios_push_test_results do |options|
 
   data = {
     'values' => values,
-    'majorDimension' => 'ROWS'
+    'majorDimension' =>'ROWS'
   }
 
   request.body = data.to_json
@@ -129,7 +122,7 @@ private_lane :smf_ios_push_test_results do |options|
     client.request(request)
   end
 
-  UI.message("DEBUG: #{data}")
+  UI.message("DEBUG: #{data.to_json}")
   case response
   when Net::HTTPSuccess
     UI.message("Successfully added new data to spread sheet")
