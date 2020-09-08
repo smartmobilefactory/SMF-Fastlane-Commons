@@ -33,14 +33,19 @@ private_lane :smf_ios_push_test_results do |options|
   xcresult_file_names.each do |filename|
     json_result_string = `xcrun xccov view --report --json #{File.join(xcresult_dir, filename)}`
     line_coverage_scan = json_result_string.scan(/lineCoverage":([0-9.]+)/)
-
-    next if line_coverage_scan.nil? || line_coverage_scan.empty?
-
+    #lines_of_code_scan = json_result_string.scan(/lineCoverage":([0-9.]+)/)
+    UI.message(json_result_string)
+    raise "debugg"
     entry_data = {
       :branch => branch,
-      :platform => platform.to_s,
-      :test_coverage => line_coverage_scan.first.first.to_f
+      :platform => platform.to_s
     }
+
+    unless line_coverage_scan.nil? || line_coverage_scan.empty?
+      entry_data[:test_coverage] = line_coverage_scan.first.first.to_f
+    end
+
+
 
     new_entry = _smf_create_spreadsheet_entry(project_name, entry_data)
     sheet_entries.push(new_entry) unless new_entry.nil?
@@ -120,7 +125,7 @@ private_lane :smf_ios_push_test_results do |options|
   response = Net::HTTP.start(sheet_uri.hostname, sheet_uri.port, use_ssl: true ) do |client|
     client.request(request)
   end
-  
+
   case response
   when Net::HTTPSuccess
     UI.message("Successfully added new data to spread sheet")
