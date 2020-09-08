@@ -97,7 +97,7 @@ private_lane :smf_ios_push_test_results do |options|
   # }
   sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_DOC_ID_KEY]
   sheet_name = $REPORTING_GOOGLE_SHEETS_SHEET_NAME
-  sheet_uri = URI.parse"https://sheets.googleapis.com/v4/spreadsheets/#{sheet_id}/values/#{sheet_name}:append"
+  sheet_uri = URI.parse"https://sheets.googleapis.com/v4/spreadsheets/#{sheet_id}/values/#{sheet_name}:append?valueInputOption=USER_ENTERED"
 
   request = Net::HTTP::Post.new(sheet_uri)
   request.content_type = 'application/json'
@@ -117,7 +117,7 @@ private_lane :smf_ios_push_test_results do |options|
     'majorDimension' =>'ROWS'
   }
 
-  request.body = "valueInputOption=USER_ENTERED&#{data.to_json}"
+  request.body = data.to_json
 
   response = Net::HTTP.start(sheet_uri.hostname, sheet_uri.port, use_ssl: true ) do |client|
     client.request(request)
