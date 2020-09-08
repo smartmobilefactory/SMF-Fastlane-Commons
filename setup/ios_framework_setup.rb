@@ -151,7 +151,6 @@ private_lane :smf_pod_super_reporting do |options|
   )
 end
 
-# TODO: add this in the documentation somewhere?
 lane :smf_pod_reporting do |options|
   smf_pod_super_reporting(options)
 end
