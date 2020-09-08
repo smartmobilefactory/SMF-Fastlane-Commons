@@ -52,8 +52,7 @@ private_lane :smf_ios_push_test_results do |options|
   client_secret = ENV[$REPORTING_GOOGLE_SHEETS_CLIENT_SECRET_KEY]
   refresh_token = ENV[$REPORTING_GOOGLE_SHEETS_REFRESH_TOKEN_KEY]
 
-  request = Net::HTTP::Get.new(access_token_uri)
-  request['Content-Type'] = 'application/x-www-form-urlencoded'
+  request = Net::HTTP::Post.new(access_token_uri)
   request.set_form_data(
     'client_id' => client_id,
     'client_secret' => client_secret,
