@@ -8,12 +8,6 @@ private_lane :smf_ios_push_test_results do |options|
 
   sheet_entries = []
 
-  ### 1)
-  # Use xcode to generate a json report from the .xcresult
-  # Depending on the configuration multiple test results could be available
-  # QUESTION FOR THOMAS: is this necessary? Could we limit to one platform?
-  # `xcrun xccov view --report --json Test-Example-iOS-2020.08.28_12-02-13-+0200.xcresult`
-  # For each result, extract the test coverage (first occurence of 'lineCoverage'): /lineCoverage":([0-9.]+)/
   xcresult_dir = File.join(smf_workspace_dir, $XCRESULT_DIR)
 
   unless Dir.exist?(xcresult_dir)
@@ -52,55 +46,8 @@ private_lane :smf_ios_push_test_results do |options|
     sheet_entries.push(new_entry) unless new_entry.nil?
   end
 
-  # 2)
-  # Refresh Access Token for the Google API using the dedicated endpoint and credentials available in Jenkins
-  # POST:
-  # https://accounts.google.com/o/oauth2/token + params
-  # Parse the result to get a valid access_token
-  # curl -d "client_id=$client_id&client_secret=$client_secret&refresh_token=$refresh_token&grant_type=refresh_token" https://accounts.google.com/o/oauth2/token
-  access_token_uri = URI.parse('https://accounts.google.com/o/oauth2/token')
-  client_id = ENV[$REPORTING_GOOGLE_SHEETS_CLIENT_ID_KEY]
-  client_secret = ENV[$REPORTING_GOOGLE_SHEETS_CLIENT_SECRET_KEY]
-  refresh_token = ENV[$REPORTING_GOOGLE_SHEETS_REFRESH_TOKEN_KEY]
+  bearer_token = _smf_get_google_api_bearer_token
 
-  request = Net::HTTP::Post.new(access_token_uri)
-  request.set_form_data(
-    'client_id' => client_id,
-    'client_secret' => client_secret,
-    'refresh_token' => refresh_token,
-    'grant_type' => 'refresh_token'
-  )
-
-  response = Net::HTTP.start(access_token_uri.hostname, access_token_uri.port, use_ssl: true ) do |client|
-    client.request(request)
-  end
-
-  case response
-  when Net::HTTPSuccess
-    begin
-      body = JSON.parse(response.body)
-      bearer_token = body.dig('access_token')
-    rescue
-      raise 'Error parsing response body'
-    end
-  else
-    UI.message("Error fetching refresh token for google api: #{response.message}")
-    raise 'Error fetching refresh token'
-  end
-
-  # 3)
-  # Using the new access_token,
-  # Add the code coverage (as well as some other information) to the Google Sheets
-  # POST:
-  # https://sheets.googleapis.com/v4/spreadsheets/1QsrW4O-S06i7YGkQ1QGWDsiw17lXqifXzl1xAh89v_4/values/Sheet1!A1:F1:append?valueInputOption=USER_ENTERED
-  # {
-  #   "values": [
-  #     # Date         Repo          Branch   Platform  Test Coverage
-  #     ["2020-04-28", "HiDrive_iOS-SyncFramework", "master", "iOS", 41]
-  #     ["2020-04-28", "HiDrive_iOS-SyncFramework", "master", "macOS", 41]
-  #   ],
-  #   "majorDimension": "ROWS"
-  # }
   sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_DOC_ID_KEY]
   sheet_name = $REPORTING_GOOGLE_SHEETS_SHEET_NAME
   sheet_uri = URI.parse"https://sheets.googleapis.com/v4/spreadsheets/#{sheet_id}/values/#{sheet_name}:append?valueInputOption=USER_ENTERED"
@@ -135,6 +82,38 @@ private_lane :smf_ios_push_test_results do |options|
     raise 'Error uploading new data to spreadsheet'
   end
 
+end
+
+def _smf_get_google_api_bearer_token
+  access_token_uri = URI.parse('https://accounts.google.com/o/oauth2/token')
+  client_id = ENV[$REPORTING_GOOGLE_SHEETS_CLIENT_ID_KEY]
+  client_secret = ENV[$REPORTING_GOOGLE_SHEETS_CLIENT_SECRET_KEY]
+  refresh_token = ENV[$REPORTING_GOOGLE_SHEETS_REFRESH_TOKEN_KEY]
+
+  request = Net::HTTP::Post.new(access_token_uri)
+  request.set_form_data(
+    'client_id' => client_id,
+    'client_secret' => client_secret,
+    'refresh_token' => refresh_token,
+    'grant_type' => 'refresh_token'
+  )
+
+  response = Net::HTTP.start(access_token_uri.hostname, access_token_uri.port, use_ssl: true ) do |client|
+    client.request(request)
+  end
+
+  case response
+  when Net::HTTPSuccess
+    begin
+      body = JSON.parse(response.body)
+      return body.dig('access_token')
+    rescue
+      raise 'Error parsing response body'
+    end
+  else
+    UI.message("Error fetching refresh token for google api: #{response.message}")
+    raise 'Error fetching refresh token'
+  end
 end
 
 def _smf_spreadsheet_entry_to_line(entry)
