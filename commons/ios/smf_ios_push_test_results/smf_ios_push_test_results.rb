@@ -5,6 +5,7 @@ private_lane :smf_ios_push_test_results do |options|
   platform = options[:platform]
 
   UI.important("Upcoming feature...")
+=begin
   ### 1)
   # Use xcode to generate a json report from the .xcresult
   # Depending on the configuration multiple test results could be available
@@ -39,7 +40,7 @@ private_lane :smf_ios_push_test_results do |options|
   end
 
   UI.message("Extracted: #{line_coverage_results}")
-
+=end
   # 2)
   # Refresh Access Token for the Google API using the dedicated endpoint and credentials available in Jenkins
   # POST:
