@@ -101,8 +101,10 @@ private_lane :smf_ios_push_test_results do |options|
 
   request = Net::HTTP::Post.new(sheet_uri)
   request.content_type = 'application/json'
+  request["Accept"] = 'application/json'
   request['Authorization'] = "Bearer #{bearer_token}"
 
+  UI.message("Token: #{bearer_token}")
 
   values = []
 
