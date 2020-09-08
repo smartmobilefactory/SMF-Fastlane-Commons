@@ -54,7 +54,7 @@ private_lane :smf_upload_with_sparkle do |options|
     sh("hdiutil detach /Volumes/#{app_name}")
   else
     sparkle_xml_path = "#{smf_workspace_dir}/build/#{sparkle_xml_name}"
-    info_plist_path = File.join(smf_path_to_ipa_or_app(build_variant), '/Contents/Info.plist').shellescape
+    info_plist_path = File.join(smf_path_to_ipa_or_app, '/Contents/Info.plist').shellescape
     _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, sparkle_xml_path)
   end
 

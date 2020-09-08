@@ -14,7 +14,7 @@ end
 def smf_import_commons
 
   case @platform
-  when :ios, :ios_framework, :macos
+  when :ios, :ios_framework, :macos, :apple
     @fastlane_commons_dir_path = "#{smf_workspace_dir}/.fastlane-smf-commons"
   when :android
     @fastlane_commons_dir_path = "#{smf_workspace_dir}/.idea/.fastlane-smf-commons"
@@ -39,53 +39,32 @@ def smf_import_commons
 
   case @platform
   when :ios
-    ios_setup_file = "#{@fastlane_commons_dir_path}/setup/ios_setup.rb"
-    if File.exist?(ios_setup_file)
-      import(ios_setup_file)
-    else
-      raise "Can't find ios_setup file at #{ios_setup_file}"
-    end
-    UI.message('Imported ios release file.')
-
+    setup_file_path = "#{@fastlane_commons_dir_path}/setup/ios_setup.rb"
   when :ios_framework
-    pod_setup_file = "#{@fastlane_commons_dir_path}/setup/ios_framework_setup.rb"
-    if File.exist?(pod_setup_file)
-      import(pod_setup_file)
-    else
-      raise "Can't find pod_setup file at #{pod_setup_file}"
-    end
-    UI.message('Imported pod release file.')
-
+    setup_file_path = "#{@fastlane_commons_dir_path}/setup/ios_framework_setup.rb"
+  when :apple
+    setup_file_path = "#{@fastlane_commons_dir_path}/setup/apple_setup.rb"
   when :macos
-    macos_setup_file = "#{@fastlane_commons_dir_path}/setup/macos_setup.rb"
-    if File.exist?(macos_setup_file)
-      import(macos_setup_file)
-    else
-      raise "Can't find macos_setup file at #{macos_setup_file}"
-    end
-    UI.message('Imported macos release file.')
-
+    setup_file_path = "#{@fastlane_commons_dir_path}/setup/macos_setup.rb"
   when :android
-    android_setup_file = "#{@fastlane_commons_dir_path}/setup/android_setup.rb"
-    if File.exist?(android_setup_file)
-      import(android_setup_file)
-    else
-      raise "Can't find android_setup file at #{android_setup_file}"
-    end
-    UI.message('Imported android release file.')
-
+    setup_file_path = "#{@fastlane_commons_dir_path}/setup/android_setup.rb"
   when :flutter
-    flutter_setup_file = "#{@fastlane_commons_dir_path}/setup/flutter_setup.rb"
-    if File.exist?(flutter_setup_file)
-      import(flutter_setup_file)
-    else
-      raise "Can't find flutter_setup file at #{flutter_setup_file}"
-    end
-    UI.message('Imported flutter setup file.')
+    setup_file_path = "#{@fastlane_commons_dir_path}/setup/flutter_setup.rb"
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
   end
+
+  _smf_import_setup_file_at(setup_file_path)
+end
+
+def _smf_import_setup_file_at(path)
+  if File.exist?(path)
+    import(path)
+  else
+    raise "Can't find setup file at #{path}"
+  end
+  UI.message("Imported setup file for #{@platform.to_s}.")
 end
 
 # Returns the path to the Config.json
@@ -144,7 +123,7 @@ error do |lane, exception, options|
   end
   
   case @platform
-  when :ios, :macos, :android, :flutter
+  when :ios, :macos, :android, :flutter, :apple
     UI.message('Handling exception for iOS/macOS/android/flutter.')
     name = smf_get_default_name_of_app(build_variant)
 

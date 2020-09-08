@@ -67,7 +67,7 @@ private_lane :smf_super_build do |options|
     force: build_variant_config.dig(:match, :force)
   )
 
-  smf_build_ios_app(
+  smf_build_apple_app(
     skip_export: options[:skip_export].nil? ? false : options[:skip_export],
     scheme: build_variant_config[:scheme],
     should_clean_project: build_variant_config[:should_clean_project],
@@ -140,7 +140,7 @@ private_lane :smf_super_report do |options|
 
   build_variant = options[:build_variant]
 
-  smf_report_metrics(build_variant: build_variant, meta_db_project_name: meta_db_project_name)
+  smf_report_metrics(build_variant: build_variant, smf_get_meta_db_project_name: smf_get_meta_db_project_name)
 end
 
 lane :smf_report do |options|
@@ -226,7 +226,7 @@ private_lane :smf_super_upload_to_appcenter do |options|
     destinations: smf_get_appcenter_destination_groups(build_variant, destinations),
     app_id: appcenter_app_id,
     escaped_filename: build_variant_config[:scheme].gsub(' ', "\ "),
-    path_to_ipa_or_app: smf_path_to_ipa_or_app(build_variant)
+    path_to_ipa_or_app: smf_path_to_ipa_or_app
   ) if !appcenter_app_id.nil?
 end
 

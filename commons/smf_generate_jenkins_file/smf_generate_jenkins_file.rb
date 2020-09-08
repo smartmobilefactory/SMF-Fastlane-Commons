@@ -14,6 +14,7 @@ CUSTOM_IOS_CREDENTIALS = [
 IOS_APP_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_iOS.template'
 POD_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_iOS_Framework.template'
 MACOS_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_macOS.template'
+APPLE_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Apple.template'
 
 # Android Templates
 ANDROID_APP_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Android.template'
@@ -30,7 +31,8 @@ private_lane :smf_generate_jenkins_file do |options|
 
   jenkins_file_template_path = custom_jenkinsfile_template.nil? ? _smf_jenkins_file_template_path : custom_jenkinsfile_template
   jenkinsFileData = File.read(jenkins_file_template_path)
-  possible_build_variants = remove_multibuild_variants ? @smf_fastlane_config[:build_variants].keys.map(&:to_s) : _smf_possible_build_variants
+  possible_build_variants = _smf_possible_build_variants(remove_multibuild_variants)
+  UI.message("Generated build_variants: #{possible_build_variants}")
   jenkinsfile_path = custom_jenkinsfile_path.nil? ? "#{smf_workspace_dir}/Jenkinsfile" : custom_jenkinsfile_path
 
   UI.message("Generating Jenkinsfile with template at: #{jenkins_file_template_path}")
@@ -67,6 +69,8 @@ def _smf_jenkins_file_template_path
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{POD_TEMPLATE_JENKINS_FILE}"
   when :macos
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{MACOS_TEMPLATE_JENKINS_FILE}"
+  when :apple
+    path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{APPLE_TEMPLATE_JENKINS_FILE}"
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
@@ -75,24 +79,50 @@ def _smf_jenkins_file_template_path
   path
 end
 
-def _smf_possible_build_variants
+def _smf_build_variant_platform_prefix_mapping(platform)
+  case platform.to_s
+  when 'macOS'
+    return $CATALYST_MAC_BUILD_VARIANT_PREFIX
+  end
+
+  nil
+end
+
+def _smf_possible_build_variants(remove_multi_build_variants)
   build_variants = @smf_fastlane_config[:build_variants].keys.map(&:to_s)
+  possible_build_variants = []
+
+  # check if the project is a catalyst project and generate build_variants for every
+  # given platform
+  build_variants.each do |build_variant|
+    alt_platforms = @smf_fastlane_config.dig(:build_variants, build_variant.to_sym, :alt_platforms)
+
+    possible_build_variants.push(build_variant)
+    next if alt_platforms.nil?
+
+    alt_platforms.each_key do |platform|
+      build_variant_prefix = _smf_build_variant_platform_prefix_mapping(platform)
+      possible_build_variants.push("#{build_variant_prefix}#{build_variant}")
+    end
+  end
+
+  return possible_build_variants if remove_multi_build_variants == true
 
   ['Live', 'Beta', 'Alpha'].each do |kind|
-    kind_variants = build_variants.select do |variant|
+    kind_variants = possible_build_variants.select do |variant|
       variant.downcase.include? kind.downcase
     end
 
-    build_variants.insert(0, kind) if kind_variants.length > 1
+    possible_build_variants.insert(0, kind) if kind_variants.length > 1
   end
 
-  build_variants
+  possible_build_variants
 end
 
 def _smf_insert_custom_credentials(jenkinsFile)
   jenkinsFileData = jenkinsFile
   case @platform
-  when :ios, :macos
+  when :ios, :macos, :apple
     for custom_credential in CUSTOM_IOS_CREDENTIALS
       if @smf_fastlane_config[:project][:custom_credentials] && @smf_fastlane_config[:project][:custom_credentials][custom_credential.to_sym]
         custom_credential_key = @smf_fastlane_config[:project][:custom_credentials][custom_credential.to_sym]

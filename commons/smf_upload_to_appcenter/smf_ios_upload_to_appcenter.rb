@@ -5,11 +5,11 @@ private_lane :smf_ios_upload_to_appcenter do |options|
   app_id = options[:app_id]
   escaped_filename = options[:escaped_filename]
   path_to_ipa_or_app = options[:path_to_ipa_or_app]
-  is_mac_app = !options[:is_mac_app].nil? ? options[:is_mac_app] : false
+  is_mac_app = options[:is_mac_app]
   destinations = options[:destinations]
-  sparkle_xml_name = options[:sparkle_xml_name]
   
   app_id, app_name, owner_name, owner_id = smf_appcenter_get_app_details(app_id)
+
   smf_upload_to_appcenter_precheck(
     app_name: app_name,
     owner_name: owner_name,

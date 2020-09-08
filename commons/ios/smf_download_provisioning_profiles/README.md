@@ -1,6 +1,6 @@
 ### Fastlane Match Provisioning Profile Handler
 Fastlane match handles the provisioning profiles for each app. This lane is used to download and setup the correct profiles and certificates 
-to be used for building the app with the smf_build_ios_app lane.
+to be used for building the app with the smf_build_apple_app lane.
 
 There are basically two cases for the match call:
 
@@ -23,8 +23,9 @@ smf_download_provisioning_profiles(
   match_type: "appstore",                                                           # The type can be one of the following values: "appstore", "adhoc", "development", "enterprise"
   extensions_suffixes: <???>,                                                       # Undocumented property??
   build_variant: "alpha",                                                           # the build variant of the current build
-  template_name: "Contact Note Field Access beta"                                   # Entitlement that can be choosen while creating a Provisioning Profile
-  force: false                                                                      # Optional: Renew the provisioning profiles every time you run match
+  template_name: "Contact Note Field Access beta",                                  # Entitlement that can be choosen while creating a Provisioning Profile
+  force: false,                                                                     # Optional: Renew the provisioning profiles every time you run match
+  platform: 'ios'                                                                   # Optional: the platform, either 'ios' or 'macos', defaults to :ios  
 )
 ```
 #### Special Parameter Infos:

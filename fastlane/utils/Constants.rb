@@ -55,3 +55,5 @@ $CHANGELOG_TEMP_FILE = 'temp_changelog.txt'
 $CHANGELOG_TEMP_FILE_HTML = 'temp_changelog.html'
 
 $POD_DEFAULT_VARIANTS = ['patch', 'minor', 'major', 'current', 'breaking', 'internal']
+
+$CATALYST_MAC_BUILD_VARIANT_PREFIX = 'macOS_'
