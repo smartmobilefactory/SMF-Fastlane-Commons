@@ -54,10 +54,9 @@ private_lane :smf_ios_push_test_results do |options|
   form_data = "client_id=#{client_id}&client_secret=#{client_secret}&refresh_token=#{refresh_token}&grant_type=refresh_token"
 
   request = Net::HTTP::Post.new(access_token_uri)
-  request.use_ssl = true
   request.set_form_data(form_data)
 
-  response = Net::HTTP.start(access_token_uri.hostname, access_token_uri.port) do |client|
+  response = Net::HTTP.start(access_token_uri.hostname, access_token_uri.port, use_ssl: true ) do |client|
     client.request(request)
   end
 
