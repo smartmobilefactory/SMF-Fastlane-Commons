@@ -104,8 +104,6 @@ private_lane :smf_ios_push_test_results do |options|
   request["Accept"] = 'application/json'
   request['Authorization'] = "Bearer #{bearer_token}"
 
-  UI.message("Token: #{bearer_token}")
-
   values = []
 
   sheet_entries.each do |entry|
@@ -122,8 +120,7 @@ private_lane :smf_ios_push_test_results do |options|
   response = Net::HTTP.start(sheet_uri.hostname, sheet_uri.port, use_ssl: true ) do |client|
     client.request(request)
   end
-
-  UI.message("DEBUG: #{data.to_json}")
+  
   case response
   when Net::HTTPSuccess
     UI.message("Successfully added new data to spread sheet")
