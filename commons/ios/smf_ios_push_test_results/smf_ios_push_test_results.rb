@@ -52,6 +52,10 @@ private_lane :smf_ios_push_test_results do |options|
   client_secret = ENV[$REPORTING_GOOGLE_SHEETS_CLIENT_SECRET_KEY]
   refresh_token = ENV[$REPORTING_GOOGLE_SHEETS_REFRESH_TOKEN_KEY]
 
+  UI.message("client_id is nil #{client_id.nil?}")
+  UI.message("client_secret is nil #{client_secret.nil?}")
+  UI.message("refresh_token is nil #{refresh_token.nil?}")
+
   request = Net::HTTP::Post.new(access_token_uri)
   request.set_form_data(
     'client_id' => client_id,
@@ -64,7 +68,7 @@ private_lane :smf_ios_push_test_results do |options|
     client.request(request)
   end
 
-  UI.message("RESPONSE: #{response}")
+  UI.message("RESPONSE: #{response.body}")
   case response
   when Net::HTTPSuccess
     UI.message("Received: #{response.body}")
