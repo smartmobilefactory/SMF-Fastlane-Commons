@@ -33,7 +33,7 @@ private_lane :smf_super_build do |options|
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
-  smf_build_ios_app(
+  smf_build_apple_app(
       skip_export: options[:skip_export].nil? ? false : options[:skip_export],
       skip_package_pkg: build_variant_config[:skip_package_pkg],
       scheme: build_variant_config[:scheme],
@@ -108,7 +108,7 @@ end
 private_lane :smf_super_report do |options|
   build_variant = options[:build_variant]
 
-  smf_report_metrics(build_variant: build_variant, meta_db_project_name: meta_db_project_name)
+  smf_report_metrics(build_variant: build_variant, smf_get_meta_db_project_name: smf_get_meta_db_project_name)
 end
 
 lane :smf_report do |options|
@@ -169,8 +169,10 @@ private_lane :smf_super_create_dmg_and_gatekeeper do |options|
       code_signing_identity: build_variant_config[:code_signing_identity]
   )
 
+  should_notarize = smf_config_get(build_variant, :notarize) && smf_is_mac_build(build_variant)
+
   smf_notarize(
-    should_notarize: build_variant_config[:notarize],
+    should_notarize: should_notarize,
     dmg_path: dmg_path,
     bundle_id: build_variant_config[:bundle_identifier],
     username: build_variant_config[:apple_id],
@@ -242,8 +244,6 @@ private_lane :smf_super_upload_to_appcenter do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
   appcenter_app_id = smf_get_appcenter_id(build_variant)
   destinations = build_variant_config[:appcenter_destinations]
-  sparkle_config = build_variant_config[:sparkle]
-  sparkle_xml_name = sparkle_config.nil? ? nil : sparkle_config[:xml_name]
 
   # Upload the IPA to AppCenter
   smf_ios_upload_to_appcenter(
@@ -252,10 +252,9 @@ private_lane :smf_super_upload_to_appcenter do |options|
     build_number: smf_get_build_number_of_app,
     app_id: appcenter_app_id,
     escaped_filename: build_variant_config[:scheme].gsub(' ', "\ "),
-    path_to_ipa_or_app: smf_path_to_ipa_or_app(build_variant),
+    path_to_ipa_or_app: smf_path_to_ipa_or_app,
     is_mac_app: true,
     podspec_path: build_variant_config[:podspec_path],
-    sparkle_xml_name: sparkle_xml_name
   ) if !appcenter_app_id.nil?
 
 end

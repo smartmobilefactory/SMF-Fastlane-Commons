@@ -1,6 +1,10 @@
-private_lane :smf_build_ios_app do |options|
+private_lane :smf_build_apple_app do |options|
 
   UI.important("Creating the Xcode archive")
+
+  # clean build directory
+  UI.message('Cleaning build directory')
+  `rm -rf #{smf_workspace_dir}/build`
 
   # Parameter
   skip_package_ipa = (options[:skip_export].nil? ? false : options[:skip_export])
@@ -12,13 +16,18 @@ private_lane :smf_build_ios_app do |options|
   project_name = options[:project_name]
   xcconfig_name = options[:xcconfig_name]
   code_signing_identity = options[:code_signing_identity]
-  upload_itc = options[:upload_itc]
-  upload_bitcode = options[:upload_bitcode]
+  upload_itc = options[:upload_itc].nil? ? false : options[:upload_itc]
+  upload_bitcode = options[:upload_bitcode].nil? ? true : options[:upload_bitcode]
   export_method = options[:export_method]
   icloud_environment = options[:icloud_environment]
   workspace = options[:workspace]
+  build_variant = options[:build_variant]
 
-  UI.message("export_mehtod is nil: #{export_method.nil?}")
+  catalyst_platform = nil
+  if @platform == :apple
+    catalyst_platform = 'ios'
+    catalyst_platform = 'macos' if smf_is_catalyst_mac_build(build_variant)
+  end
 
   output_name = scheme
 
@@ -48,7 +57,8 @@ private_lane :smf_build_ios_app do |options|
       export_method: export_method,
       skip_package_ipa: skip_package_ipa,
       skip_package_pkg: skip_package_pkg,
-      xcpretty_formatter: _smf_get_xcpretty_formatter_path
+      xcpretty_formatter: _smf_get_xcpretty_formatter_path,
+      catalyst_platform: catalyst_platform
   )
 end
 

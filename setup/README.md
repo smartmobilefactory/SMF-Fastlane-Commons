@@ -46,6 +46,25 @@ Table of Contents
             * [smf_upload_to_itunes](#smf_upload_to_itunes)
             * [smf_push_git_tag_release](#smf_push_git_tag_release)
             * [smf_send_slack_notification](#smf_send_slack_notification-1)
+      * [Apple App Setup](#apple-app-setup)
+         * [Pull Request Lanes](#pull-request-lanes)
+            * [smf_generate_files](#smf_generate_files)
+            * [smf_setup_dependencies_pr_check/smf_setup_dependencies_build](#smf_setup_dependencies_pr_checksmf_setup_dependencies_build)
+            * [smf_build](#smf_build)
+            * [smf_unit_tests](#smf_unit_tests)
+            * [smf_linter](#smf_linter)
+            * [smf_pipeline_danger](#smf_pipeline_danger-1)
+         * [Additional Lanes used for building](#additional-lanes-used-for-building)
+            * [smf_generate_changelog](#smf_generate_changelog-1)
+            * [smf_pipeline_increment_build_number](#smf_pipeline_increment_build_number-1)
+            * [smf_pipeline_create_git_tag](#smf_pipeline_create_git_tag-1)
+            * [smf_create_dmg_and_gatekeeper](#smf_create_dmg_and_gatekeeper)
+            * [smf_upload_dsyms](#smf_upload_dsyms)
+            * [smf_pipeline_upload_with_sparkle](#smf_pipeline_upload_with_sparkle)
+            * [smf_upload_to_appcenter](#smf_upload_to_appcenter)
+            * [smf_upload_to_itunes](#smf_upload_to_itunes)
+            * [smf_push_git_tag_release](#smf_push_git_tag_release)
+            * [smf_send_slack_notification](#smf_send_slack_notification-1)
       * [Android App Setup](#android-app-setup)
          * [Pull Request Lanes](#pull-request-lanes-1)
             * [smf_setup_dependencies_pr_check/smf_setup_dependencies_build](#smf_setup_dependencies_pr_checksmf_setup_dependencies_build-1)
@@ -187,6 +206,89 @@ This lane pushes changes to GitHub using the created tag. Is also creates a GitH
 [See this lane in Common Setup](#smf_send_slack_notification)
 
 
+
+## Apple App Setup
+
+The Apple app setup is use for iOS-Apps which are catalyst enabled. This means they can be build for iOS as well as macOS. Thus for those projects the `@platform` variable is set to `:apple`. If a project is catalyst enabled, the build variants which support macOS build needs the following `alt_platforms` entry in the Config.json:
+```
+...
+"alpha": {
+    "scheme"				: "Example-Scheme",
+    "apple_id"				: "...",
+    "bundle_identifier"		: "...",
+    ...
+    "alt_platforms" : {
+        "macOS": {
+            "code_signing_identity"	: "<code siginig identity for the macOS build of this build variant>",
+            "appcenter_id"			: "...",
+            "upload_itc"			: false,
+            "notarize"				: true,
+            "match": {
+                "read_only"			: false,
+                "type"				: "developer_id"
+            },
+            ....
+        }
+    }
+},
+```
+For each build_variant where an 'alt_platforms-macos' entry exists, the additional build_variant `macOS_<build_variant>` is generated into the projects jenkins file. To build a macOS version simply select the `macOS_` prefixed build variant. Furthermore for the macOS build variant the config.json values are first taken from the 'alt_platform' entry, if they can't be found there, the values from the normal build variant are taken.
+### Pull Request Lanes
+
+#### `smf_generate_files`
+This lane generates the Jenkinsfile if it was outdated. If there are other files which should be generated, you can overwrite this lane.
+
+#### `smf_setup_dependencies_pr_check`/`smf_setup_dependencies_build`
+These lanes install pods if a podfile is present in the project. They also check multiple properties (duplicated build numbers, is there an editable app version, etc.) to reduce the risk of errors when uploading to iTunes Connect. For this check `upload_itc` must be set to true in the Config.json. There is one lane for PR-Checks and one for Builds to be able to only run code for one of the two. For example Phrase-App should only be called during a build. To get to know how, have a look at the [example](#Example`). :wink:
+
+#### `smf_build`
+This lane downloads the provisioning profiles and builds the app and saves the IPA/App. :floppy_disk:
+
+#### `smf_unit_tests`
+This lane runs unit tests.
+
+#### `smf_linter`
+This lane runs lint tasks like swift lint.
+
+#### `smf_pipeline_danger`
+[See this lane in Common Setup](#smf_pipeline_danger)
+
+### Additional Lanes used for building
+
+#### `smf_generate_changelog`
+[See this lane in Common Setup](#smf_generate_changelog)
+
+#### `smf_pipeline_increment_build_number`
+[See this lane in Common Setup](#smf_pipeline_increment_build_number)
+
+#### `smf_pipeline_create_git_tag`
+[See this lane in Common Setup](#smf_pipeline_create_git_tag)
+
+#### `smf_create_dmg_and_gatekeeper`
+This lane creates the dmg from the app and notarizes it if `notarize` is set to true in the build variant config in the Config.json.
+
+#### `smf_upload_dsyms`
+This lane uploads the symbolication files to sentry. :arrow_up:
+
+#### `smf_pipeline_upload_with_sparkle`
+This lane uploads the dmg with sparkle.
+
+#### `smf_upload_to_appcenter`
+This lane uploads the IPA to App Center if an `appcenter_id` is given for the build variant in the Config.json. :arrow_up:
+```
+ "live": {
+       "variant": "productionRelease",
+       "appcenter_id": "ExampleID"
+     }
+```
+#### `smf_upload_to_itunes`
+This lane uploads the app to Testflight. :arrow_up::airplane:
+
+#### `smf_push_git_tag_release`
+This lane pushes changes to GitHub using the created tag. Is also creates a GitHub release.
+
+#### `smf_send_slack_notification`
+[See this lane in Common Setup](#smf_send_slack_notification)
 
 
 ## Android App Setup

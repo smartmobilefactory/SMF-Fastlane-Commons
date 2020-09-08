@@ -36,7 +36,7 @@ def smf_get_aab_file_regex(build_variant)
 end
 
 def smf_get_build_variant_from_config(build_variant)
-  variant = @smf_fastlane_config[:build_variants][build_variant.to_sym][:variant]
+  @smf_fastlane_config[:build_variants][build_variant.to_sym][:variant]
 end
 
 def smf_get_project_name
@@ -66,8 +66,8 @@ def smf_get_appcenter_id(build_variant, platform = nil)
       build_variant: build_variant
     )
   else
-    build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
-    appcenter_id = platform.nil? ? build_variant_config[:appcenter_id] : build_variant_config[platform.to_sym][:appcenter_id]
+    appcenter_id = smf_config_get(build_variant, :appcenter_id)
+    appcenter_id = smf_config_get(build_variant, platform.to_sym, :appcenter_id) unless platform.nil?
   end
 
   appcenter_id
@@ -111,11 +111,10 @@ def smf_get_default_name_of_pod(build_variant)
   "#{project_name} #{version}"
 end
 
-# Uses Config file to access project name. Should be changed in the future.
 def smf_get_build_number_of_app
   UI.message('Get the build number of project.')
   case @platform
-  when :ios, :ios_framework, :macos
+  when :ios, :ios_framework, :macos, :apple
     project_name = @smf_fastlane_config[:project][:project_name]
     build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
   when :android
@@ -135,39 +134,29 @@ def smf_get_build_number_of_app
   build_number
 end
 
-def smf_get_xcconfig_name(build_variant)
+def smf_path_to_app_file
 
-  xcconfig_name = 'Release'
-
-  case @platform
-  when :ios, :ios_framework, :macos
-    build_variant_config = @smf_fastlane_config[:build_variants][build_variant]
-    xcconfig_name = build_variant_config[:xcconfig_name][:archive] if !build_variant_config[:xcconfig_name].nil?
-  when :flutter
-    build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant][:ios]
-    xcconfig_name = build_variant_ios_config[:xcconfig_name][:archive] if !build_variant_ios_config[:xcconfig_name].nil?
+  if !ENV['APP_NAME'].nil?
+    UI.message("Using app name: #{ENV['APP_NAME']} from Info.plist to construct .app path")
+    return smf_workspace_dir + "/build/#{ENV['APP_NAME']}.app"
   end
 
-  xcconfig_name
-end
+  app_path = nil
 
-def smf_get_icloud_environment(build_variant)
+  Dir.foreach(smf_workspace_dir + '/build') do |filename|
 
-  icloud_environment = 'Development'
+    file_exists = filename.end_with?('.app')
 
-  case @platform
-  when :ios, :ios_framework, :macos
-    build_variant_config = @smf_fastlane_config[:build_variants][build_variant]
-    icloud_environment = build_variant_config[:icloud_environment] if !build_variant_config[:icloud_environment].nil?
-  when :flutter
-    build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant][:ios]
-    icloud_environment = build_variant_ios_config[:icloud_environment] if !build_variant_ios_config[:icloud_environment].nil?
+    if file_exists
+      app_path = smf_workspace_dir + '/build/' + filename
+      break
+    end
   end
 
-  icloud_environment
+  app_path
 end
 
-def smf_path_to_ipa_or_app(build_variant)
+def smf_path_to_ipa_or_app
 
   if !ENV['APP_NAME'].nil?
     UI.message("Using app name: #{ENV['APP_NAME']} from Info.plist to construct .app path")
@@ -177,7 +166,6 @@ def smf_path_to_ipa_or_app(build_variant)
   app_path = ''
 
   Dir.foreach(smf_workspace_dir + '/build') do |filename|
-  
     file_exists = filename.end_with?('.ipa.zip')
     file_exists = filename.end_with?('.ipa') unless file_exists
     file_exists = filename.end_with?('.app') unless file_exists
@@ -199,20 +187,20 @@ end
 
 def smf_rename_app_file(build_variant)
 
-  app_file_path = smf_path_to_ipa_or_app(build_variant)
+  app_file_path = smf_path_to_ipa_or_app
   info_plist_path = File.join(app_file_path,"/Contents/Info.plist").shellescape
 
   app_name= sh("defaults read #{info_plist_path} CFBundleName").gsub("\n", '')
   ENV['APP_NAME'] = app_name
 
-  new_app_file_path = smf_path_to_ipa_or_app(build_variant)
+  new_app_file_path = smf_path_to_ipa_or_app
 
   UI.message("Renaming #{app_file_path} to #{new_app_file_path}")
   File.rename(app_file_path, new_app_file_path)
 end
 
 def smf_path_to_dmg(build_variant)
-  app_path = smf_path_to_ipa_or_app(build_variant)
+  app_path = smf_path_to_ipa_or_app
   dmg_path = app_path.sub('.app', '.dmg')
 
   dmg_path
@@ -230,13 +218,6 @@ def smf_git_pull(branch)
   branch_name = "#{branch}"
   branch_name.sub!('origin/', '')
   sh "git pull origin #{branch_name} --depth=5 --quiet --allow-unrelated-histories -X theirs"
-end
-
-def smf_update_config(config, message = nil)
-  jsonString = JSON.pretty_generate(config)
-  File.write("#{smf_workspace_dir}/Config.json", jsonString)
-  git_add(path: "#{smf_workspace_dir}/Config.json")
-  git_commit(path: "#{smf_workspace_dir}/Config.json", message: message || 'Update Config.json')
 end
 
 def smf_danger_module_config(options)
@@ -266,31 +247,27 @@ def smf_get_tag_of_pod(podspec_path)
   "releases/#{version_number}"
 end
 
-def smf_get_first_variant_from_config
-  variant = @smf_fastlane_config[:build_variants].keys.map(&:to_s).first
-  raise('There is no build variant in Config.') if variant.nil?
-
-  variant
-end
-
 def smf_get_tag_of_app(build_variant, build_number)
   "build/#{build_variant.downcase}/#{build_number}"
 end
 
 def smf_get_version_number(build_variant = nil, podspec_path = nil)
-  build_variant_config = build_variant.nil? ? nil : @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
   case @platform
-  when :ios, :macos
-    target = build_variant_config[:target]
-    scheme = build_variant_config[:scheme]
+  when :ios, :macos, :apple
+    raise "Cannot find marketing version" if build_variant.nil?
+
+    target = smf_config_get(build_variant, :target)
+    scheme = smf_config_get(build_variant, :scheme)
+    configuration = smf_config_get(build_variant, :xcconfig_name, :archive)
+    configuration = 'Release' if configuration.nil?
 
     begin
       # First we try to get the version number from the plist via fastlane
       version_number = get_version_number(
           xcodeproj: "#{smf_get_project_name}.xcodeproj",
-          target: (target != nil ? target : scheme),
-          configuration: build_variant_config[:xcconfig_name].nil? ? nil : build_variant_config[:xcconfig_name][:archive]
+          target: (target.nil? ? scheme : target),
+          configuration: configuration
       )
     rescue
       begin
@@ -300,11 +277,11 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
           UI.message("Fastlane was not able to determine project version. Checking now for MARKETING_VERSION in the build settings")
 
           # First we make sure that we are using the correct Xcode version
-          required_xcode_version = @smf_fastlane_config[:project][:xcode_version]
+          required_xcode_version = smf_config_get(nil, :project, :xcode_version)
           smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
 
           workspacePath = "#{smf_workspace_dir}/#{smf_get_project_name}.xcworkspace"
-          buildConfigurationString = `xcodebuild -workspace "#{workspacePath}" -scheme "#{scheme}" -configuration "#{build_variant_config[:xcconfig_name][:archive]}" -showBuildSettings -json`
+          buildConfigurationString = `xcodebuild -workspace "#{workspacePath}" -scheme "#{scheme}" -configuration "#{configuration}" -showBuildSettings -json`
           buildConfigurationJSON = JSON.parse(buildConfigurationString)
           version_number = buildConfigurationJSON.first['buildSettings']["MARKETING_VERSION"]
           UI.message("Found MARKETING_VERSION in the build settings: #{version_number}")
@@ -403,4 +380,11 @@ def _smf_https_get_request(url, auth_type, credentials)
   return nil if res.code != '200'
 
   JSON.parse(res.body, {symbolize_names: true})
+end
+
+def smf_build_variant(options)
+  build_variant = options[:build_variant]
+  return build_variant unless build_variant.nil?
+
+  smf_get_first_variant_from_config
 end

@@ -2,7 +2,7 @@ private_lane :smf_notarize do |options|
 
   should_notarize = options[:should_notarize]
 
-  if should_notarize != true || @platform != :macos
+  if should_notarize != true
     UI.message("Notarization is not enabled for this build variant, or the platform is not macOS")
     next
   end
@@ -11,7 +11,7 @@ private_lane :smf_notarize do |options|
   bundle_id = options[:bundle_id]
   username = options[:username]
   asc_provider = options[:asc_provider]
-  custom_provider  = options[:custom_provider]
+  custom_provider = options[:custom_provider]
 
 
   notarize(

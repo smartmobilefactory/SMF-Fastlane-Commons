@@ -1,6 +1,6 @@
 lane :smf_sync_with_phrase_app do |options|
   case @platform
-  when :ios, :ios_framework, :macos
+  when :ios, :ios_framework, :macos, :apple
     initialize_env_variable_name_mappings
     UI.message("Strings are synced with PhraseApp using the values from the fastfile")
 

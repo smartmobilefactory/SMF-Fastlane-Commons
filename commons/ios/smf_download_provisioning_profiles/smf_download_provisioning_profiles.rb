@@ -13,46 +13,53 @@ private_lane :smf_download_provisioning_profiles do |options|
   build_variant = options[:build_variant]
   template_name = options[:template_name]
   force = options[:force]
+  platform = options[:platform].nil? ? 'ios' : options[:platform]
 
   team_id(team_id)
 
   if smf_is_keychain_enabled
-    unlock_keychain(path: "login.keychain", password: ENV[$KEYCHAIN_LOGIN_ENV_KEY])
-    unlock_keychain(path: "jenkins.keychain", password: ENV[$KEYCHAIN_JENKINS_ENV_KEY])
+    unlock_keychain(path: 'login.keychain', password: ENV[$KEYCHAIN_LOGIN_ENV_KEY])
+    unlock_keychain(path: 'jenkins.keychain', password: ENV[$KEYCHAIN_JENKINS_ENV_KEY])
   end
 
-  app_identifier = (use_wildcard_signing == true ? "*" : bundle_identifier)
-  allowed_types = ["appstore", "adhoc", "development", "enterprise"]
+  app_identifier = (use_wildcard_signing == true ? '*' : bundle_identifier)
+  allowed_types = ['appstore', 'adhoc', 'development', 'enterprise', 'developer_id']
 
   if use_default_match_config == false
     if (match_read_only == nil || allowed_types.include?(match_type) == false)
-      raise "The fastlane match entries in the Config.json file are incomplete. Set `readonly` and `type` for the `match` Key."
+      raise 'The fastlane match entries in the Config.json file are incomplete. Set `readonly` and `type` for the `match` Key.'
     end
+
     smf_download_provisioning_profile_using_match(
-        app_identifier: app_identifier,
-        type: match_type,
-        read_only: (match_type.nil? ? match_read_only : false),
-        extensions_suffixes: extensions_suffixes,
-        apple_id: apple_id,
-        team_id: team_id,
-        template_name: template_name,
-        force: force
+      app_identifier: app_identifier,
+      type: match_type,
+      read_only: (match_type.nil? ? match_read_only : false),
+      extensions_suffixes: extensions_suffixes,
+      apple_id: apple_id,
+      team_id: team_id,
+      template_name: template_name,
+      force: force,
+      platform: platform
     )
 
-  elsif (build_variant.match(/alpha/) != nil || build_variant.match(/beta/) != nil || build_variant.match(/example/) != nil)
-    regex = /com\.smartmobilefactory\.enterprise/
-    if bundle_identifier.match(regex) != nil
-      smf_download_provisioning_profile_using_match(
-          app_identifier: app_identifier,
-          type: "enterprise",
-          read_only: (match_type.nil? ? match_read_only : false),
-          extensions_suffixes: extensions_suffixes,
-          apple_id: apple_id,
-          team_id: team_id,
-          template_name: template_name,
-          force: force
-      )
-    end
+  elsif (!build_variant.match(/alpha/).nil? ||
+        !build_variant.match(/beta/).nil? ||
+        !build_variant.match(/example/).nil?) &&
+        platform != 'macos'
+          regex = /com\.smartmobilefactory\.enterprise/
+          if bundle_identifier.match(regex) != nil
+            smf_download_provisioning_profile_using_match(
+              app_identifier: app_identifier,
+              type: 'enterprise',
+              read_only: (match_type.nil? ? match_read_only : false),
+              extensions_suffixes: extensions_suffixes,
+              apple_id: apple_id,
+              team_id: team_id,
+              template_name: template_name,
+              force: force,
+              platform: 'ios'
+            )
+          end
   end
 
 end
@@ -69,6 +76,8 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
   force = options[:force]
   force = force.nil? ? !template_name.nil? : force
 
+  platform = options[:platform]
+
   git_url = $FASTLANE_MATCH_REPO_URL
 
   extension_identifiers = []
@@ -83,17 +92,18 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
   end
 
   match(
-      type: type,
-      readonly: read_only,
-      app_identifier: [app_identifier],
-      username: apple_id,
-      team_id: team_id,
-      git_url: git_url,
-      git_branch: team_id,
-      keychain_name: "jenkins.keychain",
-      keychain_password: ENV[$KEYCHAIN_JENKINS_ENV_KEY],
-      template_name: template_name,
-      force: force
+    type: type,
+    readonly: read_only,
+    app_identifier: [app_identifier],
+    username: apple_id,
+    team_id: team_id,
+    git_url: git_url,
+    git_branch: team_id,
+    keychain_name: "jenkins.keychain",
+    keychain_password: ENV[$KEYCHAIN_JENKINS_ENV_KEY],
+    template_name: template_name,
+    force: force,
+    platform: platform
   )
 
   match(
@@ -106,6 +116,7 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
     git_branch: team_id,
     keychain_name: "jenkins.keychain",
     keychain_password: ENV[$KEYCHAIN_JENKINS_ENV_KEY],
-    force: force
+    force: force,
+    platform: platform
   ) unless extension_identifiers.empty?
 end

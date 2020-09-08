@@ -92,7 +92,7 @@ private_lane :smf_super_ios_build do |options|
       build_variant: build_variant,
       force: build_variant_config.dig(:match, :force)
   )
-  smf_build_ios_app(
+  smf_build_apple_app(
       skip_export: options[:skip_export].nil? ? false : options[:skip_export],
       scheme: build_variant_config[:flavor],
       should_clean_project: build_variant_ios_config[:should_clean_project],
