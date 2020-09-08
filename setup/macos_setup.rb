@@ -187,7 +187,7 @@ private_lane :smf_super_create_dmg_and_gatekeeper do |options|
       code_signing_identity: build_variant_config[:code_signing_identity]
   )
 
-  should_notarize = smf_config_get(build_variant, :notarize) && smf_is_mac_build(build_variant)
+  should_notarize = smf_config_get(build_variant, :notarize)
 
   smf_notarize(
     should_notarize: should_notarize,
