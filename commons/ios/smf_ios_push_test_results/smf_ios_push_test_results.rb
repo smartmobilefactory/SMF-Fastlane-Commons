@@ -101,7 +101,6 @@ private_lane :smf_ios_push_test_results do |options|
 
   request = Net::HTTP::Post.new(sheet_uri)
   request.content_type = 'application/json'
-  request.set_form_data('valueInputOption' => 'USER_ENTERED')
   request['Authorization'] = "Bearer #{bearer_token}"
 
 
@@ -116,7 +115,7 @@ private_lane :smf_ios_push_test_results do |options|
     'majorDimension' =>'ROWS'
   }
 
-  request.body = data.to_json
+  request.body = "valueInputOption=USER_ENTERED&#{data.to_json}"
 
   response = Net::HTTP.start(sheet_uri.hostname, sheet_uri.port, use_ssl: true ) do |client|
     client.request(request)
