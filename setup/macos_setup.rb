@@ -33,6 +33,24 @@ private_lane :smf_super_build do |options|
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
+  extension_suffixes = smf_config_get(build_variant, :extensions_suffixes)
+  extension_suffixes = smf_config_get(nil, :extensions_suffixes) if extension_suffixes.nil?
+
+  smf_download_provisioning_profiles(
+    team_id: smf_config_get(build_variant, :team_id),
+    apple_id: smf_config_get(build_variant, :apple_id),
+    use_wildcard_signing: smf_config_get(build_variant, :use_wildcard_signing),
+    bundle_identifier: smf_config_get(build_variant, :bundle_identifier),
+    use_default_match_config: smf_config_get(build_variant, :match).nil?,
+    match_read_only: smf_config_get(build_variant, :match, :read_only),
+    match_type: smf_config_get(build_variant, :match, :type),
+    template_name: smf_config_get(build_variant, :match, :template_name),
+    extensions_suffixes: extension_suffixes,
+    build_variant: build_variant,
+    force: smf_config_get(build_variant, :match, :force),
+    platform: 'macos'
+  )
+
   smf_build_apple_app(
       skip_export: options[:skip_export].nil? ? false : options[:skip_export],
       skip_package_pkg: build_variant_config[:skip_package_pkg],
