@@ -1,6 +1,8 @@
 require 'date'
 
 private_lane :smf_ios_push_test_results do |options|
+  # set slack channel to reporting error log channel
+  smf_switch_to_reporting_slack_channel
 
   project_name = options[:project_name]
   branch = options[:branch]
@@ -42,101 +44,19 @@ private_lane :smf_ios_push_test_results do |options|
       entry_data[:covered_lines] = lines_of_code_scan.first.first.to_i
     end
 
-    new_entry = _smf_create_spreadsheet_entry(project_name, entry_data)
+    new_entry = smf_create_spreadsheet_entry(project_name, entry_data)
     sheet_entries.push(new_entry) unless new_entry.nil?
   end
 
-  bearer_token = _smf_get_google_api_bearer_token
-
   sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_DOC_ID_KEY]
   sheet_name = $REPORTING_GOOGLE_SHEETS_SHEET_NAME
-  sheet_uri = URI.parse"https://sheets.googleapis.com/v4/spreadsheets/#{sheet_id}/values/#{sheet_name}:append?valueInputOption=USER_ENTERED"
 
-  request = Net::HTTP::Post.new(sheet_uri)
-  request.content_type = 'application/json'
-  request["Accept"] = 'application/json'
-  request['Authorization'] = "Bearer #{bearer_token}"
-
-  values = []
-
-  sheet_entries.each do |entry|
-    values.push(_smf_spreadsheet_entry_to_line(entry))
-  end
-
-  data = {
-    'values' => values,
-    'majorDimension' =>'ROWS'
-  }
-
-  request.body = data.to_json
-
-  response = Net::HTTP.start(sheet_uri.hostname, sheet_uri.port, use_ssl: true ) do |client|
-    client.request(request)
-  end
-
-  case response
-  when Net::HTTPSuccess
-    UI.message("Successfully added new data to spread sheet")
-  else
-    UI.message("Error uploading new data to spreadsheet: #{response.message}")
-    raise 'Error uploading new data to spreadsheet'
-  end
-
-end
-
-def _smf_get_google_api_bearer_token
-  access_token_uri = URI.parse('https://accounts.google.com/o/oauth2/token')
-  client_id = ENV[$REPORTING_GOOGLE_SHEETS_CLIENT_ID_KEY]
-  client_secret = ENV[$REPORTING_GOOGLE_SHEETS_CLIENT_SECRET_KEY]
-  refresh_token = ENV[$REPORTING_GOOGLE_SHEETS_REFRESH_TOKEN_KEY]
-
-  request = Net::HTTP::Post.new(access_token_uri)
-  request.set_form_data(
-    'client_id' => client_id,
-    'client_secret' => client_secret,
-    'refresh_token' => refresh_token,
-    'grant_type' => 'refresh_token'
+  smf_google_api_append_data_to_spread_sheet(
+    sheet_id,
+    sheet_name,
+    sheet_entries
   )
 
-  response = Net::HTTP.start(access_token_uri.hostname, access_token_uri.port, use_ssl: true ) do |client|
-    client.request(request)
-  end
-
-  case response
-  when Net::HTTPSuccess
-    begin
-      body = JSON.parse(response.body)
-      return body.dig('access_token')
-    rescue
-      raise 'Error parsing response body'
-    end
-  else
-    UI.message("Error fetching refresh token for google api: #{response.message}")
-    raise 'Error fetching refresh token'
-  end
-end
-
-def _smf_spreadsheet_entry_to_line(entry)
-  [entry[:date], entry[:repo], entry[:branch], entry[:platform], entry[:test_coverage], entry[:covered_lines]]
-end
-
-def _smf_create_spreadsheet_entry(repo, data)
-  return nil if repo.nil?
-
-  today = Date.today.to_s
-  entry = {
-    :date => today,
-    :repo => repo
-  }
-
-  entry[:branch] = _smf_unwrap_value(data[:branch])
-  entry[:platform] = _smf_unwrap_value(data[:platform])
-  entry[:test_coverage] = _smf_unwrap_value(data[:test_coverage])
-  entry[:covered_lines] = _smf_unwrap_value(data[:covered_lines])
-
-  entry
-end
-
-def _smf_unwrap_value(value)
-  value.nil? ? '' : value
+  # switch slack channel back to original one
+  smf_switch_to_original_slack_channel
 end
