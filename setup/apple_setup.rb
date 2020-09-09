@@ -23,19 +23,6 @@ private_lane :smf_super_setup_dependencies do |options|
   )
 
   smf_pod_install
-
-  # Called only when upload_itc is set to true. This way the
-  # build will fail in the beginning if there are any problems
-  # with itc. Saves time.
-  smf_verify_itc_upload_errors(
-    build_variant: build_variant,
-    upload_itc: smf_config_get(build_variant, :upload_itc),
-    project_name: smf_config_get(nil, :project_name),
-    itc_skip_version_check: smf_config_get(build_variant, :itc_skip_version_check),
-    username: smf_config_get(build_variant, :itc_apple_id),
-    itc_team_id: smf_config_get(build_variant, :itc_team_id),
-    bundle_identifier: smf_config_get(build_variant, :bundle_identifier)
-  )
 end
 
 lane :smf_setup_dependencies_pr_check do |options|
