@@ -5,6 +5,7 @@ private_lane :smf_ios_push_test_results do |options|
   project_name = options[:project_name]
   branch = options[:branch]
   platform = options[:platform]
+  build_variant = options[:build_variant]
 
   sheet_entries = []
 
@@ -31,7 +32,8 @@ private_lane :smf_ios_push_test_results do |options|
 
     entry_data = {
       :branch => branch,
-      :platform => platform.to_s
+      :platform => platform.to_s,
+      :build_variant => build_variant.to_s
     }
 
     unless line_coverage_scan.nil? || line_coverage_scan.empty?
@@ -49,9 +51,6 @@ private_lane :smf_ios_push_test_results do |options|
   sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_DOC_ID_KEY]
   sheet_name = $REPORTING_GOOGLE_SHEETS_SHEET_NAME
 
-  smf_google_api_append_data_to_spread_sheet(
-    sheet_id,
-    sheet_name,
-    sheet_entries
-  )
+  sheet_data = smf_create_sheet_data_from_entries(sheet_entries)
+  smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, sheet_data)
 end

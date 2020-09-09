@@ -10,5 +10,6 @@ smf_ios_push_test_results(
       project_name: <project_name>,		# Name of the project
       branch: <branch>,					# Name of the branch
       platform: <platform>,				# Name of the platform (iOS, macOS, tvOS, etc.)
+      build_variant: <build_variant>    # Current build variant
   )
 ```

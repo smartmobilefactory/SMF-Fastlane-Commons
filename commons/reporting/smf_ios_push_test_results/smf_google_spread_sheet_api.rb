@@ -32,9 +32,7 @@ def _smf_google_api_get_bearer_token
   end
 end
 
-# Takes sheet_id, sheet_name and sheet_entries to append to the given sheet
-# for the structure and necessary keys of a sheet_entry see 'smf_create_spreadsheet_entry(...)'
-def smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, sheet_entries)
+def smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, data)
   bearer_token = _smf_google_api_get_bearer_token
 
   sheet_uri = URI.parse"https://sheets.googleapis.com/v4/spreadsheets/#{sheet_id}/values/#{sheet_name}:append?valueInputOption=USER_ENTERED"
@@ -44,18 +42,7 @@ def smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, sheet_entri
   request['Accept'] = 'application/json'
   request['Authorization'] = "Bearer #{bearer_token}"
 
-  values = []
-
-  sheet_entries.each do |entry|
-    values.push(_smf_spreadsheet_entry_to_line(entry))
-  end
-
-  data = {
-    'values' => values,
-    'majorDimension' =>'ROWS'
-  }
-
-  request.body = data.to_json
+  request.body = data
 
   response = Net::HTTP.start(sheet_uri.hostname, sheet_uri.port, use_ssl: true ) do |client|
     client.request(request)
@@ -70,12 +57,30 @@ def smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, sheet_entri
   end
 end
 
+# Takes sheet_id, sheet_name and sheet_entries to append to the given sheet
+# for the structure and necessary keys of a sheet_entry see 'smf_create_spreadsheet_entry(...)'
+def smf_create_sheet_data_from_entries(sheet_entries)
+
+  values = []
+
+  sheet_entries.each do |entry|
+    values.push(_smf_spreadsheet_entry_to_line(entry))
+  end
+
+  data = {
+    'values' => values,
+    'majorDimension' =>'ROWS'
+  }
+
+  data.to_json
+end
+
 ############### SPREAD SHEET HELPER ###############
 
 def _smf_spreadsheet_entry_to_line(entry)
   # The order of the elements in this array directly correspond to the table columns in the google spread sheet
   # thus it is VERY IMPORTANT to not change the order!
-  [entry[:date], entry[:repo], entry[:branch], entry[:platform], entry[:test_coverage], entry[:covered_lines]]
+  [entry[:date], entry[:repo], entry[:branch], entry[:platform], entry[:build_variant], entry[:test_coverage], entry[:covered_lines]]
 end
 
 # a spread sheet entry holds data for one line of the spread sheet
@@ -91,6 +96,7 @@ def smf_create_spreadsheet_entry(repo, data)
     :repo => repo
   }
 
+  entry[:build_variant] = _smf_unwrap_value(data[:build_variant])
   entry[:branch] = _smf_unwrap_value(data[:branch])
   entry[:platform] = _smf_unwrap_value(data[:platform])
   entry[:test_coverage] = _smf_unwrap_value(data[:test_coverage])

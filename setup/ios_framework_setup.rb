@@ -147,7 +147,8 @@ private_lane :smf_pod_super_reporting do |options|
   smf_ios_push_test_results(
     project_name: project_name,
     branch: options[:branch_name],
-    platform: platform
+    platform: platform,
+    build_variant: options[:build_variant]
   )
 end
 
