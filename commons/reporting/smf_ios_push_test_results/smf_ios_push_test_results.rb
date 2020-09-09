@@ -1,8 +1,6 @@
 require 'date'
 
 private_lane :smf_ios_push_test_results do |options|
-  # set slack channel to reporting error log channel
-  smf_switch_to_reporting_slack_channel
 
   project_name = options[:project_name]
   branch = options[:branch]
@@ -56,7 +54,4 @@ private_lane :smf_ios_push_test_results do |options|
     sheet_name,
     sheet_entries
   )
-
-  # switch slack channel back to original one
-  smf_switch_to_original_slack_channel
 end
