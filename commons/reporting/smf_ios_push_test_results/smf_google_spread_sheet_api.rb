@@ -1,3 +1,5 @@
+require 'net/http'
+
 # Retrieves a temporary access token to the google spread sheets
 # use to then upload/add/append new data to google spread sheets
 def _smf_google_api_get_bearer_token
@@ -27,8 +29,7 @@ def _smf_google_api_get_bearer_token
       raise 'Error parsing response body'
     end
   else
-    UI.message("Error fetching refresh token for google api: #{response.message}")
-    raise 'Error fetching refresh token'
+    raise "Error fetching refresh token #{response.message}"
   end
 end
 
@@ -48,12 +49,8 @@ def smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, data)
     client.request(request)
   end
 
-  case response
-  when Net::HTTPSuccess
-    UI.message('Successfully added new data to spread sheet')
-  else
-    UI.message("Error uploading new data to spreadsheet: #{response.message}")
-    raise 'Error uploading new data to spreadsheet'
+  unless response == Net::HTTPSuccess
+    raise "Error uploading new data to spreadsheet #{response.message}"
   end
 end
 
