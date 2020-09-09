@@ -49,7 +49,7 @@ def smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, data)
     client.request(request)
   end
 
-  unless response == Net::HTTPSuccess
+  unless response.class == Net::HTTPSuccess
     raise "Error uploading new data to spreadsheet #{response.message}"
   end
 end
