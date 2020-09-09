@@ -28,8 +28,8 @@ private_lane :smf_ios_push_test_results do |options|
   xcresult_file_names.each do |filename|
     json_result_string = `xcrun xccov view --report --json #{File.join(xcresult_dir, filename)}`
     result_parsed = JSON.parse(json_result_string)
-    line_coverage_scan = result_parsed.dig('lineCoverage')
-    lines_of_code_scan = result_parsed.dig('coveredLines')
+    line_coverage = result_parsed.dig('lineCoverage')
+    lines_of_code = result_parsed.dig('coveredLines')
 
     entry_data = {
       :branch => branch,
@@ -37,11 +37,11 @@ private_lane :smf_ios_push_test_results do |options|
       :build_variant => build_variant.to_s
     }
 
-    unless line_coverage_scan.nil? || line_coverage_scan.empty?
+    unless line_coverage.nil?
       entry_data[:test_coverage] = line_coverage_scan.first.first.to_f
     end
 
-    unless lines_of_code_scan.nil? || lines_of_code_scan.empty?
+    unless lines_of_code.nil?
       entry_data[:covered_lines] = lines_of_code_scan.first.first.to_i
     end
 
