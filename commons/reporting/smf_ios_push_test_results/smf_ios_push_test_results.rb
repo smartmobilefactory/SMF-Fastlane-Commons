@@ -37,13 +37,8 @@ private_lane :smf_ios_push_test_results do |options|
       :build_variant => build_variant.to_s
     }
 
-    unless line_coverage.nil?
-      entry_data[:test_coverage] = line_coverage_scan.first.first.to_f
-    end
-
-    unless lines_of_code.nil?
-      entry_data[:covered_lines] = lines_of_code_scan.first.first.to_i
-    end
+    entry_data[:test_coverage] = line_coverage
+    entry_data[:covered_lines] = lines_of_code
 
     new_entry = smf_create_spreadsheet_entry(project_name, entry_data)
     sheet_entries.push(new_entry) unless new_entry.nil?
