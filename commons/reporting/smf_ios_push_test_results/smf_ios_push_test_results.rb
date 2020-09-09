@@ -27,8 +27,9 @@ private_lane :smf_ios_push_test_results do |options|
 
   xcresult_file_names.each do |filename|
     json_result_string = `xcrun xccov view --report --json #{File.join(xcresult_dir, filename)}`
-    line_coverage_scan = json_result_string.scan(/lineCoverage":([0-9.]+)/)
-    lines_of_code_scan = json_result_string.scan(/coveredLines":([0-9]+)/)
+    result_parsed = JSON.parse(json_result_string)
+    line_coverage_scan = result_parsed.dig('lineCoverage')
+    lines_of_code_scan = result_parsed.dig('coveredLines')
 
     entry_data = {
       :branch => branch,
