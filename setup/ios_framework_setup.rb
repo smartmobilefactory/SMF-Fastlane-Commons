@@ -45,7 +45,7 @@ end
 
 private_lane :smf_pod_super_unit_tests do |options|
 
-  build_variants_for_pr_check = smf_build_variants_for_pod_pr_check
+  build_variants_for_pr_check = smf_build_variants_for_pod_pr_check(options)
   build_variants_for_pr_check.each { |variant|
 
     build_variant_config = @smf_fastlane_config[:build_variants][variant.to_sym]
@@ -117,6 +117,32 @@ end
 
 lane :smf_pod_danger do |options|
   smf_pod_super_danger(options)
+end
+
+############ REPORTING LANES ############
+
+private_lane :smf_pod_super_reporting do |options|
+
+  project_name = @smf_fastlane_config.dig(:project, :project_name)
+  build_variant_config = @smf_fastlane_config.dig(:build_variants, options[:build_variant].to_sym)
+
+  platform = build_variant_config.dig(:platform)
+  if platform.nil?
+    platform = 'iOS'
+  elsif platform.include?('mac')
+    platform = 'macOS'
+  end
+
+  smf_ios_push_test_results(
+    project_name: project_name,
+    branch: options[:branch_name],
+    platform: platform,
+    build_variant: options[:build_variant]
+  )
+end
+
+lane :smf_pod_reporting do |options|
+  smf_pod_super_reporting(options)
 end
 
 ############ POD PUBLISH LANES ############
