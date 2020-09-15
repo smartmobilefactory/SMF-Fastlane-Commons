@@ -21,6 +21,7 @@ private_lane :smf_ios_unit_tests do |options|
 
   if can_preform_unit_tests == true
 
+    UI.important("Ignoring device: \"#{device}\"")
     UI.important("Performing the unit tests with the scheme \"#{scheme_to_use}\"")
 
     destination = testing_for_mac ? "platform=macOS,arch=x86_64" : nil
@@ -30,7 +31,6 @@ private_lane :smf_ios_unit_tests do |options|
         scheme: scheme_to_use,
         xcargs: smf_xcargs_for_build_system,
         clean: false,
-        device: device,
         destination: destination,
         configuration: unit_test_xcconfig_name,
         code_coverage: true,
