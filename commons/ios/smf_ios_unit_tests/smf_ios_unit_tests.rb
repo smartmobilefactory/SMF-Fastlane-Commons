@@ -25,13 +25,13 @@ private_lane :smf_ios_unit_tests do |options|
     UI.important("Performing the unit tests with the scheme \"#{scheme_to_use}\"")
 
     destination = testing_for_mac ? "platform=macOS,arch=x86_64" : nil
+    # destination: destination,
 
     scan(
         workspace: "#{project_name}.xcworkspace",
         scheme: scheme_to_use,
         xcargs: smf_xcargs_for_build_system,
         clean: false,
-        destination: destination,
         configuration: unit_test_xcconfig_name,
         code_coverage: true,
         derived_data_path: "build/derivedData/",
