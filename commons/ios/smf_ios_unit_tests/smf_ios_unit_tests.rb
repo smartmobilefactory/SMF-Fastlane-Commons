@@ -31,9 +31,9 @@ private_lane :smf_ios_unit_tests do |options|
         scheme: scheme_to_use,
         xcargs: smf_xcargs_for_build_system,
         clean: false,
-        configuration: unit_test_xcconfig_name,
-        destination: destination,
         device: device,
+        destination: destination,
+        configuration: unit_test_xcconfig_name,
         disable_concurrent_testing: true,
         reset_simulator: true,
         code_coverage: true,
@@ -43,6 +43,7 @@ private_lane :smf_ios_unit_tests do |options|
         output_files: "report.html,report.junit,report.json"
     )
   end
+
 end
 
 def _smf_can_unit_tests_be_preformed(project_name, scheme, unit_test_xcconfig_name, testing_for_mac = nil)
