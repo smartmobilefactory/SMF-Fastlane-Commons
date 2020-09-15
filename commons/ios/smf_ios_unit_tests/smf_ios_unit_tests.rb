@@ -22,6 +22,7 @@ private_lane :smf_ios_unit_tests do |options|
   if can_preform_unit_tests == true
 
     UI.important("Performing the unit tests with the scheme \"#{scheme_to_use}\"")
+    UI.important("Name of the simulator type to run tests on: \"#{scheme_to_use}\"")
 
     destination = testing_for_mac ? "platform=macOS,arch=x86_64" : nil
 
@@ -32,7 +33,7 @@ private_lane :smf_ios_unit_tests do |options|
         clean: false,
         configuration: unit_test_xcconfig_name,
         destination: destination,
-        # device: device,
+        device: device,
         disable_concurrent_testing: true,
         reset_simulator: true,
         code_coverage: true,
