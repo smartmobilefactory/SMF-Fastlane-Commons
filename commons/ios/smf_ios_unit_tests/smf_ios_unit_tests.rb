@@ -21,11 +21,9 @@ private_lane :smf_ios_unit_tests do |options|
 
   if can_preform_unit_tests == true
 
-    UI.important("Ignoring device: \"#{device}\"")
     UI.important("Performing the unit tests with the scheme \"#{scheme_to_use}\"")
 
-    destination = testing_for_mac ? "platform=macOS,arch=x86_64" : nil
-    # destination: destination,
+    # destination = testing_for_mac ? "platform=macOS,arch=x86_64" : nil
 
     scan(
         workspace: "#{project_name}.xcworkspace",
@@ -33,6 +31,10 @@ private_lane :smf_ios_unit_tests do |options|
         xcargs: smf_xcargs_for_build_system,
         clean: false,
         configuration: unit_test_xcconfig_name,
+        # destination: destination,
+        device: device,
+        disable_concurrent_testing: true,
+        reset_simulator: true,
         code_coverage: true,
         derived_data_path: "build/derivedData/",
         output_directory: 'build',
@@ -41,20 +43,21 @@ private_lane :smf_ios_unit_tests do |options|
     )
   end
 
+  #
 end
 
 def _smf_can_unit_tests_be_preformed(project_name, scheme, unit_test_xcconfig_name, testing_for_mac = nil)
 
   UI.important("Checking whether the unit tests with the scheme \"#{scheme}\" can be performed.")
 
-  destination = testing_for_mac ? "platform=macOS,arch=x86_64" : nil
+  # destination = testing_for_mac ? "platform=macOS,arch=x86_64" : nil
 
   begin
     scan(
         workspace: "#{project_name}.xcworkspace",
         scheme: scheme,
         configuration: unit_test_xcconfig_name,
-        destination: destination,
+        # destination: destination,
         clean: false,
         skip_build: true,
         xcargs: "-dry-run #{smf_xcargs_for_build_system}"
