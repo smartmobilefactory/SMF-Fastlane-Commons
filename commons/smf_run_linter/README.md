@@ -1,6 +1,6 @@
 # smf_run_linter
 
-This lanes run linter tasks by using gradle. All lanes call *smf_danger_module_config* with the given options do get the danger module config. 
+This lanes run linter tasks by using gradle. All lanes call *smf_danger_module_config* with the given options do get the danger module config.
 
 ### Example for detekt
 ```
@@ -31,7 +31,7 @@ smf_run_klint(
 
 ## smf_danger_module_config
 
-This lanes returns an array of modules. If *modules* are given these modules will be returned unmodified. If *modules* are not specified a module with *module_basepath*, *run_detekt*, *run_klint*, *junit_task* will be added to the returned array. 
+This lanes returns an array of modules. If *modules* are given these modules will be returned unmodified. If *modules* are not specified a module with *module_basepath*, *run_detekt*, *run_klint*, *junit_task* will be added to the returned array.
 
 ## Example
 
@@ -49,6 +49,8 @@ smf_danger_module_config(
 
 This lane runs SiwftLint and stores the output in the `<project>/build` folder.
 SwiftLint is configured with the swiftlint.yml in this directory.
+
+It also generates a report of the default opt-in rules that have not been integrated or reviewed.
 
 Example:
 
