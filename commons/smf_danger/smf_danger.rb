@@ -46,6 +46,11 @@ private_lane :smf_danger do |options|
 
   _swift_lint_count_unused_rules
 
+  p ENV
+
+  envs = `printenv`
+  UI.important( envs )
+
   danger(
       github_api_token: ENV[$DANGER_GITHUB_TOKEN_KEY],
       dangerfile: "#{File.expand_path(File.dirname(__FILE__))}/Dangerfile",
