@@ -10,12 +10,6 @@ private_lane :smf_danger do |options|
     UI.important("There is not SwiftLint output file at #{smf_swift_lint_output_path}. Is SwiftLint enabled?")
   end
 
-  if File.exist?(smf_swift_lint_rules_report_path)
-    checkstyle_paths.push(smf_swift_lint_rules_report_path)
-  elsif [:ios, :ios_framework, :macos, :apple].include?(@platform)
-    UI.important("There is not SwiftLint Rules Report file at #{smf_swift_lint_rules_report_path}. Is SwiftLint enabled?")
-  end
-
   if @platform == :android
     UI.user_error!("android-commons not present! Can't start danger") unless File.exist?('../android-commons')
   end
@@ -50,11 +44,27 @@ private_lane :smf_danger do |options|
 
   _smf_create_jira_ticket_links
 
+  _swift_lint_count_unused_rules
+
   danger(
       github_api_token: ENV[$DANGER_GITHUB_TOKEN_KEY],
       dangerfile: "#{File.expand_path(File.dirname(__FILE__))}/Dangerfile",
       verbose: true
   )
+end
+
+def _swift_lint_count_unused_rules
+
+  if File.exist?(smf_swift_lint_rules_report_path)
+    line_count = `wc -l "#{smf_swift_lint_rules_report_path}"`.strip.split(' ')[0].to_i
+    line_count = (line_count - 4)
+    if line_count > 0
+      message = "There is a total of <b>#{line_count}</b> unused Swiftlint rules! You can check the generated report on Jenkins at: #{smf_swift_lint_rules_report_path}"
+      ENV['DANGER_SWIFT_LINT_RULES_REPORT'] = message
+    end
+  elsif [:ios, :ios_framework, :macos, :apple].include?(@platform)
+    UI.important("There is not SwiftLint Rules Report file at #{smf_swift_lint_rules_report_path}. Is SwiftLint enabled?")
+  end
 end
 
 def _check_common_project_setup_files
