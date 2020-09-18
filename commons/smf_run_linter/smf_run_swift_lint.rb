@@ -1,6 +1,6 @@
 # Constants
 SWIFT_LINT_OUTPUT_PATH = 'build/swiftlint.result.json'
-SWIFT_LINT_RULES_REPORT_DIR_PATH = 'build/swiftlint-rules-report.txt'
+SWIFT_LINT_RULES_REPORT_PATH = 'build/swiftlint-rules-report.txt'
 
 private_lane :smf_run_swift_lint do
 
@@ -28,10 +28,7 @@ private_lane :smf_run_swift_lint do
   # Generate Rules Report
   UI.important("Generating report of unused Swiftlint rules")
   swift_lint_report = "#{smf_workspace_dir}/Submodules/SMF-iOS-CommonProjectSetupFiles/SwiftLint/check_missing_rule_configurations.sh"
-  # swift_lint_config = "#{smf_workspace_dir}"
-  # swift_lint_output = "#{smf_workspace_dir}/#{SWIFT_LINT_RULES_REPORT_DIR_PATH}"
-  # sh("#{swift_lint_report} #{swift_lint_config} #{swift_lint_output}")
-  sh("#{swift_lint_report} #{smf_workspace_dir} #{smf_workspace_dir}/#{SWIFT_LINT_RULES_REPORT_DIR_PATH}")
+  sh("#{swift_lint_report} #{smf_workspace_dir} #{smf_workspace_dir}/#{SWIFT_LINT_RULES_REPORT_PATH}")
 end
 
 def smf_swift_lint_output_path
