@@ -28,7 +28,9 @@ private_lane :smf_run_swift_lint do
   # Generate Rules Report
   UI.important("Generating report of unused Swiftlint rules")
   swift_lint_report = "#{smf_workspace_dir}/Submodules/SMF-iOS-CommonProjectSetupFiles/SwiftLint/check_missing_rule_configurations.sh"
-  sh("#{swift_lint_report} #{smf_workspace_dir} #{smf_workspace_dir}/#{SWIFT_LINT_RULES_REPORT_PATH}")
+  if File.exist?(swift_lint_report)
+    sh("#{swift_lint_report} #{smf_workspace_dir} #{smf_workspace_dir}/#{SWIFT_LINT_RULES_REPORT_PATH}")
+  end
 end
 
 def smf_swift_lint_output_path
