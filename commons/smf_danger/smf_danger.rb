@@ -64,7 +64,10 @@ def _swift_lint_count_unused_rules
     line_count = `wc -l "#{smf_swift_lint_rules_report_path}"`.strip.split(' ')[0].to_i
     line_count = (line_count - 4)
     if line_count > 0
-      message = "There is a total of <b>#{line_count}</b> unused Swiftlint rules! You can check the generated report on Jenkins at: #{smf_swift_lint_rules_report_path}"
+      file_path = smf_swift_lint_rules_report_path.sub(smf_workspace_dir, '')
+      report_URL = "#{ENV['BUILD_URL']}/execution/node/3/ws/#{file_path}"
+      href = "<a href='#{report_URL}' target='_blank'>#{file_path}</a>"
+      message = "There is a total of <b>#{line_count}</b> unused Swiftlint rules! You can check the generated report directly Jenkins: #{href}"
       ENV['DANGER_SWIFT_LINT_RULES_REPORT'] = message
     end
   elsif [:ios, :ios_framework, :macos, :apple].include?(@platform)
