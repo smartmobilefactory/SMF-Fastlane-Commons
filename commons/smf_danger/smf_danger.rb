@@ -10,6 +10,12 @@ private_lane :smf_danger do |options|
     UI.important("There is not SwiftLint output file at #{smf_swift_lint_output_path}. Is SwiftLint enabled?")
   end
 
+  if File.exist?(smf_swift_lint_rules_report_path)
+    checkstyle_paths.push(smf_swift_lint_rules_report_path)
+  elsif [:ios, :ios_framework, :macos, :apple].include?(@platform)
+    UI.important("There is not SwiftLint Rules Report file at #{smf_swift_lint_rules_report_path}. Is SwiftLint enabled?")
+  end
+
   if @platform == :android
     UI.user_error!("android-commons not present! Can't start danger") unless File.exist?('../android-commons')
   end
