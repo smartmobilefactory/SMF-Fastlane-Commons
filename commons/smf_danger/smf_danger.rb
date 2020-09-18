@@ -46,11 +46,6 @@ private_lane :smf_danger do |options|
 
   _swift_lint_count_unused_rules
 
-  p ENV
-
-  envs = `printenv`
-  UI.important( envs )
-
   danger(
       github_api_token: ENV[$DANGER_GITHUB_TOKEN_KEY],
       dangerfile: "#{File.expand_path(File.dirname(__FILE__))}/Dangerfile",
@@ -66,8 +61,8 @@ def _swift_lint_count_unused_rules
     if line_count > 0
       file_path = smf_swift_lint_rules_report_path.sub(smf_workspace_dir, '')
       report_URL = "#{ENV['BUILD_URL']}/execution/node/3/ws/#{file_path}"
-      href = "<a href='#{report_URL}' target='_blank'>#{file_path}</a>"
-      message = "There is a total of <b>#{line_count}</b> unused Swiftlint rules! You can check the generated report directly Jenkins: #{href}"
+      href = "<a href=\"#{report_URL}\" target=\"_blank\">#{file_path}</a>"
+      message = "There is a total of <b>#{line_count}</b> unused Swiftlint rules!<br>Please check the generated report directly on Jenkins: #{href}"
       ENV['DANGER_SWIFT_LINT_RULES_REPORT'] = message
     end
   elsif [:ios, :ios_framework, :macos, :apple].include?(@platform)
