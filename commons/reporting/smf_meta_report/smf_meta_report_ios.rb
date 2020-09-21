@@ -31,24 +31,19 @@ end
 
 def _smf_create_meta_report_to_upload(project_data)
   UI.message("Preparing data for upload to spreadsheet")
-  today = Date.today.to_s
-  project_name = _smf_unwrap_value(@smf_fastlane_config[:project][:project_name])
-  platform = _smf_unwrap_value(_smf_meta_report_platform_friendly_name())
-  branch = _smf_unwrap_value(project_data['branch'])
-  xcode_version = _smf_unwrap_value(project_data['xcode_version'])
-  idfa = _smf_unwrap_value(project_data.dig('idfa', 'usage'))
-  bitcode = _smf_unwrap_value(project_data['bitcode_enabled'])
-  swiftlint_warnings = _smf_unwrap_value(project_data['swiftlint_warnings'])
-
-  # The order of these values corresponds to the columns in the google sheet and should not be changed!
-  # TODO: use same logic as in "_smf_spreadsheet_entry_to_line" (with a function)
-  values = [[today, project_name, platform, branch, xcode_version, idfa, bitcode, swiftlint_warnings]]
-  data = {
-    'values' => values,
-    'majorDimension' =>'ROWS'
+  meta_data = {
+    :date => Date.today.to_s,
+    :repo => _smf_unwrap_value(@smf_fastlane_config[:project][:project_name]),
+    :platform => _smf_unwrap_value(_smf_meta_report_platform_friendly_name()),
+    :branch => _smf_unwrap_value(project_data['branch']),
+    :xcode_version => _smf_unwrap_value(project_data['xcode_version']),
+    :idfa => _smf_unwrap_value(project_data.dig('idfa', 'usage')),
+    :bitcode => _smf_unwrap_value(project_data['bitcode_enabled']),
+    :swiftlint_warnings => _smf_unwrap_value(project_data['swiftlint_warnings'])
   }
 
-  data.to_json
+  data_json = smf_create_sheet_data_from_entries(meta_data, :META_REPORTING)
+  return data_json
 end
 
 def _smf_upload_meta_report_to_spread_sheet(data)
