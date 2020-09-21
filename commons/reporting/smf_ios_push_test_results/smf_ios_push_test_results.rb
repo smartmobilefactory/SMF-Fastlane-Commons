@@ -44,8 +44,8 @@ private_lane :smf_ios_push_test_results do |options|
     sheet_entries.push(new_entry) unless new_entry.nil?
   end
 
-  sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_DOC_ID_KEY]
-  sheet_name = $REPORTING_GOOGLE_SHEETS_SHEET_NAME
+  sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_UNIT_TESTS_DOC_ID_KEY]
+  sheet_name = $REPORTING_GOOGLE_SHEETS_UNIT_TESTS_SHEET_NAME
 
   sheet_data = smf_create_sheet_data_from_entries(sheet_entries)
   smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, sheet_data)

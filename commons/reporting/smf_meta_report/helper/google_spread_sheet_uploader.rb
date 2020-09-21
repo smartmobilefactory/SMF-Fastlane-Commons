@@ -1,15 +1,9 @@
 #!/usr/bin/ruby
-
 require 'json'
 require 'date'
 require 'net/http'
 
-
-# TODO: merge constants
-
-require_relative '../../Submodules/SMF-Fastlane-Commons/fastlane/utils/Constants.rb'
-require_relative '../../Submodules/SMF-Fastlane-Commons/commons/reporting/smf_ios_push_test_results/smf_google_spread_sheet_api.rb'
-
+require_relative '../../smf_ios_push_test_results/smf_google_spread_sheet_api.rb'
 require_relative 'file_helper.rb'
 require_relative 'project_configuration_reader.rb'
 
@@ -74,8 +68,8 @@ module GoogleSpreadSheetUploader
   end
 
   def self.upload_data_to_spread_sheet(data)
-    sheet_id = ENV[Constants::REPORTING_GOOGLE_SPREAD_SHEETS_ID_KEY]
-    sheet_name = Constants::REPORTING_GOOGLE_SHEETS_SHEET_NAME
+    sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_META_INFO_DOC_ID_KEY]
+    sheet_name = ENV[$REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME]
 
     UI.message("Uploading data to google spreadsheet #{sheet_name}")
     # function from fastlane commons submodule
