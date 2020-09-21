@@ -30,13 +30,13 @@ def _smf_analyse_ios_project(src_root)
   UI.message("Fetching data: bitcode")
   analysis_json[:bitcode] = smf_analyse_bitcode()
   UI.message("Fetching data: branch")
-  analysis_data[:branch] = options[:branch]
+  analysis_json[:branch] = options[:branch]
   UI.message("Fetching data: date")
-  analysis_data[:date] = Date.today.to_s
+  analysis_json[:date] = Date.today.to_s
   UI.message("Fetching data: repo")
-  analysis_data[:repo] = _smf_unwrap_value(@smf_fastlane_config[:project][:project_name])
+  analysis_json[:repo] = _smf_unwrap_value(@smf_fastlane_config[:project][:project_name])
   UI.message("Fetching data: platform")
-  analysis_data[:platform] = _smf_unwrap_value(_smf_meta_report_platform_friendly_name())
+  analysis_json[:platform] = _smf_unwrap_value(_smf_meta_report_platform_friendly_name())
 
   return analysis_json
 end

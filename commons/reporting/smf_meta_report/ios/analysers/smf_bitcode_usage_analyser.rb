@@ -20,7 +20,6 @@ def smf_analyse_bitcode()
   src_root = smf_workspace_dir
   UI.message("Analyser: #{__method__.to_s} ...")
   _smf_bitcode_analyser_verification()
-  UI.message("bitcode verified #{__method__.to_s} ...")
   analysis_file = _smf_bitcode_analyser_escape_path(_smf_bitcode_analyser_file_path(src_root))
   bitcode_usage = "enabled"
 
