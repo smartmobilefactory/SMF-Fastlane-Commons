@@ -61,7 +61,6 @@ module IOSProjectAnalyser
     end
 
     if fatal_errors
-      FileHelper::remove_dir(src_root)
       raise "Not all analysers could be verified, stopping analysis..."
     end
 

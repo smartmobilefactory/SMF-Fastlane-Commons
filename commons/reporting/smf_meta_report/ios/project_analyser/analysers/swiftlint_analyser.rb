@@ -35,6 +35,6 @@ end
 # - count the number of warnings and retain them with the key: 'swiftlint_warnings'
 
 # Legacy code:
-# swiftlint_json_content = FileHelper::file_content(swiftlint_report_path)
-# swiftlint_json = JSON.parse(swiftlint_json_content)
+# swiftlint_json_content = File.read(swiftlint_report_path)
+# swiftlint_json = JSON.parse(swiftlint_json_content, :symbolize_names => false)
 # swiftlint_error_count = swiftlint_json.count

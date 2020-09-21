@@ -1,5 +1,7 @@
 #!/usr/bin/ruby
 
+require 'fileutils'
+
 require_relative '../../../helper/project_configuration_reader.rb'
 
 module BitcodeUsage
@@ -16,7 +18,8 @@ module BitcodeUsage
       return :ERROR, "Error reading project name from project Config.json, name is needed for path construction."
     end
 
-    if FileHelper::file_exists(analysis_file) == false
+    if File.file?(analysis_file) == false
+      # file? will only return true for files; false for directories
       return :ERROR, "Error project has no \"project.pbxproj\" file which is needed for the anlysis"
     end
 
@@ -26,7 +29,7 @@ module BitcodeUsage
   # returns the analysed property
   def self.analyse(src_root)
     UI.message("Analysing #{self.to_s} ...")
-    analysis_file = FileHelper::escape_path(analysis_file_path(src_root))
+    analysis_file = BitcodeUsage::bitcode_escape_path(analysis_file_path(src_root))
     bitcode_usage = "enabled"
 
     grab_yes = "#{`fgrep -R "ENABLE_BITCODE = " #{analysis_file} | grep -v "YES;"`}"
@@ -54,5 +57,18 @@ module BitcodeUsage
 
     analysis_file = File.join(File.expand_path(src_root), project_name.gsub("\n", ""), "project.pbxproj")
     return analysis_file
+  end
+
+  def self.bitcode_escape_path(path)
+    escaped_path = path.gsub("\"", "")
+    regex = /\/([^\/]+\s+[^\/]+)\//
+    result = escaped_path.match(regex)
+    if result != nil && result.captures[0] != nil
+      escaped_path = escaped_path.gsub(result.captures[0], "\"#{result.captures[0]}\"")
+    else
+      return path
+    end
+
+    return escaped_path
   end
 end
