@@ -2,8 +2,6 @@
 
 module SwiftlintAnalyser
 
-  SWIFT_LINT_JSON_PATH = ".MetaJSON/swiftlint.json"
-
   @swiftlint_error_count = nil
 
   # returns a tupel describing the status and what the error is
@@ -13,8 +11,7 @@ module SwiftlintAnalyser
     UI.message("Verifying #{self.to_s}")
 
     if File.file?(smf_swift_lint_output_path) == false
-      UI.important("Couldn't locate swiftlint report at #{smf_swift_lint_output_path}")
-      return :WARNING
+      return :WARNING, "Couldn't locate swiftlint report at #{smf_swift_lint_output_path}"
     end
 
     swiftlint_report = File.read(swiftlint_report_path)

@@ -2,8 +2,6 @@
 
 module XcodeVersion
 
-  KEY = 'xcode_version'
-
   # returns a tupel describing the status and what the error is
   # first tupel entry is the status: OK, WARNING, ERROR
   # seconde tupel entry is a message
