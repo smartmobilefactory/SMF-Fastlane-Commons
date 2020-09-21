@@ -34,9 +34,9 @@ def _smf_analyse_ios_project(src_root)
   UI.message("Fetching data: date")
   analysis_json[:date] = Date.today.to_s
   UI.message("Fetching data: repo")
-  analysis_json[:repo] = _smf_unwrap_value(@smf_fastlane_config[:project][:project_name])
+  analysis_json[:repo] = @smf_fastlane_config[:project][:project_name]
   UI.message("Fetching data: platform")
-  analysis_json[:platform] = _smf_unwrap_value(_smf_meta_report_platform_friendly_name())
+  analysis_json[:platform] = _smf_meta_report_platform_friendly_name()
 
   return analysis_json
 end
