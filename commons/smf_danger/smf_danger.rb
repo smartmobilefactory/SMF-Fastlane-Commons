@@ -57,6 +57,8 @@ def _swift_lint_count_unused_rules
 
   if File.exist?(smf_swift_lint_rules_report_path)
     line_count = `wc -l "#{smf_swift_lint_rules_report_path}"`.strip.split(' ')[0].to_i
+    # In the report, there is a total of 4 lines used as format for the document (header/footer)
+    # Remove them from the total line count to get an exact number of unused swiftlint rules.
     line_count = (line_count - 4)
     if line_count > 0
       file_path = smf_swift_lint_rules_report_path.sub(smf_workspace_dir, '')
