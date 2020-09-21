@@ -11,6 +11,7 @@ module XcodeVersion
 
   def self.analyse(src_root)
     UI.message("Analysing #{self.to_s} ...")
-    return @smf_fastlane_config[:project][:xcode_version]
+    UI.message("DEBUG #{@smf_fastlane_config}")
+    return @smf_fastlane_config['project'][:xcode_version]
   end
 end
