@@ -2,7 +2,7 @@
 require 'json'
 require 'date'
 
-require_relative '../../smf_ios_push_test_results/smf_google_spread_sheet_api.rb'
+require_relative '../../smf_ios_monitor_unit_tests/smf_google_spread_sheet_api.rb'
 require_relative './project_analyser/analysers/ios_project_analyser.rb'
 
 def smf_meta_report_ios(options)

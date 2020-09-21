@@ -133,7 +133,7 @@ private_lane :smf_pod_super_reporting do |options|
     platform = 'macOS'
   end
 
-  smf_ios_push_test_results(
+  smf_ios_monitor_unit_tests(
     project_name: project_name,
     branch: options[:branch_name],
     platform: platform,

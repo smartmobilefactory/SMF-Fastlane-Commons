@@ -1,6 +1,6 @@
 require 'date'
 
-private_lane :smf_ios_push_test_results do |options|
+private_lane :smf_ios_monitor_unit_tests do |options|
 
   project_name = options[:project_name]
   branch = options[:branch]
