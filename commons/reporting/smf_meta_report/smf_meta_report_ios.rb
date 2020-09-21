@@ -4,7 +4,7 @@ require 'date'
 
 def smf_meta_report_ios(options)
 	# Analysis
-	analysis_data = _smf_analyse_ios_project(smf_workspace_dir)
+	analysis_data = _smf_analyse_ios_project(options)
   UI.message("data analysed")
 
   # Format and prepare data for uploading
@@ -15,39 +15,41 @@ def smf_meta_report_ios(options)
 
 end
 
-def _smf_analyse_ios_project(src_root)
-  # TODO: use _smf_unwrap_value() ?
-
+def _smf_analyse_ios_project(options)
   analysis_json = {}
-  UI.message("Fetching data: xcode_version")
+  UI.message("Fetching data: xcode_version") #debug
   analysis_json[:xcode_version] = smf_analyse_xcode_version()
-  UI.message("Fetching data: swiftlint_warnings")
+  UI.message("Fetching data: swiftlint_warnings") #debug
   analysis_json[:swiftlint_warnings] = smf_analyse_swiftlint_warnings()
-  UI.message("Fetching data: programming_language")
+  UI.message("Fetching data: programming_language") #debug
   analysis_json[:programming_language] = smf_analyse_programming_language()
-  UI.message("Fetching data: idfa")
+  UI.message("Fetching data: idfa") #debug
   analysis_json[:idfa] = smf_analyse_idfa()
-  UI.message("Fetching data: bitcode")
+  UI.message("Fetching data: bitcode") #debug
   analysis_json[:bitcode] = smf_analyse_bitcode()
-  UI.message("Fetching data: branch")
+  UI.message("Fetching data: branch") #debug
   analysis_json[:branch] = options[:branch]
-  UI.message("Fetching data: date")
+  UI.message("Fetching data: date") #debug
   analysis_json[:date] = Date.today.to_s
-  UI.message("Fetching data: repo")
+  UI.message("Fetching data: repo") #debug
   analysis_json[:repo] = @smf_fastlane_config[:project][:project_name]
-  UI.message("Fetching data: platform")
+  UI.message("Fetching data: platform") #debug
   analysis_json[:platform] = _smf_meta_report_platform_friendly_name()
 
   return analysis_json
 end
 
 def _smf_create_meta_report_to_upload(project_data)
-  UI.message("Preparing data for upload to spreadsheet")
+  UI.message("Preparing data for upload to spreadsheet") #debug
+  UI.message("Before unwrap: #{project_data}") #debug
 
-  data_json = smf_create_sheet_data_from_entries(project_data, :META_REPORTING)
+  unwrapped_data = {}
+  project_data.each { |key, value|
+    unwrapped_data[key] = _smf_unwrap_value(value)
+  }
 
-  UI.message("DEBUG #{analysis_json}")  #debug
-
+  data_json = smf_create_sheet_data_from_entries(unwrapped_data, :META_REPORTING)
+  UI.message("DEBUG #{data_json}") #debug
   return data_json
 end
 
