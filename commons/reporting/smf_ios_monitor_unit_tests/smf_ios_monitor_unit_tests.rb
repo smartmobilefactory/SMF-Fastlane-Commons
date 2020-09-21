@@ -28,17 +28,14 @@ private_lane :smf_ios_monitor_unit_tests do |options|
   xcresult_file_names.each do |filename|
     json_result_string = `xcrun xccov view --report --json #{File.join(xcresult_dir, filename)}`
     result_parsed = JSON.parse(json_result_string)
-    line_coverage = result_parsed.dig('lineCoverage')
-    lines_of_code = result_parsed.dig('coveredLines')
 
     entry_data = {
       :branch => branch,
       :platform => platform.to_s,
-      :build_variant => build_variant.to_s
+      :build_variant => build_variant.to_s,
+      :test_coverage] => result_parsed.dig('lineCoverage'),
+      :covered_lines] => result_parsed.dig('coveredLines')
     }
-
-    entry_data[:test_coverage] = line_coverage
-    entry_data[:covered_lines] = lines_of_code
 
     new_entry = smf_create_spreadsheet_entry(project_name, entry_data)
     sheet_entries.push(new_entry) unless new_entry.nil?
@@ -58,17 +55,15 @@ end
 def smf_create_spreadsheet_entry(repo, data)
   return nil if repo.nil?
 
-  today = Date.today.to_s
   entry = {
-    :date => today,
-    :repo => repo
+    :date => Date.today.to_s,
+    :repo => repo,
+    :build_variant] => _smf_unwrap_value(data[:build_variant]),
+    :branch] => _smf_unwrap_value(data[:branch]),
+    :platform] => _smf_unwrap_value(data[:platform]),
+    :test_coverage] => _smf_unwrap_value(data[:test_coverage]),
+    :covered_lines] => _smf_unwrap_value(data[:covered_lines])
   }
-
-  entry[:build_variant] = _smf_unwrap_value(data[:build_variant])
-  entry[:branch] = _smf_unwrap_value(data[:branch])
-  entry[:platform] = _smf_unwrap_value(data[:platform])
-  entry[:test_coverage] = _smf_unwrap_value(data[:test_coverage])
-  entry[:covered_lines] = _smf_unwrap_value(data[:covered_lines])
 
   entry
 end
