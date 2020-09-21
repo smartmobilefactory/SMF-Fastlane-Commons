@@ -12,45 +12,32 @@ def smf_meta_report_ios(options)
 
   # Upload data
   _smf_upload_meta_report_to_spread_sheet(upload_data)
-
 end
 
 def _smf_analyse_ios_project(options)
   analysis_json = {}
-  UI.message("Fetching data: xcode_version") #debug
   analysis_json[:xcode_version] = @smf_fastlane_config[:project][:xcode_version]
-  UI.message("Fetching data: swiftlint_warnings") #debug
-  analysis_json[:swiftlint_warnings] = "#{smf_analyse_swiftlint_warnings()}"
-  UI.message("Fetching data: programming_language") #debug
+  analysis_json[:swiftlint_warnings] = smf_analyse_swiftlint_warnings()
   analysis_json[:programming_language] = @smf_fastlane_config[:project][:programming_language]
-  UI.message("Fetching data: idfa") #debug
   analysis_json[:idfa] = smf_analyse_idfa()
-  UI.message("Fetching data: bitcode") #debug
   analysis_json[:bitcode] = smf_analyse_bitcode()
-  UI.message("Fetching data: branch") #debug
   analysis_json[:branch] = options[:branch]
-  UI.message("Fetching data: date") #debug
   analysis_json[:date] = Date.today.to_s
-  UI.message("Fetching data: repo") #debug
   analysis_json[:repo] = @smf_fastlane_config[:project][:project_name]
-  UI.message("Fetching data: platform") #debug
   analysis_json[:platform] = _smf_meta_report_platform_friendly_name()
 
   return analysis_json
 end
 
 def _smf_create_meta_report_to_upload(project_data)
-  UI.message("Preparing data for upload to spreadsheet") #debug
-  UI.message("Before unwrap: #{project_data}") #debug
-
   unwrapped_data = {}
   project_data.each { |key, value|
     unwrapped_data[key] = _smf_unwrap_value(value)
   }
 
-  UI.message("this smf_create_sheet_data_from_entries?")
-  data_json = smf_create_sheet_data_from_entries(unwrapped_data, :META_REPORTING)
   UI.message("DEBUG #{data_json}") #debug
+  # The function smf_create_sheet_data_from_entries expects an array as 1st argument.
+  data_json = smf_create_sheet_data_from_entries([unwrapped_data], :META_REPORTING)
   return data_json
 end
 
