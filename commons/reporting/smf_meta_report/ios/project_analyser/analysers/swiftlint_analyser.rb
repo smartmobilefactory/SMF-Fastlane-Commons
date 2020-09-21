@@ -7,7 +7,7 @@ module SwiftlintAnalyser
   # returns a tupel describing the status and what the error is
   # first tupel entry is the status: OK, WARNING, ERROR
   # seconde tupel entry is a message
-  def self.verification(src_root)
+  def self.verification()
     UI.message("Verifying #{self.to_s}")
 
     if File.file?(smf_swift_lint_output_path) == false
@@ -22,7 +22,7 @@ module SwiftlintAnalyser
   end
 
   # returns the analysed property
-  def self.analyse(src_root)
+  def self.analyse()
     UI.message("Analysing #{self.to_s} ...")
     return @swiftlint_error_count
   end

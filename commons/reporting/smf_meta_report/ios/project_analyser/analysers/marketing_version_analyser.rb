@@ -9,7 +9,8 @@ module MarketingVersion
   # returns a tupel describing the status and what the error is
   # first tupel entry is the status: OK, WARNING, ERROR
   # seconde tupel entry is a message
-  def self.verification(src_root)
+  def self.verification()
+    src_root = smf_workspace_dir
     agvtool_what_marketing = "agvtool what-marketing-version"
     agvtool_marketing_output = `cd #{src_root} 2> /dev/null && #{agvtool_what_marketing} 2> /dev/null`
 
@@ -41,7 +42,7 @@ module MarketingVersion
   end
 
   # returns the analysed property
-  def self.analyse(src_root)
+  def self.analyse()
     UI.message("Analysing #{self.to_s} ...")
     return @marketing_version
   end

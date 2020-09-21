@@ -43,7 +43,7 @@ module IOSProjectAnalyser
     UI.message("looping on #{ANALYSERS}")
     for analyser in ANALYSERS
       UI.message("analysing analyser: #{analyser.to_s}")
-      status, message = analyser.verification(src_root)
+      status, message = analyser.verification()
       if status == :OK
         UI.message("ok! for analyser #{analyser.to_s}")
         verified_analysers.push(analyser)
@@ -84,7 +84,8 @@ module IOSProjectAnalyser
 end
 
 def smf_verify_project_property(property)
-    if @smf_fastlane_config[:project][property] == nil
+    UI.message("DEBUG #{@smf_fastlane_config}")
+    if @smf_fastlane_config['project'][property.to_s] == nil
       return :WARNING, "Error reading property \"#{property}\" in projects Config.json"
     end
 

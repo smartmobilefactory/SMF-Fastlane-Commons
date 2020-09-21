@@ -10,8 +10,8 @@ module Idfa
   # returns a tupel describing the status and what the error is
   # first tupel entry is the status: OK, WARNING, ERROR
   # seconde tupel entry is a message
-  def self.verification(src_root)
-
+  def self.verification()
+    src_root = smf_workspace_dir
     if File.exist?(src_root) == false
       return :ERROR, "Error the projects root directory (\"#{src_root}\") does not exist"
     end
@@ -20,7 +20,8 @@ module Idfa
   end
 
   # returns the analysed property
-  def self.analyse(src_root)
+  def self.analyse()
+    src_root = smf_workspace_dir
     UI.message("Analysing #{self.to_s} ...")
 
     idfa_usage = "disabled"

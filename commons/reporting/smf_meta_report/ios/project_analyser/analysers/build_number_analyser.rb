@@ -9,7 +9,8 @@ module BuildNumber
   # returns a tupel describing the status and what the error is
   # first tupel entry is the status: OK, WARNING, ERROR
   # seconde tupel entry is a message
-  def self.verification(src_root)
+  def self.verification()
+    src_root = smf_workspace_dir
     agvtool_what_version = "agvtool what-version"
     agvtool_version_output = `cd #{src_root} 2> /dev/null && #{agvtool_what_version} 2> /dev/null`
 
@@ -40,7 +41,7 @@ module BuildNumber
   end
 
   # returns the analysed property
-  def self.analyse(src_root)
+  def self.analyse()
     UI.message("Analysing #{self.to_s} ...")
     return @build_number
   end

@@ -9,8 +9,8 @@ module BitcodeUsage
   # returns a tupel describing the status and what the error is
   # first tupel entry is the status: OK, WARNING, ERROR
   # seconde tupel entry is a message
-  def self.verification(src_root)
-    analysis_file = analysis_file_path(src_root)
+  def self.verification()
+    analysis_file = analysis_file_path(smf_workspace_dir)
 
     if analysis_file == nil
       return :ERROR, "Error reading project name from project Config.json, name is needed for path construction."
@@ -25,7 +25,8 @@ module BitcodeUsage
   end
 
   # returns the analysed property
-  def self.analyse(src_root)
+  def self.analyse()
+    src_root = smf_workspace_dir
     UI.message("Analysing #{self.to_s} ...")
     analysis_file = BitcodeUsage::bitcode_escape_path(analysis_file_path(src_root))
     bitcode_usage = "enabled"
