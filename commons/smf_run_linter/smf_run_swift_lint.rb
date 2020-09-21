@@ -38,7 +38,7 @@ private_lane :smf_run_swift_lint do
 end
 
 def _create_output_base_folder
-  dirname = File.dirname("#{smf_workspace_dir}/#{SWIFT_LINT_OUTPUT_BASE_DIR}")
+  dirname = "#{smf_workspace_dir}/#{SWIFT_LINT_OUTPUT_BASE_DIR}"
   # create dir only if not existing
   UI.important("Should create dir at: #{dirname}")
   unless File.directory?(dirname)
