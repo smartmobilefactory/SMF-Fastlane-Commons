@@ -7,44 +7,44 @@ def smf_meta_report_ios(options)
 	analysis_data = _smf_analyse_ios_project(smf_workspace_dir)
   UI.message("data analysed")
 
-  # Upload
-  if analysis_data.nil?
-    UI.error("Project data is nil, can't report to google sheet")
-    raise 'Project data not available'
-  else
+  # Format and prepare data for uploading
+  upload_data = _smf_create_meta_report_to_upload(analysis_data)
 
-    analysis_data[:branch] = options[:branch]
+  # Upload data
+  _smf_upload_meta_report_to_spread_sheet(upload_data)
 
-    upload_data = _smf_create_meta_report_to_upload(analysis_data)
-    _smf_upload_meta_report_to_spread_sheet(upload_data)
-  end
 end
 
 def _smf_analyse_ios_project(src_root)
+  # TODO: use _smf_unwrap_value() ?
+
   analysis_json = {}
+  UI.message("Fetching data: xcode_version")
   analysis_json[:xcode_version] = smf_analyse_xcode_version()
+  UI.message("Fetching data: swiftlint_warnings")
   analysis_json[:swiftlint_warnings] = smf_analyse_swiftlint_warnings()
+  UI.message("Fetching data: programming_language")
   analysis_json[:programming_language] = smf_analyse_programming_language()
+  UI.message("Fetching data: idfa")
   analysis_json[:idfa] = smf_analyse_idfa()
-  analysis_json[:bitcode_enabled] = smf_analyse_bitcode()
+  UI.message("Fetching data: bitcode")
+  analysis_json[:bitcode] = smf_analyse_bitcode()
+  UI.message("Fetching data: branch")
+  analysis_data[:branch] = options[:branch]
+  UI.message("Fetching data: date")
+  analysis_data[:date] = Date.today.to_s
+  UI.message("Fetching data: repo")
+  analysis_data[:repo] = _smf_unwrap_value(@smf_fastlane_config[:project][:project_name])
+  UI.message("Fetching data: platform")
+  analysis_data[:platform] = _smf_unwrap_value(_smf_meta_report_platform_friendly_name())
 
   return analysis_json
 end
 
 def _smf_create_meta_report_to_upload(project_data)
   UI.message("Preparing data for upload to spreadsheet")
-  meta_data = {
-    :date => Date.today.to_s,
-    :repo => _smf_unwrap_value(@smf_fastlane_config[:project][:project_name]),
-    :platform => _smf_unwrap_value(_smf_meta_report_platform_friendly_name()),
-    :branch => _smf_unwrap_value(project_data['branch']),
-    :xcode_version => _smf_unwrap_value(project_data['xcode_version']),
-    :idfa => _smf_unwrap_value(project_data.dig('idfa', 'usage')),
-    :bitcode => _smf_unwrap_value(project_data['bitcode_enabled']),
-    :swiftlint_warnings => _smf_unwrap_value("#{project_data['swiftlint_warnings']}")
-  }
 
-  data_json = smf_create_sheet_data_from_entries(meta_data, :META_REPORTING)
+  data_json = smf_create_sheet_data_from_entries(project_data, :META_REPORTING)
 
   UI.message("DEBUG #{analysis_json}")  #debug
 
