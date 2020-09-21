@@ -5,11 +5,10 @@ require_relative './analysers/xcode_version_analyser.rb'
 require_relative './analysers/programming_language_version_analyser.rb'
 require_relative './analysers/programming_language_analyser.rb'
 require_relative './analysers/bitcode_usage_analyser.rb'
-require_relative './analysers/branch_name_analyser.rb'
 require_relative './analysers/build_number_analyser.rb'
 require_relative './analysers/marketing_version_analyser.rb'
 require_relative './analysers/idfa_analyser.rb'
-require_relative './analysers/ats_exception_analyser.rb'
+# require_relative './analysers/ats_exception_analyser.rb'
 require_relative './analysers/swiftlint_analyser.rb'
 
 module IOSProjectAnalyser
@@ -19,10 +18,9 @@ module IOSProjectAnalyser
     ProgrammingLanguageVersion,
     ProgrammingLanguage,
     BitcodeUsage,
-    BranchName,
     BuildNumber,
     Idfa,
-    AtsException,
+    # AtsException, (currently disabled - logic must be reviewed)
     SwiftlintAnalyser
   ]
 
