@@ -8,6 +8,6 @@ def smf_analyse_swiftlint_warnings()
   end
 
   swiftlint_report = File.read(smf_swift_lint_output_path)
-  swiftlint_json = JSON.parse(swiftlint_report, :symbolize_names => false)
+  swiftlint_json = JSON.parse(swiftlint_report, :symbolize_names => true)
   return swiftlint_json.count
 end
