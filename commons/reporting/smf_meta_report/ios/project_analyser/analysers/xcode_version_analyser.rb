@@ -1,7 +1,5 @@
 #!/usr/bin/ruby
 
-require_relative '../../../helper/project_configuration_reader.rb'
-
 module XcodeVersion
 
   KEY = 'xcode_version'

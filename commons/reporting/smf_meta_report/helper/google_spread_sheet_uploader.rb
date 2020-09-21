@@ -4,7 +4,6 @@ require 'date'
 require 'net/http'
 
 require_relative '../../smf_ios_push_test_results/smf_google_spread_sheet_api.rb'
-require_relative 'project_configuration_reader.rb'
 
 module GoogleSpreadSheetUploader
 

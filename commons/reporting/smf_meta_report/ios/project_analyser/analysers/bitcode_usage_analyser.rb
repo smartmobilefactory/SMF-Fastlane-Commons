@@ -2,8 +2,6 @@
 
 require 'fileutils'
 
-require_relative '../../../helper/project_configuration_reader.rb'
-
 module BitcodeUsage
 
   KEY = 'bitcode_enabled'

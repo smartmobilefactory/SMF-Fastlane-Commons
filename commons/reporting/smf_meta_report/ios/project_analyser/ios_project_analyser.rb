@@ -1,7 +1,5 @@
 #!/usr/bin/ruby
 
-require_relative '../../helper/project_configuration_reader.rb'
-
 # Import modules which analyse one specific property each
 require_relative './analysers/xcode_version_analyser.rb'
 require_relative './analysers/programming_language_version_analyser.rb'
