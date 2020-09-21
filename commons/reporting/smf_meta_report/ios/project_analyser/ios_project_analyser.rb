@@ -76,7 +76,6 @@ def smf_analyse_ios_project(src_root)
   return { :content => analysis_json }
 end
 
-
 def smf_verify_project_property(property)
   UI.message("DEBUG #{@smf_fastlane_config}")  #debug
   if @smf_fastlane_config['project'][property.to_s] == nil
