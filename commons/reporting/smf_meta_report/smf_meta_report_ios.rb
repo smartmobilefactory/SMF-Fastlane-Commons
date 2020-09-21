@@ -28,7 +28,6 @@ def _smf_analyse_ios_project(src_root)
   analysis_json[:idfa] = smf_analyse_idfa()
   analysis_json[:bitcode_enabled] = smf_analyse_bitcode()
 
-  UI.message("DEBUG #{analysis_json}")  #debug
   return analysis_json
 end
 
@@ -42,10 +41,13 @@ def _smf_create_meta_report_to_upload(project_data)
     :xcode_version => _smf_unwrap_value(project_data['xcode_version']),
     :idfa => _smf_unwrap_value(project_data.dig('idfa', 'usage')),
     :bitcode => _smf_unwrap_value(project_data['bitcode_enabled']),
-    :swiftlint_warnings => _smf_unwrap_value(project_data['swiftlint_warnings'])
+    :swiftlint_warnings => _smf_unwrap_value("#{project_data['swiftlint_warnings']}")
   }
 
   data_json = smf_create_sheet_data_from_entries(meta_data, :META_REPORTING)
+
+  UI.message("DEBUG #{analysis_json}")  #debug
+
   return data_json
 end
 
