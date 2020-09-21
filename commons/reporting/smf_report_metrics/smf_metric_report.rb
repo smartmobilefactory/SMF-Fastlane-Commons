@@ -3,6 +3,23 @@ private_lane :smf_report_metrics do |options|
   smf_owasp_report(options)
 end
 
+private_lane :smf_meta_report do |options|
+  begin
+    case @platform
+    when :ios, :macos, :apple
+      smf_meta_report_ios(options)
+    else
+      UI.message("The platform \"#{@platform}\" does not support meta reports")
+    end
+  rescue Exception => ex
+    UI.message("Meta report could not be performed: #{ex.message}")
+    smf_send_diagnostic_message(
+      title: "#{project_name} smf_meta_report failed",
+      message: "#{ex.message}, #{ex}"
+    )
+  end
+end
+
 private_lane :smf_owasp_report do |options|
   project_name = options[:smf_get_meta_db_project_name]
   begin
