@@ -2,24 +2,20 @@
 require 'json'
 require 'date'
 
-# require_relative '../smf_ios_monitor_unit_tests/smf_google_spread_sheet_api.rb'
-# require_relative './ios/project_analyser/ios_project_analyser.rb'
-
 def smf_meta_report_ios(options)
-
 	# Analysis
-	analysis_data = [smf_analyse_ios_project(smf_workspace_dir)]
-  analysis_data.compact!
+	analysis_data = smf_analyse_ios_project(smf_workspace_dir)
+  UI.message("data analysed")
 
   # Upload
-  if analysis_data.nil? || analysis_data[:content].nil?
+  if analysis_data.nil?
     UI.error("Project data is nil, can't report to google sheet")
     raise 'Project data not available'
   else
-    project_data = analysis_data[:content]
-    project_data['branch'] = options[:branch]
 
-    upload_data = _smf_create_meta_report_to_upload(project_data)
+    analysis_data[:branch] = options[:branch]
+
+    upload_data = _smf_create_meta_report_to_upload(analysis_data)
     _smf_upload_meta_report_to_spread_sheet(upload_data)
   end
 end

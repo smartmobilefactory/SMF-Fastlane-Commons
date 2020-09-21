@@ -65,5 +65,6 @@ def smf_analyse_ios_project(src_root)
   analysis_json[:programming_language] = smf_analyse_programming_language()
   analysis_json[:idfa] = smf_analyse_idfa()
 
-  return { :content => analysis_json }
+  UI.message("DEBUG #{analysis_json}")  #debug
+  return analysis_json
 end
