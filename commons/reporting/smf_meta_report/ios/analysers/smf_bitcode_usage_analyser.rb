@@ -3,7 +3,7 @@
 require 'fileutils'
 
 def _smf_bitcode_analyser_verification()
-  analysis_file = _smf_bitcode_analysis_file_path(smf_workspace_dir)
+  analysis_file = _smf_bitcode_analyser_file_path(smf_workspace_dir)
 
   if analysis_file == nil
     raise "Error reading project name from project Config.json, name is needed for path construction."
@@ -21,7 +21,7 @@ def smf_analyse_bitcode()
   UI.message("Analyser: #{__method__.to_s} ...")
   _smf_bitcode_analyser_verification()
   UI.message("bitcode verified #{__method__.to_s} ...")
-  analysis_file = _smf_bitcode_analyser_escape_path(_smf_bitcode_analysis_file_path(src_root))
+  analysis_file = _smf_bitcode_analyser_escape_path(_smf_bitcode_analyser_file_path(src_root))
   bitcode_usage = "enabled"
 
   grab_yes = "#{`fgrep -R "ENABLE_BITCODE = " #{analysis_file} | grep -v "YES;"`}"
