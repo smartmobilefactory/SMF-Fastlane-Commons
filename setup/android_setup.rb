@@ -76,7 +76,6 @@ end
 # Danger
 
 private_lane :smf_super_pipeline_danger do |options|
-
   smf_danger
 end
 
@@ -87,9 +86,8 @@ end
 # Report project data
 
 private_lane :smf_super_report do |options|
-
   build_variant = options[:build_variant]
-
+  smf_linter(options)
   smf_report_metrics(build_variant: build_variant, smf_get_meta_db_project_name: smf_get_meta_db_project_name)
 end
 
