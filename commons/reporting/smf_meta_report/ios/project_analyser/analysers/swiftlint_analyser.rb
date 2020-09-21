@@ -28,3 +28,13 @@ module SwiftlintAnalyser
     # return { :content => File.join(src_root, SWIFT_LINT_JSON_PATH), :is_raw => false, :file => :swiftlint_json }
   end
 end
+
+
+# TODO:
+# - read and parse the swiftlint.report.json file
+# - count the number of warnings and retain them with the key: 'swiftlint_warnings'
+
+# Legacy code:
+# swiftlint_json_content = FileHelper::file_content(swiftlint_report_path)
+# swiftlint_json = JSON.parse(swiftlint_json_content)
+# swiftlint_error_count = swiftlint_json.count

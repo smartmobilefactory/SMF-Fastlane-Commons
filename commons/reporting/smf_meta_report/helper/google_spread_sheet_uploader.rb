@@ -9,27 +9,9 @@ require_relative 'project_configuration_reader.rb'
 
 module GoogleSpreadSheetUploader
 
-  def self.report_to_google_sheets(analysis_data, branch, src_root)
+  def self.report_to_google_sheets(analysis_data, options)
     project_analysis = analysis_data.find do |analysis|
       analysis[:file] == :project_json
-    end
-
-    swift_lint_analysis = analysis_data.find do |analysis|
-      analysis[:file] == :swiftlint_json
-    end
-
-    if swift_lint_analysis.nil? || swift_lint_analysis[:content].nil?
-      UI.important('Unable to find swiftlint.json to report to google sheet')
-    else
-      swiftlint_report_path = swift_lint_analysis[:content]
-      swiftlint_json_content = FileHelper::file_content(swiftlint_report_path)
-
-      if swiftlint_json_content.nil? || swiftlint_json_content.empty?
-        UI.important("swiftlint.json is empty, can't report to google sheets")
-      else
-        swiftlint_json = JSON.parse(swiftlint_json_content)
-        swiftlint_error_count = swiftlint_json.count
-      end
     end
 
     if project_analysis.nil? || project_analysis[:content].nil?
@@ -37,27 +19,26 @@ module GoogleSpreadSheetUploader
       raise 'Project data not available'
     else
       project_data = project_analysis[:content]
-      project_data['branch'] = branch
-      project_data['swiftlint_warnings'] = swiftlint_error_count
+      project_data['branch'] = options[:branch]
 
-      upload_data = GoogleSpreadSheetUploader::create_data_to_upload(project_data, src_root)
+      upload_data = GoogleSpreadSheetUploader::create_data_to_upload(project_data)
       GoogleSpreadSheetUploader::upload_data_to_spread_sheet(upload_data)
     end
   end
 
-  def self.create_data_to_upload(project_data, src_root)
+  def self.create_data_to_upload(project_data)
     UI.message("Preparing data for upload to spreadsheet")
     today = Date.today.to_s
-    project_name = _smf_unwrap_value(ProjectConfigurationReader::read_project_property(src_root, 'project_name'))
-    platform = _smf_unwrap_value(GoogleSpreadSheetUploader::get_platform(src_root))
+    project_name = _smf_unwrap_value(ProjectConfigurationReader::read_project_property(smf_workspace_dir, 'project_name'))
+    platform = _smf_unwrap_value(GoogleSpreadSheetUploader::get_platform())
     branch = _smf_unwrap_value(project_data['branch'])
     xcode_version = _smf_unwrap_value(project_data['xcode_version'])
     idfa = _smf_unwrap_value(project_data.dig('idfa', 'usage'))
     bitcode = _smf_unwrap_value(project_data['bitcode_enabled'])
     swiftlint_warnings = _smf_unwrap_value(project_data['swiftlint_warnings'])
 
-    # The order of these values corresponds to the columns in the google sheet
-    # and should not be changed!
+    # The order of these values corresponds to the columns in the google sheet and should not be changed!
+    # TODO: use same logic as in "_smf_spreadsheet_entry_to_line" (with a function)
     values = [[today, project_name, platform, branch, xcode_version, idfa, bitcode, swiftlint_warnings]]
     data = {
       'values' => values,
@@ -76,12 +57,8 @@ module GoogleSpreadSheetUploader
     smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, data)
   end
 
-  def self.get_platform(src_root)
-    project_fastfile_content = FileHelper::file_content(File.join(src_root, 'fastlane/Fastfile'))
-    scan_result = project_fastfile_content.scan(/@platform\s+=\s+:(.+)/)
-    return nil if scan_result.nil? || scan_result.empty?
-
-    case scan_result.first.first.to_s
+  def self.get_platform()
+    case "#{@platform.to_s}"
     when 'ios'
       return 'iOS'
     when 'ios_framework'
