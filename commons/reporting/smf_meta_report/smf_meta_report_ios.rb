@@ -8,7 +8,7 @@ require_relative './ios/project_analyser/ios_project_analyser.rb'
 def smf_meta_report_ios(options)
 
 	# Analysis
-	analysis_data = [IOSProjectAnalyser::analyse(smf_workspace_dir)]
+	analysis_data = [smf_analyse_ios_project(smf_workspace_dir)]
   analysis_data.compact!
 
   # Upload
