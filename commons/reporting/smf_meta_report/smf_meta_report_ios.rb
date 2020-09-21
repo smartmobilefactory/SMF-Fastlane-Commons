@@ -2,7 +2,7 @@
 require 'json'
 require 'date'
 
-require_relative '../../smf_ios_monitor_unit_tests/smf_google_spread_sheet_api.rb'
+require_relative '../smf_ios_monitor_unit_tests/smf_google_spread_sheet_api.rb'
 require_relative './project_analyser/analysers/ios_project_analyser.rb'
 
 def smf_meta_report_ios(options)
@@ -12,16 +12,11 @@ def smf_meta_report_ios(options)
   analysis_data.compact!
 
   # Upload
-  _smf_report_meta_data_to_google_sheets(analysis_data, options)
-end
-
-def _smf_report_meta_data_to_google_sheets(analysis_data, options)
-
-  if project_analysis.nil? || project_analysis[:content].nil?
+  if analysis_data.nil? || analysis_data[:content].nil?
     UI.error("Project data is nil, can't report to google sheet")
     raise 'Project data not available'
   else
-    project_data = project_analysis[:content]
+    project_data = analysis_data[:content]
     project_data['branch'] = options[:branch]
 
     upload_data = _smf_create_meta_report_to_upload(project_data)
@@ -50,6 +45,7 @@ def _smf_upload_meta_report_to_spread_sheet(data)
   sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_META_INFO_DOC_ID_KEY]
 
   # Use the 'playground' sheet for testing purposing during development
+  # TODO: revert to production sheet
   sheet_name = ENV[$REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME_PLAYGROUND]
   # sheet_name = ENV[$REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME]
 
