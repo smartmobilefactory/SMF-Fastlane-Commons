@@ -1,6 +1,7 @@
 private_lane :smf_report_metrics do |options|
   smf_report_depencencies(options)
   smf_owasp_report(options)
+  smf_meta_report(options)
 end
 
 private_lane :smf_meta_report do |options|

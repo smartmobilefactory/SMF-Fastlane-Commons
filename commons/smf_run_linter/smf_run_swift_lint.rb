@@ -40,13 +40,9 @@ end
 def _create_output_base_folder
   dirname = "#{smf_workspace_dir}/#{SWIFT_LINT_OUTPUT_BASE_DIR}"
   # create dir only if not existing
-  UI.important("Should create dir at: #{dirname}")
   unless File.directory?(dirname)
-    UI.important("now trying to create dir at: #{dirname}")
     FileUtils.mkdir_p(dirname)
   end
-
-  UI.important("File.directory?: #{File.directory?(dirname)}")
 end
 
 def smf_swift_lint_output_path
