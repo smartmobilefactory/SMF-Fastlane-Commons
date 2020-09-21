@@ -20,6 +20,7 @@ private_lane :smf_run_swift_lint do
   swiftlint(
       output_file: smf_swift_lint_output_path,
       config_file: swift_lint_yml,
+      reporter: "json",
       ignore_exit_status: true,
       reporter: "checkstyle",
       executable: swift_lint_executable_path
