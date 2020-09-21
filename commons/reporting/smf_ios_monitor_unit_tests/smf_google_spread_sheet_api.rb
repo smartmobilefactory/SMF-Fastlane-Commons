@@ -54,8 +54,8 @@ def smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, data)
   end
 end
 
-# Takes sheet_id, sheet_name and sheet_entries to append to the given sheet
-# for the structure and necessary keys of a sheet_entry see 'smf_create_spreadsheet_entry(...)'
+# Takes sheet_entries (array) and reporting_type to gather the necessary keys
+# for a valid JSON reporting to the online spreadsheet.
 def smf_create_sheet_data_from_entries(sheet_entries, reporting_type)
 
   values = []

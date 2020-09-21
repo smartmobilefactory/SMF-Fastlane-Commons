@@ -35,7 +35,7 @@ def _smf_create_meta_report_to_upload(project_data)
     unwrapped_data[key] = _smf_unwrap_value(value)
   }
 
-  UI.message("DEBUG #{data_json}") #debug
+  UI.message("DEBUG #{unwrapped_data}") #debug
   # The function smf_create_sheet_data_from_entries expects an array as 1st argument.
   data_json = smf_create_sheet_data_from_entries([unwrapped_data], :META_REPORTING)
   return data_json
