@@ -33,8 +33,8 @@ private_lane :smf_ios_monitor_unit_tests do |options|
       :branch => branch,
       :platform => platform.to_s,
       :build_variant => build_variant.to_s,
-      :test_coverage] => result_parsed.dig('lineCoverage'),
-      :covered_lines] => result_parsed.dig('coveredLines')
+      :test_coverage => result_parsed.dig('lineCoverage'),
+      :covered_lines => result_parsed.dig('coveredLines')
     }
 
     new_entry = smf_create_spreadsheet_entry(project_name, entry_data)
@@ -58,11 +58,11 @@ def smf_create_spreadsheet_entry(repo, data)
   entry = {
     :date => Date.today.to_s,
     :repo => repo,
-    :build_variant] => _smf_unwrap_value(data[:build_variant]),
-    :branch] => _smf_unwrap_value(data[:branch]),
-    :platform] => _smf_unwrap_value(data[:platform]),
-    :test_coverage] => _smf_unwrap_value(data[:test_coverage]),
-    :covered_lines] => _smf_unwrap_value(data[:covered_lines])
+    :build_variant => _smf_unwrap_value(data[:build_variant]),
+    :branch => _smf_unwrap_value(data[:branch]),
+    :platform => _smf_unwrap_value(data[:platform]),
+    :test_coverage => _smf_unwrap_value(data[:test_coverage]),
+    :covered_lines => _smf_unwrap_value(data[:covered_lines])
   }
 
   entry
