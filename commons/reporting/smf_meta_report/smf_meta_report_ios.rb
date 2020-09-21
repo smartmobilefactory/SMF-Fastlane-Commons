@@ -1,5 +1,4 @@
 #!/usr/bin/ruby
-require 'json'
 require 'date'
 
 def smf_meta_report_ios(options)
@@ -35,7 +34,6 @@ def _smf_create_meta_report_to_upload(project_data)
     unwrapped_data[key] = _smf_unwrap_value(value)
   }
 
-  UI.message("DEBUG #{unwrapped_data}") #debug
   # The function smf_create_sheet_data_from_entries expects an array as 1st argument.
   data_json = smf_create_sheet_data_from_entries([unwrapped_data], :META_REPORTING)
   return data_json
@@ -46,10 +44,11 @@ def _smf_upload_meta_report_to_spread_sheet(data)
 
   # Use the 'playground' sheet for testing purposing during development
   # TODO: revert to production sheet
-  sheet_name = ENV[$REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME_PLAYGROUND]
+  sheet_name = $REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME_PLAYGROUND
   # sheet_name = ENV[$REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME]
 
-  UI.message("Uploading data to google spreadsheet '#{sheet_name}'")
+  UI.message("DEBUG #{unwrapped_data}") #debug
+  UI.message("Uploading data to google spreadsheet name: '#{sheet_name}', id: '#{sheet_id}'")
   # function from fastlane commons submodule
   smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, data)
 end
