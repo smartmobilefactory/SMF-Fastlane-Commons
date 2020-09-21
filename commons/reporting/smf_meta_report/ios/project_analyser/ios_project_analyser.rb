@@ -1,6 +1,5 @@
 #!/usr/bin/ruby
 
-require_relative "../../helper/file_helper.rb"
 require_relative '../../helper/project_configuration_reader.rb'
 
 # Import modules which analyse one specific property each
@@ -81,3 +80,11 @@ module IOSProjectAnalyser
     return { :content => analysis_json, :is_raw => true, :file => :project_json }
   end
 end
+
+def smf_verify_project_property(property)
+    if @smf_fastlane_config[:project][property] == nil
+      return :WARNING, "Error reading property \"#{property}\" in projects Config.json"
+    end
+
+    return :OK
+  end

@@ -4,14 +4,12 @@ require_relative '../../../helper/project_configuration_reader.rb'
 
 module ProgrammingLanguage
 
-  KEY = 'programming_language'
-
   def self.verification(src_root)
-    return ProjectConfigurationReader::verify_project_property(src_root, 'programming_language')
-    end
+    return smf_verify_project_property(:programming_language)
+	end
 
   def self.analyse(src_root)
     UI.message("Analysing #{self.to_s} ...")
-    return ProjectConfigurationReader::read_project_property(src_root, 'programming_language')
+    return @smf_fastlane_config[:project][:programming_language]
   end
 end

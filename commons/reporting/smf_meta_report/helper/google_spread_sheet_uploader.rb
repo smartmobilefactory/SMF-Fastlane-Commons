@@ -4,7 +4,6 @@ require 'date'
 require 'net/http'
 
 require_relative '../../smf_ios_push_test_results/smf_google_spread_sheet_api.rb'
-require_relative 'file_helper.rb'
 require_relative 'project_configuration_reader.rb'
 
 module GoogleSpreadSheetUploader
@@ -29,7 +28,7 @@ module GoogleSpreadSheetUploader
   def self.create_data_to_upload(project_data)
     UI.message("Preparing data for upload to spreadsheet")
     today = Date.today.to_s
-    project_name = _smf_unwrap_value(ProjectConfigurationReader::read_project_property(smf_workspace_dir, 'project_name'))
+    project_name = _smf_unwrap_value(@smf_fastlane_config[:project][:project_name])
     platform = _smf_unwrap_value(GoogleSpreadSheetUploader::get_platform())
     branch = _smf_unwrap_value(project_data['branch'])
     xcode_version = _smf_unwrap_value(project_data['xcode_version'])
