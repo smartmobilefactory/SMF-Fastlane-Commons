@@ -42,7 +42,7 @@ module BuildNumber
 
   # returns the analysed property
   def self.analyse()
-    UI.message("Analysing #{self.to_s} ...")
+    UI.message("Analysing #{__method__.to_s} ...")
     return @build_number
   end
 end

@@ -43,7 +43,7 @@ module MarketingVersion
 
   # returns the analysed property
   def self.analyse()
-    UI.message("Analysing #{self.to_s} ...")
+    UI.message("Analyser: #{__method__.to_s} ...")
     return @marketing_version
   end
 end

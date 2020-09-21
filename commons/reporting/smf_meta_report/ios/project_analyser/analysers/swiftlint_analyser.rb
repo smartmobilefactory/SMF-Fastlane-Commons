@@ -1,29 +1,13 @@
 #!/usr/bin/ruby
 
-module SwiftlintAnalyser
+def smf_analyse_swiftlint_warnings()
+  UI.message("Analyser: #{__method__.to_s} ...")
 
-  @swiftlint_error_count = nil
-
-  # returns a tupel describing the status and what the error is
-  # first tupel entry is the status: OK, WARNING, ERROR
-  # seconde tupel entry is a message
-  def self.verification()
-    UI.message("Verifying #{self.to_s}")
-
-    if File.file?(smf_swift_lint_output_path) == false
-      return :WARNING, "Couldn't locate swiftlint report at #{smf_swift_lint_output_path}"
-    end
-
-    swiftlint_report = File.read(swiftlint_report_path)
-    swiftlint_json = JSON.parse(swiftlint_report)
-    @swiftlint_error_count = swiftlint_json.count
-
-    return :OK
+  if File.file?(smf_swift_lint_output_path) == false
+    raise "Couldn't locate swiftlint report at #{smf_swift_lint_output_path}"
   end
 
-  # returns the analysed property
-  def self.analyse()
-    UI.message("Analysing #{self.to_s} ...")
-    return @swiftlint_error_count
-  end
+  swiftlint_report = File.read(swiftlint_report_path)
+  swiftlint_json = JSON.parse(swiftlint_report)
+  return swiftlint_json.count
 end

@@ -27,7 +27,7 @@ module BitcodeUsage
   # returns the analysed property
   def self.analyse()
     src_root = smf_workspace_dir
-    UI.message("Analysing #{self.to_s} ...")
+    UI.message("Analyser: #{__method__.to_s} ...")
     analysis_file = BitcodeUsage::bitcode_escape_path(analysis_file_path(src_root))
     bitcode_usage = "enabled"
 
