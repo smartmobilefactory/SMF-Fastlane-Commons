@@ -7,7 +7,7 @@ def smf_analyse_swiftlint_warnings()
     raise "Couldn't locate swiftlint report at #{smf_swift_lint_output_path}"
   end
 
-  swiftlint_report = File.read(swiftlint_report_path)
+  swiftlint_report = File.read(smf_swift_lint_output_path)
   swiftlint_json = JSON.parse(swiftlint_report)
   return swiftlint_json.count
 end
