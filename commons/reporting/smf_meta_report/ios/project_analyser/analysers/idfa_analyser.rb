@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 FILES_TO_IGNORE = ["BITHockeyManager.h", "create-project-json.sh"]
-DIR_TO_IGNORE = [".xcarchive", "MetaJSON-Wrapper.app"]
+DIR_TO_IGNORE = [".xcarchive", "MetaJSON-Wrapper.app", ".fastlane-smf-commons"]
 
 # returns the analysed property
 def smf_analyse_idfa()
@@ -39,6 +39,7 @@ def smf_analyse_idfa()
 
   if idfa_appearances.length > 0
     idfa_usage = "custom"
+    UI.message("IDFA appearances: #{idfa_appearances}")
   end
 
   return {"usage" => idfa_usage, "appearances" => idfa_appearances}

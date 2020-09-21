@@ -4,7 +4,7 @@ require 'date'
 
 def smf_meta_report_ios(options)
 	# Analysis
-	analysis_data = smf_analyse_ios_project(smf_workspace_dir)
+	analysis_data = _smf_analyse_ios_project(smf_workspace_dir)
   UI.message("data analysed")
 
   # Upload
@@ -18,6 +18,18 @@ def smf_meta_report_ios(options)
     upload_data = _smf_create_meta_report_to_upload(analysis_data)
     _smf_upload_meta_report_to_spread_sheet(upload_data)
   end
+end
+
+def _smf_analyse_ios_project(src_root)
+  analysis_json = {}
+  analysis_json[:xcode_version] = smf_analyse_xcode_version()
+  analysis_json[:swiftlint_warnings] = smf_analyse_swiftlint_warnings()
+  analysis_json[:programming_language] = smf_analyse_programming_language()
+  analysis_json[:idfa] = smf_analyse_idfa()
+  analysis_json[:bitcode_enabled] = smf_analyse_bitcode()
+
+  UI.message("DEBUG #{analysis_json}")  #debug
+  return analysis_json
 end
 
 def _smf_create_meta_report_to_upload(project_data)
