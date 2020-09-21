@@ -1,6 +1,7 @@
 private_lane :smf_report_metrics do |options|
-  smf_report_depencencies(options)
-  smf_owasp_report(options)
+  # Disabled for faster testing
+  # smf_report_depencencies(options)
+  # smf_owasp_report(options)
   smf_meta_report(options)
 end
 
@@ -14,6 +15,7 @@ private_lane :smf_meta_report do |options|
     end
   rescue Exception => ex
     UI.message("Meta report could not be performed: #{ex.message}")
+    project_name = @smf_fastlane_config[:project][:project_name]
     smf_send_diagnostic_message(
       title: "#{project_name} smf_meta_report failed",
       message: "#{ex.message}, #{ex}"

@@ -40,16 +40,21 @@ module IOSProjectAnalyser
     verified_analysers = []
     fatal_errors = false
 
+    UI.message("looping on #{ANALYSERS}")
     for analyser in ANALYSERS
+      UI.message("analysing analyser: #{analyser.to_s}")
       status, message = analyser.verification(src_root)
       if status == :OK
+        UI.message("ok! for analyser #{analyser.to_s}")
         verified_analysers.push(analyser)
       elsif status == :ERROR
+        UI.message("fatal error for analyser: #{analyser.to_s}")
         fatal_errors = true
       end
 
       if message != nil
         message = "[#{analyser.to_s}] " + message
+        UI.message(message)
       end
 
       IOSProjectAnalyser::log_status(status, message)
@@ -64,6 +69,7 @@ module IOSProjectAnalyser
 
   def self.analyse(src_root)
     verified_analysers = validate(src_root)
+    UI.message("verified analysers: #{verified_analysers}")
     # Dictionary to hold the final json data which will be pushed to the monitoring tool.
     analysis_json = {}
 
