@@ -7,19 +7,15 @@ require_relative './project_analyser/analysers/ios_project_analyser.rb'
 
 def smf_meta_report_ios(options)
 
-	# ANALYSIS
+	# Analysis
 	analysis_data = [IOSProjectAnalyser::analyse(smf_workspace_dir)]
   analysis_data.compact!
 
-  # UPLOAD
+  # Upload
   _smf_report_meta_data_to_google_sheets(analysis_data, options)
-
 end
 
 def _smf_report_meta_data_to_google_sheets(analysis_data, options)
-  project_analysis = analysis_data.find do |analysis|
-    analysis[:file] == :project_json
-  end
 
   if project_analysis.nil? || project_analysis[:content].nil?
     UI.error("Project data is nil, can't report to google sheet")
@@ -57,9 +53,12 @@ end
 
 def _smf_upload_meta_report_to_spread_sheet(data)
   sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_META_INFO_DOC_ID_KEY]
-  sheet_name = ENV[$REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME]
 
-  UI.message("Uploading data to google spreadsheet #{sheet_name}")
+  # Use the 'playground' sheet for testing purposing during development
+  sheet_name = ENV[$REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME_PLAYGROUND]
+  # sheet_name = ENV[$REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME]
+
+  UI.message("Uploading data to google spreadsheet '#{sheet_name}'")
   # function from fastlane commons submodule
   smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, data)
 end

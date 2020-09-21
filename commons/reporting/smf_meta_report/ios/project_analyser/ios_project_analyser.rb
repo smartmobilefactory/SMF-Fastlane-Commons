@@ -66,7 +66,7 @@ module IOSProjectAnalyser
 
   def self.analyse(src_root)
     verified_analysers = validate(src_root)
-    # Dictionary to hold the final json data which will be written into the output json file
+    # Dictionary to hold the final json data which will be pushed to the monitoring tool.
     analysis_json = {}
 
     # execute all analysers
@@ -75,7 +75,7 @@ module IOSProjectAnalyser
       analysis_json[analyser::KEY] = analyser.analyse(src_root)
     end
 
-    return { :content => analysis_json, :is_raw => true, :file => :project_json }
+    return { :content => analysis_json }
   end
 end
 
