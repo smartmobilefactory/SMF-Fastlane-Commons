@@ -52,3 +52,13 @@ end
 def smf_swift_lint_rules_report_path
   "#{smf_workspace_dir}/#{SWIFT_LINT_RULES_REPORT_PATH}"
 end
+
+def smf_swift_lint_number_of_warnings()
+  if File.file?(smf_swift_lint_output_path) == false
+    raise "Couldn't locate swiftlint report at #{smf_swift_lint_output_path}"
+  end
+
+  swiftlint_report = File.read(smf_swift_lint_output_path)
+  swiftlint_json = JSON.parse(swiftlint_report)
+  return swiftlint_json.count
+end
