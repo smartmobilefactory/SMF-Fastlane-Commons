@@ -1,16 +1,30 @@
 #!/usr/bin/ruby
 
 require 'fileutils'
+require 'json'
 
-require_relative 'logger.rb'
-require_relative 'json_reader.rb'
+# TODO: use already loaded config.json
 
 module ProjectConfigurationReader
 
   PROJECT_CONFIG_FILE = "Config.json"
 
+  def self.read_JSON(path)
+
+    if File.exist?(path)
+
+      json_from_config = File.read(path)
+      config_json = JSON.parse(json_from_config)
+
+      return config_json
+    end
+
+    return nil
+  end
+
+
   def self.verify_project_property(src_root, property)
-    config = JsonReader::read(config_path(src_root))
+    config = ProjectConfigurationReader::read_JSON(config_path(src_root))
 
     if config == nil
       return :ERROR, "Error reading project Config.json, " + config_path(src_root) + " does not exist."
@@ -22,7 +36,7 @@ module ProjectConfigurationReader
   end
 
   def self.read_project_property(src_root, property)
-    config = JsonReader::read(config_path(src_root))
+    config = ProjectConfigurationReader::read_JSON(config_path(src_root))
     if config != nil
       return config['project'][property]
     end

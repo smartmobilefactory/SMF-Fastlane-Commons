@@ -1,20 +1,18 @@
 #!/usr/bin/ruby
 
-require_relative '../../../helper/logger.rb'
-
 module AtsException
 
   KEY = 'ats'
   PATHS_TO_IGNORE = [
-    "*/Pods/*", 
-    "*/Carthage/*", 
-    "**/.xcarchive.xcarchive/*", 
+    "*/Pods/*",
+    "*/Carthage/*",
+    "**/.xcarchive.xcarchive/*",
     "*/MetaJSON-Wrapper.app/*"
   ]
 
   DIR_TO_MATCH = [
-    /.*\/Extensions\/.*/, 
-    /.*\/PLists\/.*/, 
+    /.*\/Extensions\/.*/,
+    /.*\/PLists\/.*/,
     /.*\/plists\/.*/
   ]
 
@@ -31,7 +29,7 @@ module AtsException
 
   # returns the analysed property
   def self.analyse(src_root)
-    Logger::info("Analysing #{self.to_s} ...")
+    UI.message("Analysing #{self.to_s} ...")
 
     plist_paths = ""
 

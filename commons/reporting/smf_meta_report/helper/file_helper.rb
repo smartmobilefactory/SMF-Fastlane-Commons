@@ -2,12 +2,10 @@
 
 require 'fileutils'
 
-require_relative 'logger.rb'
-
 module FileHelper
 
   def self.remove_dir(path)
-    Logger::info("Deleting #{path}")
+    UI.message("Deleting #{path}")
     if File.exists?(path)
       FileUtils.rm_r(path)
     end
@@ -28,8 +26,8 @@ module FileHelper
 
   def self.create_write(path, content)
     self.create_parent_dir(path)
-    File.open(path, "w") {|f| 
-      f.write(content) 
+    File.open(path, "w") {|f|
+      f.write(content)
     }
   end
 
@@ -55,8 +53,8 @@ module FileHelper
   def self.file_content(path)
     begin
       return File.read(path)
-    rescue 
-      Logger::error("Error reading file: #{path}")
+    rescue
+      UI.error("Error reading file: #{path}")
       return nil
     end
   end

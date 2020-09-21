@@ -1,6 +1,5 @@
 #!/usr/bin/ruby
 
-require_relative "../../helper/logger.rb"
 require_relative "../../helper/file_helper.rb"
 require_relative '../../helper/project_configuration_reader.rb'
 
@@ -30,9 +29,19 @@ module IOSProjectAnalyser
     SwiftlintAnalyser
   ]
 
+  def self.log_status(status, msg)
+    if status == :ERROR
+      UI.error("[#{status.to_s}] #{msg}")
+    elsif status == :WARNING
+      UI.important("[#{status.to_s}] #{msg}")
+    elsif msg != nil
+      UI.message("[#{status.to_s}] #{msg}")
+    end
+  end
+
   # verify all analysers
   def self.validate(src_root)
-    Logger::info("Verifying #{self.to_s}s")
+    UI.message("Verifying #{self.to_s}s")
     verified_analysers = []
     fatal_errors = false
 
@@ -48,7 +57,7 @@ module IOSProjectAnalyser
         message = "[#{analyser.to_s}] " + message
       end
 
-      Logger::status(status, message)
+      IOSProjectAnalyser::log_status(status, message)
     end
 
     if fatal_errors
@@ -65,7 +74,7 @@ module IOSProjectAnalyser
     analysis_json = {}
 
     # execute all analysers
-    Logger::info("Starting analysis")
+    UI.message("Starting analysis")
     for analyser in verified_analysers
       analysis_json[analyser::KEY] = analyser.analyse(src_root)
     end

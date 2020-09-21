@@ -1,6 +1,5 @@
 #!/usr/bin/ruby
 
-require_relative '../../../helper/logger.rb'
 require_relative '../../../helper/project_configuration_reader.rb'
 
 module XcodeVersion
@@ -15,7 +14,7 @@ module XcodeVersion
   end
 
   def self.analyse(src_root)
-    Logger::info("Analysing #{self.to_s} ...")
+    UI.message("Analysing #{self.to_s} ...")
     return ProjectConfigurationReader::read_project_property(src_root, 'xcode_version')
   end
 end

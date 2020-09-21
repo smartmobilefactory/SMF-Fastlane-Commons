@@ -1,7 +1,5 @@
 #!/usr/bin/ruby
 
-require_relative '../../../helper/logger.rb'
-
 module Template
 
   KEY = ''
@@ -10,11 +8,11 @@ module Template
   # first tupel entry is the status: OK, WARNING, ERROR
   # seconde tupel entry is a message
   def self.verification(src_root)
-    
+
   end
 
   # returns the analysed property
   def self.analyse(src_root)
-    Logger::info("Analysing #{self.to_s} ...")
+    UI.message("Analysing #{self.to_s} ...")
   end
 end

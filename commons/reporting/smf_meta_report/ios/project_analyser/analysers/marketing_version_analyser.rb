@@ -1,7 +1,5 @@
 #!/usr/bin/ruby
 
-require_relative '../../../helper/logger.rb'
-
 module MarketingVersion
 
   KEY = 'build_number'
@@ -44,7 +42,7 @@ module MarketingVersion
 
   # returns the analysed property
   def self.analyse(src_root)
-    Logger::info("Analysing #{self.to_s} ...")
+    UI.message("Analysing #{self.to_s} ...")
     return @marketing_version
   end
 end

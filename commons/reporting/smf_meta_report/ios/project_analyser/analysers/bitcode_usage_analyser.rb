@@ -1,6 +1,5 @@
 #!/usr/bin/ruby
 
-require_relative '../../../helper/logger.rb'
 require_relative '../../../helper/project_configuration_reader.rb'
 
 module BitcodeUsage
@@ -26,7 +25,7 @@ module BitcodeUsage
 
   # returns the analysed property
   def self.analyse(src_root)
-    Logger::info("Analysing #{self.to_s} ...")
+    UI.message("Analysing #{self.to_s} ...")
     analysis_file = FileHelper::escape_path(analysis_file_path(src_root))
     bitcode_usage = "enabled"
 

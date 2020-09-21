@@ -4,6 +4,9 @@ require 'json'
 require 'date'
 require 'net/http'
 
+
+# TODO: merge constants
+
 require_relative '../../Submodules/SMF-Fastlane-Commons/fastlane/utils/Constants.rb'
 require_relative '../../Submodules/SMF-Fastlane-Commons/commons/reporting/smf_ios_push_test_results/smf_google_spread_sheet_api.rb'
 
@@ -22,13 +25,13 @@ module GoogleSpreadSheetUploader
     end
 
     if swift_lint_analysis.nil? || swift_lint_analysis[:content].nil?
-      Logger::warning('Unable to find swiftlint.json to report to google sheet')
+      UI.important('Unable to find swiftlint.json to report to google sheet')
     else
       swiftlint_report_path = swift_lint_analysis[:content]
       swiftlint_json_content = FileHelper::file_content(swiftlint_report_path)
-      
+
       if swiftlint_json_content.nil? || swiftlint_json_content.empty?
-        Logger::warning("swiftlint.json is empty, can't report to google sheets")
+        UI.important("swiftlint.json is empty, can't report to google sheets")
       else
         swiftlint_json = JSON.parse(swiftlint_json_content)
         swiftlint_error_count = swiftlint_json.count
@@ -36,7 +39,7 @@ module GoogleSpreadSheetUploader
     end
 
     if project_analysis.nil? || project_analysis[:content].nil?
-      Logger::error("Project data is nil, can't report to google sheet")
+      UI.error("Project data is nil, can't report to google sheet")
       raise 'Project data not available'
     else
       project_data = project_analysis[:content]
@@ -49,7 +52,7 @@ module GoogleSpreadSheetUploader
   end
 
   def self.create_data_to_upload(project_data, src_root)
-    Logger::info("Preparing data for upload to spreadsheet")
+    UI.message("Preparing data for upload to spreadsheet")
     today = Date.today.to_s
     project_name = _smf_unwrap_value(ProjectConfigurationReader::read_project_property(src_root, 'project_name'))
     platform = _smf_unwrap_value(GoogleSpreadSheetUploader::get_platform(src_root))
@@ -59,7 +62,7 @@ module GoogleSpreadSheetUploader
     bitcode = _smf_unwrap_value(project_data['bitcode_enabled'])
     swiftlint_warnings = _smf_unwrap_value(project_data['swiftlint_warnings'])
 
-    # The order of these values corresponds to the columns in the google sheet 
+    # The order of these values corresponds to the columns in the google sheet
     # and should not be changed!
     values = [[today, project_name, platform, branch, xcode_version, idfa, bitcode, swiftlint_warnings]]
     data = {
@@ -73,8 +76,8 @@ module GoogleSpreadSheetUploader
   def self.upload_data_to_spread_sheet(data)
     sheet_id = ENV[Constants::REPORTING_GOOGLE_SPREAD_SHEETS_ID_KEY]
     sheet_name = Constants::REPORTING_GOOGLE_SHEETS_SHEET_NAME
-    
-    Logger::info("Uploading data to google spreadsheet #{sheet_name}")
+
+    UI.message("Uploading data to google spreadsheet #{sheet_name}")
     # function from fastlane commons submodule
     smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, data)
   end

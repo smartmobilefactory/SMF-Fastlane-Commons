@@ -1,7 +1,5 @@
 #!/usr/bin/ruby
 
-require_relative '../../../helper/logger.rb'
-
 module Idfa
 
   KEY = 'idfa'
@@ -23,7 +21,7 @@ module Idfa
 
   # returns the analysed property
   def self.analyse(src_root)
-    Logger::info("Analysing #{self.to_s} ...")
+    UI.message("Analysing #{self.to_s} ...")
 
     idfa_usage = "disabled"
     idfa_appearances = []
@@ -48,7 +46,7 @@ module Idfa
           occourance = matches[0].gsub(":", "").gsub("#{src_root}", "").gsub("Binary file ", "")
           if idfa_appearances.include?(occourance) == false
             idfa_appearances.push(occourance)
-          end 
+          end
         end
       end
     end

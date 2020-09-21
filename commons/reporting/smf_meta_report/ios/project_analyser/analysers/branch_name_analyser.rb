@@ -1,7 +1,5 @@
 #!/usr/bin/ruby
 
-require_relative '../../../helper/logger.rb'
-
 module BranchName
 
   KEY = 'branch_name'
@@ -34,7 +32,7 @@ module BranchName
 
   # returns the analysed property
   def self.analyse(src_root)
-    Logger::info("Analysing #{self.to_s} ...")
+    UI.message("Analysing #{self.to_s} ...")
     return @branch_name
   end
 end

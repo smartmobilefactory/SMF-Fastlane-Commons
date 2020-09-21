@@ -1,7 +1,5 @@
 #!/usr/bin/ruby
 
-require_relative '../../../helper/logger.rb'
-
 module BuildNumber
 
   KEY = 'build_number'
@@ -43,7 +41,7 @@ module BuildNumber
 
   # returns the analysed property
   def self.analyse(src_root)
-    Logger::info("Analysing #{self.to_s} ...")
+    UI.message("Analysing #{self.to_s} ...")
     return @build_number
   end
 end
