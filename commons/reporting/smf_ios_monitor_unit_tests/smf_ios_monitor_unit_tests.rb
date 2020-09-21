@@ -47,6 +47,28 @@ private_lane :smf_ios_monitor_unit_tests do |options|
   sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_UNIT_TESTS_DOC_ID_KEY]
   sheet_name = $REPORTING_GOOGLE_SHEETS_UNIT_TESTS_SHEET_NAME
 
-  sheet_data = smf_create_sheet_data_from_entries(sheet_entries)
+  sheet_data = smf_create_sheet_data_from_entries(sheet_entries, :AUTOMATIC_REPORTING)
   smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, sheet_data)
+end
+
+# a spread sheet entry holds data for one line of the spread sheet
+# it is important that for each entry there is a value set
+# so if the a value is not existent (e.g. nil) it should be set to
+# an empty string, to ensure this, use '_smf_unwrap_value'
+def smf_create_spreadsheet_entry(repo, data)
+  return nil if repo.nil?
+
+  today = Date.today.to_s
+  entry = {
+    :date => today,
+    :repo => repo
+  }
+
+  entry[:build_variant] = _smf_unwrap_value(data[:build_variant])
+  entry[:branch] = _smf_unwrap_value(data[:branch])
+  entry[:platform] = _smf_unwrap_value(data[:platform])
+  entry[:test_coverage] = _smf_unwrap_value(data[:test_coverage])
+  entry[:covered_lines] = _smf_unwrap_value(data[:covered_lines])
+
+  entry
 end
