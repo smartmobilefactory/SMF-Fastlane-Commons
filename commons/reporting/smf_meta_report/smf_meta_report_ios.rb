@@ -4,7 +4,6 @@ require 'date'
 def smf_meta_report_ios(options)
 	# Analysis
 	analysis_data = _smf_analyse_ios_project(options)
-  UI.message("data analysed")
 
   # Format and prepare data for uploading
   upload_data = _smf_create_meta_report_to_upload(analysis_data)
@@ -20,7 +19,7 @@ def _smf_analyse_ios_project(options)
   analysis_json[:programming_language] = @smf_fastlane_config[:project][:programming_language]
   analysis_json[:idfa] = smf_analyse_idfa_usage()
   analysis_json[:bitcode] = smf_analyse_bitcode()
-  analysis_json[:branch] = ENV['GIT_BRANCH'] # options[:branch]
+  analysis_json[:branch] = ENV['BRANCH_NAME']
   analysis_json[:date] = Date.today.to_s
   analysis_json[:repo] = @smf_fastlane_config[:project][:project_name]
   analysis_json[:platform] = _smf_meta_report_platform_friendly_name()
