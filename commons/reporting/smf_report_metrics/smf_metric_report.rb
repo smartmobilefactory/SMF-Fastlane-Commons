@@ -24,7 +24,6 @@ private_lane :smf_meta_report do |options|
 end
 
 private_lane :smf_owasp_report do |options|
-  project_name = options[:smf_get_meta_db_project_name]
   begin
     case @platform
     when :android
@@ -37,6 +36,7 @@ private_lane :smf_owasp_report do |options|
     UI.message("OWASP REPORT: #{report.to_json}")
   rescue Exception => ex
     UI.message("Platform dependencies could not be reported: #{ex.message}")
+    project_name = options[:smf_get_meta_db_project_name]
     smf_send_diagnostic_message(
       title: "#{project_name} smf_owasp_report failed",
       message: "#{ex.message}, #{ex}"

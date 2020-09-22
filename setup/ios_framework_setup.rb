@@ -92,7 +92,7 @@ end
 # Linter
 
 private_lane :smf_pod_super_linter do
-    smf_run_swift_lint
+  smf_run_swift_lint
 end
 
 lane :smf_pod_linter do
@@ -119,7 +119,8 @@ lane :smf_pod_danger do |options|
   smf_pod_super_danger(options)
 end
 
-############ REPORTING LANES ############
+############ AUTOMATIC REPORTING LANES ############
+###########  For Unit-Tests Reporting  ############
 
 private_lane :smf_pod_super_reporting do |options|
 
@@ -143,6 +144,18 @@ end
 
 lane :smf_pod_reporting do |options|
   smf_pod_super_reporting(options)
+end
+
+############ META REPORTING LANES ############
+
+private_lane :smf_super_report do |options|
+  build_variant = smf_build_variant(options)
+  smf_pod_linter
+  smf_report_metrics(build_variant: build_variant, smf_get_meta_db_project_name: smf_get_meta_db_project_name)
+end
+
+lane :smf_report do |options|
+  smf_super_report(options)
 end
 
 ############ POD PUBLISH LANES ############
