@@ -23,6 +23,7 @@ def _smf_analyse_ios_project(options)
   analysis_json[:bitcode] = smf_analyse_bitcode()
   analysis_json[:swiftlint_warnings] = smf_swift_lint_number_of_warnings()
   analysis_json[:ats] = smf_analyse_ats_exception()
+  analysis_json[:swift_version] = smf_analyse_swift_version()
 
   # To Review
   analysis_json[:programming_language] = @smf_fastlane_config[:project][:programming_language]
@@ -54,7 +55,6 @@ def _smf_upload_meta_report_to_spread_sheet(data)
   sheet_name = $REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME_PLAYGROUND
   # sheet_name = ENV[$REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME]
 
-  UI.message("DEBUG #{data}") #debug
   UI.message("Uploading data to google spreadsheet name: '#{sheet_name}'")
   # function from fastlane commons submodule
   smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, data)
