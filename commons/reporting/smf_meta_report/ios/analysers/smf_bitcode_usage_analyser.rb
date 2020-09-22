@@ -1,10 +1,10 @@
 #!/usr/bin/ruby
 
 # returns the analysed property
-def smf_analyse_bitcode()
+def smf_analyse_bitcode
   UI.message("Analyser: #{__method__.to_s} ...")
 
-  pbxproj = smf_pbxproj_file_path()
+  pbxproj = smf_pbxproj_file_path
   bitcode_usage = "enabled"
 
   grab_yes = "#{`fgrep -R "ENABLE_BITCODE = " #{pbxproj} | grep -v "YES;"`}"

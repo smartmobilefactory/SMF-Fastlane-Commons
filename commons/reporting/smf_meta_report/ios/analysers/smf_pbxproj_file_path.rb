@@ -3,7 +3,7 @@
 require 'fileutils'
 
 # Returns an escaped path to the pbxproj
-def smf_pbxproj_file_path()
+def smf_pbxproj_file_path
   project_name =`cd #{smf_workspace_dir} && ls | grep -E "(\s|.)+\.xcodeproj"`
 
   if project_name.nil?

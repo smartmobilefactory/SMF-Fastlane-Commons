@@ -12,7 +12,7 @@ DIR_TO_MATCH = [
   /.*\/plists\/.*/
 ]
 
-def smf_analyse_ats_exception()
+def smf_analyse_ats_exception
   src_root = smf_workspace_dir
   UI.message("Analyser: #{__method__.to_s} ...")
 

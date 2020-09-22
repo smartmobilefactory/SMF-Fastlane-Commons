@@ -16,14 +16,14 @@ def _smf_analyse_ios_project(options)
   analysis_json = {}
   analysis_json[:date] = Date.today.to_s
   analysis_json[:repo] = @smf_fastlane_config[:project][:project_name]
-  analysis_json[:platform] = _smf_meta_report_platform_friendly_name()
+  analysis_json[:platform] = _smf_meta_report_platform_friendly_name
   analysis_json[:branch] = ENV['BRANCH_NAME']
   analysis_json[:xcode_version] = @smf_fastlane_config[:project][:xcode_version]
-  analysis_json[:idfa] = smf_analyse_idfa_usage()
-  analysis_json[:bitcode] = smf_analyse_bitcode()
-  analysis_json[:swiftlint_warnings] = smf_swift_lint_number_of_warnings()
-  analysis_json[:ats] = smf_analyse_ats_exception()
-  analysis_json[:swift_version] = smf_analyse_swift_version()
+  analysis_json[:idfa] = smf_analyse_idfa_usage
+  analysis_json[:bitcode] = smf_analyse_bitcode
+  analysis_json[:swiftlint_warnings] = smf_swift_lint_number_of_warnings
+  analysis_json[:ats] = smf_analyse_ats_exception
+  analysis_json[:swift_version] = smf_analyse_swift_version
 
   return analysis_json
 end
@@ -48,7 +48,7 @@ def _smf_upload_meta_report_to_spread_sheet(data)
   smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, data)
 end
 
-def _smf_meta_report_platform_friendly_name()
+def _smf_meta_report_platform_friendly_name
   case "#{@platform.to_s}"
   when 'ios'
     return 'iOS'

@@ -4,7 +4,7 @@ FILES_TO_IGNORE = ["BITHockeyManager.h", "create-project-json.sh"]
 DIR_TO_IGNORE = [".xcarchive", ".fastlane-smf-commons", "build"]
 
 # returns the analysed property
-def smf_analyse_idfa_usage()
+def smf_analyse_idfa_usage
   src_root = smf_workspace_dir
   UI.message("Analyser: #{__method__.to_s} ...")
 

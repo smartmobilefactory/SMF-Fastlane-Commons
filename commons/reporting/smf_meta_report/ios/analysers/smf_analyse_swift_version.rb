@@ -1,11 +1,11 @@
 #!/usr/bin/ruby
 
 # returns the analysed property
-def smf_analyse_swift_version()
+def smf_analyse_swift_version
   UI.message("Analyser: #{__method__.to_s} ...")
 
   swift_version = nil
-  grab = "#{`fgrep -R "SWIFT_VERSION = " #{smf_pbxproj_file_path()}`}"
+  grab = "#{`fgrep -R "SWIFT_VERSION = " #{smf_pbxproj_file_path}`}"
   grab.split("\n").each do |config|
     # Extract Swift version from each line of the output of fgrep.
     if swift_version_match = config.match("([0-9.]+);$")
