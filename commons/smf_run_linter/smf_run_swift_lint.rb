@@ -6,7 +6,7 @@ SWIFT_LINT_OUTPUT_PATH = 'build/swiftlint.result.json'
 SWIFT_LINT_RULES_REPORT_PATH = 'build/swiftlint-rules-report.txt'
 
 private_lane :smf_run_swift_lint do
-  _create_output_base_folder()
+  _create_output_base_folder
 
   swift_lint_executable_path = "#{smf_workspace_dir}/Submodules/SMF-iOS-CommonProjectSetupFiles/SwiftLint/portable_swiftlint/swiftlint"
   swift_lint_yml = "#{smf_workspace_dir}/.swiftlint.yml"
@@ -24,7 +24,7 @@ private_lane :smf_run_swift_lint do
   swiftlint(
       output_file: smf_swift_lint_output_path,
       config_file: swift_lint_yml,
-      reporter: "json",
+      reporter: 'json',
       ignore_exit_status: true,
       executable: swift_lint_executable_path
   )
@@ -53,7 +53,7 @@ def smf_swift_lint_rules_report_path
   "#{smf_workspace_dir}/#{SWIFT_LINT_RULES_REPORT_PATH}"
 end
 
-def smf_swift_lint_number_of_warnings()
+def smf_swift_lint_number_of_warnings
   if File.file?(smf_swift_lint_output_path) == false
     raise "Couldn't locate swiftlint report at #{smf_swift_lint_output_path}"
   end
