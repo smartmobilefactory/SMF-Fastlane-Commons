@@ -11,6 +11,7 @@ def smf_analyse_idfa_usage()
   idfa_usage = "disabled"
   idfa_appearances = []
   file_candidates = []
+  UI.message("Command: fgrep -R advertisingIdentifier #{src_root} #{_smf_idfa_analyser_ignore_files_string} || echo \"error\"")
   file_candidates = `fgrep -R advertisingIdentifier #{src_root} #{_smf_idfa_analyser_ignore_files_string} || echo "error"`
 
   if file_candidates == "error\n"
