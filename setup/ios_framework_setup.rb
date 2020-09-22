@@ -122,7 +122,7 @@ end
 ############ AUTOMATIC REPORTING LANES ############
 ###########  For Unit-Tests Reporting  ############
 
-private_lane :smf_pod_super_reporting do |options|
+private_lane :smf_pod_super_automatic_reporting do |options|
 
   project_name = @smf_fastlane_config.dig(:project, :project_name)
   build_variant_config = @smf_fastlane_config.dig(:build_variants, options[:build_variant].to_sym)
@@ -142,20 +142,20 @@ private_lane :smf_pod_super_reporting do |options|
   )
 end
 
-lane :smf_pod_reporting do |options|
-  smf_pod_super_reporting(options)
+lane :smf_pod_automatic_reporting do |options|
+  smf_pod_super_automatic_reporting(options)
 end
 
 ############ META REPORTING LANES ############
 
-private_lane :smf_super_report do |options|
+private_lane :smf_super_pod_meta_reporting do |options|
   build_variant = smf_build_variant(options)
   smf_pod_linter
   smf_report_metrics(build_variant: build_variant, smf_get_meta_db_project_name: smf_get_meta_db_project_name)
 end
 
-lane :smf_report do |options|
-  smf_super_report(options)
+lane :smf_pod_meta_reporting do |options|
+  smf_super_pod_meta_reporting(options)
 end
 
 ############ POD PUBLISH LANES ############
