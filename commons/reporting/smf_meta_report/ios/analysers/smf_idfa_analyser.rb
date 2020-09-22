@@ -4,7 +4,7 @@ FILES_TO_IGNORE = ["BITHockeyManager.h", "create-project-json.sh"]
 DIR_TO_IGNORE = [".xcarchive", "MetaJSON-Wrapper.app", ".fastlane-smf-commons"]
 
 # returns the analysed property
-def smf_analyse_idfa()
+def smf_analyse_idfa_usage()
   src_root = smf_workspace_dir
   UI.message("Analyser: #{__method__.to_s} ...")
 
@@ -14,7 +14,7 @@ def smf_analyse_idfa()
   file_candidates = `fgrep -R advertisingIdentifier #{src_root} #{_smf_idfa_analyser_ignore_files_string} || echo "error"`
 
   if file_candidates == "error\n"
-    return {"usage" => idfa_usage, "appearances" => idfa_appearances}
+    return idfa_usage
   else
     file_candidates = file_candidates.split("\n")
   end
@@ -42,7 +42,7 @@ def smf_analyse_idfa()
     UI.message("IDFA appearances: #{idfa_appearances}")
   end
 
-  return {"usage" => idfa_usage, "appearances" => idfa_appearances}
+  return idfa_usage
 end
 
 def _smf_idfa_analyser_ignore_files_string

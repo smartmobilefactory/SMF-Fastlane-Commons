@@ -18,7 +18,7 @@ def _smf_analyse_ios_project(options)
   analysis_json[:xcode_version] = @smf_fastlane_config[:project][:xcode_version]
   analysis_json[:swiftlint_warnings] = smf_swift_lint_number_of_warnings()
   analysis_json[:programming_language] = @smf_fastlane_config[:project][:programming_language]
-  analysis_json[:idfa] = smf_analyse_idfa()
+  analysis_json[:idfa] = smf_analyse_idfa_usage()
   analysis_json[:bitcode] = smf_analyse_bitcode()
   analysis_json[:branch] = options[:branch]
   analysis_json[:date] = Date.today.to_s
