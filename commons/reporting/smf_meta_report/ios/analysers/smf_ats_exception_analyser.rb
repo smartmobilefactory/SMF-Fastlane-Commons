@@ -3,8 +3,7 @@
 PATHS_TO_IGNORE = [
   "*/Pods/*",
   "*/Carthage/*",
-  "**/.xcarchive.xcarchive/*",
-  "*/MetaJSON-Wrapper.app/*"
+  "**/.xcarchive.xcarchive/*"
 ]
 
 DIR_TO_MATCH = [

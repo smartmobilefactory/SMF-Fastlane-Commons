@@ -1,7 +1,6 @@
 private_lane :smf_report_metrics do |options|
-  # Disabled for faster testing
-  # smf_report_depencencies(options)
-  # smf_owasp_report(options)
+  smf_report_depencencies(options)
+  smf_owasp_report(options)
   smf_meta_report(options)
 end
 

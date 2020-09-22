@@ -23,36 +23,25 @@ def _smf_analyse_ios_project(options)
   analysis_json[:bitcode] = smf_analyse_bitcode()
   analysis_json[:swiftlint_warnings] = smf_swift_lint_number_of_warnings()
   analysis_json[:ats] = smf_analyse_ats_exception()
-  version = smf_analyse_swift_version()
-  UI.important("Swift version: '#{version}'")
-  analysis_json[:swift_version] = version
+  analysis_json[:swift_version] = smf_analyse_swift_version()
 
   return analysis_json
 end
 
 def _smf_create_meta_report_to_upload(project_data)
   unwrapped_data = {}
-  UI.message("WRAPPED #{project_data}") #debug
   project_data.each { |key, value|
     unwrapped_data[key] = _smf_unwrap_value(value)
   }
 
-  UI.message("UNWRAPPED #{unwrapped_data}") #debug
-
   # The function smf_create_sheet_data_from_entries expects an array as 1st argument.
   data_json = smf_create_sheet_data_from_entries([unwrapped_data], :META_REPORTING)
-
-  UI.message("FORMATTED #{data_json}") #debug
   return data_json
 end
 
 def _smf_upload_meta_report_to_spread_sheet(data)
   sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_META_INFO_DOC_ID_KEY]
-
-  # Use the 'playground' sheet for testing purposing during development
-  # TODO: revert to production sheet
-  sheet_name = $REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME_PLAYGROUND
-  # sheet_name = ENV[$REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME]
+  sheet_name = $REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME
 
   UI.message("Uploading data to google spreadsheet name: '#{sheet_name}'")
   # function from fastlane commons submodule
