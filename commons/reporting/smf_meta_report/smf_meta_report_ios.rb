@@ -24,12 +24,14 @@ def _smf_analyse_ios_project(options)
   analysis_json[:date] = Date.today.to_s
   analysis_json[:repo] = @smf_fastlane_config[:project][:project_name]
   analysis_json[:platform] = _smf_meta_report_platform_friendly_name()
+  analysis_json[:ats] = smf_analyse_ats_exception()
 
   return analysis_json
 end
 
 def _smf_create_meta_report_to_upload(project_data)
   unwrapped_data = {}
+  UI.message("DEBUG #{project_data}") #debug
   project_data.each { |key, value|
     unwrapped_data[key] = _smf_unwrap_value(value)
   }

@@ -14,6 +14,7 @@ def smf_analyse_idfa_usage()
   file_candidates = `fgrep -R advertisingIdentifier #{src_root} #{_smf_idfa_analyser_ignore_files_string} || echo "error"`
 
   if file_candidates == "error\n"
+    UI.important("[ERROR]: Couldn't analyse IDFA usage")
     return idfa_usage
   else
     file_candidates = file_candidates.split("\n")
