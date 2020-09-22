@@ -14,31 +14,35 @@ end
 
 def _smf_analyse_ios_project(options)
   analysis_json = {}
-  analysis_json[:xcode_version] = @smf_fastlane_config[:project][:xcode_version]
-  analysis_json[:swiftlint_warnings] = smf_swift_lint_number_of_warnings()
-  analysis_json[:programming_language] = @smf_fastlane_config[:project][:programming_language]
-  analysis_json[:idfa] = smf_analyse_idfa_usage()
-  analysis_json[:bitcode] = smf_analyse_bitcode()
-  analysis_json[:branch] = ENV['BRANCH_NAME']
   analysis_json[:date] = Date.today.to_s
   analysis_json[:repo] = @smf_fastlane_config[:project][:project_name]
   analysis_json[:platform] = _smf_meta_report_platform_friendly_name()
+  analysis_json[:branch] = ENV['BRANCH_NAME']
+  analysis_json[:xcode_version] = @smf_fastlane_config[:project][:xcode_version]
+  analysis_json[:idfa] = smf_analyse_idfa_usage()
+  analysis_json[:bitcode] = smf_analyse_bitcode()
+  analysis_json[:swiftlint_warnings] = smf_swift_lint_number_of_warnings()
   analysis_json[:ats] = smf_analyse_ats_exception()
 
-  sh('printenv')
+  # To Review
+  analysis_json[:programming_language] = @smf_fastlane_config[:project][:programming_language]
 
   return analysis_json
 end
 
 def _smf_create_meta_report_to_upload(project_data)
   unwrapped_data = {}
-  UI.message("DEBUG #{project_data}") #debug
+  UI.message("WRAPPED #{project_data}") #debug
   project_data.each { |key, value|
     unwrapped_data[key] = _smf_unwrap_value(value)
   }
 
+  UI.message("UNWRAPPED #{unwrapped_data}") #debug
+
   # The function smf_create_sheet_data_from_entries expects an array as 1st argument.
   data_json = smf_create_sheet_data_from_entries([unwrapped_data], :META_REPORTING)
+
+  UI.message("FORMATTED #{data_json}") #debug
   return data_json
 end
 
