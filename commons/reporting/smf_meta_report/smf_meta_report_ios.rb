@@ -44,7 +44,6 @@ def _smf_upload_meta_report_to_spread_sheet(data)
   sheet_name = $REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME
 
   UI.message("Uploading data to google spreadsheet name: '#{sheet_name}'")
-  # function from fastlane commons submodule
   smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, data)
 end
 
