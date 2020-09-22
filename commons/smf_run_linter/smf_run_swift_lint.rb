@@ -52,13 +52,13 @@ def _smf_generate_swiftlint_yml
   regex = "shellScript = .*(/Submodules/SMF-iOS-CommonProjectSetupFiles/setup-common-project-files.sh.*)$"
   pbxproj_content = File.read(smf_pbxproj_file_path)
 
-  script_path = "#{working_dir}/Submodules/SMF-iOS-CommonProjectSetupFiles/SwiftLint/copy-and-run-swiftlint-config.sh"
+  script_path = "#{smf_workspace_dir}/Submodules/SMF-iOS-CommonProjectSetupFiles/SwiftLint/copy-and-run-swiftlint-config.sh"
   use_framework_config = _smf_swift_lint_is_framework(pbxproj_content)
   use_swiftUI_config = _smf_swift_lint_is_swiftUI_project(pbxproj_content)
 
   # Use the script to generate the .swiftlint.yml
   # The script will lint the code, though the result is ignored as it does not use the fastlane plugin.
-  `#{script_path} #{working_dir} #{use_framework_config} #{use_swiftUI_config}`
+  `#{script_path} #{smf_workspace_dir} #{use_framework_config} #{use_swiftUI_config}`
 end
 
 # Based on regex, analyse the pbxproj to determine wheter the current project should use the swiftlint configuration for frameworks
