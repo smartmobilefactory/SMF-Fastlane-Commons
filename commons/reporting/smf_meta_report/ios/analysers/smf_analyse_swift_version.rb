@@ -4,6 +4,23 @@
 def smf_analyse_swift_version
   UI.message("Analyser: #{__method__.to_s} ...")
 
+  # Grab custom swift version, if any
+  swift_version = _smf_grab_custom_swift_version_for_pbxproj
+  if swift_version.nil?
+    # Otherwise use the default swift version related to the xcode version used by the project.
+    swift_version = _smf_get_default_swift_version_for_xcode
+  end
+
+  if swift_version.nil?
+    UI.important("Project might not contained any Swift code or is not programmed in Swift!")
+  end
+
+  swift_version
+end
+
+# Within the project.pbxproj, the SWIFT_VERSION is set when a developer has manually configured it.
+# If he/she hasn't the variable isn't set in the xml and the default value is used (auto-configured by Xcode).
+def _smf_grab_custom_swift_version_for_pbxproj
   swift_version = nil
   grab = "#{`fgrep -R "SWIFT_VERSION = " #{smf_pbxproj_file_path}`}"
   grab.split("\n").each do |config|
@@ -19,8 +36,20 @@ def smf_analyse_swift_version
     end
   end
 
-  if swift_version.nil?
-    UI.important("Project might not contained any Swift code or is not programmed in Swift!")
+  swift_version
+end
+
+def _smf_get_default_swift_version_for_xcode
+  xcode_version = @smf_fastlane_config[:project][:xcode_version]
+  if xcode_version.nil?
+    raise "[ERROR]: Missing 'xcode_version' from Config.json"
+  end
+
+  verbose_version = `/Applications/Xcode-#{xcode_version}.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift -version`
+
+  swift_version = nil
+  if swift_version_match = verbose_version.match("([0-9.]+)")
+    swift_version = swift_version_match.captures[0]
   end
 
   swift_version
