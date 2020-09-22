@@ -20,11 +20,13 @@ def _smf_analyse_ios_project(options)
   analysis_json[:programming_language] = @smf_fastlane_config[:project][:programming_language]
   analysis_json[:idfa] = smf_analyse_idfa_usage()
   analysis_json[:bitcode] = smf_analyse_bitcode()
-  analysis_json[:branch] = options[:branch]
+  analysis_json[:branch] = ENV['GIT_BRANCH'] # options[:branch]
   analysis_json[:date] = Date.today.to_s
   analysis_json[:repo] = @smf_fastlane_config[:project][:project_name]
   analysis_json[:platform] = _smf_meta_report_platform_friendly_name()
   analysis_json[:ats] = smf_analyse_ats_exception()
+
+  sh('printenv')
 
   return analysis_json
 end
