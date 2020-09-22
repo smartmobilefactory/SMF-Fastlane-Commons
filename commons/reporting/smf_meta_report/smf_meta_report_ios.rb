@@ -23,7 +23,9 @@ def _smf_analyse_ios_project(options)
   analysis_json[:bitcode] = smf_analyse_bitcode()
   analysis_json[:swiftlint_warnings] = smf_swift_lint_number_of_warnings()
   analysis_json[:ats] = smf_analyse_ats_exception()
-  analysis_json[:swift_version] = smf_analyse_swift_version()
+  version = smf_analyse_swift_version()
+  UI.important("Swift version: '#{version}'")
+  analysis_json[:swift_version] = version
 
   # To Review
   analysis_json[:programming_language] = @smf_fastlane_config[:project][:programming_language]

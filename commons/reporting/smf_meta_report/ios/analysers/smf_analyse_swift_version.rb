@@ -9,7 +9,7 @@ def smf_analyse_swift_version()
   grab.split("\n").each do |config|
     # Extract Swift version from each line of the output of fgrep.
     if swift_version_match = config.match("([0-9.]+);$")
-      matched_version = swift_version_match.captures
+      matched_version = swift_version_match.captures[0]
       # Check if the swift version is consistent or not
       if swift_version.nil?
         swift_version = matched_version
