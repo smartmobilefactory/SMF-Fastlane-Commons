@@ -68,7 +68,7 @@ def _swift_lint_count_unused_rules
       ENV['DANGER_SWIFT_LINT_RULES_REPORT'] = message
     end
   elsif [:ios, :ios_framework, :macos, :apple].include?(@platform)
-    UI.important("There is not SwiftLint Rules Report file at #{smf_swift_lint_rules_report_path}. Is SwiftLint enabled?")
+    UI.important("There is no SwiftLint rules report at #{smf_swift_lint_rules_report_path}. Is SwiftLint enabled?")
   end
 end
 
