@@ -108,7 +108,7 @@ def _smf_send_dependency_report(report, project_name)
   UI.message("dependency data were reported:\n#{res.body}")
   smf_send_message(
     title: "#{project_name} dependency data were reported to metaDB !!",
-    message: "Debug notification to check whether the metaDB integration actually works... or not."
+    message: "Debug notification to check whether the metaDB integration actually works... or not.",
     slack_channel: 'reporting-error-log'
   )
 end
