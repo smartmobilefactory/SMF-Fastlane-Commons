@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
-FILES_TO_IGNORE = ["BITHockeyManager.h", "create-project-json.sh"]
-DIR_TO_IGNORE = [".xcarchive", ".fastlane-smf-commons", "build"]
+FILES_TO_IGNORE = ['BITHockeyManager.h', 'create-project-json.sh']
+DIR_TO_IGNORE = ['.xcarchive', '.fastlane-smf-commons', 'build']
 
 # returns the analysed property
 def smf_analyse_idfa_usage
