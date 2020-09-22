@@ -44,11 +44,32 @@ private_lane :smf_danger do |options|
 
   _smf_create_jira_ticket_links
 
+  _swift_lint_count_unused_rules
+
   danger(
       github_api_token: ENV[$DANGER_GITHUB_TOKEN_KEY],
       dangerfile: "#{File.expand_path(File.dirname(__FILE__))}/Dangerfile",
       verbose: true
   )
+end
+
+def _swift_lint_count_unused_rules
+
+  if File.exist?(smf_swift_lint_rules_report_path)
+    line_count = `wc -l "#{smf_swift_lint_rules_report_path}"`.strip.split(' ')[0].to_i
+    # In the report, there is a total of 4 lines used as format for the document (header/footer)
+    # Remove them from the total line count to get an exact number of unused swiftlint rules.
+    line_count = (line_count - 4)
+    if line_count > 0
+      file_path = smf_swift_lint_rules_report_path.sub(smf_workspace_dir, '')
+      report_URL = "#{ENV['BUILD_URL']}/execution/node/3/ws/#{file_path}"
+      href = "<a href=\"#{report_URL}\" target=\"_blank\">#{file_path}</a>"
+      message = "There is a total of <b>#{line_count}</b> unused Swiftlint rules!<br>Please check the generated report directly on Jenkins: #{href}"
+      ENV['DANGER_SWIFT_LINT_RULES_REPORT'] = message
+    end
+  elsif [:ios, :ios_framework, :macos, :apple].include?(@platform)
+    UI.important("There is no SwiftLint rules report at #{smf_swift_lint_rules_report_path}. Is SwiftLint enabled?")
+  end
 end
 
 def _check_common_project_setup_files

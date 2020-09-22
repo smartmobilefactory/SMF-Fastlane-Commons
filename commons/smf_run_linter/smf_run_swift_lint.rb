@@ -1,5 +1,6 @@
 # Constants
 SWIFT_LINT_OUTPUT_PATH = 'build/swiftlint.result.json'
+SWIFT_LINT_RULES_REPORT_PATH = 'build/swiftlint-rules-report.txt'
 
 private_lane :smf_run_swift_lint do
 
@@ -23,8 +24,19 @@ private_lane :smf_run_swift_lint do
       reporter: "checkstyle",
       executable: swift_lint_executable_path
   )
+
+  # Generate Rules Report
+  UI.important("Generating report of unused Swiftlint rules")
+  swift_lint_report = "#{smf_workspace_dir}/Submodules/SMF-iOS-CommonProjectSetupFiles/SwiftLint/check_missing_rule_configurations.sh"
+  if File.exist?(swift_lint_report)
+    sh("#{swift_lint_report} #{smf_workspace_dir} #{smf_workspace_dir}/#{SWIFT_LINT_RULES_REPORT_PATH}")
+  end
 end
 
 def smf_swift_lint_output_path
   "#{smf_workspace_dir}/#{SWIFT_LINT_OUTPUT_PATH}"
+end
+
+def smf_swift_lint_rules_report_path
+  "#{smf_workspace_dir}/#{SWIFT_LINT_RULES_REPORT_PATH}"
 end
