@@ -8,15 +8,12 @@ def smf_analyse_idfa_usage()
   src_root = smf_workspace_dir
   UI.message("Analyser: #{__method__.to_s} ...")
 
-  idfa_usage = "disabled"
   idfa_appearances = []
   file_candidates = []
-  UI.message("Command: fgrep -R advertisingIdentifier #{src_root} #{_smf_idfa_analyser_ignore_files_string} || echo \"error\"")
-  file_candidates = `fgrep -R advertisingIdentifier #{src_root} #{_smf_idfa_analyser_ignore_files_string} || echo "error"`
+  file_candidates = `fgrep -R advertisingIdentifier #{src_root} #{_smf_idfa_analyser_ignore_files_string} || echo "disabled"`
 
-  if file_candidates == "error\n"
-    UI.important("[ERROR]: Couldn't analyse IDFA usage")
-    return idfa_usage
+  if file_candidates == "disabled\n"
+    return "disabled"
   else
     file_candidates = file_candidates.split("\n")
   end
@@ -39,6 +36,7 @@ def smf_analyse_idfa_usage()
     end
   end
 
+  idfa_usage = "disabled"
   if idfa_appearances.length > 0
     idfa_usage = "custom"
     UI.message("IDFA appearances: #{idfa_appearances}")
