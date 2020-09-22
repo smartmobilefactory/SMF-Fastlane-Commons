@@ -1,6 +1,7 @@
 private_lane :smf_report_metrics do |options|
   smf_report_depencencies(options)
-  smf_owasp_report(options)
+  # Disabled for now as the owasp data are not sent to metaDB.
+  # smf_owasp_report(options)
   smf_meta_report(options)
 end
 
@@ -86,11 +87,11 @@ private_lane :smf_report_depencencies do |options|
   end
 
   dependencyReports.each { |value|
-    _smf_send_dependency_report(value)
+    _smf_send_dependency_report(value, project_name)
   }
 end
 
-def _smf_send_dependency_report(report)
+def _smf_send_dependency_report(report, project_name)
   UI.message("repot data:\n#{report.to_json}")
   uri = URI('https://metadb.solutions.smfhq.com/api/v1/software')
 
@@ -104,5 +105,10 @@ def _smf_send_dependency_report(report)
 
   res = https.request(req)
 
-  UI.message("dependency data was reported:\n#{res.body}")
+  UI.message("dependency data were reported:\n#{res.body}")
+  smf_send_message(
+    title: "#{project_name} dependency data were reported to metaDB !!",
+    message: "Debug notification to check whether the metaDB integration actually works... or not."
+    slack_channel: 'reporting-error-log'
+  )
 end
