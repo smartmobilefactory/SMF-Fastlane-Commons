@@ -27,9 +27,6 @@ def _smf_analyse_ios_project(options)
   UI.important("Swift version: '#{version}'")
   analysis_json[:swift_version] = version
 
-  # To Review
-  analysis_json[:programming_language] = @smf_fastlane_config[:project][:programming_language]
-
   return analysis_json
 end
 
