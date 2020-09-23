@@ -76,8 +76,7 @@ end
 # Danger
 
 private_lane :smf_super_pipeline_danger do |options|
-
-  smf_danger
+  smf_danger(options)
 end
 
 lane :smf_pipeline_danger do |options|
