@@ -1,10 +1,29 @@
 private_lane :smf_report_metrics do |options|
   smf_report_depencencies(options)
-  smf_owasp_report(options)
+  # Disabled for now as the owasp data are not sent to metaDB.
+  # smf_owasp_report(options)
+  smf_meta_report(options)
+end
+
+private_lane :smf_meta_report do |options|
+  begin
+    case @platform
+    when :ios, :macos, :apple, :ios_framework
+      smf_meta_report_ios(options)
+    else
+      UI.message("The platform \"#{@platform}\" does not support meta reports")
+    end
+  rescue Exception => ex
+    UI.message("Meta report could not be performed: #{ex.message}")
+    project_name = @smf_fastlane_config[:project][:project_name]
+    smf_send_diagnostic_message(
+      title: "#{project_name} smf_meta_report failed",
+      message: "#{ex.message}, #{ex}"
+    )
+  end
 end
 
 private_lane :smf_owasp_report do |options|
-  project_name = options[:smf_get_meta_db_project_name]
   begin
     case @platform
     when :android
@@ -17,6 +36,7 @@ private_lane :smf_owasp_report do |options|
     UI.message("OWASP REPORT: #{report.to_json}")
   rescue Exception => ex
     UI.message("Platform dependencies could not be reported: #{ex.message}")
+    project_name = options[:smf_get_meta_db_project_name]
     smf_send_diagnostic_message(
       title: "#{project_name} smf_owasp_report failed",
       message: "#{ex.message}, #{ex}"
@@ -67,11 +87,11 @@ private_lane :smf_report_depencencies do |options|
   end
 
   dependencyReports.each { |value|
-    _smf_send_dependency_report(value)
+    _smf_send_dependency_report(value, project_name)
   }
 end
 
-def _smf_send_dependency_report(report)
+def _smf_send_dependency_report(report, project_name)
   UI.message("repot data:\n#{report.to_json}")
   uri = URI('https://metadb.solutions.smfhq.com/api/v1/software')
 
@@ -85,5 +105,10 @@ def _smf_send_dependency_report(report)
 
   res = https.request(req)
 
-  UI.message("dependency data was reported:\n#{res.body}")
+  UI.message("dependency data were reported:\n#{res.body}")
+  smf_send_message(
+    title: "#{project_name} dependency data were reported to metaDB !!",
+    message: "Debug notification to check whether the metaDB integration actually works... or not.",
+    slack_channel: 'reporting-error-log'
+  )
 end

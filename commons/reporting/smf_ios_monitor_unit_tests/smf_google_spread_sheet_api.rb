@@ -54,14 +54,18 @@ def smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, data)
   end
 end
 
-# Takes sheet_id, sheet_name and sheet_entries to append to the given sheet
-# for the structure and necessary keys of a sheet_entry see 'smf_create_spreadsheet_entry(...)'
-def smf_create_sheet_data_from_entries(sheet_entries)
+# Takes sheet_entries (array) and reporting_type to gather the necessary keys
+# for a valid JSON reporting to the online spreadsheet.
+def smf_create_sheet_data_from_entries(sheet_entries, reporting_type)
 
   values = []
 
   sheet_entries.each do |entry|
-    values.push(_smf_spreadsheet_entry_to_line(entry))
+    if reporting_type == :AUTOMATIC_REPORTING
+      values.push(_smf_automatic_reporting_spreadsheet_entry_to_line(entry))
+    elsif reporting_type == :META_REPORTING
+      values.push(_smf_meta_reporting_spreadsheet_entry_to_line(entry))
+    end
   end
 
   data = {
@@ -74,32 +78,16 @@ end
 
 ############### SPREAD SHEET HELPER ###############
 
-def _smf_spreadsheet_entry_to_line(entry)
+def _smf_automatic_reporting_spreadsheet_entry_to_line(entry)
   # The order of the elements in this array directly correspond to the table columns in the google spread sheet
   # thus it is VERY IMPORTANT to not change the order!
   [entry[:date], entry[:repo], entry[:branch], entry[:platform], entry[:build_variant], entry[:test_coverage], entry[:covered_lines]]
 end
 
-# a spread sheet entry holds data for one line of the spread sheet
-# it is important that for each entry there is a value set
-# so if the a value is not existent (e.g. nil) it should be set to
-# an empty string, to ensure this, use '_smf_unwrap_value'
-def smf_create_spreadsheet_entry(repo, data)
-  return nil if repo.nil?
-
-  today = Date.today.to_s
-  entry = {
-    :date => today,
-    :repo => repo
-  }
-
-  entry[:build_variant] = _smf_unwrap_value(data[:build_variant])
-  entry[:branch] = _smf_unwrap_value(data[:branch])
-  entry[:platform] = _smf_unwrap_value(data[:platform])
-  entry[:test_coverage] = _smf_unwrap_value(data[:test_coverage])
-  entry[:covered_lines] = _smf_unwrap_value(data[:covered_lines])
-
-  entry
+def _smf_meta_reporting_spreadsheet_entry_to_line(entry)
+  # The order of the elements in this array directly correspond to the table columns in the google spread sheet
+  # thus it is VERY IMPORTANT to not change the order!
+  [entry[:date], entry[:repo], entry[:platform], entry[:branch], entry[:xcode_version], entry[:idfa], entry[:bitcode], entry[:swiftlint_warnings], entry[:ats], entry[:swift_version]]
 end
 
 def _smf_unwrap_value(value)
