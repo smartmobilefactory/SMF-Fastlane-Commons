@@ -39,7 +39,9 @@ def smf_analyse_idfa_usage
   idfa_usage = "disabled"
   if idfa_appearances.length > 0
     idfa_usage = "custom"
-    UI.message("IDFA appearances: #{idfa_appearances}")
+    idfa_appearances.each do |appearance|
+      UI.important("IDFA appearance in: #{appearance}")
+    end
   end
 
   return idfa_usage

@@ -60,7 +60,6 @@ private_lane :smf_danger do |options|
 end
 
 def _swift_lint_count_unused_rules
-
   if File.exist?(smf_swift_lint_rules_report_path)
     line_count = `wc -l "#{smf_swift_lint_rules_report_path}"`.strip.split(' ')[0].to_i
     # In the report, there is a total of 4 lines used as format for the document (header/footer)
