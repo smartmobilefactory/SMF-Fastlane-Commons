@@ -69,6 +69,13 @@ $REPORTING_GOOGLE_SHEETS_DOC_ID_KEY = 'REPORTING_SPREADSHEET_ID'
 $REPORTING_GOOGLE_SHEETS_SHEET_NAME = 'unit-tests'
 
 ### Config.json Keys ###
+
+# Deprecated files/folders in repository
 $CONFIG_DEPRECATED_FILES_FOLDERS_IOS = ['.MetaJSON', '.codebeatignore', '.codebeatsettings', '.codeclimate.yml', 'smf.properties']
 $CONFIG_DEPRECATED_FILES_FOLDERS_ANDROID = ['.MetaJSON', '.codebeatignore', '.codebeatsettings', 'smf.properties']
 $CONFIG_DEPRECATED_FILES_FOLDERS_FLUTTER = ['.MetaJSON', '.codebeatignore', '.codebeatsettings', 'smf.properties']
+
+# Required Config.json/project keys
+$CONFIG_REQUIRED_PROJECT_KEYS_IOS = ['xcode_version', 'slack_channel', 'project_name']
+$CONFIG_REQUIRED_PROJECT_KEYS_ANDROID = ['slack_channel', 'project_name']
+$CONFIG_REQUIRED_PROJECT_KEYS_FLUTTER = ['slack_channel', 'project_name']

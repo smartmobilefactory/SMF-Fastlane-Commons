@@ -50,6 +50,10 @@ JSON.parse(ENV['DANGER_REPO_CLEAN_UP_FILES']).each do |file|
   end
 end
 
+JSON.parse(ENV['DANGER_REPO_CLEAN_UP_PROJECT_CONFIG_KEYS']).each do |key|
+  warn("Config.json: Deprecated key in 'Project', please remove: '#{key}'")
+end
+
 ## SWIFTLINT RULES REPORT
 unless ENV['DANGER_SWIFT_LINT_RULES_REPORT'].nil?
   message(ENV['DANGER_SWIFT_LINT_RULES_REPORT'])
