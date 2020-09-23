@@ -46,9 +46,10 @@ private_lane :smf_danger do |options|
 
   _swift_lint_count_unused_rules
 
+  # Clean up repo and Config.json
   _smf_check_config_project_keys
-
   _smf_check_repo_files_folders
+  _smf_check_config_build_variant_keys
 
   danger(
       github_api_token: ENV[$DANGER_GITHUB_TOKEN_KEY],
@@ -119,6 +120,43 @@ def _smf_required_config_keys_for_platform
   end
 
   required_keys
+end
+
+def _smf_check_config_build_variant_keys
+  config = JSON.parse(File.read("#{smf_workspace_dir}/Config.json"), :symbolize_names => false)
+  build_variants = config['build_variants']
+  if build_variants.nil? || build_variants.count == 0
+    UI.error("[ERROR]: Missing or empty 'build_variants' in Config.json")
+  end
+
+  deprecated_keys = _smf_deprecated_build_variant_keys_for_platform
+  deprecated_keys_in_variant = []
+  build_variants.each do |build_variant, build_variant_info|
+    build_variant_info.keys.each do |key|
+      if deprecated_keys.include?(key)
+        deprecated_keys_in_variant.push("#{build_variant}.#{key}")
+      end
+    end
+  end
+
+  ENV['DANGER_REPO_CLEAN_UP_BUILD_VARIANTS'] = JSON.dump(deprecated_keys_in_variant)
+end
+
+def _smf_deprecated_build_variant_keys_for_platform
+  deprecated_keys = []
+  case @platform
+  when :ios, :ios_framework, :macos, :apple
+    deprecated_keys = $CONFIG_DEPRECATED_BUILD_VARIANT_KEYS_IOS
+  when :android
+    deprecated_keys = $CONFIG_DEPRECATED_BUILD_VARIANT_KEYS_ANDROID
+  when :flutter
+    deprecated_keys = $CONFIG_DEPRECATED_BUILD_VARIANT_KEYS_FLUTTER
+  else
+    UI.message("There is no platform \"#{@platform}\", exiting...")
+    raise 'Unknown platform: "#{@platform.to_s}"'
+  end
+
+  deprecated_keys
 end
 
 def _swift_lint_count_unused_rules

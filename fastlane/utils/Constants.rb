@@ -79,3 +79,8 @@ $CONFIG_DEPRECATED_FILES_FOLDERS_FLUTTER = ['.MetaJSON', '.codebeatignore', '.co
 $CONFIG_REQUIRED_PROJECT_KEYS_IOS = ['xcode_version', 'slack_channel', 'project_name']
 $CONFIG_REQUIRED_PROJECT_KEYS_ANDROID = ['slack_channel', 'project_name']
 $CONFIG_REQUIRED_PROJECT_KEYS_FLUTTER = ['slack_channel', 'project_name']
+
+# Deprecated Config.json/build_variants
+$CONFIG_DEPRECATED_BUILD_VARIANT_KEYS_IOS = ['pr.archive_ipa', 'code_signing_identity']
+$CONFIG_DEPRECATED_BUILD_VARIANT_KEYS_ANDROID = []
+$CONFIG_DEPRECATED_BUILD_VARIANT_KEYS_FLUTTER = []
