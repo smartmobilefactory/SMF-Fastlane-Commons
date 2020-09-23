@@ -72,14 +72,14 @@ def _smf_check_repo_files_folders
 end
 
 def _smf_deprecated_files_for_platform
-  deprecated_files = []
+  deprecated_files = $CONFIG_DEPRECATED_FILES_FOLDERS_COMMONS
   case @platform
   when :ios, :ios_framework, :macos, :apple
-    deprecated_files = $CONFIG_DEPRECATED_FILES_FOLDERS_IOS
+    deprecated_files += $CONFIG_DEPRECATED_FILES_FOLDERS_IOS
   when :android
-    deprecated_files = $CONFIG_DEPRECATED_FILES_FOLDERS_ANDROID
+    deprecated_files += $CONFIG_DEPRECATED_FILES_FOLDERS_ANDROID
   when :flutter
-    deprecated_files = $CONFIG_DEPRECATED_FILES_FOLDERS_FLUTTER
+    deprecated_files += $CONFIG_DEPRECATED_FILES_FOLDERS_FLUTTER
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise "Unknown platform: #{@platform.to_s}"
@@ -106,14 +106,14 @@ def _smf_check_config_project_keys
 end
 
 def _smf_required_config_keys_for_platform
-  required_keys = []
+  required_keys = $CONFIG_REQUIRED_PROJECT_KEYS_COMMONS
   case @platform
   when :ios, :ios_framework, :macos, :apple
-    required_keys = $CONFIG_REQUIRED_PROJECT_KEYS_IOS
+    required_keys += $CONFIG_REQUIRED_PROJECT_KEYS_IOS
   when :android
-    required_keys = $CONFIG_REQUIRED_PROJECT_KEYS_ANDROID
+    required_keys += $CONFIG_REQUIRED_PROJECT_KEYS_ANDROID
   when :flutter
-    required_keys = $CONFIG_REQUIRED_PROJECT_KEYS_FLUTTER
+    required_keys += $CONFIG_REQUIRED_PROJECT_KEYS_FLUTTER
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise "Unknown platform: #{@platform.to_s}"
