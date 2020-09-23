@@ -58,9 +58,20 @@ private_lane :smf_danger do |options|
 end
 
 def _smf_check_repo_files_folders
-  deprecated_files = []
   active_files_to_remove = []
+  _smf_deprecated_files_for_platform.each do |deprecated_file|
+    # Check if the files exist within the repo
+    if File.exist?("#{smf_workspace_dir}/#{deprecated_file}")
+      # if so retain the file and warn developers in PR checks.
+      active_files_to_remove.push(deprecated_file)
+    end
+  end
 
+  ENV['DANGER_REPO_CLEAN_UP_FILES'] = JSON.dump(active_files_to_remove)
+end
+
+def _smf_deprecated_files_for_platform
+  deprecated_files = []
   case @platform
   when :ios, :ios_framework, :macos, :apple
     deprecated_files = $CONFIG_DEPRECATED_FILES_FOLDERS_IOS
@@ -73,16 +84,7 @@ def _smf_check_repo_files_folders
     raise 'Unknown platform: "#{@platform.to_s}"'
   end
 
-  deprecated_files.each do |deprecated_file|
-    # Check if the files exist within the repo
-    if File.exist?("#{smf_workspace_dir}/#{deprecated_file}")
-      # if so retain the file and warn developers in PR checks.
-      active_files_to_remove.push(deprecated_file)
-    end
-  end
-
-  ENV['DANGER_REPO_CLEAN_UP_FILES'] = JSON.dump(active_files_to_remove)
-  UI.message(ENV['DANGER_REPO_CLEAN_UP_FILES'])
+  deprecated_files
 end
 
 def _smf_check_config_keys
