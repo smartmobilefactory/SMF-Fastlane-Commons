@@ -45,9 +45,7 @@ end
 
 ## REPO CLEAN UP
 JSON.parse(ENV['DANGER_REPO_CLEAN_UP_FILES']).each do |file|
-  unless file.nil?
-    warn("Deprecated file or folder: '#{file}'. Please remove from the repository")
-  end
+  warn("Deprecated file or folder: '#{file}'. Please remove from the repository")
 end
 
 JSON.parse(ENV['DANGER_REPO_CLEAN_UP_PROJECT_CONFIG_KEYS']).each do |key|
