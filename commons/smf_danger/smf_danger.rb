@@ -46,11 +46,25 @@ private_lane :smf_danger do |options|
 
   _swift_lint_count_unused_rules
 
+  _check_swift_version_in_project
+
   danger(
       github_api_token: ENV[$DANGER_GITHUB_TOKEN_KEY],
       dangerfile: "#{File.expand_path(File.dirname(__FILE__))}/Dangerfile",
       verbose: true
   )
+end
+
+def _check_swift_version_in_project
+  unless [:ios, :ios_framework, :macos, :apple].include?(@platform)
+    return
+  end
+
+  begin
+    smf_analyse_swift_version
+  rescue => exception
+    ENV['DANGER_ERROR_DIFFERENT_SWIFT_VERSION_IN_PROJECT'] = exception.message
+  end
 end
 
 def _swift_lint_count_unused_rules
