@@ -2,7 +2,8 @@ require 'fileutils'
 
 # Constants
 SWIFT_LINT_OUTPUT_BASE_DIR = 'build/'
-SWIFT_LINT_OUTPUT_PATH = 'build/swiftlint.result.json'
+SWIFT_LINT_OUTPUT_XML_PATH = 'build/swiftlint.result.xml'
+SWIFT_LINT_OUTPUT_JSON_PATH = 'build/swiftlint.result.json'
 SWIFT_LINT_RULES_REPORT_PATH = 'build/swiftlint-rules-report.txt'
 
 private_lane :smf_run_swift_lint do
@@ -25,15 +26,23 @@ private_lane :smf_run_swift_lint do
     end
   end
 
-  # Perform lint using the fastlane plugin
+  # Perform a first lint using the 'checkstyle' reporter for the Danger output in the PR
   swiftlint(
-      output_file: smf_swift_lint_output_path,
+      output_file: smf_swift_lint_output_xml_path,
+      config_file: swift_lint_yml,
+      reporter: 'checkstyle',
+      ignore_exit_status: true,
+      executable: swift_lint_executable_path
+  )
+
+  # Perform a seconf lint using the 'json' reporter for the unused rules report
+  swiftlint(
+      output_file: smf_swift_lint_output_json_path,
       config_file: swift_lint_yml,
       reporter: 'json',
       ignore_exit_status: true,
       executable: swift_lint_executable_path
   )
-
   # Generate Rules Report
   UI.important('Generating report of unused Swiftlint rules')
   swift_lint_report = "#{smf_workspace_dir}/Submodules/SMF-iOS-CommonProjectSetupFiles/SwiftLint/check_missing_rule_configurations.sh"
@@ -93,8 +102,12 @@ def _smf_create_output_base_folder
   end
 end
 
-def smf_swift_lint_output_path
-  "#{smf_workspace_dir}/#{SWIFT_LINT_OUTPUT_PATH}"
+def smf_swift_lint_output_xml_path
+  "#{smf_workspace_dir}/#{SWIFT_LINT_OUTPUT_XML_PATH}"
+end
+
+def smf_swift_lint_output_json_path
+  "#{smf_workspace_dir}/#{SWIFT_LINT_OUTPUT_JSON_PATH}"
 end
 
 def smf_swift_lint_rules_report_path
@@ -102,11 +115,11 @@ def smf_swift_lint_rules_report_path
 end
 
 def smf_swift_lint_number_of_warnings
-  if File.file?(smf_swift_lint_output_path) == false
-    raise "Couldn't locate swiftlint report at #{smf_swift_lint_output_path}"
+  if File.file?(smf_swift_lint_output_json_path) == false
+    raise "Couldn't locate swiftlint report at #{smf_swift_lint_output_json_path}"
   end
 
-  swiftlint_report = File.read(smf_swift_lint_output_path)
+  swiftlint_report = File.read(smf_swift_lint_output_json_path)
   swiftlint_json = JSON.parse(swiftlint_report)
   return swiftlint_json.count
 end
