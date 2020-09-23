@@ -65,8 +65,7 @@ def _smf_required_config_keys_for_platform
 end
 
 def _smf_check_config_build_variant_keys
-  config = JSON.parse(File.read("#{smf_workspace_dir}/Config.json"), :symbolize_names => false)
-  build_variants = config['build_variants']
+  build_variants = @smf_fastlane_config[:build_variants]
   if build_variants.nil? || build_variants.count == 0
     UI.error("[ERROR]: Missing or empty 'build_variants' in Config.json")
   end
