@@ -37,9 +37,10 @@ private_lane :smf_owasp_report do |options|
   rescue Exception => ex
     UI.message("Platform dependencies could not be reported: #{ex.message}")
     project_name = options[:smf_get_meta_db_project_name]
-    smf_send_diagnostic_message(
+    smf_send_message(
       title: "#{project_name} smf_owasp_report failed",
-      message: "#{ex.message}, #{ex}"
+      message: "#{ex.message}, #{ex}",
+      slack_channel: 'metadb-error-log'
     )
   end
   # TODO report owasp report to metadb
@@ -80,9 +81,10 @@ private_lane :smf_report_depencencies do |options|
     end
   rescue Exception => ex
     UI.message("Platform dependencies could not be reported: #{ex.message}")
-    smf_send_diagnostic_message(
+    smf_send_message(
       title: "#{project_name} report dependencies failed",
-      message: "#{ex.message}, #{ex}"
+      message: "#{ex.message}, #{ex}",
+      slack_channel: 'metadb-error-log'
     )
   end
 
@@ -109,6 +111,6 @@ def _smf_send_dependency_report(report, project_name)
   smf_send_message(
     title: "#{project_name} dependency data were reported to metaDB !!",
     message: "Debug notification to check whether the metaDB integration actually works... or not.",
-    slack_channel: 'reporting-error-log'
+    slack_channel: 'metadb-success-log'
   )
 end
