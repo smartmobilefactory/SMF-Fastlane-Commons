@@ -46,11 +46,47 @@ private_lane :smf_danger do |options|
 
   _swift_lint_count_unused_rules
 
+  _smf_check_config_keys
+
+  _smf_check_repo_files_folders
+
   danger(
       github_api_token: ENV[$DANGER_GITHUB_TOKEN_KEY],
       dangerfile: "#{File.expand_path(File.dirname(__FILE__))}/Dangerfile",
       verbose: true
   )
+end
+
+def _smf_check_repo_files_folders
+  deprecated_files = []
+  active_files_to_remove = []
+
+  case @platform
+  when :ios, :ios_framework, :macos, :apple
+    deprecated_files = $CONFIG_DEPRECATED_FILES_FOLDERS_IOS
+  when :android
+    deprecated_files = $CONFIG_DEPRECATED_FILES_FOLDERS_ANDROID
+  when :flutter
+    deprecated_files = $CONFIG_DEPRECATED_FILES_FOLDERS_FLUTTER
+  else
+    UI.message("There is no platform \"#{@platform}\", exiting...")
+    raise 'Unknown platform: "#{@platform.to_s}"'
+  end
+
+  deprecated_files.each do |deprecated_file|
+    # Check if the files exist within the repo
+    if File.exist?("#{smf_workspace_dir}/#{deprecated_file}")
+      # if so retain the file and warn developers in PR checks.
+      active_files_to_remove.push(deprecated_file)
+    end
+  end
+
+  ENV['DANGER_REPO_CLEAN_UP_FILES'] = JSON.dump(active_files_to_remove)
+  UI.message(ENV['DANGER_REPO_CLEAN_UP_FILES'])
+end
+
+def _smf_check_config_keys
+  # TODO
 end
 
 def _swift_lint_count_unused_rules

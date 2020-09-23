@@ -68,3 +68,7 @@ $REPORTING_GOOGLE_SHEETS_REFRESH_TOKEN_KEY = 'REPORTING_REFRESH_TOKEN'
 $REPORTING_GOOGLE_SHEETS_DOC_ID_KEY = 'REPORTING_SPREADSHEET_ID'
 $REPORTING_GOOGLE_SHEETS_SHEET_NAME = 'unit-tests'
 
+### Config.json Keys ###
+$CONFIG_DEPRECATED_FILES_FOLDERS_IOS = ['.MetaJSON', '.codebeatignore', '.codebeatsettings', '.codeclimate.yml', 'smf.properties']
+$CONFIG_DEPRECATED_FILES_FOLDERS_ANDROID = ['.MetaJSON', '.codebeatignore', '.codebeatsettings', 'smf.properties']
+$CONFIG_DEPRECATED_FILES_FOLDERS_FLUTTER = ['.MetaJSON', '.codebeatignore', '.codebeatsettings', 'smf.properties']
