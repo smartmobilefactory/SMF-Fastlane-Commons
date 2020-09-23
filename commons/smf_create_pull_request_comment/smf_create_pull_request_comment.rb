@@ -17,7 +17,7 @@ private_lane :smf_create_pull_request_comment do |options|
 
       UI.message("Commenting on the pull request.")
 
-      sh("curl -H \"Authorization: token #{ENV["GITHUB_TOKEN"]}\" -d '{\"body\": \"#{comment}\"}' -X POST https://api.github.com/repos/#{repo_owner}/#{repo_name}/issues/#{ENV["CHANGE_ID"]}/comments -sS -o /dev/null")
+      sh("curl -H \"Authorization: token #{ENV[$SMF_GITHUB_TOKEN_ENV_KEY]}\" -d '{\"body\": \"#{comment}\"}' -X POST https://api.github.com/repos/#{repo_owner}/#{repo_name}/issues/#{ENV["CHANGE_ID"]}/comments -sS -o /dev/null")
   else
     UI.important("Error adding comment on pull request! Unable to extract repository name and repository owner from remote origin url!")
   end

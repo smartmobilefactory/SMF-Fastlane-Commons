@@ -50,8 +50,8 @@ def _smf_commit_generated_file(path, fail_build = true)
   git_add(path: path)
   git_commit(path: path, message: "Updated Generated File: #{file_name}")
 
-  unlock_keychain(path: 'login.keychain', password: ENV['LOGIN'])
-  unlock_keychain(path: 'jenkins.keychain', password: ENV['JENKINS'])
+  unlock_keychain(path: 'login.keychain', password: ENV[$KEYCHAIN_LOGIN_ENV_KEY])
+  unlock_keychain(path: 'jenkins.keychain', password: ENV[$KEYCHAIN_JENKINS_ENV_KEY])
 
   smf_push_to_git_remote(remote_branch: ENV['CHANGE_BRANCH'])
 
