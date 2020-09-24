@@ -81,11 +81,11 @@ private_lane :smf_report_depencencies do |options|
     end
   rescue Exception => ex
     UI.message("Platform dependencies could not be reported: #{ex.message}")
-    smf_send_message(
-      title: "#{project_name} report dependencies failed",
-      message: "#{ex.message}, #{ex}",
-      slack_channel: 'metadb-error-log'
-    )
+    # smf_send_message(
+    #   title: "#{project_name} report dependencies failed",
+    #   message: "#{ex.message}, #{ex}",
+    #   slack_channel: 'metadb-error-log'
+    # )
   end
 
   dependencyReports.each { |value|
