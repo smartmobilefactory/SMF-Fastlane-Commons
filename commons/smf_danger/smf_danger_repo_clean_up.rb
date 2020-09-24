@@ -40,7 +40,7 @@ def _smf_check_config_project_keys
   project_config.keys.each do |key|
     # Retain the key if it is NOT required (eg. allowed) to warn the dev about it.
     UI.message("Is key '#{key}' NOT in the list?")
-    if required_keys.include?(key)
+    if required_keys.include?(key.to_s)
       UI.message("The key '#{key}' is VALID ")
     else
       UI.message("The key '#{key}' is DEPRECATED and should be removed")
