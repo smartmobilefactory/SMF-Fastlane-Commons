@@ -45,15 +45,16 @@ def _smf_check_config_project_missing_required_keys
   ENV['DANGER_REPO_MISSING_REQUIRED_PROJECT_CONFIG_KEYS'] = JSON.dump(missing_required_keys)
 end
 
-def _smf_check_config_project_allowed_keys_only
+def _smf_check_config_project_allowed_only_keys
   # Convert all keys to string for easier matching
   project_config_keys = _get_config(:project).keys.map { |key| key.to_s }
   # Check for non-allowed (or deprecated) keys in the 'config.project' hash
   deprecated_keys = []
+  allowed_keys = _smf_optional_config_keys_for_platform + _smf_required_config_keys_for_platform
   project_config_keys.each do |key|
     # If the key is NOT one of the allowed (and required) keys
     # Then display a warning about it using Danger to ask the dev to remove it from the Config.json.
-    unless _smf_required_config_keys_for_platform.include?(key)
+    unless allowed_keys.include?(key)
       deprecated_keys.push(key)
     end
   end
@@ -78,6 +79,25 @@ def _smf_required_config_keys_for_platform
   required_keys = required_keys.map { |key| key.to_s }
   required_keys
 end
+
+def _smf_optional_config_keys_for_platform
+  optional_keys = $CONFIG_OPTIONAL_PROJECT_KEYS_COMMONS
+  case @platform
+  when :ios, :ios_framework, :macos, :apple
+    optional_keys += $CONFIG_OPTIONAL_PROJECT_KEYS_IOS
+  when :android
+    optional_keys += $CONFIG_OPTIONAL_PROJECT_KEYS_ANDROID
+  when :flutter
+    optional_keys += $CONFIG_OPTIONAL_PROJECT_KEYS_FLUTTER
+  else
+    UI.message("There is no platform \"#{@platform}\", exiting...")
+    raise "Unknown platform: #{@platform.to_s}"
+  end
+
+  optional_keys = optional_keys.map { |key| key.to_s }
+  optional_keys
+end
+
 
 def _smf_check_config_build_variant_keys
   deprecated_keys_in_variant = []

@@ -48,7 +48,7 @@ private_lane :smf_danger do |options|
 
   # Clean up repo and Config.json
   # See file: smf_danger_repo_clean_up.rb
-  _smf_check_config_project_allowed_keys_only
+  _smf_check_config_project_allowed_only_keys
   _smf_check_config_project_missing_required_keys
   _smf_check_repo_files_folders
   _smf_check_config_build_variant_keys
