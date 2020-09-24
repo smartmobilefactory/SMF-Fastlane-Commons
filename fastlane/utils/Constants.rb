@@ -91,7 +91,7 @@ $CONFIG_DEPRECATED_FILES_FOLDERS_FLUTTER = []
 # Required Config.json/project keys
 $CONFIG_REQUIRED_PROJECT_KEYS_COMMONS = ['slack_channel', 'project_name']
 $CONFIG_REQUIRED_PROJECT_KEYS_IOS = ['xcode_version']
-$CONFIG_REQUIRED_PROJECT_KEYS_ANDROID = ['meta_db_name']
+$CONFIG_REQUIRED_PROJECT_KEYS_ANDROID = []
 $CONFIG_REQUIRED_PROJECT_KEYS_FLUTTER = ['xcode_version']
 
 # Optional Config.json/project keys
