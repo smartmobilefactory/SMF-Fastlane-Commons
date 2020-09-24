@@ -83,18 +83,18 @@ $REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME_PLAYGROUND = 'playground'
 ### Config.json Keys ###
 
 # Deprecated files/folders in repository
-$CONFIG_DEPRECATED_FILES_FOLDERS_COMMONS = ['.MetaJSON', '.codebeatignore', '.codebeatsettings', '.codeclimate.yml', 'smf.properties']
+$CONFIG_DEPRECATED_FILES_FOLDERS_COMMONS = ['.codebeatignore', '.codebeatsettings', '.codeclimate.yml', 'smf.properties']
 $CONFIG_DEPRECATED_FILES_FOLDERS_IOS = []
 $CONFIG_DEPRECATED_FILES_FOLDERS_ANDROID = []
 $CONFIG_DEPRECATED_FILES_FOLDERS_FLUTTER = []
 
 # Required Config.json/project keys
 $CONFIG_REQUIRED_PROJECT_KEYS_COMMONS = ['slack_channel', 'project_name']
-$CONFIG_REQUIRED_PROJECT_KEYS_IOS = ['xcode_version']
+$CONFIG_REQUIRED_PROJECT_KEYS_IOS = ['xcode_version', 'oktotest']
 $CONFIG_REQUIRED_PROJECT_KEYS_ANDROID = ['meta_db_name']
 $CONFIG_REQUIRED_PROJECT_KEYS_FLUTTER = []
 
 # Deprecated Config.json/build_variants
-$CONFIG_DEPRECATED_BUILD_VARIANT_KEYS_IOS = ['pr.archive_ipa']
+$CONFIG_DEPRECATED_BUILD_VARIANT_KEYS_IOS = ['pr.archive_ipa', 'upload_itc', 'itc_team_id', 'match']
 $CONFIG_DEPRECATED_BUILD_VARIANT_KEYS_ANDROID = []
 $CONFIG_DEPRECATED_BUILD_VARIANT_KEYS_FLUTTER = []

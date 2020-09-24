@@ -35,20 +35,14 @@ def _smf_check_config_project_keys
   end
 
   required_keys = _smf_required_config_keys_for_platform
-  UI.message("List of required keys: #{required_keys}")
   deprecated_keys = []
   project_config.keys.each do |key|
     # Retain the key if it is NOT required (eg. allowed) to warn the dev about it.
-    UI.message("Is key '#{key}' NOT in the list?")
-    if required_keys.include?(key.to_s)
-      UI.message("The key '#{key}' is VALID ")
-    else
-      UI.message("The key '#{key}' is DEPRECATED and should be removed")
+    unless required_keys.include?(key.to_s)
       deprecated_keys.push(key)
     end
   end
 
-  UI.message("Complete list of deprecated_keys: #{deprecated_keys}")
   ENV['DANGER_REPO_CLEAN_UP_PROJECT_CONFIG_KEYS'] = JSON.dump(deprecated_keys)
 end
 
@@ -81,8 +75,8 @@ def _smf_check_config_build_variant_keys
     build_variant_info.keys.each do |key|
       # For each build_variant
       # Checks for keys that have been marked as deprecated
-      if deprecated_keys.include?(key)
-        deprecated_keys_in_variant.push("#{build_variant}.#{key}")
+      if deprecated_keys.include?(key.to_s)
+        deprecated_keys_in_variant.push("#{build_variant}.#{key.to_s}")
       end
     end
   end
