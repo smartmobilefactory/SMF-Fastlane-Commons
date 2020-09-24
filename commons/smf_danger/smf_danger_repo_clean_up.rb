@@ -1,4 +1,3 @@
-
 def _smf_check_repo_files_folders
   active_files_to_remove = []
   _smf_deprecated_files_for_platform.each do |deprecated_file|
@@ -36,10 +35,13 @@ def _smf_check_config_project_keys
   end
 
   required_keys = _smf_required_config_keys_for_platform
+  UI.message("List of required keys: #{required_keys}")
   deprecated_keys = []
   project_config.keys.each do |key|
     # Retain the key if it is NOT required (eg. allowed) to warn the dev about it.
+    UI.message("Is key '#{key}' NOT in the list?")
     unless required_keys.include?(key)
+      UI.message("The key '#{key}' is DEPRECATED and should be removed")
       deprecated_keys.push(key)
     end
   end
