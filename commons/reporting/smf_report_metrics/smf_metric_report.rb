@@ -94,7 +94,7 @@ private_lane :smf_report_depencencies do |options|
 end
 
 def _smf_send_dependency_report(report, project_name)
-  UI.message("repot data:\n#{report.to_json}")
+  UI.message("report data:\n#{report.to_json}")
   uri = URI('https://metadb.solutions.smfhq.com/api/v1/software')
 
   https = Net::HTTP.new(uri.host,uri.port)
