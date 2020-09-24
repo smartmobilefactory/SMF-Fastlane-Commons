@@ -11,11 +11,7 @@ def smf_dependency_report_cocoapods
       if version == ""
         version = "0.0.0"
       end
-
-      dependencies.push({
-                            'name' => name,
-                            'version' => version
-                        })
+      dependencies.push({name: name, version: version})
     end
   }
 
