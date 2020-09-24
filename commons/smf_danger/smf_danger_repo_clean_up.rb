@@ -28,7 +28,24 @@ def _smf_deprecated_files_for_platform
   deprecated_files
 end
 
-def _smf_check_config_project_keys
+def _smf_check_config_project_missing_required_keys
+  project_config = @smf_fastlane_config[:project]
+  if project_config.nil?
+    UI.error("[ERROR]: Missing 'project' info in Config.json")
+  end
+
+  required_keys = _smf_required_config_keys_for_platform
+  missing_required_keys = []
+  required_keys.each do |key|
+    unless project_config.keys.include?(required_keys.to_s)
+      missing_required_keys.push(key.to_s)
+    end
+  end
+
+  ENV['DANGER_REPO_MISSING_REQUIRED_PROJECT_CONFIG_KEYS'] = JSON.dump(missing_required_keys)
+end
+
+def _smf_check_config_project_allowed_keys_only
   project_config = @smf_fastlane_config[:project]
   if project_config.nil?
     UI.error("[ERROR]: Missing 'project' info in Config.json")
@@ -39,11 +56,11 @@ def _smf_check_config_project_keys
   project_config.keys.each do |key|
     # Retain the key if it is NOT required (eg. allowed) to warn the dev about it.
     unless required_keys.include?(key.to_s)
-      deprecated_keys.push(key)
+      deprecated_keys.push(key.to_s)
     end
   end
 
-  ENV['DANGER_REPO_CLEAN_UP_PROJECT_CONFIG_KEYS'] = JSON.dump(deprecated_keys)
+  ENV['DANGER_REPO_CLEAN_UP_PROJECT_CONFIG_KEYS_ONLY'] = JSON.dump(deprecated_keys)
 end
 
 def _smf_required_config_keys_for_platform
