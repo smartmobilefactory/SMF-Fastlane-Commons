@@ -5,15 +5,18 @@ def smf_dependency_report_cocoapods
   dependencies = []
   podfile['DEPENDENCIES'].each { |value|
 
-    name, version = value.match(/([-\/0-9A-Z_a-z]*)(?:[^\d\n]*([\d\.]*)[^\d\n]*)?/).captures
-    if version == ""
-      version = "0.0.0"
-    end
+    if match = value.match(/([-\/0-9A-Z_a-z]*)(?:[^\d\n]*([\d\.]*)[^\d\n]*)?/)
+      name, version = match.captures
 
-    dependencies.push({
-                          'name' => name,
-                          'version' => version
-                      })
+      if version == ""
+        version = "0.0.0"
+      end
+
+      dependencies.push({
+                            'name' => name,
+                            'version' => version
+                        })
+    end
   }
 
   dependencies = smf_dependency_report_fetch_cocoapods_licences(dependencies)
@@ -47,3 +50,4 @@ def smf_dependency_report_fetch_cocoapods_licences(dependencies)
 
   dependencies
 end
+
