@@ -17,8 +17,8 @@ private_lane :smf_meta_report do |options|
     UI.message("Meta report could not be performed: #{ex.message}")
     project_name = @smf_fastlane_config[:project][:project_name]
     smf_send_diagnostic_message(
-      title: "#{project_name} smf_meta_report failed",
-      message: "#{ex.message}, #{ex}"
+        title: "#{project_name} smf_meta_report failed",
+        message: "#{ex.message}, #{ex}"
     )
   end
 end
@@ -38,9 +38,9 @@ private_lane :smf_owasp_report do |options|
     UI.message("Platform dependencies could not be reported: #{ex.message}")
     project_name = options[:smf_get_meta_db_project_name]
     smf_send_message(
-      title: "#{project_name} smf_owasp_report failed",
-      message: "#{ex.message}, #{ex}",
-      slack_channel: 'metadb-error-log'
+        title: "#{project_name} smf_owasp_report failed",
+        message: "#{ex.message}, #{ex}",
+        slack_channel: 'metadb-error-log'
     )
   end
   # TODO report owasp report to metadb
@@ -82,9 +82,9 @@ private_lane :smf_report_depencencies do |options|
   rescue Exception => ex
     UI.message("Platform dependencies could not be reported: #{ex.message}")
     smf_send_message(
-      title: "#{project_name} report dependencies failed",
-      message: "#{ex.message}, #{ex}",
-      slack_channel: 'metadb-error-log'
+        title: "#{project_name} report dependencies failed",
+        message: "#{ex.message}, #{ex}",
+        slack_channel: 'metadb-error-log'
     )
   end
 
@@ -97,7 +97,7 @@ def _smf_send_dependency_report(report, project_name)
   UI.message("report data:\n#{report.to_json}")
   uri = URI('https://metadb.solutions.smfhq.com/api/v1/software')
 
-  https = Net::HTTP.new(uri.host,uri.port)
+  https = Net::HTTP.new(uri.host, uri.port)
   https.use_ssl = true
 
   req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
@@ -109,8 +109,8 @@ def _smf_send_dependency_report(report, project_name)
 
   UI.message("dependency data were reported:\n#{res.body}")
   smf_send_message(
-    title: "#{project_name} dependency data were reported to metaDB !!",
-    message: "Debug notification to check whether the metaDB integration actually works... or not.",
-    slack_channel: 'metadb-success-log'
+      title: "#{project_name} dependency data were reported to metaDB !!",
+      message: "Debug notification to check whether the metaDB integration actually works... or not.",
+      slack_channel: 'metadb-success-log'
   )
 end
