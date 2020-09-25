@@ -43,6 +43,23 @@ JSON.parse(ENV["DANGER_ANDROID_LINT_PATHS"]).each do |lint_path|
   end
 end
 
+## REPO CLEAN UP
+JSON.parse(ENV['DANGER_REPO_CLEAN_UP_FILES']).each do |file|
+  warn("Deprecated file or folder: '#{file}'. Please remove from the repository")
+end
+
+JSON.parse(ENV['DANGER_REPO_CLEAN_UP_PROJECT_CONFIG_KEYS_ONLY']).each do |key|
+  warn("Config.json: Deprecated key in 'project' hash, please remove: '#{key}'")
+end
+
+JSON.parse(ENV['DANGER_REPO_CLEAN_UP_BUILD_VARIANTS']).each do |key|
+  warn("Config.json: Deprecated key in 'build_variants' hash, please remove: '#{key}'")
+end
+
+JSON.parse(ENV['DANGER_REPO_MISSING_REQUIRED_PROJECT_CONFIG_KEYS']).each do |key|
+  failure("[ERROR] - Config.json: Missing required key in 'project' hash, please add: '#{key}'")
+end
+
 ## SWIFTLINT RULES REPORT
 unless ENV['DANGER_SWIFT_LINT_RULES_REPORT'].nil?
   message(ENV['DANGER_SWIFT_LINT_RULES_REPORT'])

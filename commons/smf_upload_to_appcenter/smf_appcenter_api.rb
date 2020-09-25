@@ -32,7 +32,7 @@ end
 # [
 #   {
 #     "id": "f44a82d1-21a3-4d93-bc20-7e4b72d7fab4",
-#     "url": "https://us-central1-smf-hub.cloudfunctions.net/appcenter",
+#     "url": "#{$SMF_APPCENTER_WEBHOOK_URL}"
 #     "name": "SmfHub",
 #     "enabled": true,
 #     "event_types": ["NewAppRelease"]
@@ -60,7 +60,7 @@ end
 # webhookdata:
 # {
 #   "name" => "SmfHub",
-#   "url" => "https://us-central1-smf-hub.cloudfunctions.net/appcenter"
+#   "url" => "#{$SMF_APPCENTER_WEBHOOK_URL}"
 #   "enabled" => true
 #   "event_types" => ["NewAppRelease"]
 # }

@@ -44,7 +44,7 @@ private_lane :smf_upload_with_sparkle do |options|
   UI.message("Using '#{sparkle_private_key}' as private sparkle 🔑")
   sparkle_private_key = ENV[sparkle_private_key]
 
-  sh "#{@fastlane_commons_dir_path}/commons/ios/smf_upload_with_sparkle/sparkle.sh #{ENV['LOGIN']} #{sparkle_private_key} #{update_dir} #{sparkle_version} #{sparkle_signing_team}"
+  sh "#{@fastlane_commons_dir_path}/commons/ios/smf_upload_with_sparkle/sparkle.sh #{ENV[$KEYCHAIN_LOGIN_ENV_KEY]} #{sparkle_private_key} #{update_dir} #{sparkle_version} #{sparkle_signing_team}"
 
   if use_custom_info_plist_path == true
     sh("hdiutil attach #{dmg_path}")
@@ -116,16 +116,16 @@ def _smf_create_intermediate_directory(base_directory, info_plist_path)
     build_number = sh("defaults read #{info_plist_path} CFBundleVersion").gsub("\n", '')
     # To prevent any risk of duplicate folders on the server side, we add the current timestamp
     timestamp = Time.now.to_i
-    
+
     directory_name = app_name + "-" + version_number + "-" + build_number + "-" + timestamp.to_s
     intermediate_directory_path = "#{base_directory}#{directory_name}"
-    UI.message("Will create Sparkle intermediate directory at path: #{intermediate_directory_path}.") 
+    UI.message("Will create Sparkle intermediate directory at path: #{intermediate_directory_path}.")
     Dir.mkdir(intermediate_directory_path)
-    UI.message("Did create Sparkle intermediate directory at path: #{intermediate_directory_path}.") 
-    
+    UI.message("Did create Sparkle intermediate directory at path: #{intermediate_directory_path}.")
+
     intermediate_directory_path
   rescue => exception
-    UI.error("Encountered an error while creating sparkle intermediate directory: #{exception.message}.") 
+    UI.error("Encountered an error while creating sparkle intermediate directory: #{exception.message}.")
     raise "Cannot create Sparkle intermediate directory. Interrupting process..."
   end
 end

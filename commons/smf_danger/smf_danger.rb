@@ -46,6 +46,13 @@ private_lane :smf_danger do |options|
 
   _swift_lint_count_unused_rules
 
+  # Clean up repo and Config.json
+  # See file: smf_danger_repo_clean_up.rb
+  _smf_check_config_project_allowed_only_keys
+  _smf_check_config_project_missing_required_keys
+  _smf_check_repo_files_folders
+  _smf_check_config_build_variant_keys
+
   _check_swift_version_in_project
 
   danger(
@@ -68,7 +75,6 @@ def _check_swift_version_in_project
 end
 
 def _swift_lint_count_unused_rules
-
   if File.exist?(smf_swift_lint_rules_report_path)
     line_count = `wc -l "#{smf_swift_lint_rules_report_path}"`.strip.split(' ')[0].to_i
     # In the report, there is a total of 4 lines used as format for the document (header/footer)
