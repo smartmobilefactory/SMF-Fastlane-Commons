@@ -17,8 +17,8 @@ private_lane :smf_meta_report do |options|
     UI.message("Meta report could not be performed: #{ex.message}")
     project_name = @smf_fastlane_config[:project][:project_name]
     smf_send_diagnostic_message(
-      title: "#{project_name} smf_meta_report failed",
-      message: "#{ex.message}, #{ex}"
+        title: "#{project_name} smf_meta_report failed",
+        message: "#{ex.message}, #{ex}"
     )
   end
 end
@@ -97,7 +97,7 @@ def _smf_send_dependency_report(report, project_name)
   UI.message("report data:\n#{report.to_json}")
   uri = URI('https://metadb.solutions.smfhq.com/api/v1/software')
 
-  https = Net::HTTP.new(uri.host,uri.port)
+  https = Net::HTTP.new(uri.host, uri.port)
   https.use_ssl = true
 
   req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
@@ -109,8 +109,8 @@ def _smf_send_dependency_report(report, project_name)
 
   UI.message("dependency data were reported:\n#{res.body}")
   smf_send_message(
-    title: "#{project_name} dependency data were reported to metaDB !!",
-    message: "Debug notification to check whether the metaDB integration actually works... or not.",
+    title: "#{project_name} dependency data were reported to metaDB!",
+    message: "Debug notification to monitor how often the metaDB integration succeed",
     slack_channel: $SMF_CI_METADB_SUCCESS_LOG
   )
 end

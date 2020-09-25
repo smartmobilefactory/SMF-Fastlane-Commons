@@ -5,38 +5,27 @@ def smf_dependency_report_cocoapods
   dependencies = []
   podfile['DEPENDENCIES'].each { |value|
 
-    dependency = value.match(/([0-9a-zA-Z_\/]*) \((.*)\)/)
-    version = dependency[2]
+    if match = value.match(/([-\/0-9A-Z_a-z]*)(?:[^\d\n]*([\d\.]*)[^\d\n]*)?/)
+      name, version = match.captures
 
-    # parse tag from dependency versions like "from `https://github.com/getsentry/sentry-cocoa.git`, tag `3.13.1`"
-    tagVersionMatch = version.match(/from \`.*\`, tag \`(.*)\`/)
-    if tagVersionMatch
-      version = tagVersionMatch[1]
+      if version == ""
+        version = "0.0.0"
+      end
+      dependencies.push({'name' => name, 'version' => version})
     end
-
-    # converts dependency version from "= 3.13.1" to "3.13.1"
-    absoluteVersionMatch = version.match(/[^\d]*(\d.*)/)
-    if absoluteVersionMatch
-      version = absoluteVersionMatch[1]
-    end
-
-    dependencies.push({
-        'name' => dependency[1],
-        'version' => version
-    })
   }
 
-  dependencies = smf_dependency_report_fetch_cocoapods_licences(dependencies)  
+  dependencies = smf_dependency_report_fetch_cocoapods_licences(dependencies)
   apiData = {
-    'software_versions' => dependencies,
-    'type' => 'dependency',
-    'package_manager' => 'cocoapods'
+      'software_versions' => dependencies,
+      'type' => 'dependency',
+      'package_manager' => 'cocoapods'
   }
   apiData
 end
 
 def smf_dependency_report_fetch_cocoapods_licences(dependencies)
-  dependencies.each { |value| 
+  dependencies.each { |value|
     name = value['name'].split('/')[0]
     begin
       uri = URI.parse("https://metrics.cocoapods.org/api/v1/pods/#{name}")
@@ -57,3 +46,4 @@ def smf_dependency_report_fetch_cocoapods_licences(dependencies)
 
   dependencies
 end
+
