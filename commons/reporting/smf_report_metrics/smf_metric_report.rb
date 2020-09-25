@@ -40,7 +40,7 @@ private_lane :smf_owasp_report do |options|
     smf_send_message(
       title: "#{project_name} smf_owasp_report failed",
       message: "#{ex.message}, #{ex}",
-      slack_channel: 'metadb-error-log'
+      slack_channel: $SMF_CI_METADB_ERROR_LOG
     )
   end
   # TODO report owasp report to metadb
@@ -84,7 +84,7 @@ private_lane :smf_report_depencencies do |options|
     smf_send_message(
       title: "#{project_name} report dependencies failed",
       message: "#{ex.message}, #{ex}",
-      slack_channel: 'metadb-error-log'
+      slack_channel: $SMF_CI_METADB_ERROR_LOG
     )
   end
 
@@ -111,6 +111,6 @@ def _smf_send_dependency_report(report, project_name)
   smf_send_message(
     title: "#{project_name} dependency data were reported to metaDB !!",
     message: "Debug notification to check whether the metaDB integration actually works... or not.",
-    slack_channel: 'metadb-success-log'
+    slack_channel: $SMF_CI_METADB_SUCCESS_LOG
   )
 end
