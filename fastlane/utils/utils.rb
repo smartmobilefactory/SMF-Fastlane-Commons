@@ -60,15 +60,8 @@ def smf_get_appcenter_destination_groups(build_variant, additional_destinations)
 end
 
 def smf_get_appcenter_id(build_variant, platform = nil)
-
-  if @platform == :ios
-    appcenter_id = smf_get_appcenter_secret_diagnostic_wrapper(
-      build_variant: build_variant
-    )
-  else
-    appcenter_id = smf_config_get(build_variant, :appcenter_id)
-    appcenter_id = smf_config_get(build_variant, platform.to_sym, :appcenter_id) unless platform.nil?
-  end
+  appcenter_id = smf_config_get(build_variant, :appcenter_id)
+  appcenter_id = smf_config_get(build_variant, platform.to_sym, :appcenter_id) unless platform.nil?
 
   appcenter_id
 end
