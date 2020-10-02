@@ -34,9 +34,7 @@ module Fastlane
         hasMultipleTagsUploaded = uploadStrings(apiToken, projectId, uploadResourceDir, languages)
         downloadTranslations(apiToken, projectId, downloadResourceDir, languages, hasMultipleTagsUploaded)
 
-        if branch
-          commitChangesIfNeeded(downloadResourceDir, branch)
-        end
+        commitChangesIfNeeded(downloadResourceDir, branch)
 
       end
 
@@ -116,7 +114,6 @@ module Fastlane
               pathToCommit = "../" + path
               other_action.git_add(path: pathToCommit)
               other_action.git_commit(path: pathToCommit, message: "Updated strings from PhraseApp")
-              other_action.smf_push_to_git_remote(local_branch: branch)
           end
       end
 
