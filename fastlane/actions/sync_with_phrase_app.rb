@@ -2,7 +2,6 @@ module Fastlane
   module Actions
     class SyncWithPhraseAppAction < Action
       def self.run(params)
-        branch= params[:branch]
         projectId = params[:project_id]
         uploadResourceDir = params[:upload_resource_dir]
         downloadResourceDir = params[:download_resource_dir]
@@ -34,7 +33,7 @@ module Fastlane
         hasMultipleTagsUploaded = uploadStrings(apiToken, projectId, uploadResourceDir, languages)
         downloadTranslations(apiToken, projectId, downloadResourceDir, languages, hasMultipleTagsUploaded)
 
-        commitChangesIfNeeded(downloadResourceDir, branch)
+        commitChangesIfNeeded(downloadResourceDir)
 
       end
 
@@ -108,12 +107,11 @@ module Fastlane
         command << " \"https://phraseapp.com/api/v2/projects/#{projectId}/uploads\""
       end
 
-      def self.commitChangesIfNeeded(path, branch)
+      def self.commitChangesIfNeeded(path)
           nothing_to_commit = `git status --porcelain #{path}`.empty?
           if !nothing_to_commit
-              pathToCommit = "../" + path
-              other_action.git_add(path: pathToCommit)
-              other_action.git_commit(path: pathToCommit, message: "Updated strings from PhraseApp")
+              other_action.git_add(path: path)
+              other_action.git_commit(path: path, message: "Updated strings from PhraseApp")
           end
       end
 
@@ -131,11 +129,6 @@ module Fastlane
 
       def self.available_options
         [
-
-          FastlaneCore::ConfigItem.new(key: :branch,
-                                       env_name: "FL_BRANCH",
-                                       description: "branch to commit the changes",
-                                       optional: true),
 
           FastlaneCore::ConfigItem.new(key: :project_id,
                                        env_name: "FL_PHRASE_APP_PROJECT_ID",
