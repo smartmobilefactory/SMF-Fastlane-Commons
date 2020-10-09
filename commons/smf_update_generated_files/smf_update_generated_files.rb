@@ -1,12 +1,17 @@
 desc "Generates a Jenkinsfile (and optional additional files) and commits them if there are changes"
 private_lane :smf_update_generated_files do |options|
 
+  ios_build_nodes = options[:ios_build_nodes]
+  catalyst_build_nodes = options[:catalyst_build_nodes]
+
   additional_files_to_update = options[:files_to_update].nil? ? [] : options[:files_to_update]
 
-  _smf_update_jenkins_file
+  _smf_update_jenkins_file(ios_build_nodes, catalyst_build_nodes)
 
-  additional_files_to_update.each { |file_data|
+  additional_files_to_update.each do |file_data|
     smf_generate_jenkins_file(
+      ios_build_nodes: ios_build_nodes,
+      catalyst_build_nodes: catalyst_build_nodes,
       custom_jenkinsfile_template: file_data[:template],
       custom_jenkinsfile_path: file_data[:file],
       remove_multibuild_variants: file_data[:remove_multibuilds]
@@ -15,16 +20,19 @@ private_lane :smf_update_generated_files do |options|
     if (_smf_generated_file_changed?(file_data[:file]))
       _smf_commit_generated_file(file_data[:file], false)
     end
-  }
+  end
 
 end
 
-def _smf_update_jenkins_file
+def _smf_update_jenkins_file(ios_build_nodes, catalyst_build_nodes)
   UI.message('Checking for Jenkinsfile changes...')
   # JENKINSFILE is always updated
   jenkinsfile_path = File.join(smf_workspace_dir, 'Jenkinsfile')
 
-  smf_generate_jenkins_file
+  smf_generate_jenkins_file(
+    ios_build_nodes: ios_build_nodes,
+    catalyst_build_nodes: catalyst_build_nodes
+  )
 
   if (_smf_generated_file_changed?(jenkinsfile_path))
     _smf_commit_generated_file(jenkinsfile_path)
