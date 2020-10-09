@@ -151,7 +151,7 @@ def _smf_insert_custom_credentials(jenkinsFile)
 end
 
 def _smf_insert_preferred_build_node_label(jenkinsFileData)
-  xcode_version = @smf_fastlane_config.dig(:project, :xcode_version)
+  xcode_version = nil #@smf_fastlane_config.dig(:project, :xcode_version)
 
   node_label = xcode_version.nil? ? 'null' : "'#{NODE_LABEL_PREFIX}#{xcode_version}'"
 
