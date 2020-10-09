@@ -2,6 +2,7 @@
 This lane generates the Jenkins file for this project. But it can also be used to generate custom jenkinsfiles for tools for example.
 Therefore some optional parameters are available to set the template and output path, and also to remove multibuild variants (e.g. "Alpha", "Beta", ...) if needed.
 
+The two build node arrays are used to generate the available build nodes into the jenkins file. 
 Example:
 
 ```
