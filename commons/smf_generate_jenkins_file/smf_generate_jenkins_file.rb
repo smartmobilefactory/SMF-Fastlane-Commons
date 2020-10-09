@@ -159,7 +159,7 @@ def _smf_insert_build_nodes(jenkinsFileData)
   when :ios, :ios_framework, :macos, :flutter, :apple
     xcode_version = @smf_fastlane_config.dig(:project, :xcode_version)
     # create label with the projects xcode version
-    preferred_node_label = xcode_version.nil? ? nil : "'#{NODE_LABEL_PREFIX}#{xcode_version}'"
+    preferred_node_label = xcode_version.nil? ? nil : "#{NODE_LABEL_PREFIX}#{xcode_version}"
 
     build_nodes = $AVAILABLE_IOS_NODES
 
