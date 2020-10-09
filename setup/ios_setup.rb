@@ -3,12 +3,12 @@
 # Update Files
 
 private_lane :smf_super_generate_files do |options|
-  ios_build_nodes = options[:ios_build_nodes]
-  catalyst_build_nodes = options[:catalyst_build_nodes]
+  ios_build_nodes = ENV['SMF_IOS_BUILD_NODES']
+
+  UI.message("ios_build_nodes: #{ios_build_nodes}, type: #{ios_build_nodes.class}")
 
   smf_update_generated_files(
-    ios_build_nodes: ios_build_nodes,
-    catalyst_build_nodes: catalyst_build_nodes
+    ios_build_nodes: ios_build_nodes
   )
 end
 
