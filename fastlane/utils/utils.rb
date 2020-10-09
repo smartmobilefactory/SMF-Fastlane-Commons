@@ -381,3 +381,8 @@ def smf_build_variant(options)
 
   smf_get_first_variant_from_config
 end
+
+def smf_string_array_to_array(string)
+  array = string.delete(' ').delete('[').delete(']')
+  array.split(',')
+end
