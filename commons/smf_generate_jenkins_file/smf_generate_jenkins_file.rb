@@ -59,7 +59,7 @@ private_lane :smf_generate_jenkins_file do |options|
 end
 
 def _smf_jenkins_file_template_path
-  
+
   case @platform
   when :ios
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{IOS_APP_TEMPLATE_JENKINS_FILE}"
@@ -153,7 +153,7 @@ end
 def _smf_insert_preferred_build_node_label(jenkinsFileData)
   xcode_version = @smf_fastlane_config.dig(:project, :xcode_version)
 
-  node_label = xcode_version.nil? ? 'null' : "#{NODE_LABEL_PREFIX}#{xcode_version}"
+  node_label = xcode_version.nil? ? 'null' : "'#{NODE_LABEL_PREFIX}#{xcode_version}'"
 
   jenkinsFileData.gsub(NODE_LABEL_PATTERN, node_label)
 end
