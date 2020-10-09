@@ -62,9 +62,6 @@ $REPORTING_GOOGLE_SHEETS_META_INFO_DOC_ID_KEY = 'META_REPORTING_SPREADSHEET_ID'
 $REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME = 'apple'
 $REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME_PLAYGROUND = 'playground'
 
-# Available iOS node labels
-$AVAILABLE_IOS_NODES = ['iosbuild', 'mobileci7', 'mobileci8', 'mobileci10']
-
 ### Config.json Keys ###
 
 # Deprecated files/folders in repository
