@@ -29,6 +29,9 @@ FLUTTER_APP_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Flutter.template'
 
 private_lane :smf_generate_jenkins_file do |options|
 
+  ios_build_nodes = options[:ios_build_nodes]
+  catalyst_build_nodes = options[:catalyst_build_nodes]
+
   custom_jenkinsfile_template = options[:custom_jenkinsfile_template]
   custom_jenkinsfile_path = options[:custom_jenkinsfile_path]
   remove_multibuild_variants = options[:remove_multibuild_variants].nil? ? false : options[:remove_multibuild_variants]
@@ -53,7 +56,7 @@ private_lane :smf_generate_jenkins_file do |options|
 
   jenkinsFileData = _smf_insert_custom_credentials(jenkinsFileData) unless @platform == :macos
 
-  jenkinsFileData = _smf_insert_build_nodes(jenkinsFileData)
+  jenkinsFileData = _smf_insert_build_nodes(jenkinsFileData, ios_build_nodes, catalyst_build_nodes)
 
   File.write(jenkinsfile_path, jenkinsFileData)
 end
@@ -154,14 +157,16 @@ end
 # when manually building this is the list of choices for the build node
 # for PRs it defaults to the first element, thats why the preferred build node
 # is prepended
-def _smf_insert_build_nodes(jenkinsFileData)
+def _smf_insert_build_nodes(jenkinsFileData, ios_build_nodes, catalyst_build_nodes)
   case @platform
   when :ios, :ios_framework, :macos, :flutter, :apple
     xcode_version = @smf_fastlane_config.dig(:project, :xcode_version)
     # create label with the projects xcode version
     preferred_node_label = xcode_version.nil? ? nil : "#{NODE_LABEL_PREFIX}#{xcode_version}"
 
-    build_nodes = $AVAILABLE_IOS_NODES
+    build_nodes = @platform == :apple ? catalyst_build_nodes : ios_build_nodes
+
+    return jenkinsFileData if build_nodes.nil?
 
     unless preferred_node_label.nil?
       # remove label from list if it contains it

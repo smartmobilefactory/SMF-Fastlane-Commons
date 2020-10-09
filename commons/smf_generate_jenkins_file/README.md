@@ -6,6 +6,8 @@ Example:
 
 ```
 smf_generate_jenkins_file(
+  ios_build_nodes: ['iosbuild', 'mobileci7', ...],                                  # optional, but needed for all none android jobs, possible build nodes for ios projects
+  catalyst_build_nodes: ['mobileci8',...],                                          # optional, but needed for all none android jobs, possible build nodes for catalyst projects
   custom_jenkinsfile_template: <path_to_template>                                   # optional
   custom_jenkinsfile_path: <path_to_store_new_jenkinsfile>                          # optional 
   remove_multibuild_variants: <boolean: if true "Alpha", "Beta", etc. are removed>  # optional, defaults to false
