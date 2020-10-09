@@ -12,12 +12,12 @@ _custom_credentials = [
 	'CUSTOM_SPARKLE_SIGNING_KEY': '__CUSTOM_SPARKLE_SIGNING_KEY__'
 ]
 
-_node_label = __NODE_LABEL__
+_build_nodes = __BUILD_NODES__
 
 _build_parameters = [
 	'build_variants': _build_variants,
 	'custom_credentials': _custom_credentials,
-	'node_label': _node_label
+	'build_nodes': _build_nodes
 ]
 
 iOSApp(_build_parameters)

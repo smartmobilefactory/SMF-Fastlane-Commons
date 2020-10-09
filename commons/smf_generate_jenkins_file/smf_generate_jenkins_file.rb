@@ -4,9 +4,9 @@ require 'json'
 BUILD_VARIANTS_PATTERN = '__BUILD_VARIANTS__'
 POD_EXAMPLE_VARIANTS_PATTERN = '__EXAMPLE_VARIANTS__'
 
-# This label is replaced by the preferred build node label
-NODE_LABEL_PATTERN = '__NODE_LABEL__'
+BUILD_NODES_PATTERN = '__BUILD_NODES__'
 NODE_LABEL_PREFIX = 'xcode-'
+
 FALLBACK_TEMPLATE_CREDENTIAL_KEY = 'PIPELINE_TEMPLATE_CREDENTIAL'
 CUSTOM_IOS_CREDENTIALS = [
     '__CUSTOM_PHRASE_APP_TOKEN__',
@@ -53,7 +53,7 @@ private_lane :smf_generate_jenkins_file do |options|
 
   jenkinsFileData = _smf_insert_custom_credentials(jenkinsFileData) unless @platform == :macos
 
-  jenkinsFileData = _smf_insert_preferred_build_node_label(jenkinsFileData)
+  jenkinsFileData = _smf_insert_build_nodes(jenkinsFileData)
 
   File.write(jenkinsfile_path, jenkinsFileData)
 end
@@ -150,10 +150,29 @@ def _smf_insert_custom_credentials(jenkinsFile)
   jenkinsFileData
 end
 
-def _smf_insert_preferred_build_node_label(jenkinsFileData)
-  xcode_version = @smf_fastlane_config.dig(:project, :xcode_version)
+# inserts an array with available build nodes (labels) into the jenkins file
+# when manually building this is the list of choices for the build node
+# for PRs it defaults to the first element, thats why the preferred build node
+# is prepended
+def _smf_insert_build_nodes(jenkinsFileData)
+  case @platform
+  when :ios, :ios_framework, :macos, :flutter, :apple
+    xcode_version = @smf_fastlane_config.dig(:project, :xcode_version)
+    # create label with the projects xcode version
+    preferred_node_label = xcode_version.nil? ? nil : "'#{NODE_LABEL_PREFIX}#{xcode_version}'"
 
-  node_label = xcode_version.nil? ? 'null' : "'#{NODE_LABEL_PREFIX}#{xcode_version}'"
+    build_nodes = $AVAILABLE_IOS_NODES
 
-  jenkinsFileData.gsub(NODE_LABEL_PATTERN, node_label)
+    unless preferred_node_label.nil?
+      # remove label from list if it contains it
+      build_nodes -= [preferred_node_label]
+
+      # insert it in the first place
+      build_nodes.insert(0, preferred_node_label)
+    end
+
+    return jenkinsFileData.gsub(BUILD_NODES_PATTERN, JSON.dump(build_nodes))
+  end
+
+  jenkinsFileData
 end
