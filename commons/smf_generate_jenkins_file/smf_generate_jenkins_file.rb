@@ -1,13 +1,17 @@
 require 'json'
 
 # Local Constants
-BUILD_VARIANTS_PATTERN = "__BUILD_VARIANTS__"
-POD_EXAMPLE_VARIANTS_PATTERN = "__EXAMPLE_VARIANTS__"
-FALLBACK_TEMPLATE_CREDENTIAL_KEY = "PIPELINE_TEMPLATE_CREDENTIAL"
+BUILD_VARIANTS_PATTERN = '__BUILD_VARIANTS__'
+POD_EXAMPLE_VARIANTS_PATTERN = '__EXAMPLE_VARIANTS__'
+
+# This label is replaced by the preferred build node label
+NODE_LABEL_PATTERN = '__NODE_LABEL__'
+NODE_LABEL_PREFIX = 'xcode-'
+FALLBACK_TEMPLATE_CREDENTIAL_KEY = 'PIPELINE_TEMPLATE_CREDENTIAL'
 CUSTOM_IOS_CREDENTIALS = [
-    "__CUSTOM_PHRASE_APP_TOKEN__",
-    "__CUSTOM_SPARKLE_PRIVATE_SSH_KEY__",
-    "__CUSTOM_SPARKLE_SIGNING_KEY__"
+    '__CUSTOM_PHRASE_APP_TOKEN__',
+    '__CUSTOM_SPARKLE_PRIVATE_SSH_KEY__',
+    '__CUSTOM_SPARKLE_SIGNING_KEY__'
 ]
 
 # iOS/macOS Templates
@@ -49,11 +53,13 @@ private_lane :smf_generate_jenkins_file do |options|
 
   jenkinsFileData = _smf_insert_custom_credentials(jenkinsFileData) unless @platform == :macos
 
+  jenkinsFileData = _smf_insert_preferred_build_node_label(jenkinsFileData)
+
   File.write(jenkinsfile_path, jenkinsFileData)
 end
 
 def _smf_jenkins_file_template_path
-  path = nil
+  
   case @platform
   when :ios
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{IOS_APP_TEMPLATE_JENKINS_FILE}"
@@ -142,4 +148,12 @@ def _smf_insert_custom_credentials(jenkinsFile)
   end
 
   jenkinsFileData
+end
+
+def _smf_insert_preferred_build_node_label(jenkinsFileData)
+  xcode_version = @smf_fastlane_config.dig(:project, :xcode_version)
+
+  node_label = xcode_version.nil? ? 'null' : "#{NODE_LABEL_PREFIX}#{xcode_version}"
+
+  jenkinsFileData.gsub(NODE_LABEL_PATTERN, node_label)
 end
