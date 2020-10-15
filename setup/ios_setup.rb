@@ -3,9 +3,8 @@
 # Update Files
 
 private_lane :smf_super_generate_files do |options|
-  ios_build_nodes = smf_string_array_to_array(ENV['SMF_IOS_BUILD_NODES'])
 
-  UI.message("ios_build_nodes: #{ios_build_nodes}, type: #{ios_build_nodes.class}")
+  ios_build_nodes = smf_string_array_to_array(ENV['SMF_IOS_BUILD_NODES'])
 
   smf_update_generated_files(
     ios_build_nodes: ios_build_nodes

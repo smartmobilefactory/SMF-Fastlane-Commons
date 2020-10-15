@@ -11,7 +11,6 @@ Example:
 ```
 smf_update_generated_files(
     ios_build_nodes: ['iosbuild', 'mobileci7', ...],   # optional, but needed for all none android jobs, possible build nodes for ios projects
-    catalyst_build_nodes: ['mobileci8',...],           # optional, but needed for all none android jobs, possible build nodes for catalyst projects
     files_to_update: [ {                               \
             :template => <path to template>,            |
             :file => <path to file>,                    |
