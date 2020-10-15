@@ -5,7 +5,7 @@ BUILD_VARIANTS_PATTERN = '__BUILD_VARIANTS__'
 POD_EXAMPLE_VARIANTS_PATTERN = '__EXAMPLE_VARIANTS__'
 
 BUILD_NODES_PATTERN = '__BUILD_NODES__'
-NODE_LABEL_PREFIX = 'xcode-'
+NODE_XCODE_LABEL_PREFIX = 'xcode-'
 
 FALLBACK_TEMPLATE_CREDENTIAL_KEY = 'PIPELINE_TEMPLATE_CREDENTIAL'
 CUSTOM_IOS_CREDENTIALS = [
@@ -162,7 +162,7 @@ def _smf_insert_build_nodes(jenkinsFileData, ios_build_nodes, catalyst_build_nod
   when :ios, :ios_framework, :macos, :flutter, :apple
     xcode_version = @smf_fastlane_config.dig(:project, :xcode_version)
     # create label with the projects xcode version
-    preferred_node_label = xcode_version.nil? ? nil : "#{NODE_LABEL_PREFIX}#{xcode_version}"
+    preferred_node_label = xcode_version.nil? ? nil : "#{NODE_XCODE_LABEL_PREFIX}#{xcode_version}"
 
     build_nodes = @platform == :apple ? catalyst_build_nodes : ios_build_nodes
 
