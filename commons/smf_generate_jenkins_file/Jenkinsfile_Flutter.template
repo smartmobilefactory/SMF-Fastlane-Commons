@@ -6,11 +6,8 @@
 
 _build_variants = __BUILD_VARIANTS__
 
-_build_nodes = __BUILD_NODES__
-
 _build_parameters = [
-	'build_variants': _build_variants,
-	'build_nodes': _build_nodes
+	'build_variants': _build_variants
 ]
 
 flutterApp(_build_parameters)
