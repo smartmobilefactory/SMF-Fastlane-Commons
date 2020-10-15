@@ -36,6 +36,11 @@ end
 def smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, data)
   bearer_token = _smf_google_api_get_bearer_token
 
+  # Delay of 5 seconds to let Google's servers propagate the new access_token
+  # https://stackoverflow.com/a/42771170/2790648
+  # Added on 14.09.2020 due to random "Internal Server Error (RuntimeError)"
+  sleep(5)
+
   sheet_uri = URI.parse"https://sheets.googleapis.com/v4/spreadsheets/#{sheet_id}/values/#{sheet_name}:append?valueInputOption=USER_ENTERED"
 
   request = Net::HTTP::Post.new(sheet_uri)
