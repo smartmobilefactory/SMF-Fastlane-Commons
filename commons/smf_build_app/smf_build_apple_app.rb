@@ -91,7 +91,7 @@ def smf_is_using_old_build_system
   file_to_search_opened = File.open(file_to_search, "r")
   contents = file_to_search_opened.read
 
-  regex = /<dict>\n\t<key>BuildSystemType<\/key>\n\t<string>Original<\/string>\n<\/dict>/
+  regex = /<key>BuildSystemType<\/key>\n\t<string>Original<\/string>/
 
   return true if (contents.match(regex) != nil)
 
