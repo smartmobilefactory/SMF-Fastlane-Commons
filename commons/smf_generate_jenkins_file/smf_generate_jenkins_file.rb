@@ -1,13 +1,17 @@
 require 'json'
 
 # Local Constants
-BUILD_VARIANTS_PATTERN = "__BUILD_VARIANTS__"
-POD_EXAMPLE_VARIANTS_PATTERN = "__EXAMPLE_VARIANTS__"
-FALLBACK_TEMPLATE_CREDENTIAL_KEY = "PIPELINE_TEMPLATE_CREDENTIAL"
+BUILD_VARIANTS_PATTERN = '__BUILD_VARIANTS__'
+POD_EXAMPLE_VARIANTS_PATTERN = '__EXAMPLE_VARIANTS__'
+
+BUILD_NODES_PATTERN = '__BUILD_NODES__'
+NODE_XCODE_LABEL_PREFIX = 'xcode-'
+
+FALLBACK_TEMPLATE_CREDENTIAL_KEY = 'PIPELINE_TEMPLATE_CREDENTIAL'
 CUSTOM_IOS_CREDENTIALS = [
-    "__CUSTOM_PHRASE_APP_TOKEN__",
-    "__CUSTOM_SPARKLE_PRIVATE_SSH_KEY__",
-    "__CUSTOM_SPARKLE_SIGNING_KEY__"
+    '__CUSTOM_PHRASE_APP_TOKEN__',
+    '__CUSTOM_SPARKLE_PRIVATE_SSH_KEY__',
+    '__CUSTOM_SPARKLE_SIGNING_KEY__'
 ]
 
 # iOS/macOS Templates
@@ -24,6 +28,8 @@ ANDROID_FRAMEWORK_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Android_Framework.templat
 FLUTTER_APP_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Flutter.template'
 
 private_lane :smf_generate_jenkins_file do |options|
+
+  ios_build_nodes = options[:ios_build_nodes]
 
   custom_jenkinsfile_template = options[:custom_jenkinsfile_template]
   custom_jenkinsfile_path = options[:custom_jenkinsfile_path]
@@ -49,11 +55,13 @@ private_lane :smf_generate_jenkins_file do |options|
 
   jenkinsFileData = _smf_insert_custom_credentials(jenkinsFileData) unless @platform == :macos
 
+  jenkinsFileData = _smf_insert_build_nodes(jenkinsFileData, ios_build_nodes)
+
   File.write(jenkinsfile_path, jenkinsFileData)
 end
 
 def _smf_jenkins_file_template_path
-  path = nil
+
   case @platform
   when :ios
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{IOS_APP_TEMPLATE_JENKINS_FILE}"
@@ -139,6 +147,39 @@ def _smf_insert_custom_credentials(jenkinsFile)
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
+  end
+
+  jenkinsFileData
+end
+
+# inserts an array with available build nodes (labels) into the jenkins file
+# when manually building this is the list of choices for the build node
+# for PRs it defaults to the first element, thats why the preferred build node
+# is prepended
+def _smf_insert_build_nodes(jenkinsFileData, ios_build_nodes)
+
+  if [:ios, :ios_framework, :macos, :apple].include?(@platform)
+    xcode_version = @smf_fastlane_config.dig(:project, :xcode_version)
+    # create label with the projects xcode version
+    preferred_node_label = xcode_version.nil? ? nil : "#{NODE_XCODE_LABEL_PREFIX}#{xcode_version}"
+
+    return jenkinsFileData if ios_build_nodes.nil?
+
+    unless preferred_node_label.nil?
+
+      unless ios_build_nodes.include?(preferred_node_label)
+        UI.error("There is no node availabel with label '#{preferred_node_label}' if the xcode version should be availabel on a node, please add a new label accordingly")
+        raise 'Unknown node label'
+      end
+
+      # remove label from list
+      ios_build_nodes -= [preferred_node_label]
+
+      # insert it in the first place
+      ios_build_nodes.insert(0, preferred_node_label)
+    end
+
+    return jenkinsFileData.gsub(BUILD_NODES_PATTERN, JSON.dump(ios_build_nodes))
   end
 
   jenkinsFileData

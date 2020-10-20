@@ -31,13 +31,7 @@ end
 # Update Jenkinsfile
 
 private_lane :smf_shared_super_generate_files do |options|
-
-  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
-
-  smf_update_generated_files(
-      branch: options[:branch],
-      build_variant: build_variant
-  )
+  smf_update_generated_files
 end
 
 lane :smf_shared_generate_files do |options|

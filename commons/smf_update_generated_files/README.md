@@ -9,11 +9,12 @@ Each dict should contain:
 Example:
 
 ```
-smf_update_generated_setup_files(
+smf_update_generated_files(
+    ios_build_nodes: ['iosbuild', 'mobileci7', ...],   # optional, but needed for all none android jobs, possible build nodes for ios projects
     files_to_update: [ {                               \
             :template => <path to template>,            |
             :file => <path to file>,                    |
-            :remove_multibuilds => <true or false>      |--- optional parameter
+            :remove_multibuilds => <true or false>      |--- optional parameter (used in sparkle package creator, see tools)
         },                                              |
         ...                                             |
     ]                                                   /

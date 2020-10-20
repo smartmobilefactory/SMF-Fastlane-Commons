@@ -381,3 +381,12 @@ def smf_build_variant(options)
 
   smf_get_first_variant_from_config
 end
+
+# converts an array wrapped into a string (for example '["test", "test2"]')
+# into an array
+def smf_string_array_to_array(string)
+  return nil if string.nil?
+
+  array = string.delete(' ').delete('[').delete(']')
+  array.split(',')
+end
