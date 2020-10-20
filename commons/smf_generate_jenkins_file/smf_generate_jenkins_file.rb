@@ -157,8 +157,8 @@ end
 # for PRs it defaults to the first element, thats why the preferred build node
 # is prepended
 def _smf_insert_build_nodes(jenkinsFileData, ios_build_nodes)
-  case @platform
-  when :ios, :ios_framework, :macos, :apple
+
+  if [:ios, :ios_framework, :macos, :apple].include?(@platform)
     xcode_version = @smf_fastlane_config.dig(:project, :xcode_version)
     # create label with the projects xcode version
     preferred_node_label = xcode_version.nil? ? nil : "#{NODE_XCODE_LABEL_PREFIX}#{xcode_version}"
