@@ -167,11 +167,6 @@ def _smf_insert_build_nodes(jenkinsFileData, ios_build_nodes)
 
     unless preferred_node_label.nil?
 
-      unless ios_build_nodes.include?(preferred_node_label)
-        UI.error("There is no node availabel with label '#{preferred_node_label}' if the xcode version should be availabel on a node, please add a new label accordingly")
-        raise 'Unknown node label'
-      end
-
       # remove label from list
       ios_build_nodes -= [preferred_node_label]
 
