@@ -16,7 +16,6 @@ def smf_ios_monitor_unit_tests(options)
   test_results = Dir.glob('**/build/test-results/**/TEST-*.xml')
   if test_results.empty?
     UI.message("No test result files found in #{project_dir}")
-    next
   end
 
   test_count = 0
