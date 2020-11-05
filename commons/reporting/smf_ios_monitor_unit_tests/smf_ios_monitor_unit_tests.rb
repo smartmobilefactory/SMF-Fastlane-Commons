@@ -62,7 +62,8 @@ def smf_create_spreadsheet_entry(repo, data)
     :branch => _smf_unwrap_value(data[:branch]),
     :platform => _smf_unwrap_value(data[:platform]),
     :test_coverage => _smf_unwrap_value(data[:test_coverage]),
-    :covered_lines => _smf_unwrap_value(data[:covered_lines])
+    :covered_lines => _smf_unwrap_value(data[:covered_lines]),
+    :unit_test_count => _smf_unwrap_value(data[:unit_test_count])
   }
 
   entry
