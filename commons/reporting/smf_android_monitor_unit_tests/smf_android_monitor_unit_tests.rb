@@ -1,8 +1,6 @@
-#!/usr/bin/env ruby
-
 require 'date'
 
-def smf_ios_monitor_unit_tests(options)
+private_lane :smf_android_monitor_unit_tests do |options|
 
   project_dir = smf_workspace_dir
   # unless Dir.exist?(project_dir)
@@ -65,5 +63,5 @@ end
 # end
 
 # options = {:branch => 'dev', :project_name => "eismann"}
-# smf_ios_monitor_unit_tests(options, "/Users/kevindelord/Downloads/Eismann")
+# smf_android_monitor_unit_tests(options, "/Users/kevindelord/Downloads/Eismann")
 
