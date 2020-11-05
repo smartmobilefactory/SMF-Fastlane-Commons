@@ -66,11 +66,11 @@ private_lane :smf_report_depencencies do |options|
       dependencyReports.push(prepare_api_data.call(smf_dependency_report_android))
     when :ios
       report = smf_dependency_report_cocoapods
-      report['project_type'] = 'iOS'
+      report['project_type'] = smf_meta_report_platform_friendly_name
       dependencyReports.push(prepare_api_data.call(report))
     when :macos
       report = smf_dependency_report_cocoapods
-      report['project_type'] = 'macOS'
+      report['project_type'] = smf_meta_report_platform_friendly_name
       dependencyReports.push(prepare_api_data.call(report))
     when :apple
       report = smf_dependency_report_cocoapods

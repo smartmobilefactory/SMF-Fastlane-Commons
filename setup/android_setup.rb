@@ -95,6 +95,24 @@ lane :smf_report do |options|
   smf_super_report(options)
 end
 
+############ AUTOMATIC REPORTING LANES ############
+###########  For Unit-Tests Reporting  ############
+
+private_lane :smf_super_android_automatic_reporting do |options|
+
+  project_name = @smf_fastlane_config.dig(:project, :project_name)
+
+  smf_android_monitor_unit_tests(
+    project_name: project_name,
+    branch: options[:branch_name],
+    platform: smf_meta_report_platform_friendly_name
+  )
+end
+
+lane :smf_android_automatic_reporting do |options|
+  smf_super_android_automatic_reporting(options)
+end
+
 ########## ADDITIONAL LANES USED FOR BUILDING ##########
 
 # Generate Changelog

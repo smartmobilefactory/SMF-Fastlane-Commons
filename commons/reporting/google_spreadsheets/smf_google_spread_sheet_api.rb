@@ -33,6 +33,7 @@ def _smf_google_api_get_bearer_token
   end
 end
 
+# Using a temporary access token, append the data to a given online spreadsheet
 def smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, data)
   bearer_token = _smf_google_api_get_bearer_token
 
@@ -81,12 +82,34 @@ def smf_create_sheet_data_from_entries(sheet_entries, reporting_type)
   data.to_json
 end
 
+# A spread sheet entry holds data for one line of the spread sheet
+# It is important that for each entry there is a value set.
+# If a value does not existent (e.g. nil) it should be set to
+# an empty string, to ensure this, use '_smf_unwrap_value'.
+def smf_create_spreadsheet_entry(data)
+  # The project_name is required.
+  return nil if data[:project_name].nil?
+
+  entry = {
+    :date => Date.today.to_s,
+    :repo => data[:project_name],
+    :build_variant => _smf_unwrap_value(data[:build_variant]),
+    :branch => _smf_unwrap_value(data[:branch]),
+    :platform => _smf_unwrap_value(data[:platform]),
+    :test_coverage => _smf_unwrap_value(data[:test_coverage]),
+    :covered_lines => _smf_unwrap_value(data[:covered_lines]),
+    :unit_test_count => _smf_unwrap_value(data[:unit_test_count])
+  }
+
+  entry
+end
+
 ############### SPREAD SHEET HELPER ###############
 
 def _smf_automatic_reporting_spreadsheet_entry_to_line(entry)
   # The order of the elements in this array directly correspond to the table columns in the google spread sheet
   # thus it is VERY IMPORTANT to not change the order!
-  [entry[:date], entry[:repo], entry[:branch], entry[:platform], entry[:build_variant], entry[:test_coverage], entry[:covered_lines]]
+  [entry[:date], entry[:repo], entry[:branch], entry[:platform], entry[:build_variant], entry[:test_coverage], entry[:covered_lines], entry[:unit_test_count]]
 end
 
 def _smf_meta_reporting_spreadsheet_entry_to_line(entry)
