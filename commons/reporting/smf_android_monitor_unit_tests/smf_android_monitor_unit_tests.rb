@@ -26,17 +26,13 @@ private_lane :smf_android_monitor_unit_tests do |options|
     end
   end
 
-  UI.message("test count: #{test_count}")
-
   options[:unit_test_count] = test_count
 
   sheet_entry = smf_create_spreadsheet_entry(options)
 
-  UI.message("new entry: #{sheet_entry}")
-
   sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_UNIT_TESTS_DOC_ID_KEY]
   sheet_name = $REPORTING_GOOGLE_SHEETS_UNIT_TESTS_SHEET_NAME_PLAYGROUND
-  sheet_data = smf_create_sheet_data_from_entries(sheet_entry, :AUTOMATIC_REPORTING)
+  sheet_data = smf_create_sheet_data_from_entries([sheet_entry], :AUTOMATIC_REPORTING)
   puts sheet_data
   # smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, sheet_data)
 end
