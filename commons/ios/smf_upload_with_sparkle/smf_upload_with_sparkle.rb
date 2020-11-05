@@ -32,7 +32,8 @@ private_lane :smf_upload_with_sparkle do |options|
 
   release_notes = smf_read_changelog(html: true)
   release_notes_name = "#{scheme}.html"
-  File.write("#{update_dir}#{release_notes_name}", release_notes)
+  release_notes_path = "#{update_dir}#{release_notes_name}"
+  File.write(release_notes_path, release_notes)
 
   if !File.exists?(dmg_path)
     raise("DMG file #{dmg_path} does not exit. Nothing to upload.")
@@ -53,10 +54,12 @@ private_lane :smf_upload_with_sparkle do |options|
     _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, xml_path)
     sh("hdiutil detach /Volumes/#{app_name}")
   else
-    sparkle_xml_path = "#{smf_workspace_dir}/build/#{sparkle_xml_name}"
+    xml_path = "#{smf_workspace_dir}/build/#{sparkle_xml_name}"
     info_plist_path = File.join(smf_path_to_ipa_or_app, '/Contents/Info.plist').shellescape
-    _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, sparkle_xml_path)
+    _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, xml_path)
   end
+
+  _smf_prepare_alternative_channel_directory(update_dir, info_plist_path, xml_path, dmg_path, release_notes_path)
 
   unless sparkle_upload_url.nil? || sparkle_upload_user.nil?
 
@@ -75,7 +78,50 @@ private_lane :smf_upload_with_sparkle do |options|
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{update_dir.shellescape}#{release_notes_name} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{dmg_path.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{appcast_xml.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
+    # TODO: handle RC-Test folder upload if existing
     end
+  end
+end
+
+
+def _smf_prepare_alternative_channel_directory(base_directory, info_plist_path, xml_path, dmg_path, release_notes_path)
+  # TODO: need to add docs here, SMFSUAlternativeFeedURL is arbitrary from HiDrive mac
+  su_rc_channel_url = sh("defaults read #{info_plist_path} SMFSUAlternativeFeedURL").gsub("\n", '')
+
+  if su_rc_channel_url =~ /\A#{URI::regexp}\z/
+    begin
+      UI.message('Creating alternative package')
+      # TODO: put name in variable ??
+     directory_path = "#{base_directory}RCTest/"
+     Dir.mkdir(directory_path)
+    
+     # Copy all content inside new folder
+     sh("cp #{dmg_path.shellescape} #{directory_path}")
+     sh("cp #{xml_path.shellescape} #{directory_path}")
+     sh("cp #{release_notes_path.shellescape} #{directory_path}")
+
+
+     # Replace original url with alternative URL in new XML
+     su_feed_url = sh("defaults read #{info_plist_path} SUFeedURL").gsub("\n", '')
+     xml_content = File.read(xml_path)
+     new_contents = text.gsub(su_feed_url, su_rc_channel_url)
+     
+     if xml_content == new_contents
+      raise "Alternative Appcast XML creation failed. Result is identical to source"
+     end 
+
+     alternative_xml_path = "#{directory_path}#{xml_path.split('/').last}"
+
+    File.open(sparkle_xml_path, 'w+') do |f|
+      f.write(new_contents)
+    end
+
+     rescue => exception
+      UI.error("Encountered an error while creating alternative package: #{exception.message}.")
+      raise "Cannot create alternative package. Interrupting process..."
+    end
+  else
+    UI.message('Skipping alternative package creation: Did not find a valid feed URL for key SMFSUAlternativeFeedURL')
   end
 end
 
