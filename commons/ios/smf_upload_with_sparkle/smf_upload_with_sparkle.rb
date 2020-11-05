@@ -103,8 +103,13 @@ def _smf_prepare_alternative_channel_directory(base_directory, info_plist_path, 
 
      # Replace original url with alternative URL in new XML
      su_feed_url = sh("defaults read #{info_plist_path} SUFeedURL").gsub("\n", '')
+     xml_name = su_feed_url.split('/').last
+    
+     # We want to find the URL but without the XML name
+     url_to_find = su_feed_url.sub(xml_name, '')
+     url_to_replace = su_rc_channel_url.sub(xml_name, '')
      xml_content = File.read(xml_path)
-     new_contents = text.gsub(su_feed_url, su_rc_channel_url)
+     new_contents = xml_content.gsub(url_to_find, url_to_replace)
      
      if xml_content == new_contents
       raise "Alternative Appcast XML creation failed. Result is identical to source"
@@ -112,11 +117,10 @@ def _smf_prepare_alternative_channel_directory(base_directory, info_plist_path, 
 
      alternative_xml_path = "#{directory_path}#{xml_path.split('/').last}"
 
-    File.open(sparkle_xml_path, 'w+') do |f|
+     File.open(alternative_xml_path, 'w+') do |f|
       f.write(new_contents)
-    end
-
-     rescue => exception
+     end 
+    rescue => exception
       UI.error("Encountered an error while creating alternative package: #{exception.message}.")
       raise "Cannot create alternative package. Interrupting process..."
     end
