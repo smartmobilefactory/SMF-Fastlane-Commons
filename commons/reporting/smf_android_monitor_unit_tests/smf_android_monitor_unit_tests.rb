@@ -22,7 +22,7 @@ private_lane :smf_android_monitor_unit_tests do |options|
 
   # Prepare raw data for the spreadsheet entry
   options[:unit_test_count] = test_count
-  sheet_entry = _smf_create_spreadsheet_entry(options)
+  sheet_entry = smf_create_spreadsheet_entry(options)
 
   # Gather API credentiels and format data for the API
   sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_UNIT_TESTS_DOC_ID_KEY]

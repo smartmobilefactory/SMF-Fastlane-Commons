@@ -38,13 +38,16 @@ private_lane :smf_ios_monitor_unit_tests do |options|
       :covered_lines => result_parsed.dig('coveredLines')
     }
 
-    new_entry = _smf_create_spreadsheet_entry(entry_data)
+    # Prepare raw data for the spreadsheet entry
+    new_entry = smf_create_spreadsheet_entry(entry_data)
     sheet_entries.push(new_entry) unless new_entry.nil?
   end
 
+  # Gather API credentiels and format data for the API
   sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_UNIT_TESTS_DOC_ID_KEY]
   sheet_name = $REPORTING_GOOGLE_SHEETS_UNIT_TESTS_SHEET_NAME
-
   sheet_data = smf_create_sheet_data_from_entries(sheet_entries, :AUTOMATIC_REPORTING)
+
+  # Push to monitoring data to Google Spreadsheet via the API
   smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, sheet_data)
 end
