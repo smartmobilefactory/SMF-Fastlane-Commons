@@ -101,7 +101,11 @@ end
 private_lane :smf_super_android_automatic_reporting do |options|
 
   project_name = @smf_fastlane_config.dig(:project, :project_name)
-  # TODO
+
+  smf_android_monitor_unit_tests(
+    project_name: project_name,
+    branch: options[:branch_name]
+  )
 end
 
 lane :smf_android_automatic_reporting do |options|
