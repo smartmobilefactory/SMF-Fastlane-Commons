@@ -8,6 +8,7 @@ Example:
 ```
 smf_android_monitor_unit_tests(
     project_name: <project_name>,		# Name of the project
-    branch: <branch>					# Name of the branch
+    branch: <branch>,					# Name of the branch
+    platform: <platform>				# Name of the platform (Android)
 )
 ```
