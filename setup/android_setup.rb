@@ -105,7 +105,7 @@ private_lane :smf_super_android_automatic_reporting do |options|
   smf_android_monitor_unit_tests(
     project_name: project_name,
     branch: options[:branch_name],
-    platform: 'android'
+    platform: smf_meta_report_platform_friendly_name
   )
 end
 

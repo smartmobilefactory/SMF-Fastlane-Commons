@@ -88,8 +88,8 @@ def _smf_jenkins_file_template_path
 end
 
 def _smf_build_variant_platform_prefix_mapping(platform)
-  case platform.to_s
-  when 'macOS'
+  case @platform
+  when :macOS
     return $CATALYST_MAC_BUILD_VARIANT_PREFIX
   end
 
