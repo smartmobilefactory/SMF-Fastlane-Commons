@@ -59,7 +59,7 @@ private_lane :smf_upload_with_sparkle do |options|
     _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, xml_path)
   end
 
-  _smf_prepare_alternative_channel_directory(update_dir, info_plist_path, xml_path, dmg_path, release_notes_path)
+  alternative_channel_directory_path = _smf_prepare_alternative_channel_directory(update_dir, info_plist_path, xml_path, dmg_path, release_notes_path)
 
   unless sparkle_upload_url.nil? || sparkle_upload_user.nil?
 
@@ -72,13 +72,16 @@ private_lane :smf_upload_with_sparkle do |options|
       sh("cp #{dmg_path.shellescape} #{intermediate_directory_path}")
       sh("cp #{appcast_xml.shellescape} #{intermediate_directory_path}")
       sh("cp #{update_dir.shellescape}#{release_notes_name} #{intermediate_directory_path}")
+      # TODO: test that
+      sh("cp #{alternative_channel_directory_path.shellescape} #{intermediate_directory_path}") unless alternative_channel_directory_path.nil?
       sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} -r #{intermediate_directory_path} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
     else
       # We upload the three elements directly
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{update_dir.shellescape}#{release_notes_name} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{dmg_path.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{appcast_xml.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
-    # TODO: handle RC-Test folder upload if existing
+    # TODO: TEST THAT
+    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{alternative_channel_directory_path.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}") unless alternative_channel_directory_path.nil?
     end
   end
 end
@@ -100,7 +103,6 @@ def _smf_prepare_alternative_channel_directory(base_directory, info_plist_path, 
      sh("cp #{xml_path.shellescape} #{directory_path}")
      sh("cp #{release_notes_path.shellescape} #{directory_path}")
 
-
      # Replace original url with alternative URL in new XML
      su_feed_url = sh("defaults read #{info_plist_path} SUFeedURL").gsub("\n", '')
      xml_name = su_feed_url.split('/').last
@@ -119,7 +121,9 @@ def _smf_prepare_alternative_channel_directory(base_directory, info_plist_path, 
 
      File.open(alternative_xml_path, 'w+') do |f|
       f.write(new_contents)
-     end 
+     end
+
+     alternative_xml_path
     rescue => exception
       UI.error("Encountered an error while creating alternative package: #{exception.message}.")
       raise "Cannot create alternative package. Interrupting process..."
