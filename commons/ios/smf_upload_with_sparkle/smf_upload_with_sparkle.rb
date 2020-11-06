@@ -94,7 +94,7 @@ def _smf_prepare_alternative_channel_directory(base_directory, info_plist_path, 
     begin
       UI.message('Creating alternative package')
       # TODO: put name in variable ??
-     directory_path = "#{base_directory}alternative/"
+     directory_path = "#{base_directory}test/"
      Dir.mkdir(directory_path)
     
      # Copy all content inside new folder
