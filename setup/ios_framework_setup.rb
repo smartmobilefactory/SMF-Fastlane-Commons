@@ -141,13 +141,13 @@ private_lane :smf_pod_super_automatic_reporting do |options|
   UI.message(build_variant)
 
   # Platform
-  build_variant_config = @smf_fastlane_config.dig(:build_variants, build_variant.to_sym)
-  platform = build_variant_config.dig(:platform)
-  if platform.nil?
+  # build_variant_config = @smf_fastlane_config.dig(:build_variants, build_variant.to_sym)
+  # platform = build_variant_config.dig(:platform)
+  # if platform.nil?
     platform = 'iOS'
-  elsif platform.include?('mac')
-    platform = 'macOS'
-  end
+  # elsif platform.include?('mac')
+  #   platform = 'macOS'
+  # end
 
   smf_ios_monitor_unit_tests(
     project_name: project_name,
