@@ -72,8 +72,7 @@ private_lane :smf_upload_with_sparkle do |options|
       sh("cp #{dmg_path.shellescape} #{intermediate_directory_path}")
       sh("cp #{appcast_xml.shellescape} #{intermediate_directory_path}")
       sh("cp #{update_dir.shellescape}#{release_notes_name} #{intermediate_directory_path}")
-      # TODO: test that
-      sh("cp -r #{alternative_channel_directory_path.shellescape} #{intermediate_directory_path}") unless alternative_channel_directory_path.nil?
+      sh("mv #{alternative_channel_directory_path.shellescape} #{intermediate_directory_path}") unless alternative_channel_directory_path.nil?
       sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} -r #{intermediate_directory_path} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
     else
       # We upload the three elements directly
