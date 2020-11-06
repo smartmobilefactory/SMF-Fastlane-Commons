@@ -130,7 +130,8 @@ end
 private_lane :smf_pod_super_automatic_reporting do |options|
 
   project_name = @smf_fastlane_config.dig(:project, :project_name)
-  build_variant_config = @smf_fastlane_config.dig(:build_variants, options[:build_variant].to_sym)
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+  build_variant_config = @smf_fastlane_config.dig(:build_variants, build_variant.to_sym)
 
   platform = build_variant_config.dig(:platform)
   if platform.nil?
@@ -143,7 +144,7 @@ private_lane :smf_pod_super_automatic_reporting do |options|
     project_name: project_name,
     branch: options[:branch_name],
     platform: platform,
-    build_variant: options[:build_variant]
+    build_variant: build_variant
   )
 end
 
