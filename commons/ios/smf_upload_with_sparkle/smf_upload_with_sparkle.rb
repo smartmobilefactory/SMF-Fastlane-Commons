@@ -80,8 +80,8 @@ private_lane :smf_upload_with_sparkle do |options|
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{update_dir.shellescape}#{release_notes_name} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{dmg_path.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{appcast_xml.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
-    # TODO: TEST THAT
-    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{alternative_channel_directory_path.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}") unless alternative_channel_directory_path.nil?
+    # TODO: TEST THAT AND THIS ABOUT The PAcakge creator for telekom
+    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} -r #{alternative_channel_directory_path.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}") unless alternative_channel_directory_path.nil?
     end
   end
 end
@@ -95,7 +95,7 @@ def _smf_prepare_alternative_channel_directory(base_directory, info_plist_path, 
     begin
       UI.message('Creating alternative package')
       # TODO: put name in variable ??
-     directory_path = "#{base_directory}RCTest/"
+     directory_path = "#{base_directory}alternative/"
      Dir.mkdir(directory_path)
     
      # Copy all content inside new folder
@@ -123,7 +123,7 @@ def _smf_prepare_alternative_channel_directory(base_directory, info_plist_path, 
       f.write(new_contents)
      end
 
-     alternative_xml_path
+     directory_path
     rescue => exception
       UI.error("Encountered an error while creating alternative package: #{exception.message}.")
       raise "Cannot create alternative package. Interrupting process..."
