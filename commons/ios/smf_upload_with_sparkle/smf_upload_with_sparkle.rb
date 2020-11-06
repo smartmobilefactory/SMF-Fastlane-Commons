@@ -48,11 +48,9 @@ private_lane :smf_upload_with_sparkle do |options|
   sh "#{@fastlane_commons_dir_path}/commons/ios/smf_upload_with_sparkle/sparkle.sh #{ENV[$KEYCHAIN_LOGIN_ENV_KEY]} #{sparkle_private_key} #{update_dir} #{sparkle_version} #{sparkle_signing_team}"
 
   if use_custom_info_plist_path == true
-    sh("hdiutil attach #{dmg_path}")
     info_plist_path = "/Volumes/#{app_name}/#{app_name}.app/Contents/Info.plist".shellescape
     xml_path = File.join(target_directory, sparkle_xml_name)
     _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, xml_path)
-    sh("hdiutil detach /Volumes/#{app_name}")
   else
     xml_path = "#{smf_workspace_dir}/build/#{sparkle_xml_name}"
     info_plist_path = File.join(smf_path_to_ipa_or_app, '/Contents/Info.plist').shellescape

@@ -17,7 +17,6 @@ lane :smf_create_sparkle_package do |options|
   app_name = File.basename(input_dmg_path).sub('.dmg', '')
   info_plist_path = "/Volumes/#{app_name}/#{app_name}.app/Contents/Info.plist".shellescape
   build_number = sh("defaults read #{info_plist_path} CFBundleVersion").gsub("\n", '')
-  sh("hdiutil detach /Volumes/#{app_name}")
 
   if sparkle_config.nil?
     UI.error("There is no sparkle entry for the build variant: #{build_variant}")
@@ -42,6 +41,9 @@ lane :smf_create_sparkle_package do |options|
     source_dmg_path: input_dmg_path,
     target_directory: target_directory
   )
+
+  # We keep the DMG mounted during `smf_upload_with_sparkle` because we give the DMG path to it.
+  sh("hdiutil detach /Volumes/#{app_name}")
 
   package_name = _smf_sparkle_package_name(project_name, build_variant, build_number)
   package_path = _smf_zip_sparkle_package(target_directory, package_name)
