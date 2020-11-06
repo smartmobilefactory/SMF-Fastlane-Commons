@@ -69,62 +69,62 @@ private_lane :smf_send_message do |options|
     payload['Notarization Log'] = ENV['FL_NOTARIZE_LOG_FILE_URL'] if @platform == :mac and !ENV['FL_NOTARIZE_LOG_FILE_URL'].nil?
 
     # Send failure messages also to CI to notice them so that we can see if they can be improved
-    # begin
-    #   if type == 'error' && !(slack_channel.eql? ci_error_log)
-    #     slack(
-    #         slack_url: slack_workspace_url,
-    #         icon_url: icon_url,
-    #         pretext: title,
-    #         message: content,
-    #         channel: ci_error_log,
-    #         username: "#{project_name} CI",
-    #         success: success,
-    #         payload: payload,
-    #         default_payloads: [:git_branch],
-    #     )
-    #   end
-    # rescue => exception
-    #   UI.important("Failed to send error message to #{ci_error_log} Slack room. Exception: #{exception}")
-    # end
+    begin
+      if type == 'error' && !(slack_channel.eql? ci_error_log)
+        slack(
+            slack_url: slack_workspace_url,
+            icon_url: icon_url,
+            pretext: title,
+            message: content,
+            channel: ci_error_log,
+            username: "#{project_name} CI",
+            success: success,
+            payload: payload,
+            default_payloads: [:git_branch],
+        )
+      end
+    rescue => exception
+      UI.important("Failed to send error message to #{ci_error_log} Slack room. Exception: #{exception}")
+    end
 
-    # begin
-    #   if !attachment_path.nil?
-    #     slack(
-    #         slack_url: slack_workspace_url,
-    #         icon_url: icon_url,
-    #         pretext: title,
-    #         message: content,
-    #         channel: slack_channel,
-    #         username: "#{project_name} CI",
-    #         success: success,
-    #         payload: payload,
-    #         default_payloads: [:git_branch],
-    #         attachment_properties: {
-    #             fields: [
-    #                 {
-    #                     title: 'Attachment',
-    #                     value: attachment_path.to_s
-    #                 }
-    #             ]
-    #         }
-    #     )
-    #   else
-    #     slack(
-    #         slack_url: slack_workspace_url,
-    #         icon_url: icon_url,
-    #         pretext: title,
-    #         message: content,
-    #         channel: slack_channel,
-    #         username: "#{project_name} CI",
-    #         success: success,
-    #         payload: payload,
-    #         default_payloads: [:git_branch],
-    #     )
-    #   end
-    # rescue => exception
-    #   UI.important("Failed to send error message to #{slack_channel} Slack room. Exception: #{exception}")
-    #   raise exception if fail_build_job_on_error
-    # end
+    begin
+      if !attachment_path.nil?
+        slack(
+            slack_url: slack_workspace_url,
+            icon_url: icon_url,
+            pretext: title,
+            message: content,
+            channel: slack_channel,
+            username: "#{project_name} CI",
+            success: success,
+            payload: payload,
+            default_payloads: [:git_branch],
+            attachment_properties: {
+                fields: [
+                    {
+                        title: 'Attachment',
+                        value: attachment_path.to_s
+                    }
+                ]
+            }
+        )
+      else
+        slack(
+            slack_url: slack_workspace_url,
+            icon_url: icon_url,
+            pretext: title,
+            message: content,
+            channel: slack_channel,
+            username: "#{project_name} CI",
+            success: success,
+            payload: payload,
+            default_payloads: [:git_branch],
+        )
+      end
+    rescue => exception
+      UI.important("Failed to send error message to #{slack_channel} Slack room. Exception: #{exception}")
+      raise exception if fail_build_job_on_error
+    end
 
   elsif slack_channel
     UI.error("Didn't send message as \"slack_channel\" contains \"/\"")
