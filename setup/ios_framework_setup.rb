@@ -129,31 +129,31 @@ end
 
 private_lane :smf_pod_super_automatic_reporting do |options|
 
-  UI.message(options)
-  project_name = @smf_fastlane_config.dig(:project, :project_name)
-  UI.message(project_name)
-  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
-  UI.message(build_variant)
-  branch_name = !options[:branch_name].nil? ? options[:branch_name] : smf_workspace_dir_git_branch
-  UI.message(branch_name)
+  UI.message("hello there")
+  # project_name = @smf_fastlane_config.dig(:project, :project_name)
+  # UI.message(project_name)
+  # build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+  # UI.message(build_variant)
+  # branch_name = !options[:branch_name].nil? ? options[:branch_name] : smf_workspace_dir_git_branch
+  # UI.message(branch_name)
 
-  raise "missing build_variant" if build_variant.nil?
-  UI.message(build_variant)
+  # raise "missing build_variant" if build_variant.nil?
+  # UI.message(build_variant)
 
   # Platform
   # build_variant_config = @smf_fastlane_config.dig(:build_variants, build_variant.to_sym)
   # platform = build_variant_config.dig(:platform)
   # if platform.nil?
-    platform = 'iOS'
+    # platform = 'iOS'
   # elsif platform.include?('mac')
   #   platform = 'macOS'
   # end
 
   smf_ios_monitor_unit_tests(
-    project_name: project_name,
-    branch: branch_name,
-    platform: platform,
-    build_variant: build_variant
+    project_name: "project_name",
+    branch: "branch_name",
+    platform: "platform",
+    build_variant: "build_variant"
   )
 end
 
