@@ -129,9 +129,13 @@ end
 
 private_lane :smf_pod_super_automatic_reporting do |options|
 
+  puts options
   project_name = @smf_fastlane_config.dig(:project, :project_name)
+  puts project_name
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+  puts build_variant
   branch_name = !options[:branch_name].nil? ? options[:branch_name] : smf_workspace_dir_git_branch
+  puts branch_name
 
   raise "missing build_variant" if build_variant.nil?
   puts build_variant
