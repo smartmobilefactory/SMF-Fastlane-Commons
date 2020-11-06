@@ -162,7 +162,7 @@ def smf_path_to_ipa_or_app
     file_exists = filename.end_with?('.ipa.zip')
     file_exists = filename.end_with?('.ipa') unless file_exists
     file_exists = filename.end_with?('.app') unless file_exists
-    
+
     if file_exists
       app_path = smf_workspace_dir + '/build/' + filename
       break
@@ -389,4 +389,9 @@ def smf_string_array_to_array(string)
 
   array = string.delete(' ').delete('[').delete(']')
   array.split(',')
+end
+
+def smf_workspace_dir_git_branch
+  current_branch = `cd #{smf_workspace_dir}; git rev-parse --abbrev-ref HEAD`.gsub("\n", '')
+  return current_branch
 end
