@@ -16,6 +16,10 @@ private_lane :smf_upload_with_sparkle do |options|
   sparkle_xml_name = options[:sparkle_xml_name]
   sparkle_private_key = options[:sparkle_private_key]
 
+  # If the DMG's Info.plist contains a valid URL for key SMFSUAlternativeFeedURL, we will create a second Sparkle package in a sub-folder named `alternative_channel_directory_name`
+  # Changing this value here will have some impacts on alternative channel URLs for mac apps. See https://smartmobilefactory.atlassian.net/browse/STRMAC-2306
+  alternative_channel_directory_name = 'test'
+
   # Optional
   source_dmg_path = options[:source_dmg_path]
   target_directory = options[:target_directory]
@@ -32,7 +36,8 @@ private_lane :smf_upload_with_sparkle do |options|
 
   release_notes = smf_read_changelog(html: true)
   release_notes_name = "#{scheme}.html"
-  File.write("#{update_dir}#{release_notes_name}", release_notes)
+  release_notes_path = "#{update_dir}#{release_notes_name}"
+  File.write(release_notes_path, release_notes)
 
   if !File.exists?(dmg_path)
     raise("DMG file #{dmg_path} does not exit. Nothing to upload.")
@@ -47,16 +52,16 @@ private_lane :smf_upload_with_sparkle do |options|
   sh "#{@fastlane_commons_dir_path}/commons/ios/smf_upload_with_sparkle/sparkle.sh #{ENV[$KEYCHAIN_LOGIN_ENV_KEY]} #{sparkle_private_key} #{update_dir} #{sparkle_version} #{sparkle_signing_team}"
 
   if use_custom_info_plist_path == true
-    sh("hdiutil attach #{dmg_path}")
     info_plist_path = "/Volumes/#{app_name}/#{app_name}.app/Contents/Info.plist".shellescape
     xml_path = File.join(target_directory, sparkle_xml_name)
     _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, xml_path)
-    sh("hdiutil detach /Volumes/#{app_name}")
   else
-    sparkle_xml_path = "#{smf_workspace_dir}/build/#{sparkle_xml_name}"
+    xml_path = "#{smf_workspace_dir}/build/#{sparkle_xml_name}"
     info_plist_path = File.join(smf_path_to_ipa_or_app, '/Contents/Info.plist').shellescape
-    _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, sparkle_xml_path)
+    _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, xml_path)
   end
+
+  alternative_channel_directory_path = _smf_prepare_alternative_channel_directory(update_dir, info_plist_path, xml_path, dmg_path, release_notes_path, alternative_channel_directory_name)
 
   unless sparkle_upload_url.nil? || sparkle_upload_user.nil?
 
@@ -69,13 +74,60 @@ private_lane :smf_upload_with_sparkle do |options|
       sh("cp #{dmg_path.shellescape} #{intermediate_directory_path}")
       sh("cp #{appcast_xml.shellescape} #{intermediate_directory_path}")
       sh("cp #{update_dir.shellescape}#{release_notes_name} #{intermediate_directory_path}")
+      sh("mv #{alternative_channel_directory_path.shellescape} #{intermediate_directory_path}") unless alternative_channel_directory_path.nil?
       sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} -r #{intermediate_directory_path} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
     else
       # We upload the three elements directly
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{update_dir.shellescape}#{release_notes_name} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{dmg_path.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{appcast_xml.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
+    sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} -r #{alternative_channel_directory_path.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}") unless alternative_channel_directory_path.nil?
     end
+  end
+end
+
+
+def _smf_prepare_alternative_channel_directory(base_directory, info_plist_path, xml_path, dmg_path, release_notes_path, alternative_channel_directory_name)
+  su_rc_channel_url = sh("defaults read #{info_plist_path} SMFSUAlternativeFeedURL").gsub("\n", '')
+
+  if su_rc_channel_url =~ /\A#{URI::regexp}\z/
+    begin
+      UI.message('Creating alternative package')
+     directory_path = "#{base_directory}#{alternative_channel_directory_name}/"
+     Dir.mkdir(directory_path)
+    
+     # Copy all content inside new folder
+     sh("cp #{dmg_path.shellescape} #{directory_path}")
+     sh("cp #{xml_path.shellescape} #{directory_path}")
+     sh("cp #{release_notes_path.shellescape} #{directory_path}")
+
+     # Replace original url with alternative URL in new XML
+     su_feed_url = sh("defaults read #{info_plist_path} SUFeedURL").gsub("\n", '')
+     xml_name = su_feed_url.split('/').last
+    
+     # We want to find the URL but without the XML name
+     url_to_find = su_feed_url.sub(xml_name, '')
+     url_to_replace = su_rc_channel_url.sub(xml_name, '')
+     xml_content = File.read(xml_path)
+     new_contents = xml_content.gsub(url_to_find, url_to_replace)
+     
+     if xml_content == new_contents
+      raise "Alternative Appcast XML creation failed. Result is identical to source"
+     end 
+
+     alternative_xml_path = "#{directory_path}#{xml_path.split('/').last}"
+
+     File.open(alternative_xml_path, 'w+') do |f|
+      f.write(new_contents)
+     end
+
+     directory_path
+    rescue => exception
+      UI.error("Encountered an error while creating alternative package: #{exception.message}.")
+      raise 'Cannot create alternative package. Interrupting process...'
+    end
+  else
+    UI.message('Skipping alternative package creation: Did not find a valid feed URL for key SMFSUAlternativeFeedURL')
   end
 end
 
