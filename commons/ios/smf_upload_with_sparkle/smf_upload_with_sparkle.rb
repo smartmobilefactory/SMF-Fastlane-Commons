@@ -16,6 +16,10 @@ private_lane :smf_upload_with_sparkle do |options|
   sparkle_xml_name = options[:sparkle_xml_name]
   sparkle_private_key = options[:sparkle_private_key]
 
+  # If the DMG's Info.plist contains a valid URL for key SMFSUAlternativeFeedURL, we will create a second Sparkle package in a sub-folder named `alternative_channel_directory_name`
+  # Changing this value here will have some impacts on alternative channel URLs for mac apps. See https://smartmobilefactory.atlassian.net/browse/STRMAC-2306
+  alternative_channel_directory_name = "test"
+
   # Optional
   source_dmg_path = options[:source_dmg_path]
   target_directory = options[:target_directory]
@@ -57,7 +61,7 @@ private_lane :smf_upload_with_sparkle do |options|
     _smf_prepare_sparkle_xml_for_upload(release_notes_name, info_plist_path, xml_path)
   end
 
-  alternative_channel_directory_path = _smf_prepare_alternative_channel_directory(update_dir, info_plist_path, xml_path, dmg_path, release_notes_path)
+  alternative_channel_directory_path = _smf_prepare_alternative_channel_directory(update_dir, info_plist_path, xml_path, dmg_path, release_notes_path, alternative_channel_directory_name)
 
   unless sparkle_upload_url.nil? || sparkle_upload_user.nil?
 
@@ -77,22 +81,20 @@ private_lane :smf_upload_with_sparkle do |options|
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{update_dir.shellescape}#{release_notes_name} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{dmg_path.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} #{appcast_xml.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}")
-    # TODO: TEST THAT AND THIS ABOUT The PAcakge creator for telekom
     sh("scp -i #{ENV['CUSTOM_SPARKLE_PRIVATE_SSH_KEY']} -r #{alternative_channel_directory_path.shellescape} '#{sparkle_upload_user}'@#{sparkle_upload_url}:/#{sparkle_dmg_path}") unless alternative_channel_directory_path.nil?
     end
   end
 end
 
 
-def _smf_prepare_alternative_channel_directory(base_directory, info_plist_path, xml_path, dmg_path, release_notes_path)
+def _smf_prepare_alternative_channel_directory(base_directory, info_plist_path, xml_path, dmg_path, release_notes_path, alternative_channel_directory_name)
   # TODO: need to add docs here, SMFSUAlternativeFeedURL is arbitrary from HiDrive mac
   su_rc_channel_url = sh("defaults read #{info_plist_path} SMFSUAlternativeFeedURL").gsub("\n", '')
 
   if su_rc_channel_url =~ /\A#{URI::regexp}\z/
     begin
       UI.message('Creating alternative package')
-      # TODO: put name in variable ??
-     directory_path = "#{base_directory}test/"
+     directory_path = "#{base_directory}#{alternative_channel_directory_name}/"
      Dir.mkdir(directory_path)
     
      # Copy all content inside new folder
