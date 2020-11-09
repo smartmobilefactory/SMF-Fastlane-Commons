@@ -88,7 +88,6 @@ end
 
 
 def _smf_prepare_alternative_channel_directory(base_directory, info_plist_path, xml_path, dmg_path, release_notes_path, alternative_channel_directory_name)
-  # TODO: need to add docs here, SMFSUAlternativeFeedURL is arbitrary from HiDrive mac
   su_rc_channel_url = sh("defaults read #{info_plist_path} SMFSUAlternativeFeedURL").gsub("\n", '')
 
   if su_rc_channel_url =~ /\A#{URI::regexp}\z/

@@ -1,9 +1,27 @@
 # smf_upload_with_sparkle
 
-This lane uploads the .dmg file with Sparkle.
+This lane prepares a Sparkle package containing:
+- App's DMG
+- An HTML file containing the changelog
+- XML file containing update informations called appcast. It contains hardcoded URLs for the DMG and the changelog.
 
-### Example
+If `sparkle_upload_user` and `sparkle_upload_url` are specified, the package will be uploaded via `scp` to the specified location.
+
+## Application configuration
+
+On top of the configuration in Config.json, one needs to specify information in the Info.plist for the package to be created.
+See documentation for more details: https://sparkle-project.org/documentation/
+
+- `SUPublicEDKey`: Should contain the public part of the EdDSA signature used to sign the update.
+- `SUFeedURL`: URL where the app will look for the appcast.xml file. This URL is used as a base to generate the URLs inside appcast.xml. For example, if the URL is https://example.com/update/appcast.xml, then the DMG and the changelog will also be in https://example.com/update/
+
+### Optional keys:
+
+- `SMFSUAlternativeFeedURL`: This is a SMF custom key that allows us to specify a second update URL. If the value for this key is a valid URL, then a second Sparkle package will be created as a child of the main one, in a sub-folder named `test` (customer requirement). If the value is not a valid URL, or the key does not exist, then the second package won't be created. See https://smartmobilefactory.atlassian.net/browse/STRMAC-2306.
+
+## Example
 Uploads the .dmg to Sparkle.
+
 ```
 smf_upload_with_sparkle(
     build_variant: "alpha",                     # The currently building build variant
@@ -21,7 +39,14 @@ smf_upload_with_sparkle(
 )
 ``` 
 ### Sparkle Package Creator
-This lane is also used by the sparkle package creator tool. Therefore the upload url and user are set to nil to prevent the lane from uploading. A custom source path for the app's dmg is given. The appcast, html etc is then created at the given target directory.
+This lane is also used by the sparkle package creator tool. Therefore the upload url and user are set to nil to prevent the lane from uploading. A custom source path for the app's dmg is given. The appcast, html etc is then created at the given target directory. 
+
+We need this package creator to be able to create a Sparkle package after Telekom sent us the signed version of their app. https://smartmobilefactory.atlassian.net/l/c/G71YsTQm
+Our regular build process is able to make a Sparkle package starting from source code, with this `Sparkle package creator`, we can directly make a package from an already existing DMG.
+
+- Package creator URL: https://ci.smfhq.com/job/HiDrive_App/job/Sparkle-Package-Creator_iOS/
+- In any case, the packages created via this method are stored as a release in this repo: https://github.com/smartmobilefactory/SMF-Sparkle-Packages-Container
+
 
 ### Custom Sparkle Credentials for MacOS-Apps
 
