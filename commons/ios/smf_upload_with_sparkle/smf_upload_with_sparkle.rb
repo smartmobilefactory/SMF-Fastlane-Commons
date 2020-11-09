@@ -18,7 +18,7 @@ private_lane :smf_upload_with_sparkle do |options|
 
   # If the DMG's Info.plist contains a valid URL for key SMFSUAlternativeFeedURL, we will create a second Sparkle package in a sub-folder named `alternative_channel_directory_name`
   # Changing this value here will have some impacts on alternative channel URLs for mac apps. See https://smartmobilefactory.atlassian.net/browse/STRMAC-2306
-  alternative_channel_directory_name = "test"
+  alternative_channel_directory_name = 'test'
 
   # Optional
   source_dmg_path = options[:source_dmg_path]
@@ -124,7 +124,7 @@ def _smf_prepare_alternative_channel_directory(base_directory, info_plist_path, 
      directory_path
     rescue => exception
       UI.error("Encountered an error while creating alternative package: #{exception.message}.")
-      raise "Cannot create alternative package. Interrupting process..."
+      raise 'Cannot create alternative package. Interrupting process...'
     end
   else
     UI.message('Skipping alternative package creation: Did not find a valid feed URL for key SMFSUAlternativeFeedURL')
