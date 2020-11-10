@@ -121,13 +121,14 @@ def _smf_prepare_alternative_channel_directory(base_directory, info_plist_path, 
       f.write(new_contents)
      end
 
-     directory_path
+     return directory_path
     rescue => exception
       UI.error("Encountered an error while creating alternative package: #{exception.message}.")
       raise 'Cannot create alternative package. Interrupting process...'
     end
   else
     UI.message('Skipping alternative package creation: Did not find a valid feed URL for key SMFSUAlternativeFeedURL')
+    return nil
   end
 end
 
