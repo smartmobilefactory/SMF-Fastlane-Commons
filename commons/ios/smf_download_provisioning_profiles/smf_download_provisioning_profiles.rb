@@ -33,7 +33,7 @@ private_lane :smf_download_provisioning_profiles do |options|
     smf_download_provisioning_profile_using_match(
       app_identifier: app_identifier,
       type: match_type,
-      read_only: (match_type.nil? ? match_read_only : false),
+      read_only: match_read_only,
       extensions_suffixes: extensions_suffixes,
       apple_id: apple_id,
       team_id: team_id,
@@ -51,7 +51,7 @@ private_lane :smf_download_provisioning_profiles do |options|
             smf_download_provisioning_profile_using_match(
               app_identifier: app_identifier,
               type: 'enterprise',
-              read_only: (match_type.nil? ? match_read_only : false),
+              read_only: match_read_only,
               extensions_suffixes: extensions_suffixes,
               apple_id: apple_id,
               team_id: team_id,
