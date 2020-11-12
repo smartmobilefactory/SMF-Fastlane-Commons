@@ -34,7 +34,7 @@ private_lane :smf_create_github_release do |options|
      changelog = "No description (changelog) provided."
    end
 
-  version = smf_get_version_number(build_variant)
+  version = smf_get_version_number(build_variant, podspec_path)
   release_name = "#{build_variant.upcase} #{version} (#{build_number})"
 
   if @platform == :ios_framework
