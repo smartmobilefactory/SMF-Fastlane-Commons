@@ -24,6 +24,12 @@ private_lane :smf_increment_version_number do |options|
 
   all_podspecs = [podspec_path] + additional_podspecs
 
+  versions = smf_get_podspec_versions(all_podspecs)
+
+  if versions.count > 1
+    raise "⛔️ There are different versions in the podspecs: #{versions}. Aborting..."
+  end
+
   UI.message("Commit files #{all_podspecs}")
 
   if bump_type != 'current'
