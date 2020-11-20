@@ -77,7 +77,7 @@ def _smf_verify_podspecs(podspecs)
   versions = []
 
   podspecs.each do |podspecs_path|
-    version = read_podspec(podspecs_path).dig('version')
+    version = read_podspec(path: podspecs_path).dig('version')
     versions.push(version) unless version.nil?
   end
 
