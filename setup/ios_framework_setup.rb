@@ -37,7 +37,7 @@ private_lane :smf_pod_super_setup_dependencies_pr_check do |options|
 
   smf_build_precheck(
     pods_spec_repo: @smf_fastlane_config[:build_variants][:framework][:pods_specs_repo],
-    additional_podspecs: podspecs
+    podspecs: podspecs
   )
 
   smf_pod_install
