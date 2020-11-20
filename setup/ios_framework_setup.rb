@@ -48,6 +48,7 @@ lane :smf_pod_setup_dependencies_pr_check do |options|
 end
 
 # Lint podspecs
+# This assures that if there are multiple podspecs, that they all build properly
 
 private_lane :smf_super_lint_podspecs do |options|
 
