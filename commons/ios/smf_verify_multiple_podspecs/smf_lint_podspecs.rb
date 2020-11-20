@@ -1,4 +1,4 @@
-private_lane :smf_verify_and_lint_podspecs do |options|
+private_lane :smf_lint_podspecs do |options|
 
   podspecs = options[:podspecs]
 

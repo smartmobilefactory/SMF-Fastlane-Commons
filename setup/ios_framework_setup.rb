@@ -56,12 +56,12 @@ private_lane :smf_super_lint_podspecs do |options|
   additional_podspecs = @smf_fastlane_config[:build_variants][:framework][:additional_podspecs]
   podspecs += additional_podspecs unless additional_podspecs.nil?
 
-  smf_verify_and_lint_podspecs(
+  smf_lint_podspecs(
     podspecs: podspecs
   )
 end
 
-lane :smf_lint_podspecs do |options|
+lane :smf_pod_lint_podspecs do |options|
   smf_super_lint_podspecs(options)
 end
 
