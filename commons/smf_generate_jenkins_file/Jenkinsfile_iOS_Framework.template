@@ -2,7 +2,7 @@
 // Automatically generated. Do not edit.
 //
 
-@Library('jenkins-pipeline-commons@master') _
+@Library('jenkins-pipeline-commons@feature/STRFRAMEWORK-2296') _
 
 _build_variants = __BUILD_VARIANTS__
 
