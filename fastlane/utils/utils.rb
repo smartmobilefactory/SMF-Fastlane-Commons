@@ -399,7 +399,7 @@ end
 # Returns array with all versions found
 def smf_get_podspec_versions(podspecs)
   return [] if podspecs.nil? || podspecs.count < 0
-  return read_podspec(path: podspecs.first).dig('version') if podspecs.count == 1
+  return [read_podspec(path: podspecs.first).dig('version')] if podspecs.count == 1
 
   versions = []
 

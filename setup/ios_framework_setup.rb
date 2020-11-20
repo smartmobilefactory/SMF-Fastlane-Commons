@@ -217,10 +217,12 @@ private_lane :smf_super_pipeline_increment_version_number do |options|
   bump_type = options[:build_variant]
   build_variant_config = @smf_fastlane_config[:build_variants][:framework]
   podspec_path = build_variant_config[:podspec_path]
+  additional_podspecs = build_variant_config[:additional_podspecs]
 
   smf_increment_version_number(
       podspec_path: podspec_path,
-      bump_type: bump_type
+      bump_type: bump_type,
+      additional_podspecs: additional_podspecs
   )
 end
 
