@@ -72,16 +72,9 @@ def _smf_perform_build_precheck_for_pods_spec_repo_url(pods_specs_repo = false)
 end
 
 def _smf_verify_podspecs(podspecs)
-  return if podspecs.nil? || podspecs.count < 2
+  versions = smf_get_podspec_versions(podspecs)
 
-  versions = []
-
-  podspecs.each do |podspecs_path|
-    version = read_podspec(path: podspecs_path).dig('version')
-    versions.push(version) unless version.nil?
-  end
-
-  return unless versions.uniq.count > 1
+  return unless versions.count > 1
 
   message = "⚠️ Warning, different versions found in podspecs: #{versions.uniq}"
 
