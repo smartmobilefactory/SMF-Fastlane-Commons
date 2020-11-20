@@ -10,7 +10,7 @@ private_lane :smf_verify_and_lint_podspecs do |options|
 
     pod_lib_lint(
       allow_warnings: true,
-      sources: $POD_REPO_SOURCES,
+      sources: $PODSPEC_REPO_SOURCES,
       podspec: podspec_path,
       fail_fast: true
     )
