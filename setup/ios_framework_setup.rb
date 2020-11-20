@@ -61,7 +61,7 @@ private_lane :smf_super_lint_podspecs do |options|
 end
 
 lane :smf_lint_podspecs do |options|
-  smf_super_verify_multiple_podspecs(options)
+  smf_super_lint_podspecs(options)
 end
 
 # Run Unit Tests
