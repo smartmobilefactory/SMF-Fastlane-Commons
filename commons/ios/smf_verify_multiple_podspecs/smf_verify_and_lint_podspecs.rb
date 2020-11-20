@@ -1,10 +1,10 @@
 private_lane :smf_verify_and_lint_podspecs do |options|
 
-  podpecs = options[:podspecs]
+  podspecs = options[:podspecs]
 
-  return if podpecs.nil? || podpecs.count < 2
+  return if podspecs.nil? || podspecs.count < 2
 
-  podpecs.each do |podspec_path|
+  podspecs.each do |podspec_path|
 
     UI.message("Linting podspec: #{podspec_path}")
 
