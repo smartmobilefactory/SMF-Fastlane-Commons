@@ -83,7 +83,7 @@ def _smf_verify_podspecs(podspecs)
 
   return unless versions.uniq.count > 1
 
-  message = "⚠️ Warning, different versions found in podspecs: #{versions}"
+  message = "⚠️ Warning, different versions found in podspecs: #{versions.uniq}"
 
   UI.error(message)
 
