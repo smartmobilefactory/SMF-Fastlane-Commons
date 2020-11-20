@@ -31,8 +31,9 @@ end
 
 private_lane :smf_pod_super_setup_dependencies_pr_check do |options|
 
-  podspecs = [@smf_fastlane_config[:build_variants][:framework][:podspce_path]]
-  podspecs += @smf_fastlane_config[:build_variants][:framework][:additional_podspecs]
+  podspecs = [@smf_fastlane_config[:build_variants][:framework][:podspec_path]]
+  additional_podspecs = @smf_fastlane_config[:build_variants][:framework][:additional_podspecs]
+  podspecs += additional_podspecs unless additional_podspecs.nil?
 
   smf_build_precheck(
     pods_spec_repo: @smf_fastlane_config[:build_variants][:framework][:pods_specs_repo],
