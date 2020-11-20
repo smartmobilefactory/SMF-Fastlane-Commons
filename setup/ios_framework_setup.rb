@@ -47,6 +47,22 @@ lane :smf_pod_setup_dependencies_pr_check do |options|
   smf_pod_super_setup_dependencies_pr_check(options)
 end
 
+# Lint podspecs
+
+private_lane :smf_super_lint_podspecs do |options|
+
+  podspecs = [@smf_fastlane_config[:build_variants][:framework][:podspec_path]]
+  additional_podspecs = @smf_fastlane_config[:build_variants][:framework][:additional_podspecs]
+  podspecs += additional_podspecs unless additional_podspecs.nil?
+
+  smf_verify_and_lint_podspecs(
+    podspecs: podspecs
+  )
+end
+
+lane :smf_lint_podspecs do |options|
+  smf_super_verify_multiple_podspecs(options)
+end
 
 # Run Unit Tests
 
