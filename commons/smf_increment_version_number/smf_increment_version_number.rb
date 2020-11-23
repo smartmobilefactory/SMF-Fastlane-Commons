@@ -2,11 +2,18 @@ private_lane :smf_increment_version_number do |options|
 
   podspec_path = options[:podspec_path]
   bump_type = options[:bump_type]
+  additional_podspecs = options[:additional_podspecs].nil? ? [] : options[:additional_podspecs]
 
   UI.message('Incrementing version number') unless bump_type == 'current'
 
   # Bump library's version if needed
   _smf_bump_pod_version(podspec_path, bump_type)
+
+  additional_podspecs.each do |additional_podspec_path|
+    UI.message("Incrementing version for #{additional_podspec_path}")
+
+    _smf_bump_pod_version(additional_podspec_path, bump_type)
+  end
 
   version_number = smf_get_version_number(nil, podspec_path)
   tag = smf_get_tag_of_pod(podspec_path)
@@ -15,9 +22,19 @@ private_lane :smf_increment_version_number do |options|
     raise "⛔️ The new tag ('#{tag}') already exists! Aborting..."
   end
 
+  all_podspecs = [podspec_path] + additional_podspecs
+
+  versions = smf_get_podspec_versions(all_podspecs)
+
+  if versions.count > 1
+    raise "⛔️ There are different versions in the podspecs: #{versions}. Aborting..."
+  end
+
+  UI.message("Commit files #{all_podspecs}")
+
   if bump_type != 'current'
     git_commit(
-        path: podspec_path,
+        path: all_podspecs,
         message: "Release Pod #{version_number}"
     )
   end

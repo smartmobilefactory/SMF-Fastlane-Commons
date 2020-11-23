@@ -24,10 +24,10 @@ private_lane :smf_push_pod do |options|
     # Try to Publish the pod. If it fails the temporary branch is deleted
     if specs_repo
       sh "cd #{workspace_dir}"
-      pod_push(path: podspec_path, allow_warnings: true, skip_import_validation: true, repo: specs_repo, verbose: true)
+      pod_push(path: podspec_path, allow_warnings: true, skip_import_validation: true, repo: specs_repo)
     else
       sh "cd #{workspace_dir}"
-      pod_push(path: podspec_path, verbose: true)
+      pod_push(path: podspec_path)
     end
 
   rescue => e

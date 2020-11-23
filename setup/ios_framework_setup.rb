@@ -31,11 +31,13 @@ end
 
 private_lane :smf_pod_super_setup_dependencies_pr_check do |options|
 
-  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
-  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
+  podspecs = [@smf_fastlane_config[:build_variants][:framework][:podspec_path]]
+  additional_podspecs = @smf_fastlane_config[:build_variants][:framework][:additional_podspecs]
+  podspecs += additional_podspecs unless additional_podspecs.nil?
 
   smf_build_precheck(
-    pods_spec_repo: @smf_fastlane_config[:build_variants][:framework][:pods_specs_repo]
+    pods_spec_repo: @smf_fastlane_config[:build_variants][:framework][:pods_specs_repo],
+    podspecs: podspecs
   )
 
   smf_pod_install
@@ -45,6 +47,26 @@ lane :smf_pod_setup_dependencies_pr_check do |options|
   smf_pod_super_setup_dependencies_pr_check(options)
 end
 
+# Lint podspecs
+# This assures that if there are multiple podspecs, that they all build properly
+
+private_lane :smf_super_lint_podspecs do |options|
+
+  podspecs = [@smf_fastlane_config[:build_variants][:framework][:podspec_path]]
+  additional_podspecs = @smf_fastlane_config[:build_variants][:framework][:additional_podspecs]
+  podspecs += additional_podspecs unless additional_podspecs.nil?
+
+  required_xcode_version = @smf_fastlane_config[:project][:xcode_version]
+
+  smf_lint_podspecs(
+    podspecs: podspecs,
+    required_xcode_version: required_xcode_version
+  )
+end
+
+lane :smf_pod_lint_podspecs do |options|
+  smf_super_lint_podspecs(options)
+end
 
 # Run Unit Tests
 
@@ -198,10 +220,12 @@ private_lane :smf_super_pipeline_increment_version_number do |options|
   bump_type = options[:build_variant]
   build_variant_config = @smf_fastlane_config[:build_variants][:framework]
   podspec_path = build_variant_config[:podspec_path]
+  additional_podspecs = build_variant_config[:additional_podspecs]
 
   smf_increment_version_number(
       podspec_path: podspec_path,
-      bump_type: bump_type
+      bump_type: bump_type,
+      additional_podspecs: additional_podspecs
   )
 end
 
@@ -218,6 +242,7 @@ private_lane :smf_super_release_pod do |options|
   podspec_path = build_variant_config[:podspec_path]
   xcode_version = @smf_fastlane_config[:project][:xcode_version]
   specs_repo = build_variant_config[:pods_specs_repo]
+  additional_podspecs = build_variant_config[:additional_podspecs]
   local_branch = options[:local_branch]
 
   smf_git_pull(local_branch)
@@ -228,6 +253,19 @@ private_lane :smf_super_release_pod do |options|
     required_xcode_version: xcode_version,
     local_branch: local_branch
   )
+
+  additional_podspecs.each do |additional_podspec_path|
+    UI.message("Pushing pod with podspec: #{additional_podspec_path}")
+
+    smf_git_pull(local_branch)
+
+    smf_push_pod(
+      podspec_path: additional_podspec_path,
+      specs_repo: specs_repo,
+      required_xcode_version: xcode_version,
+      local_branch: local_branch
+    )
+  end
 
   changelog = smf_read_changelog
 

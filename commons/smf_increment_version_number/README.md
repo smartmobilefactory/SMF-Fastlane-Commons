@@ -8,6 +8,7 @@ Increment the version number.
 smf_increment_version_number(
     podspec_path: <path to pods podspec file>
     bump_type: <either major, minor, current, patch, breaking or internal>
+    additional_podspecs: <array with additional podspec paths>
 )
 ```
 

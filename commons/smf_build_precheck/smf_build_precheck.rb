@@ -3,6 +3,7 @@ private_lane :smf_build_precheck do |options|
   upload_itc = options[:upload_itc]
   itc_apple_id = options[:itc_apple_id]
   pods_spec_repo = options[:pods_spec_repo]
+  podspecs = options[:podspecs]
 
   case @platform
   when :ios, :apple
@@ -14,6 +15,8 @@ private_lane :smf_build_precheck do |options|
     _smf_perform_build_precheck_for_pods_spec_repo_url(
       pods_spec_repo
     )
+
+    _smf_verify_podspecs(podspecs)
   when :flutter
     _smf_perform_build_precheck(upload_itc, itc_apple_id)
   else
@@ -66,4 +69,27 @@ def _smf_perform_build_precheck_for_pods_spec_repo_url(pods_specs_repo = false)
 
     raise "Podspec repo is an https url"
   end
+end
+
+def _smf_verify_podspecs(podspecs)
+  versions = smf_get_podspec_versions(podspecs)
+
+  return unless versions.count > 1
+
+  message = "⚠️ Warning, different versions found in podspecs: #{versions.uniq}"
+
+  UI.error(message)
+
+  smf_send_message(
+    title: 'Build Precheck Error',
+    message: message,
+    type: 'error'
+  )
+
+  smf_create_pull_request_comment(
+    comment: message
+  )
+
+  raise "Different versions found in podspecs"
+
 end

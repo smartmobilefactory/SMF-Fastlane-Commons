@@ -395,3 +395,18 @@ def smf_workspace_dir_git_branch
   current_branch = `cd #{smf_workspace_dir}; git rev-parse --abbrev-ref HEAD`.gsub("\n", '')
   return current_branch
 end
+
+# Returns array with all versions found
+def smf_get_podspec_versions(podspecs)
+  return [] if podspecs.nil? || podspecs.count < 0
+  return [read_podspec(path: podspecs.first).dig('version')] if podspecs.count == 1
+
+  versions = []
+
+  podspecs.each do |podspecs_path|
+    version = read_podspec(path: podspecs_path).dig('version')
+    versions.push(version) unless version.nil?
+  end
+
+  versions.uniq
+end
