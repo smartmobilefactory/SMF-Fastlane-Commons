@@ -3,7 +3,7 @@ private_lane :smf_lint_podspecs do |options|
   podspecs = options[:podspecs]
   required_xcode_version = options[:required_xcode_version]
 
-  return if podspecs.nil? || podspecs.count < 2
+  next if podspecs.nil? || podspecs.count < 2
 
   smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
 
