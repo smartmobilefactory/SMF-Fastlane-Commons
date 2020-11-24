@@ -242,7 +242,7 @@ private_lane :smf_super_release_pod do |options|
   podspec_path = build_variant_config[:podspec_path]
   xcode_version = @smf_fastlane_config[:project][:xcode_version]
   specs_repo = build_variant_config[:pods_specs_repo]
-  additional_podspecs = build_variant_config[:additional_podspecs]
+  additional_podspecs = build_variant_config[:additional_podspecs].nil? ? [] : build_variant_config[:additional_podspecs]
   local_branch = options[:local_branch]
 
   smf_git_pull(local_branch)
