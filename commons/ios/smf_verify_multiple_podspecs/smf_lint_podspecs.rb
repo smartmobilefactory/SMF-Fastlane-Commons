@@ -15,7 +15,7 @@ private_lane :smf_lint_podspecs do |options|
       allow_warnings: true,
       sources: $PODSPEC_REPO_SOURCES,
       podspec: podspec_path,
-      include_podspecs: podspecs,
+      include_podspecs: podspecs.join(","),
       fail_fast: true
     )
   end
