@@ -52,9 +52,9 @@ end
 
 private_lane :smf_super_lint_podspecs do |options|
 
-  podspecs = [@smf_fastlane_config[:build_variants][:framework][:podspec_path]]
+  podspec = [@smf_fastlane_config[:build_variants][:framework][:podspec_path]]
   additional_podspecs = @smf_fastlane_config[:build_variants][:framework][:additional_podspecs]
-  podspecs += additional_podspecs unless additional_podspecs.nil?
+  #podspecs += additional_podspecs unless additional_podspecs.nil?
 
   required_xcode_version = @smf_fastlane_config[:project][:xcode_version]
 
