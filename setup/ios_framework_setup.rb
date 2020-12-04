@@ -59,7 +59,7 @@ private_lane :smf_super_lint_podspecs do |options|
 
   smf_lint_podspecs(
     main_podspec: main_podspec,
-    additional_podspecs: additional_podspecs.nil? ? [] : additional_podspecs,
+    additional_podspecs: additional_podspecs,
     required_xcode_version: required_xcode_version
   )
 end
