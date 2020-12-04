@@ -1,20 +1,33 @@
 private_lane :smf_lint_podspecs do |options|
 
-  podspecs = options[:podspecs]
+  main_podspec = options[:main_podspec]
+  additional_podspecs = options[:additional_podspecs]
   required_xcode_version = options[:required_xcode_version]
 
-  next if podspecs.nil? || podspecs.count < 2
+  next if additional_podspecs.nil? || additional_podspecs.count < 1
 
   smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
 
-  podspecs.each do |podspec_path|
+  UI.message("Linting podspec: #{main_podspec}")
 
-    UI.message("Linting podspec: #{podspec_path}")
+  pod_lib_lint(
+    allow_warnings: true,
+    sources: $PODSPEC_REPO_SOURCES,
+    podspec: main_podspec,
+    fail_fast: true
+  )
+
+  additional_podspecs.each do |additional_podspec_path|
+
+    UI.message("Linting podspec: #{additional_podspec_path}")
 
     pod_lib_lint(
       allow_warnings: true,
       sources: $PODSPEC_REPO_SOURCES,
-      podspec: podspec_path,
+      podspec: additional_podspec_path,
+      # We need `include_podspecs` here to be able to use our local `main_podspec` for the lint. 
+      # If we don't specify it, it will use the `main_podspec` corresponding to the version number in `additional_podspec_path`, making the lint fail.
+      include_podspecs: main_podspec,
       fail_fast: true
     )
   end
