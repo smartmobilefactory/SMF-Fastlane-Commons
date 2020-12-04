@@ -6,7 +6,8 @@ Example:
 
 ```
 smf_lint_podspecs(
-    podspecs: <array with all podspec paths of this project>    # Important: this array should also include the "main" podspec and not only the additional ones
+    main_podspec:  <path to the main podspec>
+    additional_podspecs:  <array with all additional podspec paths of this project>  # Important: this array should only include the additional_podspecs
     required_xcode_version: <xcode version from config json>
 )
 ```
