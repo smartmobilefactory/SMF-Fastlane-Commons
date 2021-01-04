@@ -5,7 +5,7 @@ The functions declared here are used to prepare, format and upload data to the G
 ## smf_create_spreadsheet_entry
 
 A spread sheet entry holds data for one line of the spread sheet, it is important that for each entry there is a value set.
-If a value does not existent (e.g. nil) it should be set to an empty string, to ensure this, use `_smf_unwrap_value`.
+If a value does not exist (e.g. nil) it should be set to an empty string, to ensure this, use `_smf_unwrap_value`.
 
 ### Example
 ```
