@@ -179,7 +179,7 @@ module Fastlane
           FastlaneCore::ConfigItem.new(key: :is_kmpp,
                                        env_name: "IS_KMPP",
                                        default_value: false,
-                                       is_string: false
+                                       is_string: false,
                                        description: "when true the naming conventions of moko/resources are used to support shared translations",
                                        optional: true)
         ]
