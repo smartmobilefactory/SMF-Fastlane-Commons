@@ -7,6 +7,7 @@ module Fastlane
         downloadResourceDir = params[:download_resource_dir]
         resourceDir = params[:resource_dir]
         languages = params[:languages]
+        isKmpp = params[:is_kmpp]
         
         apiToken = ENV["PHRASE_APP_TOKEN"]
 
@@ -15,11 +16,19 @@ module Fastlane
         end
         
         if !resourceDir
-          resourceDir = "./app/src/main/res/"
+          if isKmpp
+            resourceDir = "./core/src/commonMain/resources/MR/"
+          else
+            resourceDir = "./app/src/main/res/"
+          end
         end
-        
+
         if !uploadResourceDir
-          uploadResourceDir = resourceDir
+          if isKmpp
+            uploadResourceDir = resourceDir + "base"
+          else
+            uploadResourceDir = resourceDir + "values"
+          end
         end
         
         if !downloadResourceDir
@@ -31,33 +40,40 @@ module Fastlane
         end
 
         hasMultipleTagsUploaded = uploadStrings(apiToken, projectId, uploadResourceDir, languages)
-        downloadTranslations(apiToken, projectId, downloadResourceDir, languages, hasMultipleTagsUploaded)
+        downloadTranslations(apiToken, projectId, downloadResourceDir, languages, hasMultipleTagsUploaded, isKmpp)
 
         commitChangesIfNeeded(downloadResourceDir)
 
       end
 
       def self.uploadStrings(apiToken, projectId, resourceDir, languages)
-        defaultValuesDir = resourceDir + "values"
         uploadedTagCount = 0
-        Dir.foreach(defaultValuesDir) do |item|
+        Dir.foreach(resourceDir) do |item|
           next if item == '.' or item == '..'
           next if !item.start_with?("strings")
           tag = item.gsub(/(.*).xml/, '\1')
           uploadedTagCount = uploadedTagCount + 1
-          sh(buildUploadStringsCommand(apiToken, projectId, languages['default'], defaultValuesDir + "/" + item, tag))
+          sh(buildUploadStringsCommand(apiToken, projectId, languages['default'], resourceDir + "/" + item, tag))
         end
         return uploadedTagCount > 1
       end
 
-      def self.downloadTranslations(apiToken, projectId, resourceDir, languages, hasMultipleTagsUploaded)
+      def self.downloadTranslations(apiToken, projectId, resourceDir, languages, hasMultipleTagsUploaded, isKmpp)
+
         languages.each do |languageKey, languageId|
           print languageKey + " - " + languageId
 
-          dir = resourceDir + "values-" + languageKey
-          if languageKey == "default"
-            dir = resourceDir + "values"
-          end
+          if isKmpp
+            dir = resourceDir + languageKey
+            if languageKey == "default"
+              dir = resourceDir + "base"
+            end
+          else
+            dir = resourceDir + "values-" + languageKey
+            if languageKey == "default"
+              dir = resourceDir + "values"
+            end
+          end 
 
           if languageKey == "default" and hasMultipleTagsUploaded
             downloadTranslationsWithTags(apiToken, projectId, dir, languageId)
@@ -154,7 +170,14 @@ module Fastlane
                                        env_name: "APP_PHRASE_APP_LANGUAGES",
                                        type: Hash,
                                        description: "example: {\"de\" => \"locale_id\"}",
-                                       optional: false)
+                                       optional: false),
+
+          FastlaneCore::ConfigItem.new(key: :is_kmpp,
+                                       env_name: "IS_KMPP",
+                                       default_value: false,
+                                       is_string: false,
+                                       description: "when true the naming conventions of moko/resources are used to support shared translations",
+                                       optional: true)
         ]
       end
 
