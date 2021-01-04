@@ -39,11 +39,7 @@ module Fastlane
            raise "default language is not set"
         end
 
-        if isKmpp
-          hasMultipleTagsUploaded = uploadKmppStrings(apiToken, projectId, uploadResourceDir, languages)
-        else
-          hasMultipleTagsUploaded = uploadStrings(apiToken, projectId, uploadResourceDir, languages)
-        end
+        hasMultipleTagsUploaded = uploadStrings(apiToken, projectId, uploadResourceDir, languages)
         downloadTranslations(apiToken, projectId, downloadResourceDir, languages, hasMultipleTagsUploaded, isKmpp)
 
         commitChangesIfNeeded(downloadResourceDir)
