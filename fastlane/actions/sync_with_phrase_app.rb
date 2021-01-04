@@ -40,6 +40,8 @@ module Fastlane
         end
 
         hasMultipleTagsUploaded = uploadStrings(apiToken, projectId, uploadResourceDir, languages)
+        # sleep for a small amount of time to make uploaded strings available to download again
+        sleep(15)
         downloadTranslations(apiToken, projectId, downloadResourceDir, languages, hasMultipleTagsUploaded, isKmpp)
 
         commitChangesIfNeeded(downloadResourceDir)
