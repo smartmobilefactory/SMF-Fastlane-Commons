@@ -174,16 +174,14 @@ module Fastlane
                                        env_name: "APP_PHRASE_APP_LANGUAGES",
                                        type: Hash,
                                        description: "example: {\"de\" => \"locale_id\"}",
-                                       optional: false)
+                                       optional: false),
 
           FastlaneCore::ConfigItem.new(key: :is_kmpp,
                                        env_name: "IS_KMPP",
                                        default_value: false,
                                        is_string: false
-                                       description: "",
-                                       optional: true),
-          
-          
+                                       description: "when true the naming conventions of moko/resources are used to support shared translations",
+                                       optional: true)
         ]
       end
 
