@@ -120,62 +120,22 @@ end
 
 # Using a temporary access token, append the data to a given online spreadsheet
 def smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, data)
-  bearer_token = _smf_google_api_get_bearer_token
 
-  # Delay of 5 seconds to let Google's servers propagate the new access_token
-  # https://stackoverflow.com/a/42771170/2790648
-  # Added on 14.09.2020 due to random "Internal Server Error (RuntimeError)"
-  sleep(5)
-
-  sheet_uri = URI.parse"https://sheets.googleapis.com/v4/spreadsheets/#{sheet_id}/values/#{sheet_name}:append?valueInputOption=USER_ENTERED"
-
-  request = Net::HTTP::Post.new(sheet_uri)
-  request.content_type = 'application/json'
-  request['Accept'] = 'application/json'
-  request['Authorization'] = "Bearer #{bearer_token}"
-
+  uri = URI.parse"https://sheets.googleapis.com/v4/spreadsheets/#{sheet_id}/values/#{sheet_name}:append?valueInputOption=USER_ENTERED"
+  request = Net::HTTP::Post.new(uri)
   request.body = data
 
-  response = Net::HTTP.start(sheet_uri.hostname, sheet_uri.port, use_ssl: true ) do |client|
-    client.request(request)
-  end
-
-  unless response.is_a?(Net::HTTPSuccess)
-    raise "Error uploading new data to spreadsheet #{response.message}"
-  end
+  _smf_google_api_start_request(request, uri)
 end
 
 # Using a temporary access token, get the data from an online spreadsheet
 def smf_google_api_get_data_from_spread_sheet(sheet_id, sheet_name)
-  bearer_token = _smf_google_api_get_bearer_token
 
-  # Delay of 5 seconds to let Google's servers propagate the new access_token
-  # https://stackoverflow.com/a/42771170/2790648
-  # Added on 14.09.2020 due to random "Internal Server Error (RuntimeError)"
-  sleep(5)
+  uri = URI.parse"https://sheets.googleapis.com/v4/spreadsheets/#{sheet_id}/values/#{sheet_name}"
+  request = Net::HTTP::Get.new(uri)
 
-  sheet_uri = URI.parse"https://sheets.googleapis.com/v4/spreadsheets/#{sheet_id}/values/#{sheet_name}"
-
-  request = Net::HTTP::Get.new(sheet_uri)
-  request.content_type = 'application/json'
-  request['Accept'] = 'application/json'
-  request['Authorization'] = "Bearer #{bearer_token}"
-
-  response = Net::HTTP.start(sheet_uri.hostname, sheet_uri.port, use_ssl: true ) do |client|
-    client.request(request)
-  end
-
-  case response
-  when Net::HTTPSuccess
-    begin
-      body = JSON.parse(response.body)
-      return body.dig('values')
-    rescue
-      raise 'Error parsing response body'
-    end
-  else
-    raise "Error fetching spreadsheet: #{response.message}"
-  end
+  response_body = _smf_google_api_start_request(request, uri)
+  return response_body.dig('values')
 end
 
 # Takes sheet_entries (array) and reporting_type to gather the necessary keys
