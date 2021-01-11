@@ -16,10 +16,7 @@ private_lane :smf_ios_monitor_unit_tests do |options|
     raise 'Missing test result directory'
   end
 
-  puts "Available results:"
-
   xcresult_file_names = Dir.entries(xcresult_dir).select do |file|
-    puts "#{file}"
     file.to_s.end_with?('.xcresult') && file.to_s.include?('iOS')
   end
 
@@ -28,10 +25,8 @@ private_lane :smf_ios_monitor_unit_tests do |options|
     next
   end
 
-  puts xcresult_file_names
+  # Only use one test coverage reports
   filename = xcresult_file_names.first
-  puts filename
-
   json_result_string = `xcrun xccov view --report --json #{File.join(xcresult_dir, filename)}`
   result_parsed = JSON.parse(json_result_string)
 
@@ -47,7 +42,6 @@ private_lane :smf_ios_monitor_unit_tests do |options|
   # Prepare raw data for the spreadsheet entry
   new_entry = smf_create_spreadsheet_entry(entry_data)
   sheet_entries.push(new_entry) unless new_entry.nil?
-
 
   # Gather API credentiels and format data for the API
   sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_UNIT_TESTS_DOC_ID_KEY]
