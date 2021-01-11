@@ -25,7 +25,7 @@ private_lane :smf_ios_monitor_unit_tests do |options|
     next
   end
 
-  # Only use one test coverage reports
+  # Only use one test coverage report
   filename = xcresult_file_names.first
   json_result_string = `xcrun xccov view --report --json #{File.join(xcresult_dir, filename)}`
   result_parsed = JSON.parse(json_result_string)
@@ -45,7 +45,7 @@ private_lane :smf_ios_monitor_unit_tests do |options|
 
   # Gather API credentiels and format data for the API
   sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_UNIT_TESTS_DOC_ID_KEY]
-  sheet_name = $REPORTING_GOOGLE_SHEETS_UNIT_TESTS_SHEET_NAME_PLAYGROUND
+  sheet_name = $REPORTING_GOOGLE_SHEETS_UNIT_TESTS_SHEET_NAME
   sheet_data = smf_create_sheet_data_from_entries(sheet_entries, :AUTOMATIC_REPORTING)
 
   # Push to monitoring data to Google Spreadsheet via the API
