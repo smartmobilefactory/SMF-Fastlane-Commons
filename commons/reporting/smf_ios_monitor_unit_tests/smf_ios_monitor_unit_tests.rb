@@ -17,7 +17,7 @@ private_lane :smf_ios_monitor_unit_tests do |options|
   end
 
   xcresult_file_names = Dir.entries(xcresult_dir).select do |file|
-    file.to_s.end_with?('.xcresult') && file.to_s.include?('iOS')
+    file.to_s.end_with?('.xcresult')
   end
 
   if xcresult_file_names.empty?
