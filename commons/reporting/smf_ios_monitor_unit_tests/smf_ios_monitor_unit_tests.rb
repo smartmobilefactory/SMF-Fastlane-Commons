@@ -16,8 +16,11 @@ private_lane :smf_ios_monitor_unit_tests do |options|
     raise 'Missing test result directory'
   end
 
+  puts "Available results:"
+
   xcresult_file_names = Dir.entries(xcresult_dir).select do |file|
-    file.to_s.end_with?('.xcresult')
+    puts "#{file}"
+    file.to_s.end_with?('.xcresult') && file.to_s.include?('iOS')
   end
 
   if xcresult_file_names.empty?
@@ -25,23 +28,26 @@ private_lane :smf_ios_monitor_unit_tests do |options|
     next
   end
 
-  xcresult_file_names.each do |filename|
-    json_result_string = `xcrun xccov view --report --json #{File.join(xcresult_dir, filename)}`
-    result_parsed = JSON.parse(json_result_string)
+  puts xcresult_file_names
+  filename = xcresult_file_names.first
+  puts filename
 
-    entry_data = {
-      :project_name => project_name,
-      :branch => branch,
-      :platform => platform.to_s,
-      :build_variant => build_variant.to_s,
-      :test_coverage => result_parsed.dig('lineCoverage'),
-      :covered_lines => result_parsed.dig('coveredLines')
-    }
+  json_result_string = `xcrun xccov view --report --json #{File.join(xcresult_dir, filename)}`
+  result_parsed = JSON.parse(json_result_string)
 
-    # Prepare raw data for the spreadsheet entry
-    new_entry = smf_create_spreadsheet_entry(entry_data)
-    sheet_entries.push(new_entry) unless new_entry.nil?
-  end
+  entry_data = {
+    :project_name => project_name,
+    :branch => branch,
+    :platform => platform.to_s,
+    :build_variant => build_variant.to_s,
+    :test_coverage => result_parsed.dig('lineCoverage'),
+    :covered_lines => result_parsed.dig('coveredLines')
+  }
+
+  # Prepare raw data for the spreadsheet entry
+  new_entry = smf_create_spreadsheet_entry(entry_data)
+  sheet_entries.push(new_entry) unless new_entry.nil?
+
 
   # Gather API credentiels and format data for the API
   sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_UNIT_TESTS_DOC_ID_KEY]
