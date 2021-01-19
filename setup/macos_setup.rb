@@ -26,6 +26,10 @@ lane :smf_setup_dependencies_pr_check do |options|
   smf_super_setup_dependencies(options)
 end
 
+lane :smf_pod_setup_dependencies_pr_check do |options|
+  smf_super_setup_dependencies(options)
+end
+
 lane :smf_setup_dependencies_build do |options|
   smf_super_setup_dependencies(options)
 end
