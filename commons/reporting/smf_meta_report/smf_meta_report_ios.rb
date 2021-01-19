@@ -5,11 +5,31 @@ def smf_meta_report_ios(options)
   # Analysis
   analysis_data = _smf_analyse_ios_project(options)
 
-  # Format and prepare data for uploading
-  upload_data = _smf_create_meta_report_to_upload(analysis_data)
+  if _should_send_report_data(options)
+    # Format and prepare data for uploading
+    upload_data = _smf_create_meta_report_to_upload(analysis_data)
 
-  # Upload data
-  _smf_upload_meta_report_to_spread_sheet(upload_data)
+    # Upload data
+    _smf_upload_meta_report_to_spread_sheet(upload_data)
+  end
+end
+
+# Returns true only when the :branch value respect the required
+# format. The goal is to avoid reports for useless-testing branches.
+# Accepted format:
+# - 'master': branch strictly named master
+# - '<version>/master': where version is only digit with optional 'decimal'
+#      examples: '12/master', '3.4/master'
+def _should_send_report_data(options)
+  if options[:branch].match(/^master$/)
+      return true
+    end
+
+    if options[:branch].match(/^\d+\.?\d*\/master$/)
+      return true
+    end
+
+    return false
 end
 
 def _smf_analyse_ios_project(options)
