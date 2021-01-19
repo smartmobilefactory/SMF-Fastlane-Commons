@@ -5,7 +5,7 @@ def smf_meta_report_ios(options)
   # Analysis
   analysis_data = _smf_analyse_ios_project(options)
 
-  if _should_send_report_data(options)
+  if _should_send_report_data(analysis_data)
     # Format and prepare data for uploading
     upload_data = _smf_create_meta_report_to_upload(analysis_data)
 
