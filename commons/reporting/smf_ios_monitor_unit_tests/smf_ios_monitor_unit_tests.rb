@@ -17,10 +17,10 @@ private_lane :smf_ios_monitor_unit_tests do |options|
   #   platform = 'macOS'
   # end
 
-  project_name = options[:project_name]
-  branch = options[:branch]
-  platform = options[:platform]
-  build_variant = options[:build_variant]
+  # project_name = options[:project_name]
+  # branch = options[:branch]
+  # platform = options[:platform]
+  # build_variant = options[:build_variant]
 
   sheet_entries = []
 
