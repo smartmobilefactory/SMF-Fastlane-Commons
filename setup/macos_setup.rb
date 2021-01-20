@@ -26,7 +26,7 @@ lane :smf_setup_dependencies_pr_check do |options|
   smf_super_setup_dependencies(options)
 end
 
-lane :smf_pod_setup_dependencies_pr_check do |options|
+lane :smf_setup_dependencies_reporting do |options|
   smf_super_setup_dependencies(options)
 end
 
@@ -107,6 +107,9 @@ lane :smf_unit_tests do |options|
   smf_super_unit_tests(options)
 end
 
+lane :smf_unit_tests_reporting do |options|
+  smf_super_unit_tests(options)
+end
 
 # Linter
 
@@ -140,6 +143,10 @@ end
 
 lane :smf_report do |options|
   smf_super_report(options)
+end
+
+lane :smf_automatic_reporting do |options|
+  smf_ios_monitor_unit_tests(options)
 end
 
 ########## ADDITIONAL LANES USED FOR BUILDING ##########

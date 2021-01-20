@@ -2,10 +2,10 @@ require 'date'
 
 private_lane :smf_ios_monitor_unit_tests do |options|
 
-  project_name = options[:project_name]
-  branch = options[:branch]
-  platform = options[:platform]
-  build_variant = options[:build_variant]
+  project_name = @smf_fastlane_config.dig(:project, :project_name)
+  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+  branch = !options[:branch_name].nil? ? options[:branch_name] : smf_workspace_dir_git_branch
+  platform = smf_meta_report_platform_friendly_name
 
   sheet_entries = []
 

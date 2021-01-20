@@ -47,6 +47,10 @@ lane :smf_pod_setup_dependencies_pr_check do |options|
   smf_pod_super_setup_dependencies_pr_check(options)
 end
 
+lane :smf_setup_dependencies_reporting do |options|
+  smf_pod_super_setup_dependencies_pr_check(options)
+end
+
 # Lint podspecs
 # This assures that if there are multiple podspecs, that they all build properly
 
@@ -115,6 +119,9 @@ lane :smf_pod_unit_tests do |options|
   smf_pod_super_unit_tests(options)
 end
 
+lane :smf_unit_tests_reporting do |options|
+  smf_pod_super_unit_tests(options)
+end
 
 # Linter
 
@@ -149,31 +156,8 @@ end
 ############ AUTOMATIC REPORTING LANES ############
 ###########  For Unit-Tests Reporting  ############
 
-private_lane :smf_pod_super_automatic_reporting do |options|
-
-  project_name = @smf_fastlane_config.dig(:project, :project_name)
-  build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
-  branch_name = !options[:branch_name].nil? ? options[:branch_name] : smf_workspace_dir_git_branch
-
-  # Platform friendly name
-  build_variant_config = @smf_fastlane_config.dig(:build_variants, build_variant.to_sym)
-  platform = build_variant_config.dig(:platform)
-  if platform.nil?
-    platform = 'iOS'
-  elsif platform.include?('mac')
-    platform = 'macOS'
-  end
-
-  smf_ios_monitor_unit_tests(
-    project_name: project_name,
-    branch: branch_name,
-    platform: platform,
-    build_variant: build_variant
-  )
-end
-
-lane :smf_pod_automatic_reporting do |options|
-  smf_pod_super_automatic_reporting(options)
+lane :smf_automatic_reporting do |options|
+  smf_ios_monitor_unit_tests(options)
 end
 
 ############ META REPORTING LANES ############
