@@ -7,21 +7,6 @@ private_lane :smf_ios_monitor_unit_tests do |options|
   branch = !options[:branch_name].nil? ? options[:branch_name] : smf_workspace_dir_git_branch
   platform = smf_meta_report_platform_friendly_name
 
-  # Platform friendly name
-  #
-  # build_variant_config = @smf_fastlane_config.dig(:build_variants, build_variant.to_sym)
-  # platform = build_variant_config.dig(:platform)
-  # if platform.nil?
-  #   platform = 'iOS'
-  # elsif platform.include?('mac')
-  #   platform = 'macOS'
-  # end
-
-  # project_name = options[:project_name]
-  # branch = options[:branch]
-  # platform = options[:platform]
-  # build_variant = options[:build_variant]
-
   sheet_entries = []
 
   xcresult_dir = File.join(smf_workspace_dir, $XCRESULT_DIR)
