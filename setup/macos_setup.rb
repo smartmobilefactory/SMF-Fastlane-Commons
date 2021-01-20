@@ -107,6 +107,10 @@ lane :smf_unit_tests do |options|
   smf_super_unit_tests(options)
 end
 
+lane :smf_unit_tests_reporting do |options|
+  smf_super_unit_tests(options)
+end
+
 # Linter
 
 private_lane :smf_super_linter do

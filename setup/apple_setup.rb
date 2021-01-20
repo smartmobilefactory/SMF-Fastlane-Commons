@@ -113,6 +113,10 @@ lane :smf_unit_tests do |options|
   smf_super_unit_tests(options)
 end
 
+lane :smf_unit_tests_reporting do |options|
+  smf_super_unit_tests(options)
+end
+
 # Reporting
 
 lane :smf_automatic_reporting do |options|

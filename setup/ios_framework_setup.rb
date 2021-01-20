@@ -119,7 +119,7 @@ lane :smf_pod_unit_tests do |options|
   smf_pod_super_unit_tests(options)
 end
 
-lane :smf_unit_tests do |options|
+lane :smf_unit_tests_reporting do |options|
   smf_pod_super_unit_tests(options)
 end
 
