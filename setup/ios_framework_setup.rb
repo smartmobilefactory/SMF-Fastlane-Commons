@@ -82,7 +82,7 @@ private_lane :smf_pod_super_unit_tests do |options|
     build_variant_config = @smf_fastlane_config[:build_variants][variant.to_sym]
     testing_for_mac = build_variant_config[:platform] == 'mac'
 
-    if !testing_for_mac and build_variant_config[:download_provisioning_profiles] != false
+    if build_variant_config[:download_provisioning_profiles] != false
 
       UI.message("Downloading provisioning profiles for variant '#{variant}'")
 
