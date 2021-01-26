@@ -1,5 +1,4 @@
 #!/usr/bin/ruby
-
 require 'json'
 
 # returns the analysed property
@@ -38,6 +37,8 @@ def _smf_grab_custom_swift_version_for_pbxproj(xcode_settings)
       swift_version = target_swift_version
     elsif swift_version != target_swift_version
       raise "[ERROR]: Multiple SWIFT_VERSION were found in the \"project.pbxproj\": '#{swift_version}' and '#{target_swift_version}'"
+    else
+      puts "Target '#{target}': { SWIFT_VERSION: #{target_swift_version} }"
     end
   end
 
