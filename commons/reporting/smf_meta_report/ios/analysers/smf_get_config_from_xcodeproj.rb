@@ -10,9 +10,7 @@ def smf_xcodeproj_settings(options={})
   json_string = ""
   build_variant = options[:build_variant]
   if !build_variant.nil? && build_variant != ''
-    puts "SELECT build_variant: '#{build_variant}'"
     scheme = smf_config_get(build_variant, :scheme)
-    puts "SELECT scheme: '#{scheme}'"
     json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -scheme #{scheme} -showBuildSettings -json`
   else
     json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -showBuildSettings -json`
@@ -20,6 +18,20 @@ def smf_xcodeproj_settings(options={})
 
   xcode_settings = JSON.parse(json_string)
   return xcode_settings
+end
+
+def smf_xcodeproj_targets()
+  json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -list -json`
+  xcodeproj_targets = JSON.parse(json_string).dig('project').dig('targets')
+
+  return xcodeproj_targets
+end
+
+def smf_xcodeproj_target_settings(target)
+  json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -target #{target} -showBuildSettings -json`
+  json = JSON.parse(json_string)[0].dig('buildSettings')
+
+  return json
 end
 
 # Return the configuration value associated to the given key from the xcode project
@@ -38,12 +50,8 @@ def smf_xcodeproj_settings_get(config_key, xcode_settings=[], options)
   buildSettings = xcode_settings[0].dig('buildSettings')
   config_value = buildSettings.dig(config_key)
 
-  json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -list -json`
-  xcodeproj_targets = JSON.parse(json_string).dig('project').dig('targets')
-
-  for target in xcodeproj_targets
-    target_json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -target #{target} -showBuildSettings -json`
-    target_settings = JSON.parse(target_json_string)[0].dig('buildSettings')
+  for target in smf_xcodeproj_targets
+    target_settings = smf_xcodeproj_target_settings(target)
     target_config_value = target_settings.dig(config_key)
     puts "Target '#{target}': { #{config_key}: #{target_config_value} }"
 
