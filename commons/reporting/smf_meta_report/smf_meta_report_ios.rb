@@ -75,7 +75,7 @@ end
 
 def _smf_upload_meta_report_to_spread_sheet(data)
   sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_META_INFO_DOC_ID_KEY]
-  sheet_name = $REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME
+  sheet_name = $REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME_PLAYGROUND
 
   UI.message("Uploading data to google spreadsheet name: '#{sheet_name}'")
   smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, data)
