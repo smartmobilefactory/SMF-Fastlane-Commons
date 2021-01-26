@@ -29,7 +29,7 @@ end
 #                     Use this to optimize the process and avoid multiple settings analyses.
 #                     If empty or not specified the function `smf_xcodeproj_settings`
 #                     will be called.
-#   - options: the current job options (dictionary given from the pipeline)
+#   - options: the current job options containing the build_variant
 def smf_xcodeproj_settings_get(config_key, xcode_settings=[], options)
   if xcode_settings.empty?
     xcode_settings = smf_xcodeproj_settings(options)
