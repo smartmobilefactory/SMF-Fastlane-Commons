@@ -30,13 +30,19 @@ private_lane :smf_ios_monitor_unit_tests do |options|
   json_result_string = `xcrun xccov view --report --json #{File.join(xcresult_dir, filename)}`
   result_parsed = JSON.parse(json_result_string)
 
+  # Gather unit-tests count
+  json_result_string = `xcrun xcresulttool get --path #{File.join(xcresult_dir, filename)} --format json`
+  tests_results = JSON.parse(json_result_string)
+  tests_count = tests_results.dig('metrics').dig('testsCount').dig('_value')
+
   entry_data = {
     :project_name => project_name,
     :branch => branch,
     :platform => platform.to_s,
     :build_variant => build_variant.to_s,
     :test_coverage => result_parsed.dig('lineCoverage'),
-    :covered_lines => result_parsed.dig('coveredLines')
+    :covered_lines => result_parsed.dig('coveredLines'),
+    :unit_test_count => tests_count
   }
 
   # Prepare raw data for the spreadsheet entry
