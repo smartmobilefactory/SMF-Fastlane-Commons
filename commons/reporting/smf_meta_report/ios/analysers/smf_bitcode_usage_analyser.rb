@@ -9,8 +9,7 @@ def smf_analyse_bitcode(xcode_settings)
 
   bitcode_usage = 'enabled'
   if (bitcode_configuration == 'NO')
-    # bitcode is enabled by default
-    # custom state is disabled
+    # bitcode is enabled by default, custom state is disabled
     bitcode_usage = 'disabled'
   end
 

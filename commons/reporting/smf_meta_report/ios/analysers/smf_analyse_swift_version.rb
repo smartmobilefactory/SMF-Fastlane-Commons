@@ -1,11 +1,13 @@
 #!/usr/bin/ruby
 
+require 'json'
+
 # returns the analysed property
-def smf_analyse_swift_version
+def smf_analyse_swift_version(xcode_settings)
   UI.message("Analyser: #{__method__.to_s} ...")
 
   # Grab custom swift version, if any
-  swift_version = _smf_grab_custom_swift_version_for_pbxproj
+  swift_version = _smf_grab_custom_swift_version_for_pbxproj(xcode_settings)
   if swift_version.nil?
     # Otherwise use the default swift version related to the xcode version used by the project.
     swift_version = _smf_get_default_swift_version_for_xcode
@@ -20,23 +22,26 @@ end
 
 # Within the project.pbxproj, the SWIFT_VERSION is set when a developer has manually configured it.
 # If he/she hasn't the variable isn't set in the xml and the default value is used (auto-configured by Xcode).
-def _smf_grab_custom_swift_version_for_pbxproj
-  swift_version = nil
-  grab = "#{`fgrep -R "SWIFT_VERSION = " #{smf_pbxproj_file_path}`}"
-  grab.split("\n").each do |config|
-    # Extract Swift version from each line of the output of fgrep.
-    if swift_version_match = config.match("([0-9.]+);$")
-      matched_version = swift_version_match.captures[0]
-      # Check if the swift version is consistent or not
-      if swift_version.nil?
-        swift_version = matched_version
-      elsif swift_version != matched_version
-        raise "[ERROR]: Multiple SWIFT_VERSION were found in the \"project.pbxproj\": '#{swift_version}' and '#{matched_version}'"
-      end
+def _smf_grab_custom_swift_version_for_pbxproj(xcode_settings)
+  buildSettings = xcode_settings[0].dig('buildSettings')
+  swift_version = buildSettings.dig('SWIFT_VERSION')
+
+  json_string = `xcodebuild -project #{smf_pbxproj_file_path} -list -json`
+  xcodeproj_targets = JSON.parse(json_string).dig('project').dig('targets')
+
+  for target in xcodeproj_targets
+    target_json_string = `xcodebuild -project #{smf_pbxproj_file_path} -target #{target} -showBuildSettings -json`
+    target_settings = JSON.parse(target_json_string)[0].dig('buildSettings')
+    target_swift_version = target_settings.dig('SWIFT_VERSION')
+
+    if swift_version.nil?
+      swift_version = target_swift_version
+    elsif swift_version != target_swift_version
+      raise "[ERROR]: Multiple SWIFT_VERSION were found in the \"project.pbxproj\": '#{swift_version}' and '#{target_swift_version}'"
     end
   end
 
-  swift_version
+  return swift_version
 end
 
 def _smf_get_default_swift_version_for_xcode
