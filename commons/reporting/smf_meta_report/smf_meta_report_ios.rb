@@ -37,21 +37,8 @@ def _should_send_report_data(options)
   return false
 end
 
-def _smf_xcodeproj_settings
-  # Xcodebuild command info:
-  # '-configuration' the 'Release' configuration is taken by default
-  # '-scheme' by default only the first scheme is used. We shall specify the scheme
-  # in case we want to analyze a non-default one.
-  # TODO: Use -scheme
-  puts smf_xcodeproj_file_path
-
-  json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -showBuildSettings -json`
-  xcode_settings = JSON.parse(json_string)
-  return xcode_settings
-end
-
 def _smf_analyse_ios_project(options)
-  xcode_settings = _smf_xcodeproj_settings
+  xcode_settings = smf_xcodeproj_settings
 
   analysis_json = {}
   analysis_json[:date] = Date.today.to_s
@@ -66,6 +53,8 @@ def _smf_analyse_ios_project(options)
   analysis_json[:swift_version] = smf_analyse_swift_version(xcode_settings)
 
   puts analysis_json
+  puts "deployment_target: #{smf_analyse_deployment_target(xcode_settings)}"
+
   return analysis_json
 end
 
