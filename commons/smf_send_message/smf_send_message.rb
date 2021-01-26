@@ -59,7 +59,7 @@ private_lane :smf_send_message do |options|
 
   UI.message("Sending message \"#{content}\" to room \"#{slack_channel}\"")
 
-  if false && (slack_channel && (slack_channel.include? '/') == false)
+  if slack_channel && (slack_channel.include? '/') == false
 
     payload = {
       'Build Job' => build_url,

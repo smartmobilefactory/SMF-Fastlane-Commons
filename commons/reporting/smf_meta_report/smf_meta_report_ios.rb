@@ -22,10 +22,6 @@ end
 # - '<version>/master': where version is only digit with optional 'decimal'
 #      examples: '12/master', '3.4/master'
 def _should_send_report_data(options)
-  if options[:branch].match(/^reporting$/) # DEBUG Remove this for PR
-    return true
-  end
-
   if options[:branch].match(/^master$/)
     return true
   end
@@ -53,8 +49,6 @@ def _smf_analyse_ios_project(options)
   analysis_json[:swift_version] = smf_analyse_swift_version(xcode_settings, options)
   analysis_json[:deployment_target] = smf_analyse_deployment_target(xcode_settings, options)
 
-  puts analysis_json
-
   return analysis_json
 end
 
@@ -71,7 +65,7 @@ end
 
 def _smf_upload_meta_report_to_spread_sheet(data)
   sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_META_INFO_DOC_ID_KEY]
-  sheet_name = $REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME_PLAYGROUND
+  sheet_name = $REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME
 
   UI.message("Uploading data to google spreadsheet name: '#{sheet_name}'")
   smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, data)
