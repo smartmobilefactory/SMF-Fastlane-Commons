@@ -36,14 +36,12 @@ def smf_xcodeproj_settings_get(config_key, xcode_settings=[])
     target_json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -target #{target} -showBuildSettings -json`
     target_settings = JSON.parse(target_json_string)[0].dig('buildSettings')
     target_config_value = target_settings.dig(config_key)
+    puts "Target '#{target}': { #{config_key}: #{target_config_value} }"
 
     if config_value.nil?
       config_value = target_config_value
     elsif config_value != target_config_value
       raise "[ERROR]: Multiple #{config_key} were found in the \".xcodeproj\": '#{config_value}' and '#{target_config_value}'"
-    else
-      # DEBUG delete this
-      puts "Target '#{target}': { #{config_key}: #{target_config_value} }"
     end
   end
 
