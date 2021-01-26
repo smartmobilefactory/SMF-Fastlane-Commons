@@ -1,6 +1,5 @@
 #!/usr/bin/ruby
 require 'date'
-require 'json'
 
 def smf_meta_report_ios(options)
   # Analysis
