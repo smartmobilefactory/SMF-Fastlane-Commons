@@ -1,21 +1,17 @@
 #!/usr/bin/ruby
 
 # returns the analysed property
-def smf_analyse_bitcode
+def smf_analyse_bitcode(xcode_settings)
   UI.message("Analyser: #{__method__.to_s} ...")
 
-  pbxproj = smf_pbxproj_file_path
-  bitcode_usage = "enabled"
+  buildSettings = xcode_settings[0].dig('buildSettings')
+  bitcode_configuration = buildSettings.dig('ENABLE_BITCODE')
 
-  grab_yes = "#{`fgrep -R "ENABLE_BITCODE = " #{pbxproj} | grep -v "YES;"`}"
-
-  if (grab_yes != "" && grab_yes != nil)
-    grab_no = "#{`fgrep -R "ENABLE_BITCODE = " #{pbxproj} | grep -v "NO;"`}"
-    if (grab_no != "" && grab_no != nil)
-      bitcode_usage = "enabled"
-    else
-      bitcode_usage = "disabled"
-    end
+  bitcode_usage = 'enabled'
+  if (bitcode_configuration == 'NO')
+    # bitcode is enabled by default
+    # custom state is disabled
+    bitcode_usage = 'disabled'
   end
 
   return bitcode_usage

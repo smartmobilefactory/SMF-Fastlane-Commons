@@ -1,5 +1,6 @@
 #!/usr/bin/ruby
 require 'date'
+require 'json'
 
 def smf_meta_report_ios(options)
   # Analysis
@@ -32,7 +33,20 @@ def _should_send_report_data(options)
     return false
 end
 
+def _smf_xcodeproj_settings
+  # Xcodebuild command info:
+  # '-configuration' the 'Release' configuration is taken by default
+  # '-scheme' by default only the first scheme is used. We shall specify the scheme
+  # in case we want to analyze a non-default one.
+  # TODO: Use -scheme
+  json_string = `xcodebuild -project #{smf_pbxproj_file_path} -showBuildSettings -json`
+  xcode_settings = JSON.parse(json_string)
+  return xcode_settings
+end
+
 def _smf_analyse_ios_project(options)
+  xcode_settings = _smf_xcodeproj_settings
+
   analysis_json = {}
   analysis_json[:date] = Date.today.to_s
   analysis_json[:repo] = @smf_fastlane_config[:project][:project_name]
@@ -40,7 +54,7 @@ def _smf_analyse_ios_project(options)
   analysis_json[:branch] = ENV['BRANCH_NAME']
   analysis_json[:xcode_version] = @smf_fastlane_config[:project][:xcode_version]
   analysis_json[:idfa] = smf_analyse_idfa_usage
-  analysis_json[:bitcode] = smf_analyse_bitcode
+  analysis_json[:bitcode] = smf_analyse_bitcode(xcode_settings)
   analysis_json[:swiftlint_warnings] = smf_swift_lint_number_of_warnings
   analysis_json[:ats] = smf_analyse_ats_exception
   analysis_json[:swift_version] = smf_analyse_swift_version
