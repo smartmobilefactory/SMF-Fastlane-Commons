@@ -22,15 +22,19 @@ end
 # - '<version>/master': where version is only digit with optional 'decimal'
 #      examples: '12/master', '3.4/master'
 def _should_send_report_data(options)
+  if options[:branch].match(/^reporting$/) # DEBUG Remove this for PR
+    return true
+  end
+
   if options[:branch].match(/^master$/)
-      return true
-    end
+    return true
+  end
 
-    if options[:branch].match(/^\d+\.?\d*\/master$/)
-      return true
-    end
+  if options[:branch].match(/^\d+\.?\d*\/master$/)
+    return true
+  end
 
-    return false
+  return false
 end
 
 def _smf_xcodeproj_settings
