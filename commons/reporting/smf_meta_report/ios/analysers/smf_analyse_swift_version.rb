@@ -26,11 +26,11 @@ def _smf_grab_custom_swift_version_for_pbxproj(xcode_settings)
   buildSettings = xcode_settings[0].dig('buildSettings')
   swift_version = buildSettings.dig('SWIFT_VERSION')
 
-  json_string = `xcodebuild -project #{smf_pbxproj_file_path} -list -json`
+  json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -list -json`
   xcodeproj_targets = JSON.parse(json_string).dig('project').dig('targets')
 
   for target in xcodeproj_targets
-    target_json_string = `xcodebuild -project #{smf_pbxproj_file_path} -target #{target} -showBuildSettings -json`
+    target_json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -target #{target} -showBuildSettings -json`
     target_settings = JSON.parse(target_json_string)[0].dig('buildSettings')
     target_swift_version = target_settings.dig('SWIFT_VERSION')
 

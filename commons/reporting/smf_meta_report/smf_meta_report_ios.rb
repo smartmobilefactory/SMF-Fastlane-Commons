@@ -43,7 +43,9 @@ def _smf_xcodeproj_settings
   # '-scheme' by default only the first scheme is used. We shall specify the scheme
   # in case we want to analyze a non-default one.
   # TODO: Use -scheme
-  json_string = `xcodebuild -project #{smf_pbxproj_file_path} -showBuildSettings -json`
+  puts smf_xcodeproj_file_path
+
+  json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -showBuildSettings -json`
   xcode_settings = JSON.parse(json_string)
   return xcode_settings
 end
