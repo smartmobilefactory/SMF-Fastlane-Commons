@@ -1,11 +1,11 @@
 #!/usr/bin/ruby
 
 # returns the analysed property
-def smf_analyse_swift_version(xcode_settings)
+def smf_analyse_swift_version(xcode_settings, options)
   UI.message("Analyser: #{__method__.to_s} ...")
 
   # Grab custom swift version, if any
-  swift_version = smf_xcodeproj_settings_get('SWIFT_VERSION', xcode_settings)
+  swift_version = smf_xcodeproj_settings_get('SWIFT_VERSION', xcode_settings, options)
 
   if swift_version.nil?
     # Otherwise use the default swift version related to the xcode version used by the project.

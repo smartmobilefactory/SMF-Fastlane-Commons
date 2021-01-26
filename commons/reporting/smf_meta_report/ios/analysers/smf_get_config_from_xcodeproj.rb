@@ -1,15 +1,23 @@
 #!/usr/bin/ruby
 require 'json'
 
-def smf_xcodeproj_settings
+def smf_xcodeproj_settings(options={})
   # Xcodebuild command info:
   # '-configuration' the 'Release' configuration is taken by default
-  # '-scheme' by default only the first scheme is used. We shall specify the scheme
+  # '-scheme' by default xcodebuild uses the first scheme. We shall specify the scheme
   # in case we want to analyze a non-default one.
-  # TODO: Use -scheme
-  puts smf_xcodeproj_file_path
 
-  json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -showBuildSettings -json`
+  json_string = ""
+  build_variant = options[:build_variant]
+  if !build_variant.nil? && build_variant != ''
+    puts "SELECT build_variant: '#{build_variant}'"
+    scheme = smf_config_get(build_variant, :scheme)
+    puts "SELECT scheme: '#{scheme}'"
+    json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -scheme #{scheme} -showBuildSettings -json`
+  else
+    json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -showBuildSettings -json`
+  end
+
   xcode_settings = JSON.parse(json_string)
   return xcode_settings
 end
@@ -21,9 +29,10 @@ end
 #                     Use this to optimize the process and avoid multiple settings analyses.
 #                     If empty or not specified the function `smf_xcodeproj_settings`
 #                     will be called.
-def smf_xcodeproj_settings_get(config_key, xcode_settings=[])
+#   - options: the current job options (dictionary given from the pipeline)
+def smf_xcodeproj_settings_get(config_key, xcode_settings=[], options)
   if xcode_settings.empty?
-    xcode_settings = smf_xcodeproj_settings
+    xcode_settings = smf_xcodeproj_settings(options)
   end
 
   buildSettings = xcode_settings[0].dig('buildSettings')
