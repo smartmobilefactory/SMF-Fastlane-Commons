@@ -8,14 +8,17 @@ def smf_xcodeproj_settings(options={})
   # in case we want to analyze a non-default one.
 
   json_string = ""
+  scheme = ""
+
   build_variant = options[:build_variant]
   if !build_variant.nil? && build_variant != ''
-    scheme = smf_config_get(build_variant, :scheme)
-    json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -scheme #{scheme} -showBuildSettings -json`
-  else
-    json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -showBuildSettings -json`
+    scheme_name = smf_config_get(build_variant, :scheme)
+    if !scheme_name.nil? && scheme_name != ''
+      scheme = "-scheme #{scheme_name}"
+    end
   end
 
+  json_string = `xcodebuild -project #{smf_xcodeproj_file_path} #{scheme} -showBuildSettings -json`
   xcode_settings = JSON.parse(json_string)
   return xcode_settings
 end
