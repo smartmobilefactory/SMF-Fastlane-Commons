@@ -25,7 +25,7 @@ def smf_xcodeproj_settings(options={})
   return xcode_settings
 end
 
-def smf_xcodeproj_targets()
+def smf_xcodeproj_targets
   json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -list -json`
   xcodeproj_targets = JSON.parse(json_string).dig('project').dig('targets')
 
@@ -39,7 +39,7 @@ def smf_xcodeproj_target_settings(target)
   return json
 end
 
-def smf_xcodeproj_name()
+def smf_xcodeproj_name
   path = smf_xcodeproj_file_path
   xcodeproj_name = path.match(/\/([^\/]+)$/)[1]
 
