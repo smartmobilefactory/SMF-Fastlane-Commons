@@ -11,15 +11,15 @@ def smf_analyse_deployment_targets(xcode_settings, options)
     'watchOS' => 'WATCHOS_DEPLOYMENT_TARGET'
   }
 
-  deployment_targets = ''
+  deployment_targets_string = ''
 
   keys.each do |key, config|
     deployment_target = smf_xcodeproj_settings_get(config, xcode_settings, options)
-    if !deployment_target.nil?
-        prefix = (deployment_target == '' ? '' : ' ')
-        deployment_targets = "#{prefix}#{key} #{deployment_target}"
+    if !deployment_target.nil? && deployment_target != ''
+        prefix = (deployment_targets_string == '' ? '' : ' ')
+        deployment_targets_string = "#{prefix}#{key} #{deployment_target}"
     end
   end
 
-  return deployment_targets
+  return deployment_targets_string
 end
