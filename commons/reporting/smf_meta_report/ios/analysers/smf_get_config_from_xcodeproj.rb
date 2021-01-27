@@ -37,6 +37,13 @@ def smf_xcodeproj_target_settings(target)
   return json
 end
 
+def smf_xcodeproj_name()
+  path = smf_xcodeproj_file_path
+  xcodeproj_name = path.match(/\/([^\/]+)$/)[1]
+
+  return xcodeproj_name
+end
+
 # Return the configuration value associated to the given key from the xcode project
 # Parameters:
 #   - config_key: The xcode config key to retrieve the value from (ex: 'SWIFT_VERSION')
@@ -61,7 +68,12 @@ def smf_xcodeproj_settings_get(config_key, xcode_settings=[], options)
     if config_value.nil?
       config_value = target_config_value
     elsif !target_config_value.nil? && target_config_value != '' && config_value != target_config_value
-      raise "[ERROR]: Multiple #{config_key} were found in the \".xcodeproj\": '#{config_value}' and '#{target_config_value}'"
+      message = "Multiple #{config_key} were found in the \"#{smf_xcodeproj_name}\": '#{config_value}' and '#{target_config_value}'"
+      smf_send_message(
+        title: 'Inconsistent configuration in xcodeproj',
+        message: message,
+        type: 'error'
+      )
     end
   end
 
