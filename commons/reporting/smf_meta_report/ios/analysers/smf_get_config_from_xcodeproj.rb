@@ -60,7 +60,7 @@ def smf_xcodeproj_settings_get(config_key, xcode_settings=[], options)
 
     if config_value.nil?
       config_value = target_config_value
-    elsif config_value != target_config_value
+    elsif !target_config_value.nil? && target_config_value != '' && config_value != target_config_value
       raise "[ERROR]: Multiple #{config_key} were found in the \".xcodeproj\": '#{config_value}' and '#{target_config_value}'"
     end
   end
