@@ -2,6 +2,7 @@ desc 'Sending a message to the given Slack channel'
 
 def _smf_should_skip_notifications_for_branch()
   branch = smf_workspace_dir_git_branch
+
   if branch.match(/^master$/) # iOS (A-Team)
     return false
   end
@@ -10,7 +11,11 @@ def _smf_should_skip_notifications_for_branch()
     return false
   end
 
-  if branch.match(/^dev$/) # iOS (Android)
+  if branch.match(/^dev$/) # Android
+    return false
+  end
+
+  if branch.match(/^kmpp$/) # Android (Eismann - temporary)
     return false
   end
 
