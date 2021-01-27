@@ -22,17 +22,19 @@ end
 #      examples: '12/master', '3.4/master'
 def _should_send_report_data(options)
   if options[:branch].match(/^master$/)
-      return true
-    end
+    return true
+  end
 
-    if options[:branch].match(/^\d+\.?\d*\/master$/)
-      return true
-    end
+  if options[:branch].match(/^\d+\.?\d*\/master$/)
+    return true
+  end
 
-    return false
+  return false
 end
 
 def _smf_analyse_ios_project(options)
+  xcode_settings = smf_xcodeproj_settings(options)
+
   analysis_json = {}
   analysis_json[:date] = Date.today.to_s
   analysis_json[:repo] = @smf_fastlane_config[:project][:project_name]
@@ -40,10 +42,11 @@ def _smf_analyse_ios_project(options)
   analysis_json[:branch] = ENV['BRANCH_NAME']
   analysis_json[:xcode_version] = @smf_fastlane_config[:project][:xcode_version]
   analysis_json[:idfa] = smf_analyse_idfa_usage
-  analysis_json[:bitcode] = smf_analyse_bitcode
+  analysis_json[:bitcode] = smf_analyse_bitcode(xcode_settings, options)
   analysis_json[:swiftlint_warnings] = smf_swift_lint_number_of_warnings
   analysis_json[:ats] = smf_analyse_ats_exception
-  analysis_json[:swift_version] = smf_analyse_swift_version
+  analysis_json[:swift_version] = smf_analyse_swift_version(xcode_settings, options)
+  analysis_json[:deployment_target] = smf_analyse_deployment_targets(xcode_settings, options)
 
   return analysis_json
 end

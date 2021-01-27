@@ -1,11 +1,12 @@
 #!/usr/bin/ruby
 
 # returns the analysed property
-def smf_analyse_swift_version
+def smf_analyse_swift_version(xcode_settings, options)
   UI.message("Analyser: #{__method__.to_s} ...")
 
   # Grab custom swift version, if any
-  swift_version = _smf_grab_custom_swift_version_for_pbxproj
+  swift_version = smf_xcodeproj_settings_get('SWIFT_VERSION', xcode_settings, options)
+
   if swift_version.nil?
     # Otherwise use the default swift version related to the xcode version used by the project.
     swift_version = _smf_get_default_swift_version_for_xcode
@@ -13,27 +14,6 @@ def smf_analyse_swift_version
 
   if swift_version.nil?
     UI.important("Project might not contained any Swift code or is not programmed in Swift!")
-  end
-
-  swift_version
-end
-
-# Within the project.pbxproj, the SWIFT_VERSION is set when a developer has manually configured it.
-# If he/she hasn't the variable isn't set in the xml and the default value is used (auto-configured by Xcode).
-def _smf_grab_custom_swift_version_for_pbxproj
-  swift_version = nil
-  grab = "#{`fgrep -R "SWIFT_VERSION = " #{smf_pbxproj_file_path}`}"
-  grab.split("\n").each do |config|
-    # Extract Swift version from each line of the output of fgrep.
-    if swift_version_match = config.match("([0-9.]+);$")
-      matched_version = swift_version_match.captures[0]
-      # Check if the swift version is consistent or not
-      if swift_version.nil?
-        swift_version = matched_version
-      elsif swift_version != matched_version
-        raise "[ERROR]: Multiple SWIFT_VERSION were found in the \"project.pbxproj\": '#{swift_version}' and '#{matched_version}'"
-      end
-    end
   end
 
   swift_version
