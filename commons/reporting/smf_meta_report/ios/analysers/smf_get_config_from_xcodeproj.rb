@@ -1,12 +1,14 @@
 #!/usr/bin/ruby
 require 'json'
 
+# Returns a json representing the xcode's build settings of either the default target
+# or if specified of a dedicated scheme.
+#
+# xcodebuild command info:
+# '-configuration' the 'Release' configuration is taken by default
+# '-scheme' by default xcodebuild uses the first scheme. We shall specify the scheme
+# in case we want to analyze a non-default one.
 def smf_xcodeproj_settings(options={})
-  # Xcodebuild command info:
-  # '-configuration' the 'Release' configuration is taken by default
-  # '-scheme' by default xcodebuild uses the first scheme. We shall specify the scheme
-  # in case we want to analyze a non-default one.
-
   json_string = ""
   scheme = ""
 
