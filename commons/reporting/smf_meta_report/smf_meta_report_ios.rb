@@ -21,6 +21,9 @@ end
 # - '<version>/master': where version is only digit with optional 'decimal'
 #      examples: '12/master', '3.4/master'
 def _should_send_report_data(options)
+
+  return true # DEBUG remove this for PR
+
   if options[:branch].match(/^master$/)
     return true
   end
@@ -46,7 +49,9 @@ def _smf_analyse_ios_project(options)
   analysis_json[:swiftlint_warnings] = smf_swift_lint_number_of_warnings
   analysis_json[:ats] = smf_analyse_ats_exception
   analysis_json[:swift_version] = smf_analyse_swift_version(xcode_settings, options)
-  analysis_json[:deployment_target] = smf_analyse_deployment_target(xcode_settings, options)
+
+  deployment_targets = smf_analyse_deployment_targets(xcode_settings, options)
+  analysis_json.merge(deployment_targets)
 
   return analysis_json
 end

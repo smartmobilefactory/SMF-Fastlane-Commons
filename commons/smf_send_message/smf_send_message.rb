@@ -1,4 +1,22 @@
 desc 'Sending a message to the given Slack channel'
+
+def _smf_should_skip_notifications_for_branch()
+  branch = smf_workspace_dir_git_branch
+  if branch.match(/^master$/) # iOS (A-Team)
+    return false
+  end
+
+  if branch.match(/^\d+\.?\d*\/master$/) # iOS (Strato-Team)
+    return false
+  end
+
+  if branch.match(/^dev$/) # iOS (Android)
+    return false
+  end
+
+  return true
+end
+
 private_lane :smf_send_message do |options|
 
   slack_workspace_url = "https://hooks.slack.com/services/#{ENV[$SMF_SLACK_URL]}"
@@ -59,7 +77,10 @@ private_lane :smf_send_message do |options|
 
   UI.message("Sending message \"#{content}\" to room \"#{slack_channel}\"")
 
-  if slack_channel && (slack_channel.include? '/') == false
+  if _smf_should_skip_notifications_for_branch
+    UI.message("[WARNING]: skip slack notifications from development branches")
+
+  elsif slack_channel && (slack_channel.include? '/') == false
 
     payload = {
       'Build Job' => build_url,

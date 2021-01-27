@@ -1,15 +1,22 @@
 #!/usr/bin/ruby
 
 # returns the analysed property
-def smf_analyse_deployment_target(xcode_settings, options)
+def smf_analyse_deployment_targets(xcode_settings, options)
   UI.message("Analyser: #{__method__.to_s} ...")
 
-  key = 'IPHONEOS_DEPLOYMENT_TARGET'
-  deployment_target =  smf_xcodeproj_settings_get(key, xcode_settings, options)
+  keys = {
+    :iphoneos_deployment_target => 'IPHONEOS_DEPLOYMENT_TARGET',
+    :macosx_deployment_target => 'MACOSX_DEPLOYMENT_TARGET',
+    :tvos_deployment_target => 'TVOS_DEPLOYMENT_TARGET',
+    :watchos_deployment_target => 'WATCHOS_DEPLOYMENT_TARGET'
+  }
 
-  if deployment_target.nil?
-    raise "[ERROR]: Project does not contain a valid #{key}"
+  analysis_json = {}
+
+  keys.each do |key, config|
+    deployment_target = smf_xcodeproj_settings_get(config, xcode_settings, options)
+    analysis_json[key] = deployment_target
   end
 
-  return deployment_target
+  return analysis_json
 end
