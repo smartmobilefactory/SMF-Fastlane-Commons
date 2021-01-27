@@ -49,9 +49,7 @@ def _smf_analyse_ios_project(options)
   analysis_json[:swiftlint_warnings] = smf_swift_lint_number_of_warnings
   analysis_json[:ats] = smf_analyse_ats_exception
   analysis_json[:swift_version] = smf_analyse_swift_version(xcode_settings, options)
-
-  deployment_targets = smf_analyse_deployment_targets(xcode_settings, options)
-  analysis_json.merge(deployment_targets)
+  analysis_json[:deployment_target] = smf_analyse_deployment_targets(xcode_settings, options)
 
   return analysis_json
 end
