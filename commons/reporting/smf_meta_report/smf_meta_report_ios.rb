@@ -21,9 +21,6 @@ end
 # - '<version>/master': where version is only digit with optional 'decimal'
 #      examples: '12/master', '3.4/master'
 def _should_send_report_data(options)
-
-  return true # DEBUG remove this for PR
-
   if options[:branch].match(/^master$/)
     return true
   end
@@ -67,7 +64,7 @@ end
 
 def _smf_upload_meta_report_to_spread_sheet(data)
   sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_META_INFO_DOC_ID_KEY]
-  sheet_name = $REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME_PLAYGROUND
+  sheet_name = $REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME
 
   UI.message("Uploading data to google spreadsheet name: '#{sheet_name}'")
   smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, data)
