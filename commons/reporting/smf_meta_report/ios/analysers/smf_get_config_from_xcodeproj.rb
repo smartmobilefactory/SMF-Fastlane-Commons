@@ -8,14 +8,17 @@ def smf_xcodeproj_settings(options={})
   # in case we want to analyze a non-default one.
 
   json_string = ""
+  scheme = ""
+
   build_variant = options[:build_variant]
   if !build_variant.nil? && build_variant != ''
-    scheme = smf_config_get(build_variant, :scheme)
-    json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -scheme #{scheme} -showBuildSettings -json`
-  else
-    json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -showBuildSettings -json`
+    scheme_name = smf_config_get(build_variant, :scheme)
+    if !scheme_name.nil? && scheme_name != ''
+      scheme = "-scheme #{scheme_name}"
+    end
   end
 
+  json_string = `xcodebuild -project #{smf_xcodeproj_file_path} #{scheme} -showBuildSettings -json`
   xcode_settings = JSON.parse(json_string)
   return xcode_settings
 end
@@ -32,6 +35,13 @@ def smf_xcodeproj_target_settings(target)
   json = JSON.parse(json_string)[0].dig('buildSettings')
 
   return json
+end
+
+def smf_xcodeproj_name()
+  path = smf_xcodeproj_file_path
+  xcodeproj_name = path.match(/\/([^\/]+)$/)[1]
+
+  return xcodeproj_name
 end
 
 # Return the configuration value associated to the given key from the xcode project
@@ -57,8 +67,13 @@ def smf_xcodeproj_settings_get(config_key, xcode_settings=[], options)
 
     if config_value.nil?
       config_value = target_config_value
-    elsif config_value != target_config_value
-      raise "[ERROR]: Multiple #{config_key} were found in the \".xcodeproj\": '#{config_value}' and '#{target_config_value}'"
+    elsif !target_config_value.nil? && target_config_value != '' && config_value != target_config_value
+      message = "Multiple #{config_key} were found in the \"#{smf_xcodeproj_name}\": '#{config_value}' and '#{target_config_value}'"
+      smf_send_message(
+        title: 'Inconsistent configuration in xcodeproj',
+        message: message,
+        type: 'error'
+      )
     end
   end
 
