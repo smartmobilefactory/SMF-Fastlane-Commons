@@ -7,7 +7,7 @@ def _smf_should_skip_notifications_for_branch
     return false
   end
 
-  if branch.match(/^\d+\.?\d*\/master$/) # iOS (Strato-Team)
+  if branch.match(/^\d+[\d\.]*\/master$/) # iOS (Strato-Team)
     return false
   end
 
