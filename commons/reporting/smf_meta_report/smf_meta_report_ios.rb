@@ -21,11 +21,11 @@ end
 # - '<version>/master': where version is only digit with optional 'decimal'
 #      examples: '12/master', '3.4/master'
 def _should_send_report_data(options)
-  if options[:branch].match(/^master$/)
+  if options[:branch].match(/^master$/) # iOS (A-Team)
     return true
   end
 
-  if options[:branch].match(/^\d+\.?\d*\/master$/)
+  if options[:branch].match(/^\d+[\d\.]*\/master$/) # iOS (Strato-Team)
     return true
   end
 
