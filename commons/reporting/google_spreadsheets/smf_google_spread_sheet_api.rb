@@ -201,7 +201,7 @@ end
 def _smf_financial_reporting_spreadsheet_entry_to_line(entry)
   # The order of the elements in this array directly correspond to the table columns in the google spread sheet
   # thus it is VERY IMPORTANT to not change the order!
-  [entry[:date], entry[:project], entry[:sales], entry[:expenses], entry[:target], entry[:actual], entry[:daily_rate], entry[:ratio]]
+  [entry[:date], entry[:project], entry[:sales], entry[:expenses], entry[:sales_year], entry[:expenses_year], entry[:target], entry[:actual], entry[:daily_rate], entry[:ratio]]
 end
 
 def _smf_unwrap_value(value)
