@@ -133,7 +133,6 @@ lane :smf_linter do |options|
   smf_super_linter(options)
 end
 
-
 # Danger
 
 private_lane :smf_super_pipeline_danger do |options|
