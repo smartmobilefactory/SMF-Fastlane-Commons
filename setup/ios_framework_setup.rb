@@ -47,7 +47,7 @@ lane :smf_pod_setup_dependencies_pr_check do |options|
   smf_pod_super_setup_dependencies_pr_check(options)
 end
 
-lane :smf_setup_dependencies_reporting do |options|
+override_lane :smf_setup_dependencies_reporting do |options|
   smf_pod_super_setup_dependencies_pr_check(options)
 end
 
@@ -119,7 +119,7 @@ lane :smf_pod_unit_tests do |options|
   smf_pod_super_unit_tests(options)
 end
 
-lane :smf_unit_tests_reporting do |options|
+override_lane :smf_unit_tests_reporting do |options|
   smf_pod_super_unit_tests(options)
 end
 
@@ -156,7 +156,7 @@ end
 ############ AUTOMATIC REPORTING LANES ############
 ###########  For Unit-Tests Reporting  ############
 
-lane :smf_automatic_reporting do |options|
+override_lane :smf_automatic_reporting do |options|
   smf_ios_monitor_unit_tests(options)
 end
 
