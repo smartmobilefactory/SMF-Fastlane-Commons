@@ -25,7 +25,7 @@ module Fastlane
 
       # GENERAL
       FILE_ENCODING = 'UTF-8'.freeze
-      
+
       def self.run(params)
 
         # Determines for which platform the sync is performed
@@ -194,7 +194,7 @@ module Fastlane
           is_kmpp
         )
 
-        #commitChangesIfNeeded(download_resource_dir) # TODO: reenable
+        commitChangesIfNeeded(download_resource_dir)
       end
 
       def self.handle_extensions(upload_api_client, download_api_client, platform, base, extensions)
@@ -455,7 +455,7 @@ module Fastlane
           api_token_key = ANDROID_API_TOKEN_KEY
         end
 
-        api_token = "9ded292f47e15e6c6db3c9a09375e9c517f7cdf1526ac8c0a7c62022f2af254e" #ENV[api_token_key]
+        api_token = ENV[api_token_key]
 
         raise "Phrase API token is missing! ENV key #{api_token_key}" unless api_token
 
