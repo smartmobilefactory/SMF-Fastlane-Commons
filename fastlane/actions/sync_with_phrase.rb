@@ -25,8 +25,7 @@ module Fastlane
 
       # GENERAL
       FILE_ENCODING = 'UTF-8'.freeze
-
-
+      
       def self.run(params)
 
         # Determines for which platform the sync is performed
