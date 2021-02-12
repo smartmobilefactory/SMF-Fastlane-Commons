@@ -64,7 +64,7 @@ def _smf_send_slack_message(data)
       :short => false
     }
 
-    message[:attachments][0][:fields].append(payload_json)
+    message[:attachments][0][:fields].push(payload_json)
   end
 
   # POST request
