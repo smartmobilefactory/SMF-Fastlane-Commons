@@ -44,7 +44,6 @@ private_lane :smf_send_message do |options|
 
   project_name = !ENV['PROJECT_NAME'].nil? ? ENV['PROJECT_NAME'] : @smf_fastlane_config[:project][:project_name]
   type = !options[:type].nil? ? options[:type].to_s : 'warning'
-  success = type == 'success' || type == 'message'
   build_url = !options[:build_url].nil? ? options[:build_url] : ENV['BUILD_URL']
   exception = options[:exception]
   additional_html_entries = !options[:additional_html_entries].nil? ? options[:additional_html_entries] : []
@@ -105,7 +104,7 @@ private_lane :smf_send_message do |options|
           message: content,
           channel: slack_channel,
           username: "#{project_name} CI",
-          success: success,
+          type: type,
           payload: payload,
       )
     rescue => exception
