@@ -540,7 +540,7 @@ module Fastlane
         result = `if iconv --from-code=UTF-16 --to-code=UTF-8 #{file_path} > #{utf_8_converted_file_path}; then echo "1"; fi`
 
         if result.empty?
-          UI.message("Unabled to convert #{filename} from UTF-8 ot UTF-16, continuing without conversion...")
+          UI.message("Unabled to convert #{filename} from UTF-16 ot UTF-8, continuing without conversion...")
           return nil
         else
           UI.message("Successfully converted #{filename} from UTF-8 to UTF-16");
