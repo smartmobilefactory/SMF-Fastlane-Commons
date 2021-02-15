@@ -348,7 +348,8 @@ module Fastlane
             locale_id,
             output_file,
             tag,
-            IOS_LOCALIZABLE_FORMAT
+            IOS_LOCALIZABLE_FORMAT,
+            true
           )
         end
 
@@ -364,7 +365,8 @@ module Fastlane
             locale_id,
             file,
             tag,
-            IOS_LOCALIZABLE_FORMAT
+            IOS_LOCALIZABLE_FORMAT,
+            true
           )
         end
       end
@@ -425,13 +427,14 @@ module Fastlane
         end
       end
 
-      def self.download_file(api_client, project_id, locale_id, output_file, tags, file_format)
+      def self.download_file(api_client, project_id, locale_id, output_file, tags, file_format, utf_8_encode = false)
         options = {
           return_type: 'String', # This is a workaround as there is currently no other way to get the downloaded content see https://github.com/phrase/phrase-ruby/issues/7
           file_format: file_format,
-          tags: tags,
-          encoding: FILE_ENCODING
+          tags: tags
         }
+
+        options['encoding'] = FILE_ENCODING if utf_8_encode
 
         begin
           UI.message("Dowloading translation file #{output_file} with ID: #{locale_id}")
