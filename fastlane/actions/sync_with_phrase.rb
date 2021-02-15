@@ -537,12 +537,13 @@ module Fastlane
 
         file_path = File.join(upload_resource_dir, filename)
         utf_8_converted_file_path = File.join(upload_resource_dir, 'utf8-' + filename)
-        result = `if iconv --from-code=UTF-16 --to-code=UTF-8 #{file_path} > #{utf_8_converted_file_path}; then echo "Successfully converted #{filename} from UTF-8 to UTF-16"; fi`
+        result = `if iconv --from-code=UTF-16 --to-code=UTF-8 #{file_path} > #{utf_8_converted_file_path}; then echo "1"; fi`
 
         if result.empty?
           UI.message("Unabled to convert #{filename} from UTF-8 ot UTF-16, continuing without conversion...")
           return nil
         else
+          UI.message("Successfully converted #{filename} from UTF-8 to UTF-16");
           return utf_8_converted_file_path
         end
 
