@@ -237,28 +237,39 @@ module Fastlane
         tags = []
 
         Dir.foreach(upload_resource_dir) do |item|
+          file = File.join(upload_resource_dir, item)
 
           case platform
           when :ios
             next unless item.end_with?(IOS_LOCALIZABLE_FORMAT)
             locale_id = languages.dig(base)
             tag = item.gsub(/(.*).#{IOS_LOCALIZABLE_FORMAT}/, '\1')
+
+            utf8_converted_file = convert_to_utf_8_if_possible(upload_resource_dir, item)
+            file = utf8_converted_file unless utf8_converted_file.nil?
+
+            tags.push(tag)
+
+            upload_translation_file(api_client, project_id, locale_id, file, tag)
+
+            # remove file if it was a utf-8 converted copy
+            File.delete(utf8_converted_file) unless utf8_converted_file.nil?
           when :android
             next unless item.start_with?('strings')
             locale_id = languages.dig(ANDROID_DEFAULT_LANGUAGE_KEY)
             tag = item.gsub(/(.*).#{ANDROID_LOCALIZABLE_FORMAT}/, '\1')
+
+            tags.push(tag)
+
+            upload_translation_file(api_client, project_id, locale_id, file, tag)
           end
-
-          tags.push(tag)
-          file = File.join(upload_resource_dir, item)
-
-          upload_translation_file(api_client, project_id, locale_id, file, tag)
         end
 
         tags
       end
 
       def self.upload_translation_file(api_client, project_id, locale_id, file, tags)
+
         options = {
           file: File.new(file),
           locale_id: locale_id,
@@ -518,6 +529,23 @@ module Fastlane
         when :android
           raise 'default language is no set' if !languages.dig(ANDROID_DEFAULT_LANGUAGE_KEY)
         end
+      end
+
+      def self.convert_to_utf_8_if_possible(upload_resource_dir, filename)
+
+        UI.message("Trying to convert #{filename} from UTF-16 to UTF-8")
+
+        file_path = File.join(upload_resource_dir, filename)
+        utf_8_converted_file_path = File.join(upload_resource_dir, 'utf8-' + filename)
+        result = `if iconv --from-code=UTF-16 --to-code=UTF-8 #{file_path} > #{utf_8_converted_file_path}; then echo "Successfully converted #{filename} from UTF-8 to UTF-16"; fi`
+
+        if result.empty?
+          UI.message("Unabled to convert #{filename} from UTF-8 ot UTF-16, continuing without conversion...")
+          return nil
+        else
+          return utf_8_converted_file_path
+        end
+
       end
 
     end
