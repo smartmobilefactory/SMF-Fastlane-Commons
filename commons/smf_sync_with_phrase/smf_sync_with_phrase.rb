@@ -448,7 +448,7 @@ def _smf_convert_to_utf_8_if_possible(upload_resource_dir, filename)
   utf_8_converted_file_path = File.join(smf_workspace_dir, 'utf8-' + filename)
 
   supported_encodings = `iconv -l`.split(' ')
-  current_encoding = `file -I #{file_path}`.gsub(/.*charset=(.+)/, '\1').upcase
+  current_encoding = `file -I #{file_path}`.gsub(/.*charset=(.+)/, '\1').strip.upcase
 
   if !supported_encodings.include?(current_encoding)
     UI.message("Unsupported file encoding #{current_encoding}, skipping conversion!")
