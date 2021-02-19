@@ -37,6 +37,18 @@ def _smf_post_slack_request(message)
   response
 end
 
+def _smf_slack_message_body(data)
+  text = data[:message]
+
+  if (text.nil? or text == '')
+    pretext = data[:pretext]
+    # Remove emojis for a more minimal message content
+    text = pretext.gsub(/:[a-z_]+:/, '').strip()
+  end
+
+  return text
+end
+
 def _smf_send_slack_message(data)
   # Build message
   message = {
@@ -47,7 +59,7 @@ def _smf_send_slack_message(data)
       {
         :color => color_for_type(data[:type]),
         :pretext => data[:pretext],
-        :text => data[:message],
+        :text => _smf_slack_message_body(data),
         :fields => [],
         :footer => 'Jenkins CI Notifications',
         :footer_icon => data[:icon_url],
