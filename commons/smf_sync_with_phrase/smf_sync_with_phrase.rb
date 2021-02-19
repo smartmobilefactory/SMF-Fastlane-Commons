@@ -53,7 +53,7 @@ private_lane :smf_sync_with_phrase do |options|
   download_resource_dir = resource_dir unless download_resource_dir
 
   # push and pull for the main locales
-  upload_and_download(
+  _smf_upload_and_download(
     upload_api_client,
     download_api_client,
     project_id,
