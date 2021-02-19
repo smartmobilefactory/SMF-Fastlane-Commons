@@ -79,7 +79,7 @@ private_lane :smf_sync_with_phrase do |options|
 end
 
 # uploads and downloads the translation files for given resource directories and a project id
-def _smf_upload_and_download(upload_api_client, download_api_client, project_id, upload_resource_dir, download_resource_dir, languages, is_kmpp, base)
+def _smf_upload_and_download(upload_api_client, download_api_client, project_id, upload_resource_dir, download_resource_dir, languages, is_kmpp, base, commit_message = nil)
 
   used_tags = _smf_upload_translations(
     upload_api_client,
@@ -101,7 +101,7 @@ def _smf_upload_and_download(upload_api_client, download_api_client, project_id,
     is_kmpp
   )
 
-  _smf_commit_changes_if_needed(download_resource_dir)
+  _smf_commit_changes_if_needed(download_resource_dir, commit_message)
 end
 
 def _smf_handle_extensions(upload_api_client, download_api_client, base, extensions)
@@ -132,7 +132,8 @@ def _smf_handle_extensions(upload_api_client, download_api_client, base, extensi
       download_resource_dir,
       languages,
       nil,
-      base
+      base,
+      'Updated strings from Phrase for extensions'
     )
   end
 end
@@ -349,9 +350,9 @@ end
 
 ############################### GIT ############################
 
-def _smf_commit_changes_if_needed(path)
+def _smf_commit_changes_if_needed(path, commit_message = nil)
   nothing_to_commit = `git status --porcelain #{path}`.empty?
-  commit_message = 'Updated strings from Phrase'
+  commit_message = commit_message.nil? ? 'Updated strings from Phrase' : commit_message
   if !nothing_to_commit
     `git add #{path}`
     `git commit -m "#{commit_message}" #{path}`
