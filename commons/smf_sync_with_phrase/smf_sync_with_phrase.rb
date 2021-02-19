@@ -160,7 +160,7 @@ def _smf_upload_translations(api_client, project_id, upload_resource_dir, langua
 
       # remove file if it was a utf-8 converted copy
       if utf8_converted_file
-        UI.message("Deleting #{utf8_converted_file}")
+        UI.message("Deleting #{File.basename(utf8_converted_file)}")
         File.delete(utf8_converted_file)
       end
     when :android
@@ -188,9 +188,9 @@ def _smf_upload_translation_file(api_client, project_id, locale_id, file, tags)
   }
 
   begin
-    UI.message("Uploading translation file: #{file}")
+    UI.message("Uploading translation file: #{File.basename(file)}")
     result = api_client.upload_create(project_id, options)
-    UI.message("Updated #{file} at #{result.updated_at} UTC")
+    UI.message("Updated #{File.basename(file)} at #{result.updated_at} UTC")
   rescue Phrase::ApiError => e
     puts "Exception while uploading translation file #{file}: #{e}"
   end
@@ -341,7 +341,7 @@ def _smf_download_file(api_client, project_id, locale_id, output_file, tags, fil
   }
 
   begin
-    UI.message("Dowloading translation file #{output_file} with ID: #{locale_id}")
+    UI.message("Dowloading translation file #{File.basename(output_file)} with ID: #{locale_id}")
     result = api_client.locale_download(project_id, locale_id, options)
     File.write(output_file, result.data) unless result.data.nil? || result.data.empty?
   rescue Phrase::ApiError => e
