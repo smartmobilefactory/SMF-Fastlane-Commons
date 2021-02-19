@@ -42,6 +42,7 @@ def _smf_slack_message_body(data)
 
   if (text.nil? or text == '')
     pretext = data[:pretext]
+    # Remove emojis for a more minimal message content
     text = pretext.gsub(/:[a-z_]+:/, '').strip()
   end
 
