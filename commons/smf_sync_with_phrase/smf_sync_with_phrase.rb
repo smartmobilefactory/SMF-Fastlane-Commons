@@ -33,7 +33,7 @@ private_lane :smf_sync_with_phrase do |options|
   is_kmpp = options[:is_kmpp]
 
   base = options[:base]
-  raise 'Base is missing for iOS' if !base && platform == :ios
+  raise 'Base is missing for iOS' if !base && @platform == :ios
 
   # Base directory in which the translation files lay
   resource_dir = _smf_resource_dir(is_kmpp, options[:resource_dir])
