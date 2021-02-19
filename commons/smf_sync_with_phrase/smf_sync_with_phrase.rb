@@ -350,9 +350,10 @@ end
 
 def _smf_commit_changes_if_needed(path)
   nothing_to_commit = `git status --porcelain #{path}`.empty?
+  commit_message = 'Updated strings from Phrase'
   if !nothing_to_commit
-    other_action.git_add(path: path)
-    other_action.git_commit(path: path, message: "Updated strings from PhraseApp")
+    `git add #{path}`
+    `git commit -m "#{commit_message}" #{path}`
   end
 end
 
