@@ -446,7 +446,7 @@ def _smf_convert_to_utf_8_if_possible(upload_resource_dir, filename)
   file_path = File.join(upload_resource_dir, filename)
   # storing the converted file temporarly in the projects root directory, will be deleted aftewards
   utf_8_converted_file_path = File.join(smf_workspace_dir, 'utf8-' + filename)
-  result = `iconv --from-code=UTF-16 --to-code=UTF-8 #{file_path} > #{utf_8_converted_file_path} && then echo "1"`.strip()
+  result = `iconv --from-code=UTF-16 --to-code=UTF-8 #{file_path} > #{utf_8_converted_file_path} && echo "1"`.strip()
 
   if result == '1'
     UI.message("Successfully converted #{filename} from UTF-16 to UTF-8")
