@@ -442,7 +442,7 @@ end
 def _smf_convert_to_utf_8_if_possible(upload_resource_dir, filename)
 
   file_path = File.join(upload_resource_dir, filename)
-  # storing the converted file temporarly in the projects root directory, will be deleted aftewards
+  # storing the converted file temporarily in the projects root directory, will be deleted aftewards
   utf_8_converted_file_path = File.join(smf_workspace_dir, 'utf8-' + filename)
 
   supported_encodings = `iconv -l`.split(' ')
