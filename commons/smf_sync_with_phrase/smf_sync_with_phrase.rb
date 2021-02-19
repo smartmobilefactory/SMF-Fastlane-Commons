@@ -236,7 +236,7 @@ def _smf_download_translations_ios(api_client, project_id, download_resource_dir
 end
 
 def _smf_download_files_ios(api_client, project_id, dir, locale_id, used_tags)
-  files_to_download = used_tags.map { |tag| File.join(dir, tag + '.' + IOS_LOCALIZABLE_FORMAT) }
+  new_files_to_download = used_tags.map { |tag| File.join(dir, tag + '.' + IOS_LOCALIZABLE_FORMAT) }
 
   # First update files which are already there
   Dir.foreach(dir) do |item|
@@ -245,7 +245,7 @@ def _smf_download_files_ios(api_client, project_id, dir, locale_id, used_tags)
     tag = item.gsub(/(.*).#{IOS_LOCALIZABLE_FORMAT}/, '\1')
     output_file = File.join(dir, tag + '.' + IOS_LOCALIZABLE_FORMAT)
 
-    files_to_download -= [output_file] # remove file because it was already there and will now be updated
+    new_files_to_download -= [output_file] # remove file because it was already there and will now be updated
 
     _smf_download_file(
       api_client,
@@ -257,10 +257,8 @@ def _smf_download_files_ios(api_client, project_id, dir, locale_id, used_tags)
     )
   end
 
-  UI.message("New files to download: #{files_to_download.to_s}")
-
   # if there are new files that were not there before, download them
-  files_to_download.each do |file|
+  new_files_to_download.each do |file|
     tag = file.gsub(/.*\/(.*).#{IOS_LOCALIZABLE_FORMAT}/, '\1')
 
     _smf_download_file(
@@ -364,8 +362,8 @@ end
 def _smf_api_token(use_custom_api_token)
   case @platform
   when :ios
-    api_token_key  = IOS_API_TOKEN_KEY
-    api_token_key  = IOS_CUSTOM_API_TOKEN_KEY if use_custom_api_token
+    api_token_key = IOS_API_TOKEN_KEY
+    api_token_key = IOS_CUSTOM_API_TOKEN_KEY if use_custom_api_token
 
   when :android
     api_token_key = ANDROID_API_TOKEN_KEY
@@ -448,7 +446,7 @@ def _smf_convert_to_utf_8_if_possible(upload_resource_dir, filename)
     UI.message("Unabled to convert #{filename} from UTF-16 ot UTF-8, continuing without conversion...")
     return nil
   else
-    UI.message("Successfully converted #{filename} from UTF-8 to UTF-16");
+    UI.message("Successfully converted #{filename} from UTF-16 to UTF-8");
     return utf_8_converted_file_path
   end
 
