@@ -444,7 +444,8 @@ def _smf_convert_to_utf_8_if_possible(upload_resource_dir, filename)
   UI.message("Trying to convert #{filename} from UTF-16 to UTF-8")
 
   file_path = File.join(upload_resource_dir, filename)
-  utf_8_converted_file_path = File.join(upload_resource_dir, 'utf8-' + filename)
+  # storing the converted file temporarly in the projects root directory, will be deleted aftewards
+  utf_8_converted_file_path = File.join(smf_workspace_dir, 'utf8-' + filename)
   result = `if iconv --from-code=UTF-16 --to-code=UTF-8 #{file_path} > #{utf_8_converted_file_path}; then echo "1"; fi`
 
   if result.empty?
