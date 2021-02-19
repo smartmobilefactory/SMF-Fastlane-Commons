@@ -151,16 +151,18 @@ def _smf_upload_translations(api_client, project_id, upload_resource_dir, langua
       next unless item.end_with?(IOS_LOCALIZABLE_FORMAT)
       locale_id = languages.dig(base)
       tag = item.gsub(/(.*).#{IOS_LOCALIZABLE_FORMAT}/, '\1')
+      tags.push(tag)
 
       utf8_converted_file = _smf_convert_to_utf_8_if_possible(upload_resource_dir, item)
       file = utf8_converted_file unless utf8_converted_file.nil?
 
-      tags.push(tag)
-
       _smf_upload_translation_file(api_client, project_id, locale_id, file, tag)
 
       # remove file if it was a utf-8 converted copy
-      File.delete(utf8_converted_file) unless utf8_converted_file.nil?
+      if utf8_converted_file
+        UI.message("Deleting #{utf8_converted_file}")
+        File.delete(utf8_converted_file)
+      end
     when :android
       next unless item.start_with?('strings')
       locale_id = languages.dig(ANDROID_DEFAULT_LANGUAGE_KEY)
@@ -449,7 +451,7 @@ def _smf_convert_to_utf_8_if_possible(upload_resource_dir, filename)
     UI.message("Unabled to convert #{filename} from UTF-16 ot UTF-8, continuing without conversion...")
     return nil
   else
-    UI.message("Successfully converted #{filename} from UTF-16 to UTF-8");
+    UI.message("Successfully converted #{filename} from UTF-16 to UTF-8")
     return utf_8_converted_file_path
   end
 
