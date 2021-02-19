@@ -8,8 +8,8 @@ IOS_LOCALIZABLE_FORMAT = 'strings'.freeze
 # ANDROID
 ANDROID_UPLOAD_DIR_NAME = 'values'.freeze
 ANDROID_UPLOAD_DIR_NAME_KMPP = 'base'.freeze
-ANDROID_RESOURCE_DIR = './app/src/main/res/'.freeze
-ANDROID_RESOURCE_DIR_KMPP = './core/src/commonMain/resources/MR/'.freeze
+ANDROID_RESOURCE_DIR = '/app/src/main/res/'.freeze
+ANDROID_RESOURCE_DIR_KMPP = '/core/src/commonMain/resources/MR/'.freeze
 ANDROID_API_TOKEN_KEY = 'PHRASE_APP_TOKEN'.freeze
 ANDROID_DEFAULT_LANGUAGE_KEY = 'default'.freeze
 ANDROID_LOCALIZABLE_FORMAT = 'xml'.freeze
@@ -41,16 +41,18 @@ private_lane :smf_sync_with_phrase do |options|
   languages = options[:languages]
   _smf_validate_languages(languages, base)
 
-  upload_resource_dir = options[:upload_resource_dir]
   upload_resource_dir = _smf_get_upload_resource_dir(
     is_kmpp,
     resource_dir,
     base,
-    upload_resource_dir
+    options[:upload_resource_dir]
   )
 
-  download_resource_dir = options[:download_resource_dir]
-  download_resource_dir = resource_dir unless download_resource_dir
+  if options[:download_resource_dir]
+    download_resource_dir = File.join(smf_workspace_dir, options[:download_resource_dir])
+  else
+    download_resource_dir = resource_dir
+  end
 
   # push and pull for the main locales
   _smf_upload_and_download(
@@ -394,14 +396,14 @@ end
 
 # returns the directory in which the translation files are stored
 def _smf_resource_dir(is_kmpp, resource_dir)
-  return resource_dir if resource_dir
+  return File.join(smf_workspace_dir, resource_dir) if resource_dir
 
   case @platform
   when :ios
     raise 'Error, missing resource directory. For iOS you have to pass a resource directory.'
   when :android
-    resource_dir = ANDROID_RESOURCE_DIR
-    resource_dir = ANDROID_RESOURCE_DIR_KMPP if is_kmpp
+    resource_dir = File.join(smf_workspace_dir, ANDROID_RESOURCE_DIR)
+    resource_dir = File.join(smf_workspace_dir, ANDROID_RESOURCE_DIR_KMPP) if is_kmpp
   end
 
   resource_dir
@@ -409,7 +411,7 @@ end
 
 # returns the correct dir which contains the translation files to upload
 def _smf_get_upload_resource_dir(is_kmpp, resource_dir, base, upload_resource_dir)
-  return upload_resource_dir unless !upload_resource_dir
+  return File.join(smf_workspace_dir, upload_resource_dir) if upload_resource_dir
 
   case @platform
   when :ios
