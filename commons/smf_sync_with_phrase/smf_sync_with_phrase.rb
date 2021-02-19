@@ -113,6 +113,7 @@ def _smf_handle_extensions(upload_api_client, download_api_client, base, extensi
     resource_dir = extension.dig(:resource_dir)
     languages = extension.dig(:languages)
     next unless project_id && resource_dir && languages
+    resource_dir = File.join(smf_workspace_dir, resource_dir)
 
     upload_resource_dir = _smf_get_upload_resource_dir(
       nil, # not needed because this is always an iOS project
