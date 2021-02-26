@@ -15,6 +15,7 @@ end
 # format. The goal is to avoid reports for useless-testing branches.
 # Accepted strictly named branches: 'master', 'dev' or 'kmpp'
 def _should_send_android_report_data(options)
+  puts "Branch should be: #{ENV['BRANCH_NAME']}"
   if branch.match(/^master$/)
     return false
   end
@@ -31,6 +32,8 @@ def _should_send_android_report_data(options)
 end
 
 def _smf_analyse_android_project(options)
+  puts options
+
   analysis_json = {}
   analysis_json[:date] = Date.today.to_s
   analysis_json[:repo] = @smf_fastlane_config[:project][:project_name]
@@ -43,5 +46,6 @@ def _smf_analyse_android_project(options)
   analysis_json[:target_sdk_version] = report['targetSdkVersion'].to_s
   analysis_json[:min_sdk_version] = report['minSdkVersion'].to_s
 
+  puts analysis_json
   return analysis_json
 end
