@@ -29,11 +29,7 @@ def _should_send_android_report_data(options)
     return true
   end
 
-  if options[:branch].match(/^reporting$/) # Android (Eismann - temporary)
-    return true
-  end
-
-  return true # DEBUG set 'false' for PR
+  return false
 end
 
 def _smf_analyse_android_project(options)
