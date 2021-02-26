@@ -13,8 +13,12 @@ end
 
 # Returns true only when the :branch value respect the required
 # format. The goal is to avoid reports for useless-testing branches.
-# Accepted strictly named branches: 'dev' or 'kmpp'
+# Accepted strictly named branches: 'master', 'dev' or 'kmpp'
 def _should_send_android_report_data(options)
+  if branch.match(/^master$/)
+    return false
+  end
+
   if branch.match(/^dev$/) # Android
     return false
   end
