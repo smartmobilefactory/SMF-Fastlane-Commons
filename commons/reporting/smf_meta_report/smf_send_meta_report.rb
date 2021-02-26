@@ -24,7 +24,8 @@ def smf_send_meta_report(project_data, type)
 
   # Retrieve the online Google Spreadsheet identifier
   sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_META_INFO_DOC_ID_KEY]
-
   UI.message("Uploading data to google spreadsheet name: '#{sheet_name}'")
+  puts sheet_id
+  puts data_json
   smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, data_json)
 end

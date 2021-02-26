@@ -19,7 +19,7 @@ def _smf_google_api_get_bearer_token
     'grant_type' => 'refresh_token'
   )
 
-  response = Net::HTTP.start(access_token_uri.hostname, access_token_uri.port, use_ssl: true ) do |client|
+  response = Net::HTTP.start(access_token_uri.hostname, access_token_uri.port, use_ssl: true) do |client|
     client.request(request)
   end
 
@@ -122,6 +122,7 @@ end
 def smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, data)
 
   uri = URI.parse"https://sheets.googleapis.com/v4/spreadsheets/#{sheet_id}/values/#{sheet_name}:append?valueInputOption=USER_ENTERED"
+  puts uri
   request = Net::HTTP::Post.new(uri)
   request.body = data
 
