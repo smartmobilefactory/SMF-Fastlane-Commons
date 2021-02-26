@@ -8,6 +8,8 @@ def smf_meta_report_ios(options)
   if _should_send_ios_report_data(analysis_data)
     # Format and upload data to Google Spreadsheet
     smf_send_meta_report(analysis_data, :APPLE_META_REPORTING)
+  else
+    puts "Meta Reporting disabled for branch: '#{analysis_data[:branch]}'"
   end
 end
 

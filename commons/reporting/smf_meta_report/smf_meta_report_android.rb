@@ -6,8 +6,10 @@ def smf_meta_report_android(options)
   analysis_data = _smf_analyse_android_project(options)
 
   if _should_send_android_report_data(analysis_data)
-        # Format and upload data to Google Spreadsheet
+    # Format and upload data to Google Spreadsheet
     smf_send_meta_report(analysis_data, :ANDROID_META_REPORTING)
+  else
+    puts "Meta Reporting disabled for branch: '#{analysis_data[:branch]}'"
   end
 end
 
@@ -15,17 +17,21 @@ end
 # format. The goal is to avoid reports for useless-testing branches.
 # Accepted strictly named branches: 'master', 'dev' or 'kmpp'
 def _should_send_android_report_data(options)
-  puts "Branch should be: #{ENV['BRANCH_NAME']}"
-  if branch.match(/^master$/)
-    return false
+  puts "Branch should be: '#{ENV['BRANCH_NAME']}' and is '#{options[:branch]}'"
+  if options[:branch].match(/^master$/)
+    return true
   end
 
-  if branch.match(/^dev$/) # Android
-    return false
+  if options[:branch].match(/^dev$/) # Android
+    return true
   end
 
-  if branch.match(/^kmpp$/) # Android (Eismann - temporary)
-    return false
+  if options[:branch].match(/^kmpp$/) # Android (Eismann - temporary)
+    return true
+  end
+
+  if options[:branch].match(/^reporting$/) # Android (Eismann - temporary)
+    return true
   end
 
   return false
