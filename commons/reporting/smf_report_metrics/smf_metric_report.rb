@@ -1,5 +1,6 @@
 private_lane :smf_report_metrics do |options|
-  smf_report_depencencies(options)
+  # Disabled to speed the reporting process
+  # smf_report_depencencies(options)
   # Disabled for now as the owasp data are not sent to metaDB.
   # smf_owasp_report(options)
   smf_meta_report(options)
