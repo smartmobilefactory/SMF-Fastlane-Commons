@@ -13,8 +13,7 @@ end
 
 # Returns true only when the :branch value respect the required
 # format. The goal is to avoid reports for useless-testing branches.
-# Accepted format:
-# - 'dev' or 'kmpp': branches strictly named
+# Accepted strictly named branches: 'dev' or 'kmpp'
 def _should_send_android_report_data(options)
   if branch.match(/^dev$/) # Android
     return false
@@ -33,6 +32,12 @@ def _smf_analyse_android_project(options)
   analysis_json[:repo] = @smf_fastlane_config[:project][:project_name]
   analysis_json[:platform] = smf_meta_report_platform_friendly_name
   analysis_json[:branch] = ENV['BRANCH_NAME']
+
+  report = smf_project_report_android
+  analysis_json[:kotlin_version] = report['kotlinVersion'].to_s
+  analysis_json[:gradle_version] = report['gradleVersion'].to_s
+  analysis_json[:target_sdk_version] = report['targetSdkVersion'].to_s
+  analysis_json[:min_sdk_version] = report['minSdkVersion'].to_s
 
   return analysis_json
 end
