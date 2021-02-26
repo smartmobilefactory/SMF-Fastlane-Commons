@@ -10,6 +10,8 @@ private_lane :smf_meta_report do |options|
     case @platform
     when :ios, :macos, :apple, :ios_framework
       smf_meta_report_ios(options)
+    when :android
+      smf_meta_report_android(options)
     else
       UI.message("The platform \"#{@platform}\" does not support meta reports")
     end
