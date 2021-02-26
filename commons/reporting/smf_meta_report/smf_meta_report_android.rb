@@ -49,6 +49,5 @@ def _smf_analyse_android_project(options)
   analysis_json[:target_sdk_version] = report['targetSdkVersion'].to_s
   analysis_json[:min_sdk_version] = report['minSdkVersion'].to_s
 
-  puts analysis_json
   return analysis_json
 end
