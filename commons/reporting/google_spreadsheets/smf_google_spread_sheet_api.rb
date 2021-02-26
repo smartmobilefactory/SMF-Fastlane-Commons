@@ -147,8 +147,10 @@ def smf_create_sheet_data_from_entries(sheet_entries, reporting_type)
   sheet_entries.each do |entry|
     if reporting_type == :AUTOMATIC_REPORTING
       values.push(_smf_automatic_reporting_spreadsheet_entry_to_line(entry))
-    elsif reporting_type == :META_REPORTING
-      values.push(_smf_meta_reporting_spreadsheet_entry_to_line(entry))
+    elsif reporting_type == :APPLE_META_REPORTING
+      values.push(_smf_apple_meta_reporting_spreadsheet_entry_to_line(entry))
+    elsif reporting_type == :ANDROID_META_REPORTING
+      values.push(_smf_android_meta_reporting_spreadsheet_entry_to_line(entry))
     elsif reporting_type == :FINANCIAL_REPORTING
       values.push(_smf_financial_reporting_spreadsheet_entry_to_line(entry))
     end
@@ -192,10 +194,16 @@ def _smf_automatic_reporting_spreadsheet_entry_to_line(entry)
   [entry[:date], entry[:repo], entry[:branch], entry[:platform], entry[:build_variant], entry[:test_coverage], entry[:covered_lines], entry[:unit_test_count]]
 end
 
-def _smf_meta_reporting_spreadsheet_entry_to_line(entry)
+def _smf_apple_meta_reporting_spreadsheet_entry_to_line(entry)
   # The order of the elements in this array directly correspond to the table columns in the google spread sheet
   # thus it is VERY IMPORTANT to not change the order!
   [entry[:date], entry[:repo], entry[:platform], entry[:branch], entry[:xcode_version], entry[:idfa], entry[:bitcode], entry[:swiftlint_warnings], entry[:ats], entry[:swift_version], entry[:deployment_target]]
+end
+
+def _smf_android_meta_reporting_spreadsheet_entry_to_line(entry)
+  # The order of the elements in this array directly correspond to the table columns in the google spread sheet
+  # thus it is VERY IMPORTANT to not change the order!
+  [entry[:date], entry[:repo], entry[:platform], entry[:branch]]
 end
 
 def _smf_financial_reporting_spreadsheet_entry_to_line(entry)
