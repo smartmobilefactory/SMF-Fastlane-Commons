@@ -55,6 +55,8 @@ end
 #                     will be called.
 #   - options: the current job options containing the build_variant
 def smf_xcodeproj_settings_get(config_key, xcode_settings={}, options={})
+  puts "XCODE SETTINGS: Search for #{config_key}"
+
   if xcode_settings.empty?
     xcode_settings = smf_xcodeproj_settings(options)
   end
@@ -66,6 +68,14 @@ def smf_xcodeproj_settings_get(config_key, xcode_settings={}, options={})
     target_settings = smf_xcodeproj_target_settings(target)
     target_config_value = target_settings.dig(config_key)
     puts "Target '#{target}': { #{config_key}: #{target_config_value} }"
+
+    puts ENV['CHANGE_ID']
+    puts ENV['CHECK_PR']
+    if ENV['CHANGE_ID'].nil? == false && ENV['CHECK_PR'].nil? == false
+      puts "check is in PR !"
+    else
+      puts "invalid envs"
+    end
 
     if config_value.nil?
       config_value = target_config_value
