@@ -153,7 +153,7 @@ def _smf_check_valid_xcode_config(options)
   smf_analyse_bitcode(xcode_settings, options)
   # If invalid, set warning under env 'DANGER_SWIFT_VERSION'
   smf_analyse_swift_version(xcode_settings, options)
-  # If invalid, set warning for the invalid deployment target:
+  # If invalid, set warning(s) for the invalid deployment target(s):
   # env: 'DANGER_IPHONEOS_DEPLOYMENT_TARGET'
   # env: 'DANGER_MACOSX_DEPLOYMENT_TARGET'
   # env: 'DANGER_TVOS_DEPLOYMENT_TARGET'
