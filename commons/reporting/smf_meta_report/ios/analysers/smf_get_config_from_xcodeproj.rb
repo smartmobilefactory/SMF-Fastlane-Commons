@@ -55,8 +55,6 @@ end
 #                     will be called.
 #   - options: the current job options containing the build_variant
 def smf_xcodeproj_settings_get(config_key, xcode_settings={}, options={})
-  puts "XCODE SETTINGS: Search for #{config_key}"
-
   if xcode_settings.empty?
     xcode_settings = smf_xcodeproj_settings(options)
   end
@@ -69,22 +67,12 @@ def smf_xcodeproj_settings_get(config_key, xcode_settings={}, options={})
     target_config_value = target_settings.dig(config_key)
     puts "Target '#{target}': { #{config_key}: #{target_config_value} }"
 
-    puts ENV['CHANGE_ID']
-    if ENV['CHANGE_ID'].nil? == false
-      puts "check is in PR !"
-    else
-      puts "invalid envs"
-    end
-
     if config_value.nil?
       config_value = target_config_value
     elsif !target_config_value.nil? && target_config_value != '' && config_value != target_config_value
       message = "Multiple #{config_key} were found in the \"#{smf_xcodeproj_name}\": '#{config_value}' and '#{target_config_value}'"
-      puts message
       ENV["DANGER_#{config_key}"] = message
-      puts "DANGER_#{config_key}"
-      puts ENV["DANGER_#{config_key}"]
-      # Send a Slack notification if the current build is not a PR check but a build release
+      # Send a Slack notification if the current build is not a PR check but a build release.
       # For PRs, Danger checks the ENV variables and adds warnings directly on GitHub during the PR review.
       if ENV['CHANGE_ID'].nil?
         smf_send_message(
