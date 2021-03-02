@@ -6,8 +6,8 @@ private_lane :smf_danger do |options|
 
   if File.exist?(smf_swift_lint_output_xml_path)
     checkstyle_paths.push(smf_swift_lint_output_xml_path)
-  elsif [:ios, :ios_framework, :macos, :apple].include?(@platform)
-    UI.important("There is not SwiftLint output file at #{smf_swift_lint_output_xml_path}. Is SwiftLint enabled?")
+  elsif _is_apple_platform
+    UI.important("There is no SwiftLint output file at #{smf_swift_lint_output_xml_path}. Is SwiftLint enabled?")
   end
 
   if @platform == :android
@@ -52,6 +52,7 @@ private_lane :smf_danger do |options|
   _smf_check_config_project_missing_required_keys
   _smf_check_repo_files_folders
   _smf_check_config_build_variant_keys
+  _smf_check_valid_xcode_config(options)
 
   _check_swift_version_in_project
 
@@ -62,8 +63,12 @@ private_lane :smf_danger do |options|
   )
 end
 
+def _is_apple_platform
+  return [:ios, :ios_framework, :macos, :apple].include?(@platform)
+end
+
 def _check_swift_version_in_project
-  unless [:ios, :ios_framework, :macos, :apple].include?(@platform)
+  unless _is_apple_platform
     return
   end
 
@@ -87,7 +92,7 @@ def _swift_lint_count_unused_rules
       message = "There is a total of <b>#{line_count}</b> unused Swiftlint rules!<br>Please check the generated report directly on Jenkins: #{href}"
       ENV['DANGER_SWIFT_LINT_RULES_REPORT'] = message
     end
-  elsif [:ios, :ios_framework, :macos, :apple].include?(@platform)
+  elsif _is_apple_platform
     UI.important("There is no SwiftLint rules report at #{smf_swift_lint_rules_report_path}. Is SwiftLint enabled?")
   end
 end
@@ -123,7 +128,6 @@ def _smf_find_paths_of_files_in_directory(directory, file_type = '')
 end
 
 def _smf_create_jira_ticket_links
-
   contexts_to_search = {
       :titel => ENV['PR_TITLE'],
       :body => ENV['PR_BODY'],
@@ -137,4 +141,22 @@ def _smf_create_jira_ticket_links
   html_formatted_tickets = _smf_generate_changelog(nil, tickets, :html)
 
   ENV['DANGER_JIRA_TICKETS'] = html_formatted_tickets
+end
+
+def _smf_check_valid_xcode_config(options)
+  unless _is_apple_platform
+    return
+  end
+
+  xcode_settings = smf_xcodeproj_settings(options)
+  # If invalid, set warning under env 'DANGER_ENABLE_BITCODE'
+  smf_analyse_bitcode(xcode_settings, options)
+  # If invalid, set warning under env 'DANGER_SWIFT_VERSION'
+  smf_analyse_swift_version(xcode_settings, options)
+  # If invalid, set warning(s) for the invalid deployment target(s):
+  # env: 'DANGER_IPHONEOS_DEPLOYMENT_TARGET'
+  # env: 'DANGER_MACOSX_DEPLOYMENT_TARGET'
+  # env: 'DANGER_TVOS_DEPLOYMENT_TARGET'
+  # env: 'DANGER_WATCHOS_DEPLOYMENT_TARGET'
+  smf_analyse_deployment_targets(xcode_settings, options)
 end
