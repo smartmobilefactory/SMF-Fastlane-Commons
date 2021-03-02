@@ -26,14 +26,14 @@ rm -rf "/Users/smf/Library/Caches/Sparkle_generate_appcast/"
 
 echo "---- Download latest generate_appcast release ----"
 
-curl -L https://github.com/sparkle-project/Sparkle/releases/download/$SPARKLE_VERSION/Sparkle-$SPARKLE_VERSION.tar.bz2 --output sparkle.tar.bz2
+curl -L https://github.com/sparkle-project/Sparkle/releases/download/$SPARKLE_VERSION/Sparkle-$SPARKLE_VERSION.tar.xz --output sparkle.tar.xz
 
 mkdir sparkle_dl
-tar xjf sparkle.tar.bz2 -C sparkle_dl
+tar xJf sparkle.tar.xz -C sparkle_dl
 # Only retain the generate_appcast binary.
 mv sparkle_dl/bin/generate_appcast .
 # Remove downloaded files.
-rm -rf sparkle_dl sparkle.tar.bz2
+rm -rf sparkle_dl sparkle.tar.xz
 
 echo "---- codesign generate_appcast ----"
 
