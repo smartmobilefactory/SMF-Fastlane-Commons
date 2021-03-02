@@ -65,7 +65,9 @@ def smf_xcodeproj_settings_get(config_key, xcode_settings={}, options={})
   for target in smf_xcodeproj_targets
     target_settings = smf_xcodeproj_target_settings(target)
     target_config_value = target_settings.dig(config_key)
-    puts "Target '#{target}': { #{config_key}: #{target_config_value} }"
+    if !target_config_value.nil? && target_config_value != ''
+      puts "Target '#{target}': { #{config_key}: #{target_config_value} }"
+    end
 
     if config_value.nil?
       config_value = target_config_value
