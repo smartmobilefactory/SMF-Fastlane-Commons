@@ -97,7 +97,8 @@ private_lane :smf_pod_super_unit_tests do |options|
           template_name: build_variant_config.dig(:match, :template_name),
           extensions_suffixes: !build_variant_config[:extensions_suffixes].nil? ? build_variant_config[:extensions_suffixes] : @smf_fastlane_config[:extensions_suffixes],
           build_variant: variant,
-          force: build_variant_config.dig(:match, :force)
+          force: build_variant_config.dig(:match, :force),
+          platform: smf_config_get(build_variant, :match, :platform)
       )
     end
 
