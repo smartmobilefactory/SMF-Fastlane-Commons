@@ -19,6 +19,14 @@ end
 # Setup Dependencies
 
 private_lane :smf_super_setup_dependencies do |options|
+
+  build_variant = smf_build_variant(options)
+  
+  smf_build_precheck(
+    upload_itc: smf_config_get(build_variant, :upload_itc),
+    itc_apple_id: smf_config_get(build_variant, :itc_apple_id)
+  )
+
   smf_pod_install
 end
 
