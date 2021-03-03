@@ -50,6 +50,9 @@ private_lane :smf_super_build do |options|
 
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
 
+  default_platform = 'ios'
+  platform = smf_config_get(build_variant, :match, :platform).nil? ? default_platform : smf_config_get(build_variant, :match, :platform)
+
   smf_download_provisioning_profiles(
     team_id: build_variant_config[:team_id],
     apple_id: build_variant_config[:apple_id],
@@ -61,7 +64,8 @@ private_lane :smf_super_build do |options|
     template_name: build_variant_config.dig(:match, :template_name),
     extensions_suffixes: !build_variant_config[:extensions_suffixes].nil? ? build_variant_config[:extensions_suffixes] : @smf_fastlane_config[:extensions_suffixes],
     build_variant: build_variant,
-    force: build_variant_config.dig(:match, :force)
+    force: build_variant_config.dig(:match, :force),
+    platform: platform
   )
 
   smf_build_apple_app(

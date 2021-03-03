@@ -52,7 +52,8 @@ private_lane :smf_super_build do |options|
   extension_suffixes = smf_config_get(build_variant, :extensions_suffixes)
   extension_suffixes = smf_config_get(nil, :extensions_suffixes) if extension_suffixes.nil?
 
-  platform = smf_is_mac_build(build_variant) ? 'macos' : 'ios'
+  default_platform = smf_is_mac_build(build_variant) ? 'macos' : 'ios'
+  platform = smf_config_get(build_variant, :match, :platform).nil? ? default_platform : smf_config_get(build_variant, :match, :platform)
 
   smf_download_provisioning_profiles(
     team_id: smf_config_get(build_variant, :team_id),
