@@ -45,7 +45,7 @@ $CHANGELOG_TEMP_FILE_HTML = 'temp_changelog.html'
 $POD_DEFAULT_VARIANTS = ['patch', 'minor', 'major', 'current', 'breaking', 'internal']
 $CATALYST_MAC_BUILD_VARIANT_PREFIX = 'macOS_'
 
-$PODSPEC_REPO_SOURCES = ['https://github.com/smartmobilefactory/SMF-CocoaPods-Specs', 'https://github.com/CocoaPods/Specs']
+$PODSPEC_REPO_SOURCES = ['git@github.com:smartmobilefactory/SMF-CocoaPods-Specs', 'https://github.com/CocoaPods/Specs']
 
 ### Reporting ###
 
