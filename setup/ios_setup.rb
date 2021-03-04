@@ -259,7 +259,8 @@ private_lane :smf_super_upload_to_itunes do |options|
     slack_channel: slack_channel,
     bundle_identifier: build_variant_config[:bundle_identifier],
     upload_itc: build_variant_config[:upload_itc],
-    required_xcode_version: @smf_fastlane_config[:project][:xcode_version]
+    required_xcode_version: @smf_fastlane_config[:project][:xcode_version],
+    itc_platform: build_variant_ios_config[:itc_platform]
   )
 end
 
