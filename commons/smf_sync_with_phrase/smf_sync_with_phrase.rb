@@ -25,6 +25,7 @@ FILE_ENCODING = 'UTF-8'.freeze
 private_lane :smf_sync_with_phrase do |options|
   # Projects phrase id
   project_id = options[:project_id]
+  raise 'Unable to sync with phrase, missing project id' unless project_id
 
   # Optional, set to true if ios project contains custom api token
   use_custom_api_token = options[:use_custom_api_token]
