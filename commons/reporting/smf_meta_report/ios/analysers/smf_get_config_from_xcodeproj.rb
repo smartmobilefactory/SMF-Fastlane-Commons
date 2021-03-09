@@ -20,20 +20,20 @@ def smf_xcodeproj_settings(options={})
     end
   end
 
-  json_string = `xcodebuild -project #{smf_xcodeproj_file_path} #{scheme} -showBuildSettings -json`
+  json_string = `xcodebuild -project "#{smf_xcodeproj_file_path}" "#{scheme}" -showBuildSettings -json`
   xcode_settings = JSON.parse(json_string)
   return xcode_settings
 end
 
 def smf_xcodeproj_targets
-  json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -list -json`
+  json_string = `xcodebuild -project "#{smf_xcodeproj_file_path}" -list -json`
   xcodeproj_targets = JSON.parse(json_string).dig('project').dig('targets')
 
   return xcodeproj_targets
 end
 
 def smf_xcodeproj_target_settings(target)
-  json_string = `xcodebuild -project #{smf_xcodeproj_file_path} -target #{target} -showBuildSettings -json`
+  json_string = `xcodebuild -project "#{smf_xcodeproj_file_path}" -target "#{target}" -showBuildSettings -json`
   json = JSON.parse(json_string)[0].dig('buildSettings')
 
   return json
