@@ -1,5 +1,6 @@
 require 'json'
 
+puts "Danger: Bump Type"
 if ENV['MULTIPLE_BUMP_TYPES_ERROR'] == 'true'
   warn("⛔️ You have selected <b>multiple</b> \"bump types\" in the description of this PR. Please select only one!")
 elsif ENV['NO_BUMP_TYPE_ERROR'] == 'true'
@@ -8,11 +9,13 @@ elsif !ENV['POD_VERSION'].nil?
   message("Upcoming Build Version is <b>#{ENV['POD_VERSION']}</b>")
 end
 
+puts "Danger: Common-Project-Setup-Files check"
 ## COMMON PROJECT SETUP FILES CHECK
 if ENV['COMMON_PROJECT_SETUP_FILES_OUTDATED'] == 'true'
   warn('The SMF-iOS-CommonProjectSetupFiles are not up to date with origin/master !')
 end
 
+puts "Danger: Github Warnings"
 ## WARNINGS:
 if (github.pr_body + github.pr_title).include?("WIP")
   warn("Pull Request is Work in Progress")
@@ -21,6 +24,7 @@ end
 can_merge = github.pr_json["mergeable"]
 warn("This PR cannot be merged yet.", sticky: false) unless can_merge
 
+puts "Danger: TODOs"
 begin
   ## TODOs:
   todoist.warn_for_todos
@@ -29,6 +33,7 @@ rescue
   message("Todoist could not be executed")
 end
 
+puts "Danger: Code Lint"
 ## LINT:
 JSON.parse(ENV["DANGER_ANDROID_LINT_PATHS"]).each do |lint_path|
   if !lint_path.nil?
@@ -43,6 +48,7 @@ JSON.parse(ENV["DANGER_ANDROID_LINT_PATHS"]).each do |lint_path|
   end
 end
 
+puts "Danger: Repo Clean-up"
 ## REPO CLEAN UP
 JSON.parse(ENV['DANGER_REPO_CLEAN_UP_FILES']).each do |file|
   warn("Deprecated file or folder: '#{file}'. Please remove from the repository")
@@ -60,16 +66,19 @@ JSON.parse(ENV['DANGER_REPO_MISSING_REQUIRED_PROJECT_CONFIG_KEYS']).each do |key
   failure("[ERROR] - Config.json: Missing required key in 'project' hash, please add: '#{key}'")
 end
 
+puts "Danger: Generate Swiftlint rules report"
 ## SWIFTLINT RULES REPORT
 unless ENV['DANGER_SWIFT_LINT_RULES_REPORT'].nil?
   message(ENV['DANGER_SWIFT_LINT_RULES_REPORT'])
 end
 
+puts "Danger: Check Swift version in Xcode"
 ## SWIFT VERSION IN XCODE
 unless ENV['DANGER_ERROR_DIFFERENT_SWIFT_VERSION_IN_PROJECT'].nil?
   failure(ENV['DANGER_ERROR_DIFFERENT_SWIFT_VERSION_IN_PROJECT'])
 end
 
+puts "Danger: Checkstyle"
 ## CHECKSTYLE:
 JSON.parse(ENV["DANGER_CHECKSTYLE_PATHS"]).each do |checkstyle_path|
   if !checkstyle_path.nil?
@@ -82,6 +91,7 @@ JSON.parse(ENV["DANGER_CHECKSTYLE_PATHS"]).each do |checkstyle_path|
   end
 end
 
+puts "Danger: JUnit"
 ## JUNIT:
 JSON.parse(ENV["DANGER_JUNIT_PATHS"]).each do |junit_tests_dir|
   if !junit_tests_dir.nil?
@@ -98,14 +108,15 @@ JSON.parse(ENV["DANGER_JUNIT_PATHS"]).each do |junit_tests_dir|
   end
 end
 
+puts "Danger: Jira tickets"
 ## JIRA TICKETS
-
 if ENV["DANGER_JIRA_TICKETS"].nil? || ENV["DANGER_JIRA_TICKETS"].empty? then
   warn("Unable to find any Jira Tickets related to this Pull Request, are there any?")
 else
   message(ENV["DANGER_JIRA_TICKETS"])
 end
 
+puts "Danger: Xcode warnings"
 ## XCODE WARNINGS
 if File.exist?('build/reports/errors.json')
   xcode_summary.inline_mode = true
