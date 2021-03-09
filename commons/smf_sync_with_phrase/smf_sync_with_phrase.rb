@@ -1,3 +1,5 @@
+require 'phrase'
+
 # LOCAL CONSTANTS
 # IOS
 IOS_LOCALE_DIR_POSTFIX = '.lproj'.freeze
