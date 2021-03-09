@@ -150,7 +150,7 @@ def _smf_upload_translations(api_client, project_id, upload_resource_dir, langua
     when :ios
       next unless item.end_with?(IOS_LOCALIZABLE_FORMAT)
       locale_id = languages.dig(base)
-      tag = item.gsub(/(.*).#{IOS_LOCALIZABLE_FORMAT}/, '\1')
+      tag = _smf_tag_from_file(item)
       tags.push(tag)
 
       utf8_converted_file = _smf_convert_to_utf_8_if_possible(upload_resource_dir, item)
@@ -166,7 +166,7 @@ def _smf_upload_translations(api_client, project_id, upload_resource_dir, langua
     when :android
       next unless item.start_with?('strings')
       locale_id = languages.dig(ANDROID_DEFAULT_LANGUAGE_KEY)
-      tag = item.gsub(/(.*).#{ANDROID_LOCALIZABLE_FORMAT}/, '\1')
+      tag = _smf_tag_from_file(item)
 
       tags.push(tag)
 
@@ -246,7 +246,7 @@ def _smf_download_files_ios(api_client, project_id, dir, locale_id, used_tags)
   Dir.foreach(dir) do |item|
     next unless item.end_with?(IOS_LOCALIZABLE_FORMAT)
 
-    tag = item.gsub(/(.*).#{IOS_LOCALIZABLE_FORMAT}/, '\1')
+    tag = _smf_tag_from_file(item)
     output_file = File.join(dir, tag + '.' + IOS_LOCALIZABLE_FORMAT)
 
     new_files_to_download -= [output_file] # remove file because it was already there and will now be updated
@@ -263,7 +263,7 @@ def _smf_download_files_ios(api_client, project_id, dir, locale_id, used_tags)
 
   # if there are new files that were not there before, download them
   new_files_to_download.each do |file|
-    tag = file.gsub(/.*\/(.*).#{IOS_LOCALIZABLE_FORMAT}/, '\1')
+    tag = _smf_tag_from_file(item, true)
 
     _smf_download_file(
       api_client,
@@ -318,7 +318,7 @@ def _smf_download_files_android(api_client, project_id, dir, locale_id)
   Dir.foreach(dir) do |item|
     next unless item.start_with?('strings')
 
-    tag = item.gsub(/(.*).#{ANDROID_LOCALIZABLE_FORMAT}/, '\1')
+    tag = _smf_tag_from_file(item)
     output_file = File.join(dir, "#{tag}.#{ANDROID_LOCALIZABLE_FORMAT}")
 
     _smf_download_file(
@@ -464,4 +464,28 @@ def _smf_convert_to_utf_8_if_possible(upload_resource_dir, filename)
     UI.message("Unabled to convert #{filename} from #{current_encoding} to UTF-8, continuing without conversion!")
     return nil
   end
+end
+
+
+def _smf_tag_from_file(file, full_path = false)
+  case @platform
+  when :ios
+    file_extension = IOS_LOCALIZABLE_FORMAT
+  when :android
+    file_extension = ANDROID_LOCALIZABLE_FORMAT
+  else
+    raise "Unsupported platform #{@platform}"
+  end
+
+  # this expression matches strings of the format  filename.<file_extension> and then replaces the whole
+  # string with "filename"
+  # for example "Localizable.strings".gsub(/(.*).#{file_extension}/, '\1') will produce "Localizable"
+  tag = file.gsub(/(.*).#{file_extension}/, '\1')
+
+  # if a full path is given, the expression matches /some/paht/filename.<extension> and then repaces
+  # the whole string with "filename"
+  # for example "/some/path/Localizable.strings".gsub(/(.*).#{file_extension}/, '\1') will produce "Localizable"
+  tag = file.gsub(/.*\/(.*).#{file_extension}/, '\1') if full_path
+
+  tag
 end
