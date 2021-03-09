@@ -16,11 +16,11 @@ def smf_xcodeproj_settings(options={})
   if !build_variant.nil? && build_variant != ''
     scheme_name = smf_config_get(build_variant, :scheme)
     if !scheme_name.nil? && scheme_name != ''
-      scheme = "-scheme #{scheme_name}"
+      scheme = "-scheme \"#{scheme_name}\""
     end
   end
-
-  json_string = `xcodebuild -project "#{smf_xcodeproj_file_path}" -scheme "#{scheme}" -showBuildSettings -json`
+  
+  json_string = `xcodebuild -project "#{smf_xcodeproj_file_path}" #{scheme} -showBuildSettings -json`
   xcode_settings = JSON.parse(json_string)
   return xcode_settings
 end
