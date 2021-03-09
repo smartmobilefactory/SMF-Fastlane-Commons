@@ -445,7 +445,9 @@ def _smf_convert_to_utf_8_if_possible(upload_resource_dir, filename)
   # storing the converted file temporarily in the projects root directory, will be deleted aftewards
   utf_8_converted_file_path = File.join(smf_workspace_dir, 'utf8-' + filename)
 
+  # this returns a list of supported encodings
   supported_encodings = `iconv -l`.split(' ')
+  # file -I gives information about the file and its encoding, with the gsub the encoding is extracted
   current_encoding = `file -I #{file_path}`.gsub(/.*charset=(.+)/, '\1').strip.upcase
 
   if !supported_encodings.include?(current_encoding)
@@ -455,6 +457,8 @@ def _smf_convert_to_utf_8_if_possible(upload_resource_dir, filename)
 
   UI.message("Trying to convert #{filename} from #{current_encoding} to UTF-8")
 
+  # iconv is a tool to convert files from one encoding to another
+  # this expression tries to convert the file from its current encoding to UTF-8, if it succeeds it returns 1
   result = `iconv -s --from-code=#{current_encoding} --to-code=UTF-8 #{file_path} > #{utf_8_converted_file_path} && echo "1"`.strip()
 
   if result == '1'
