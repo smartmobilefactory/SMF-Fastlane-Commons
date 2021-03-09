@@ -65,17 +65,24 @@ def smf_xcodeproj_settings_get(config_key, xcode_settings={}, options={})
   for target in smf_xcodeproj_targets
     target_settings = smf_xcodeproj_target_settings(target)
     target_config_value = target_settings.dig(config_key)
-    puts "Target '#{target}': { #{config_key}: #{target_config_value} }"
+    if !target_config_value.nil? && target_config_value != ''
+      puts "Target '#{target}': { #{config_key}: #{target_config_value} }"
+    end
 
     if config_value.nil?
       config_value = target_config_value
     elsif !target_config_value.nil? && target_config_value != '' && config_value != target_config_value
       message = "Multiple #{config_key} were found in the \"#{smf_xcodeproj_name}\": '#{config_value}' and '#{target_config_value}'"
-      smf_send_message(
-        title: 'Inconsistent configuration in xcodeproj',
-        message: message,
-        type: 'error'
-      )
+      ENV["DANGER_#{config_key}"] = message
+      # Send a Slack notification if the current build is not a PR check but a build release.
+      # For PRs, Danger checks the ENV variables and adds warnings directly on GitHub during the PR review.
+      if ENV['CHANGE_ID'].nil?
+        smf_send_message(
+          title: 'Inconsistent configuration in xcodeproj',
+          message: message,
+          type: 'error'
+        )
+      end
     end
   end
 

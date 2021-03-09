@@ -19,6 +19,14 @@ end
 # Setup Dependencies
 
 private_lane :smf_super_setup_dependencies do |options|
+
+  build_variant = smf_build_variant(options)
+  
+  smf_build_precheck(
+    upload_itc: smf_config_get(build_variant, :upload_itc),
+    itc_apple_id: smf_config_get(build_variant, :itc_apple_id)
+  )
+
   smf_pod_install
 end
 
@@ -45,6 +53,9 @@ private_lane :smf_super_build do |options|
   extension_suffixes = smf_config_get(build_variant, :extensions_suffixes)
   extension_suffixes = smf_config_get(nil, :extensions_suffixes) if extension_suffixes.nil?
 
+  default_platform = 'macos'
+  platform = smf_config_get(build_variant, :match, :platform).nil? ? default_platform : smf_config_get(build_variant, :match, :platform)
+
   smf_download_provisioning_profiles(
     team_id: smf_config_get(build_variant, :team_id),
     apple_id: smf_config_get(build_variant, :apple_id),
@@ -57,7 +68,7 @@ private_lane :smf_super_build do |options|
     extensions_suffixes: extension_suffixes,
     build_variant: build_variant,
     force: smf_config_get(build_variant, :match, :force),
-    platform: 'macos'
+    platform: platform
   )
 
   smf_build_apple_app(

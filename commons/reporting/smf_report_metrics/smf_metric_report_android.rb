@@ -23,12 +23,17 @@ def smf_dependency_report_android
   apiData
 end
 
-def smf_general_dependency_report_android
+def smf_project_report_android
   gradle(task: 'createProjectJson')
-
-  apiData = []
   report = JSON.parse(File.read(smf_get_file_path('.MetaJSON/Project.json')), :symbolize_names => false)
-  
+
+  return report
+end
+
+def smf_general_dependency_report_android
+  apiData = []
+  report = smf_project_report_android
+
   dependencies = []
   dependencies.append({
     'name' => 'androidTargetSdk',
@@ -51,10 +56,8 @@ end
 
 
 def smf_development_dependency_report_android
-  gradle(task: 'createProjectJson')
-
   apiData = []
-  report = JSON.parse(File.read(smf_get_file_path('.MetaJSON/Project.json')), :symbolize_names => false)
+  report = smf_project_report_android
 
   dependencies = []
   dependencies.append({

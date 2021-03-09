@@ -107,7 +107,6 @@ else
 end
 
 ## XCODE WARNINGS
-
 if File.exist?('build/reports/errors.json')
   xcode_summary.inline_mode = true
   xcode_summary.ignored_files = 'Pods/**'
@@ -122,4 +121,19 @@ if File.exist?('build/reports/errors.json')
   }
 
   xcode_summary.report 'build/reports/errors.json'
+end
+
+xcode_warnings = [
+  'DANGER_ENABLE_BITCODE',
+  'DANGER_SWIFT_VERSION',
+  'DANGER_IPHONEOS_DEPLOYMENT_TARGET',
+  'DANGER_MACOSX_DEPLOYMENT_TARGET',
+  'DANGER_TVOS_DEPLOYMENT_TARGET',
+  'DANGER_WATCHOS_DEPLOYMENT_TARGET'
+]
+
+xcode_warnings.each do |warning|
+  if !ENV[warning].nil? && !ENV[warning].empty? then
+    warn(ENV[warning])
+  end
 end

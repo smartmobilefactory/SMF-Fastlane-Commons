@@ -57,13 +57,10 @@ end
 private_lane :smf_super_lint_podspecs do |options|
 
   main_podspec = @smf_fastlane_config[:build_variants][:framework][:podspec_path]
-  additional_podspecs = @smf_fastlane_config[:build_variants][:framework][:additional_podspecs]
 
   required_xcode_version = @smf_fastlane_config[:project][:xcode_version]
 
   smf_lint_podspecs(
-    main_podspec: main_podspec,
-    additional_podspecs: additional_podspecs,
     required_xcode_version: required_xcode_version
   )
 end
@@ -97,7 +94,8 @@ private_lane :smf_pod_super_unit_tests do |options|
           template_name: build_variant_config.dig(:match, :template_name),
           extensions_suffixes: !build_variant_config[:extensions_suffixes].nil? ? build_variant_config[:extensions_suffixes] : @smf_fastlane_config[:extensions_suffixes],
           build_variant: variant,
-          force: build_variant_config.dig(:match, :force)
+          force: build_variant_config.dig(:match, :force),
+          platform: build_variant_config.dig(:match, :platform)
       )
     end
 
@@ -284,5 +282,4 @@ end
 lane :smf_pod_send_slack_notification do |options|
   smf_super_pod_send_slack_notification(options)
 end
-
 

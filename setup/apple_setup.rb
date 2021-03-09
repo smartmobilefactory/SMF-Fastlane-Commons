@@ -52,7 +52,8 @@ private_lane :smf_super_build do |options|
   extension_suffixes = smf_config_get(build_variant, :extensions_suffixes)
   extension_suffixes = smf_config_get(nil, :extensions_suffixes) if extension_suffixes.nil?
 
-  platform = smf_is_mac_build(build_variant) ? 'macos' : 'ios'
+  default_platform = smf_is_mac_build(build_variant) ? 'macos' : 'ios'
+  platform = smf_config_get(build_variant, :match, :platform).nil? ? default_platform : smf_config_get(build_variant, :match, :platform)
 
   smf_download_provisioning_profiles(
     team_id: smf_config_get(build_variant, :team_id),
@@ -320,7 +321,8 @@ private_lane :smf_super_upload_to_itunes do |options|
     slack_channel: slack_channel,
     bundle_identifier: smf_config_get(build_variant, :bundle_identifier),
     upload_itc: smf_config_get(build_variant, :upload_itc),
-    required_xcode_version: xcode_version
+    required_xcode_version: xcode_version,
+    itc_platform: smf_config_get(build_variant, :itc_platform)
   )
 end
 
