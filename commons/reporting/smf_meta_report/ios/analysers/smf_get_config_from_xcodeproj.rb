@@ -19,7 +19,7 @@ def smf_xcodeproj_settings(options={})
       scheme = "-scheme \"#{scheme_name}\""
     end
   end
-
+  
   json_string = `xcodebuild -project "#{smf_xcodeproj_file_path}" #{scheme} -showBuildSettings -json`
   xcode_settings = JSON.parse(json_string)
   return xcode_settings
