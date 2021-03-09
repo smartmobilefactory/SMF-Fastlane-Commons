@@ -58,7 +58,7 @@ private_lane :smf_sync_with_phrase do |options|
   end
 
   # push and pull for the main locales
-  _smf_upload_and_download(
+  _smf_upload_and_download_translations(
     upload_api_client,
     download_api_client,
     project_id,
@@ -82,7 +82,7 @@ private_lane :smf_sync_with_phrase do |options|
 end
 
 # uploads and downloads the translation files for given resource directories and a project id
-def _smf_upload_and_download(upload_api_client, download_api_client, project_id, upload_resource_dir, download_resource_dir, languages, is_kmpp, base, commit_message = nil)
+def _smf_upload_and_download_translations(upload_api_client, download_api_client, project_id, upload_resource_dir, download_resource_dir, languages, is_kmpp, base, commit_message = nil)
 
   used_tags = _smf_upload_translations(
     upload_api_client,
@@ -127,7 +127,7 @@ def _smf_handle_ios_extensions(upload_api_client, download_api_client, base, ext
 
     download_resource_dir = resource_dir
 
-    _smf_upload_and_download(
+    _smf_upload_and_download_translations(
       upload_api_client,
       download_api_client,
       project_id,
