@@ -71,7 +71,7 @@ private_lane :smf_sync_with_phrase do |options|
   # handle iOS extensions with seperate project ids and resources folders
   if @platform == :ios
     extensions = options[:extensions]
-    _smf_handle_extensions(
+    _smf_handle_ios_extensions(
       upload_api_client,
       download_api_client,
       base,
@@ -106,7 +106,7 @@ def _smf_upload_and_download(upload_api_client, download_api_client, project_id,
   _smf_commit_changes_if_needed(download_resource_dir, commit_message)
 end
 
-def _smf_handle_extensions(upload_api_client, download_api_client, base, extensions)
+def _smf_handle_ios_extensions(upload_api_client, download_api_client, base, extensions)
   return unless extensions
 
   UI.message('Handling extensions...')
@@ -358,8 +358,8 @@ def _smf_commit_changes_if_needed(path, commit_message = nil)
   nothing_to_commit = `git status --porcelain #{path}`.empty?
   commit_message = commit_message.nil? ? 'Updated strings from Phrase' : commit_message
   if !nothing_to_commit
-    `git add #{path}`
-    `git commit -m "#{commit_message}" #{path}`
+    git_add(path: path)
+    git_commit(path: path, message: commit_message)
   end
 end
 
