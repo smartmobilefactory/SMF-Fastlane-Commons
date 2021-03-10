@@ -100,7 +100,7 @@ private_lane :smf_send_message do |options|
     begin
       _smf_send_slack_message(
           icon_url: icon_url,
-          pretext: title,
+          title: title,
           message: content,
           channel: slack_channel,
           username: "#{project_name} CI",
