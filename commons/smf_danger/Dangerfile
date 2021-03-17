@@ -72,12 +72,6 @@ unless ENV['DANGER_SWIFT_LINT_RULES_REPORT'].nil?
   message(ENV['DANGER_SWIFT_LINT_RULES_REPORT'])
 end
 
-puts "Danger: Check Swift version in Xcode"
-## SWIFT VERSION IN XCODE
-unless ENV['DANGER_ERROR_DIFFERENT_SWIFT_VERSION_IN_PROJECT'].nil?
-  failure(ENV['DANGER_ERROR_DIFFERENT_SWIFT_VERSION_IN_PROJECT'])
-end
-
 puts "Danger: Checkstyle"
 ## CHECKSTYLE:
 JSON.parse(ENV["DANGER_CHECKSTYLE_PATHS"]).each do |checkstyle_path|
