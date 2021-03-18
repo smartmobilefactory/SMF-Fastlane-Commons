@@ -52,6 +52,7 @@ private_lane :smf_upload_to_sentry do |options|
 
         success = true
       rescue => exception
+        UI.message("Upload attempt ##{fail_count} failed, retrying... ")
         fail_count += 1
         latest_exception = exception
       end
