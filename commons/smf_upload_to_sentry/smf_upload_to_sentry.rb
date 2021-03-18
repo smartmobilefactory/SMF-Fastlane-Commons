@@ -40,6 +40,14 @@ private_lane :smf_upload_to_sentry do |options|
     success = false
     latest_exception = nil
 
+    # 18.03.2021: Temporary fix added:
+    # This retry loop is a temporary fix for an sentry cli issue
+    # (see https://github.com/getsentry/sentry-fastlane-plugin/issues/38)
+    # which causes the upload to subsequently fail.
+    # This error seems to be some internal error in sentry.
+    # We should keep an eye on it and if it gets fixed
+    # this retry loop should be removed.
+
     while fail_count < MAX_RETRIES && !success
       begin
         sentry_upload_dsym(
