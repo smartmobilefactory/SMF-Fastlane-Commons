@@ -244,14 +244,14 @@ def _smf_download_translations_ios(api_client, project_id, download_resource_dir
 end
 
 def _smf_download_files_ios(api_client, project_id, dir, locale_id, used_tags)
-  new_files_to_download = used_tags.map { |tag| File.join(dir, tag + '.' + IOS_LOCALIZABLE_FORMAT) }
+  new_files_to_download = used_tags.map { |tag| File.join(dir, tag) }
 
   # First update files which are already there
   Dir.foreach(dir) do |item|
     next unless item.end_with?(IOS_LOCALIZABLE_FORMAT)
 
     tag = _smf_tag_from_file(item)
-    output_file = File.join(dir, tag + '.' + IOS_LOCALIZABLE_FORMAT)
+    output_file = File.join(dir, tag)
 
     new_files_to_download -= [output_file] # remove file because it was already there and will now be updated
 
@@ -267,7 +267,7 @@ def _smf_download_files_ios(api_client, project_id, dir, locale_id, used_tags)
 
   # if there are new files that were not there before, download them
   new_files_to_download.each do |file|
-    tag = _smf_tag_from_file(item)
+    tag = _smf_tag_from_file(file)
 
     _smf_download_file(
       api_client,
