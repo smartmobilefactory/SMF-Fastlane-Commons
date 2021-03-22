@@ -153,6 +153,7 @@ def _smf_upload_translations(api_client, project_id, upload_resource_dir, langua
     when :ios
       next unless item.end_with?(IOS_LOCALIZABLE_FORMAT)
       locale_id = languages.dig(base)
+
       tag = _smf_tag_from_file(item)
       tags.push(tag)
 
@@ -169,8 +170,8 @@ def _smf_upload_translations(api_client, project_id, upload_resource_dir, langua
     when :android
       next unless item.start_with?('strings')
       locale_id = languages.dig(ANDROID_DEFAULT_LANGUAGE_KEY)
-      tag = _smf_tag_from_file(item)
 
+      tag = _smf_tag_from_file(item)
       tags.push(tag)
 
       _smf_upload_translation_file(api_client, project_id, locale_id, file, tag)
@@ -266,7 +267,7 @@ def _smf_download_files_ios(api_client, project_id, dir, locale_id, used_tags)
 
   # if there are new files that were not there before, download them
   new_files_to_download.each do |file|
-    tag = _smf_tag_from_file(item, true)
+    tag = _smf_tag_from_file(item)
 
     _smf_download_file(
       api_client,
@@ -476,25 +477,19 @@ end
 
 # this function gets filename(+extension) of the whole path of a file as input
 # and returns just the filename to be used as tag
-def _smf_tag_from_file(file, full_path = false)
+def _smf_tag_from_file(file)
   case @platform
   when :ios
-    file_extension = IOS_LOCALIZABLE_FORMAT
+    # For ios the tag is the filename+extension. For example Localizable.strings
+    tag = File.basename(file)
   when :android
     file_extension = ANDROID_LOCALIZABLE_FORMAT
+    # For android the tag is the filename without the extension. For example, the tag for "somedir/strings.xml"
+    # would be "strings"
+    tag = File.basename(file, ".#{file_extension}")
   else
     raise "Unsupported platform #{@platform}"
   end
-
-  # this expression matches strings of the format  filename.<file_extension> and then replaces the whole
-  # string with "filename"
-  # for example "Localizable.strings".gsub(/(.*).#{file_extension}/, '\1') will produce "Localizable"
-  tag = file.gsub(/(.*).#{file_extension}/, '\1')
-
-  # if a full path is given, the expression matches /some/paht/filename.<extension> and then repaces
-  # the whole string with "filename"
-  # for example "/some/path/Localizable.strings".gsub(/(.*).#{file_extension}/, '\1') will produce "Localizable"
-  tag = file.gsub(/.*\/(.*).#{file_extension}/, '\1') if full_path
 
   tag
 end
