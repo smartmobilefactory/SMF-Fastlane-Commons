@@ -95,3 +95,8 @@ The `project_id` has to be set to the phrase project id of the extension. The `r
 ##### Encodings
 
 For iOS, we try to convert the locale file to UTF-8 encoding to prevent wrong interpretation by phrase if the file has a unordinary encoding.  
+
+
+### Deprecated Lane `smf_sync_with_phrase_app`
+
+The lane `smf_sync_with_phrase_app` is deprecated. It is kept in the commons for backwards compatibility. If used it sends a deprecation warning to the projects slack channel with a link to a migration [guide](https://smartmobilefactory.atlassian.net/wiki/spaces/SMFCI/pages/2150498338/PhraseApp+CLI+migration).
