@@ -261,7 +261,8 @@ def _smf_download_files_ios(api_client, project_id, dir, locale_id, used_tags)
       locale_id,
       output_file,
       tag,
-      IOS_LOCALIZABLE_FORMAT
+      IOS_LOCALIZABLE_FORMAT,
+      true
     )
   end
 
@@ -275,7 +276,8 @@ def _smf_download_files_ios(api_client, project_id, dir, locale_id, used_tags)
       locale_id,
       file,
       tag,
-      IOS_LOCALIZABLE_FORMAT
+      IOS_LOCALIZABLE_FORMAT,
+      true
     )
   end
 end
@@ -336,12 +338,13 @@ def _smf_download_files_android(api_client, project_id, dir, locale_id)
   end
 end
 
-def _smf_download_file(api_client, project_id, locale_id, output_file, tags, file_format)
+def _smf_download_file(api_client, project_id, locale_id, output_file, tags, file_format, include_empty_translations = false)
   options = {
     return_type: 'String', # This is a workaround as there is currently no other way to get the downloaded content see https://github.com/phrase/phrase-ruby/issues/7
     file_format: file_format,
     tags: tags,
-    encoding: FILE_ENCODING
+    encoding: FILE_ENCODING,
+    include_empty_translations: include_empty_translations
   }
 
   begin
