@@ -465,7 +465,7 @@ def _smf_convert_to_utf_8_if_possible(upload_resource_dir, filename)
   result = `iconv -s --from-code=#{current_encoding} --to-code=UTF-8 #{file_path} > #{utf_8_converted_file_path} && echo "1"`.strip()
 
   if result == '1'
-    UI.message("Successfully converted #{filename} from UTF-16 to UTF-8")
+    UI.message("Successfully converted #{filename} from #{current_encoding} to UTF-8")
     return utf_8_converted_file_path
   else
     UI.message("Unabled to convert #{filename} from #{current_encoding} to UTF-8, continuing without conversion!")
