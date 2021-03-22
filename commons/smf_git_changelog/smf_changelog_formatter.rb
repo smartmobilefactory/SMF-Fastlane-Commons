@@ -57,8 +57,15 @@ def _smf_standard_changelog(changelog, changelog_format)
   standard_changelog = ''
 
   case changelog_format
-  when :markdown, :slack_markdown
+  when :markdown
     standard_changelog = changelog.join("\n")
+  when :slack_markdown
+    standard_changelog =
+        changelog.map { |commit|
+          FORMAT_ELEMENTS[:slack_markdown][:bullet_point][:prefix] +
+          commit.gsub('- ', '') +
+          FORMAT_ELEMENTS[:slack_markdown][:bullet_point][:postfix]
+        }.join('')
   when :html
     standard_changelog =
       FORMAT_ELEMENTS[:html][:section][:body][:prefix] +
