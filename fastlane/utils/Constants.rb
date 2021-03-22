@@ -40,6 +40,7 @@ $SMF_PHRASE_APP_SCRIPTS_REPO_URL = 'git@github.com:smartmobilefactory/Phraseapp-
 # Changelog
 $CHANGELOG_TEMP_FILE = 'temp_changelog.txt'
 $CHANGELOG_TEMP_FILE_HTML = 'temp_changelog.html'
+$CHANGELOG_TEMP_FILE_SLACK_MARKDOWN = 'temp_changelog_slack_markdown.text'
 
 # Build Options
 $POD_DEFAULT_VARIANTS = ['patch', 'minor', 'major', 'current', 'breaking', 'internal']

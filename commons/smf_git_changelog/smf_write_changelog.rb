@@ -8,4 +8,9 @@ private_lane :smf_write_changelog do |options|
     UI.message("Writing changelog as html to temoprary file #{_smf_changelog_html_temp_path}")
     File.write(_smf_changelog_html_temp_path, options[:html_changelog])
   end
+
+  if !options[:slack_changelog].nil?
+    UI.message("Writing changelog as slack_markdown to temoprary file #{_smf_changelog_slack_markdown_temp_path}")
+    File.write(_smf_changelog_slack_markdown_temp_path, options[:slack_changelog])
+  end
 end

@@ -33,15 +33,33 @@ FORMAT_ELEMENTS = {
         postfix: ''
       }
     }
+  },
+  slack_markdown: {
+    spacer: "\n\n_____________________________________________________________",
+    bullet_point: {
+      prefix: '• ',
+      postfix: "\n"
+    },
+    section: {
+      header: {
+        prefix: "\n",
+        postfix: "\n\n"
+      },
+      body: {
+        prefix: '',
+        postfix: ''
+      }
+    }
   }
 }.freeze
 
 def _smf_standard_changelog(changelog, changelog_format)
   standard_changelog = ''
 
-  if changelog_format == :markdown
+  case changelog_format
+  when :markdown, :slack_markdown
     standard_changelog = changelog.join("\n")
-  elsif changelog_format == :html
+  when :html
     standard_changelog =
       FORMAT_ELEMENTS[:html][:section][:body][:prefix] +
       changelog.map { |commit|
@@ -172,10 +190,13 @@ def _smf_ticket_to_link(ticket, changelog_format, use_title = true)
   return ticket_string if ticket[:link].nil?
 
   ticket_string += ": #{ticket[:title]}" if use_title
-  if changelog_format == :html
+  case changelog_format
+  when :html
     ticket_link =  "<a href=\"#{ticket[:link]}\">#{ticket_string}</a>"
-  elsif changelog_format == :markdown
+  when :markdown
     ticket_link = "[#{ticket_string}](#{ticket[:link]})"
+  when :slack_markdown
+    ticket_link = "<#{ticket[:link]}|#{ticket_string}>"
   end
 
   ticket_link
