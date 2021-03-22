@@ -54,29 +54,17 @@ private_lane :smf_danger do |options|
   _smf_check_config_build_variant_keys
   _smf_check_valid_xcode_config(options)
 
-  _check_swift_version_in_project
-
+  dangerfile = "#{File.expand_path(File.dirname(__FILE__))}/Dangerfile"
+  puts "Loading Dangerfile: #{dangerfile}"
   danger(
       github_api_token: ENV[$DANGER_GITHUB_TOKEN_KEY],
-      dangerfile: "#{File.expand_path(File.dirname(__FILE__))}/Dangerfile",
+      dangerfile: dangerfile,
       verbose: true
   )
 end
 
 def _is_apple_platform
   return [:ios, :ios_framework, :macos, :apple].include?(@platform)
-end
-
-def _check_swift_version_in_project
-  unless _is_apple_platform
-    return
-  end
-
-  begin
-    smf_analyse_swift_version
-  rescue => exception
-    ENV['DANGER_ERROR_DIFFERENT_SWIFT_VERSION_IN_PROJECT'] = exception.message
-  end
 end
 
 def _swift_lint_count_unused_rules

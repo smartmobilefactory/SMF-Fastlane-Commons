@@ -1,5 +1,7 @@
 private_lane :smf_upload_to_sentry do |options|
 
+  build_variant = options[:build_variant]
+
   org_slug = options[:org_slug]
   project_slug = options[:project_slug]
   build_variant_org_slug = options[:build_variant_org_slug]
@@ -29,23 +31,53 @@ private_lane :smf_upload_to_sentry do |options|
         UI.message('Using nil as dsym_path as no file exists at the constructed path.')
       end
 
-      sentry_upload_dsym(
-          auth_token: ENV[$SENTRY_AUTH_TOKEN],
-          org_slug: org_slug,
-          project_slug: project_slug,
-          url: 'https://sentry.solutions.smfhq.com/',
-          dsym_path: dsym_path
-      )
-
     rescue => exception
-      UI.important("Warning: Dsyms could not be uploaded to Sentry !")
-
-      smf_send_message(
-          title: "Failed to upload dsyms to Sentry for #{smf_get_default_name_of_app(options[:build_variant])} 😢",
-          type: "warning",
-          exception: exception,
-          slack_channel: slack_channel
-      )
+      _smf_sentry_raise_warning(exception, build_variant, slack_channel)
     end
+
+    MAX_RETRIES = 10
+    fail_count = 0
+    success = false
+    latest_exception = nil
+
+    # 18.03.2021: Temporary fix added:
+    # This retry loop is a temporary fix for an sentry cli issue
+    # (see https://github.com/getsentry/sentry-fastlane-plugin/issues/38)
+    # which causes the upload to subsequently fail.
+    # This error seems to be some internal error in sentry.
+    # We should keep an eye on it and if it gets fixed
+    # this retry loop should be removed.
+
+    while fail_count < MAX_RETRIES && !success
+      begin
+        sentry_upload_dsym(
+            auth_token: ENV[$SENTRY_AUTH_TOKEN],
+            org_slug: org_slug,
+            project_slug: project_slug,
+            url: 'https://sentry.solutions.smfhq.com/',
+            dsym_path: dsym_path
+        )
+
+        success = true
+      rescue => exception
+        UI.message("Upload attempt ##{fail_count} failed, retrying... ")
+        fail_count += 1
+        latest_exception = exception
+      end
+    end
+
+    _smf_sentry_raise_warning(latest_exception, build_variant, slack_channel) unless success
+
   end
+end
+
+def _smf_sentry_raise_warning(exception, build_variant, slack_channel)
+  UI.important('Warning: Dsyms could not be uploaded to Sentry !')
+
+  smf_send_message(
+    title: "Failed to upload dsyms to Sentry for #{smf_get_default_name_of_app(build_variant)} 😢",
+    type: "warning",
+    exception: exception,
+    slack_channel: slack_channel
+  )
 end
