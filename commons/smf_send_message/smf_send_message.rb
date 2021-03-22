@@ -19,7 +19,7 @@ def _smf_should_skip_notifications_for_branch
     return false
   end
 
-  return true
+  return false # TODO set to true, changed to false for testing
 end
 
 private_lane :smf_send_message do |options|
