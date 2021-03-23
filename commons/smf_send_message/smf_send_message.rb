@@ -94,7 +94,15 @@ private_lane :smf_send_message do |options|
 
     # Send failure messages also to CI to notice them so that we can see if they can be improved
     if type == 'error' && !(slack_channel.eql? ci_error_log)
-      slack_channel = ci_error_log
+      _smf_send_slack_message(
+        icon_url: icon_url,
+        title: title,
+        message: content,
+        channel: ci_error_log,
+        username: "#{project_name} CI",
+        type: type,
+        payload: payload,
+        )
     end
 
     begin

@@ -1,4 +1,28 @@
+# ################################################################################
+# THIS LANE IS DEPRECATED AND SHOULD BE REMOVED AS SOON AS
+# ALL PROJECTS ARE MIGRATED TO USE THE NEW SYSTEM (see lane smf_sync_with_phrase)
+# ################################################################################
+#
+def smf_send_phraseapp_deprecation_warning
+
+  name = @smf_fastlane_config.dig(:project, :project_name)
+  slack_channel = @smf_fastlane_config.dig(:project, :slack_channel)
+
+  migration_guide_url = 'https://smartmobilefactory.atlassian.net/l/c/kXWib1if'
+  message = "This project uses a deprecated lane to sync strings with phraseapp, please migrate to the new system using this migration guide: #{migration_guide_url}"
+
+  smf_send_message(
+    title: "⚠️ WARNING: #{name} uses deprecated phraseapp scripts ⚠️",
+    message: message,
+    type: 'error',
+    slack_channel: slack_channel
+  )
+end
+
 lane :smf_sync_with_phrase_app do |options|
+
+  smf_send_phraseapp_deprecation_warning
+
   case @platform
   when :ios, :ios_framework, :macos, :apple
     initialize_env_variable_name_mappings
@@ -43,11 +67,11 @@ lane :smf_sync_with_phrase_app do |options|
 
     if files_which_changed.include? '.strings'
 
-        sh("cd #{project_root_dir} && git add *.strings && git commit -m \"Updating i18n\" *.strings")
+      sh("cd #{project_root_dir} && git add *.strings && git commit -m \"Updating i18n\" *.strings")
 
-        smf_push_to_git_remote(
-            tags: false
-        )
+      smf_push_to_git_remote(
+        tags: false
+      )
     end
 
   when :android
@@ -66,15 +90,15 @@ end
 
 def initialize_env_variable_name_mappings
   @phrase_app_config_keys_env_variable_mapping = {
-      :access_token_key           => ["phraseappAccessToken", true, $SMF_PHRASE_APP_ACCESS_TOKEN_KEY], # optional
-      :project_id                 => ["phraseappProjectId", false],
-      :source                     => ["phraseappSource", false],
-      :locales                    => ["phraseappLocales", false],
-      :format                     => ["phraseappFormat", false],
-      :base_directory             => ["phraseappBasedir", false],
-      :files                      => ["phraseappFiles", false],
-      :files_prefix               => ["phraseappFilesPrefix", true, ""], # optional
-      :forbid_comments_in_source  => ["phraseappForbidCommentsInSource", true, "1"]  # optional
+    :access_token_key           => ["phraseappAccessToken", true, $SMF_PHRASE_APP_ACCESS_TOKEN_KEY], # optional
+    :project_id                 => ["phraseappProjectId", false],
+    :source                     => ["phraseappSource", false],
+    :locales                    => ["phraseappLocales", false],
+    :format                     => ["phraseappFormat", false],
+    :base_directory             => ["phraseappBasedir", false],
+    :files                      => ["phraseappFiles", false],
+    :files_prefix               => ["phraseappFilesPrefix", true, ""], # optional
+    :forbid_comments_in_source  => ["phraseappForbidCommentsInSource", true, "1"]  # optional
   }
 end
 
