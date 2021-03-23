@@ -34,7 +34,7 @@ private_lane :smf_upload_with_sparkle do |options|
   dmg_path = source_dmg_path.nil? ? smf_path_to_dmg(build_variant) : source_dmg_path
   update_dir = target_directory.nil? ? "#{smf_workspace_dir}/build/" : target_directory
 
-  release_notes = smf_read_changelog(html: true)
+  release_notes = smf_read_changelog(type: :html)
   release_notes_name = "#{scheme}.html"
   release_notes_path = "#{update_dir}#{release_notes_name}"
   File.write(release_notes_path, release_notes)
