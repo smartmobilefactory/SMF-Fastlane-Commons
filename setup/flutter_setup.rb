@@ -107,7 +107,7 @@ private_lane :smf_super_android_build do |options|
   keystore_folder = build_variant_android_config[:keystore]
 
   if keystore_folder.nil?
-    sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} build apk --release --flavor #{build_variant}")
+    sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} build apk --release --flavor #{build_variant} --no-sound-null-safety")
   else
     keystore_values = smf_pull_keystore(folder: keystore_folder)
     ENV["keystore_file"] = keystore_values[:keystore_file]
