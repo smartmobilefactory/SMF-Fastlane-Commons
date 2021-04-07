@@ -2,7 +2,7 @@
 // Automatically generated. Do not edit.
 //
 
-@Library('jenkins-pipeline-commons@master') _
+@Library('jenkins-pipeline-commons@flutter-update') _
 
 _build_variants = __BUILD_VARIANTS__
 _build_nodes = __BUILD_NODES__
