@@ -31,7 +31,11 @@ end
 # Update Jenkinsfile
 
 private_lane :smf_shared_super_generate_files do |options|
-  smf_update_generated_files
+  ios_build_nodes = smf_string_array_to_array(ENV['SMF_IOS_BUILD_NODES'])
+
+  smf_update_generated_files(
+    ios_build_nodes: ios_build_nodes
+  )
 end
 
 lane :smf_shared_generate_files do |options|
