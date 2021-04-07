@@ -12,7 +12,7 @@ def smf_xcodeproj_file_path
 
   xcodeproj_path = File.join(File.expand_path(smf_workspace_dir), project_name)
 
-  return _smf_xcodeproj_file_escape_path(xcodeproj_path)
+  return xcodeproj_path
 end
 
 
@@ -31,18 +31,5 @@ def smf_pbxproj_file_path
     raise "Error project has no \"project.pbxproj\" file which is needed for the anlysis"
   end
 
-  return _smf_xcodeproj_file_escape_path(pbxproj_path)
-end
-
-def _smf_xcodeproj_file_escape_path(path)
-  escaped_path = path.gsub("\"", "")
-  regex = /\/([^\/]+\s+[^\/]+)\//
-  result = escaped_path.match(regex)
-  if result != nil && result.captures[0] != nil
-    escaped_path = escaped_path.gsub(result.captures[0], "\"#{result.captures[0]}\"")
-  else
-    return path
-  end
-
-  return escaped_path
+  return pbxproj_path
 end
