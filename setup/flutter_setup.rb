@@ -64,7 +64,7 @@ private_lane :smf_super_ios_build do |options|
   build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
   build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant.to_sym][:ios]
 
-  sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} build ios --release --no-codesign --flavor #{build_variant}")
+  sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} build ios --release --no-codesign --flavor #{build_variant} --no-sound-null-safety")
 
   smf_download_provisioning_profiles(
       team_id: build_variant_ios_config[:team_id],
@@ -116,8 +116,8 @@ private_lane :smf_super_android_build do |options|
     ENV["keystore_key_password"] = keystore_values[:keystore_key_password]
 
     # build apk for internal testing and aab for play store distribution
-    sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} build apk --release --flavor #{build_variant}")
-    sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} build appbundle --release --flavor #{build_variant}")
+    sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} build apk --release --flavor #{build_variant} --no-sound-null-safety")
+    sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} build appbundle --release --flavor #{build_variant} --no-sound-null-safety")
   end
 
 end
@@ -296,7 +296,7 @@ end
 # Run Unit Tests
 
 private_lane :smf_super_run_unit_tests do |options|
-  sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} test")
+  sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} test --no-sound-null-safety")
 end
 
 lane :smf_run_unit_tests do |options|
