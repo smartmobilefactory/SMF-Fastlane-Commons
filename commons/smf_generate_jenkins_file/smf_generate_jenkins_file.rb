@@ -158,7 +158,7 @@ end
 # is prepended
 def _smf_insert_build_nodes(jenkinsFileData, ios_build_nodes)
 
-  if [:ios, :ios_framework, :macos, :apple].include?(@platform)
+  if [:ios, :ios_framework, :macos, :apple, :flutter].include?(@platform)
     xcode_version = @smf_fastlane_config.dig(:project, :xcode_version)
     # create label with the projects xcode version
     preferred_node_label = xcode_version.nil? ? nil : "#{NODE_XCODE_LABEL_PREFIX}#{xcode_version}"
