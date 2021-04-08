@@ -82,10 +82,12 @@ def _smf_fetch_pull_request_data(pr_number)
     title = pull_request.dig(:title)
     body = pull_request.dig(:body)
     pr_link = pull_request.dig(:html_url)
+    branch = pull_request.dig(:head).dig(:ref)
   rescue
     title = nil
     body = nil
     pr_link = nil
+    branch = nil
   end
 
   commits = _smf_https_get_request(
@@ -104,7 +106,8 @@ def _smf_fetch_pull_request_data(pr_number)
     body: body,
     title: title,
     commits: commits,
-    pr_link: pr_link
+    pr_link: pr_link,
+    branch: branch
   }
 
   pr_data
