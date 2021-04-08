@@ -185,9 +185,23 @@ end
 
 private_lane :smf_super_push_git_tag_release do |options|
 
-  branch = options[:branch]
-  smf_git_pull(branch)
-  smf_push_to_git_remote(local_branch: branch)
+  local_branch = options[:local_branch]
+  build_variant = options[:build_variant]
+
+  changelog = smf_read_changelog
+
+  smf_git_pull(local_branch)
+  smf_push_to_git_remote(local_branch: local_branch)
+
+  # Create the GitHub release
+  build_number = smf_get_build_number_of_app
+  smf_create_github_release(
+    build_number: build_number,
+    tag: smf_get_tag_of_app(build_variant, build_number),
+    branch: local_branch,
+    build_variant: build_variant,
+    changelog: changelog
+  )
 end
 
 lane :smf_push_git_tag_release do |options|
