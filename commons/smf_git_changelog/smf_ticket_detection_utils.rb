@@ -145,3 +145,16 @@ def _smf_filter_blacklisted_tickets(tickets)
 
   filtered_tickets
 end
+
+def _smf_find_ticket_tags_in_related_pr(commit_message)
+
+  matches = commit_message.scan(/.*\(#([0-9]*)\)\z/)
+  return [] if matches.empty?
+
+  pull_number = matches[0][0]
+
+  pr_data = _smf_fetch_pull_request_data(pull_number)
+  ticket_tags = smf_find_jira_ticket_tags_in_pr(pr_data)
+
+  ticket_tags
+end

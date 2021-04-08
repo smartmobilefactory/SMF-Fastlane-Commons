@@ -33,15 +33,16 @@ private_lane :smf_git_changelog do |options|
 
   changelog_messages = changelog_from_git_commits(
     between: [last_tag, 'HEAD'],
-    merge_commit_filtering: 'exclude_merges',
+    merge_commit_filtering: 'include_merges',
     pretty: '- (%an) %s'
   )
 
   changelog_messages = '' if changelog_messages.nil?
 
   cleaned_changelog_messages = []
+  ignored_commits = [/Release Pod.*/, /Increment build number.*/, /Updating i18n/]
   changelog_messages.split(/\n+/).each do |commit_message|
-    if _smf_should_commit_be_ignored_in_changelog(commit_message, [/.*SMFHUDSONCHECKOUT.*/])
+    if _smf_should_commit_be_ignored_in_changelog(commit_message, ignored_commits)
       next
     end
 
@@ -146,17 +147,3 @@ def _smf_extract_issue(issue_data, type, base_url)
 
   ticket
 end
-
-def _smf_find_ticket_tags_in_related_pr(commit_message)
-
-  matches = commit_message.scan(/.*\(#([0-9]*)\)\z/)
-  return [] if matches.empty?
-
-  pull_number = matches[0][0]
-
-  pr_data = _smf_fetch_pull_request_data(pull_number)
-  ticket_tags = smf_find_jira_ticket_tags_in_pr(pr_data)
-
-  ticket_tags
-end
-
