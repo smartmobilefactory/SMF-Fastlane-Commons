@@ -82,10 +82,10 @@ def _smf_make_pr_reference(ticket_tag)
   pr_number_matches = ticket_tag.scan(/^PR-([0-9]+)$/)
   return nil if pr_number_matches.empty?
 
-  pr_url = _smf_fetch_pull_request_data(pr_number_matches.first.first).dig(:pr_url)
+  pr_link = _smf_fetch_pull_request_data(pr_number_matches.first.first).dig(:pr_link)
   new_ticket = {
     tag: ticket_tag,
-    link: pr_url
+    link: pr_link
   }
 
   new_ticket
