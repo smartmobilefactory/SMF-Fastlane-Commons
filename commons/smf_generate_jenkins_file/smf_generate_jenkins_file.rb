@@ -131,6 +131,7 @@ def _smf_custom_credential_deprecation_warning
   when :ios, :macos, :apple
     UI.message('Checking for deprecation') # TODO: remove
     custom_credentials = smf_config_get(nil, [:project, :custom_credentials])
+    UI.message(custom_credentials)
     if custom_credentials.nil? == false && custom_credentials.empty? == false
       _, credential_value = custom_credentials.first
 
