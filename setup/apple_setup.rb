@@ -53,7 +53,8 @@ private_lane :smf_super_build do |options|
   extension_suffixes = smf_config_get(nil, :extensions_suffixes) if extension_suffixes.nil?
 
   default_platform = smf_is_mac_build(build_variant) ? 'macos' : 'ios'
-  platform = smf_config_get(build_variant, :match, :platform).nil? ? default_platform : smf_config_get(build_variant, :match, :platform)
+  match_platform = smf_config_get(build_variant, :match, :platform)
+  platform = match_platform.nil? ? default_platform : match_platform
 
   smf_download_provisioning_profiles(
     team_id: smf_config_get(build_variant, :team_id),
@@ -259,18 +260,20 @@ private_lane :smf_super_pipeline_upload_with_sparkle do |options|
   build_variant = smf_build_variant(options)
   next unless smf_is_mac_build(build_variant)
 
-  smf_upload_with_sparkle(
-    build_variant: build_variant,
-    create_intermediate_folder: smf_config_get(build_variant, :sparkle, :create_intermediate_folder),
-    scheme: smf_config_get(build_variant, :scheme),
-    sparkle_dmg_path: smf_config_get(build_variant, :sparkle, :dmg_path),
-    sparkle_upload_user: smf_config_get(build_variant, :sparkle, :upload_user),
-    sparkle_upload_url: smf_config_get(build_variant, :sparkle, :upload_url),
-    sparkle_version: smf_config_get(build_variant, :sparkle, :sparkle_version),
-    sparkle_signing_team: smf_config_get(build_variant, :sparkle, :sparkle_signing_team),
-    sparkle_xml_name: smf_config_get(build_variant, :sparkle, :xml_name),
-    sparkle_private_key: smf_config_get(build_variant, :sparkle, :signing_key)
-  ) if smf_config_get(build_variant, :use_sparkle) == true
+  if smf_config_get(build_variant, :use_sparkle) == true
+    smf_upload_with_sparkle(
+      build_variant: build_variant,
+      create_intermediate_folder: smf_config_get(build_variant, :sparkle, :create_intermediate_folder),
+      scheme: smf_config_get(build_variant, :scheme),
+      sparkle_dmg_path: smf_config_get(build_variant, :sparkle, :dmg_path),
+      sparkle_upload_user: smf_config_get(build_variant, :sparkle, :upload_user),
+      sparkle_upload_url: smf_config_get(build_variant, :sparkle, :upload_url),
+      sparkle_version: smf_config_get(build_variant, :sparkle, :sparkle_version),
+      sparkle_signing_team: smf_config_get(build_variant, :sparkle, :sparkle_signing_team),
+      sparkle_xml_name: smf_config_get(build_variant, :sparkle, :xml_name),
+      sparkle_private_key: smf_config_get(build_variant, :sparkle, :signing_key)
+    )
+  end
 end
 
 lane :smf_pipeline_upload_with_sparkle do |options|
