@@ -53,6 +53,7 @@ private_lane :smf_generate_jenkins_file do |options|
   jenkinsFileData = jenkinsFileData.gsub("#{BUILD_VARIANTS_PATTERN}", JSON.dump(possible_build_variants))
 
   # Deprecated, remove after migration, along with macos and ios jenkins file
+  UI.message('Inserting custom credentials') # TODO: remove
   jenkinsFileData = _smf_insert_custom_credentials(jenkinsFileData) unless @platform == :macos
 
   jenkinsFileData = _smf_insert_build_nodes(jenkinsFileData, ios_build_nodes)
@@ -128,6 +129,7 @@ end
 def _smf_custom_credential_deprecation_warning
   case @platform
   when :ios, :macos, :apple
+    UI.message('Checking for deprecation') # TODO: remove
     custom_credentials = smf_config_get(nil, [:project, :custom_credentials])
     if custom_credentials.nil? == false && custom_credentials.empty? == false
       _, credential_value = custom_credentials.first
@@ -137,6 +139,7 @@ def _smf_custom_credential_deprecation_warning
         message = "This project uses a deprecated way to pass setup custom credentials, please update
                    using this migration guide: #{migration_guide_url}"
 
+        UI.message('Sending deprecation message') # TODO: remove
         smf_send_deprecation_warning(
           title: 'Custom Credential Passing',
           message: message
