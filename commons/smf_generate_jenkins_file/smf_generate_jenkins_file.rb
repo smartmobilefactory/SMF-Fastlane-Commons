@@ -136,9 +136,8 @@ def _smf_custom_credential_deprecation_warning
 
       if credential_value.is_a?(Hash) == false
         migration_guide_url = 'https://smartmobilefactory.atlassian.net/l/c/QZebJa0M'
-        message = "This project uses a deprecated way to pass setup custom credentials, please update
-                   using this migration guide: #{migration_guide_url}"
-        
+        message = "This project uses a deprecated way to pass setup custom credentials, please update using this migration guide: #{migration_guide_url}"
+
         smf_send_deprecation_warning(
           title: 'Custom Credential Passing',
           message: message

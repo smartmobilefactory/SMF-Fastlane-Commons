@@ -6,8 +6,7 @@
 def smf_send_phraseapp_deprecation_warning
 
   migration_guide_url = 'https://smartmobilefactory.atlassian.net/l/c/kXWib1if'
-  message = "This project uses a deprecated lane to sync strings with phraseapp,
-             please migrate to the new system using this migration guide: #{migration_guide_url}"
+  message = "This project uses a deprecated lane to sync strings with phraseapp, please migrate to the new system using this migration guide: #{migration_guide_url}"
 
   smf_send_deprecation_warning(
     title: 'Use of deprecated phrase app scripts',
