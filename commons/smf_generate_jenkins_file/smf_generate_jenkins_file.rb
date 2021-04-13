@@ -53,6 +53,7 @@ private_lane :smf_generate_jenkins_file do |options|
 
   jenkinsFileData = jenkinsFileData.gsub("#{BUILD_VARIANTS_PATTERN}", JSON.dump(possible_build_variants))
 
+  # Deprecated, remove after migration, along with macos and ios jenkins file
   jenkinsFileData = _smf_insert_custom_credentials(jenkinsFileData) unless @platform == :macos
 
   jenkinsFileData = _smf_insert_build_nodes(jenkinsFileData, ios_build_nodes)
@@ -127,10 +128,37 @@ def _smf_possible_build_variants(remove_multi_build_variants)
   possible_build_variants
 end
 
+def _smf_custom_credential_deprecation_warning
+  case @platform
+  when :ios, :macos, :apple
+    custom_credentials = smf_config_get(nil, [:project, :custom_credentials])
+    if custom_credentials.nil? == false && custom_credentials.empty? == false
+      _, credential_value = custom_credentials.first
+
+      if credential_value.is_a?(Hash) == false
+        migration_guide_url = 'https://smartmobilefactory.atlassian.net/l/c/QZebJa0M'
+        message = "This project uses a deprecated way to pass setup custom credentials, please update
+                   using this migration guide: #{migration_guide_url}"
+
+        smf_send_deprecation_warning(
+          title: 'Custom Credential Passing',
+          message: message
+        )
+      end
+    end
+  end
+end
+
+######################################################
+# THIS FUNCTION IS DEPRECATED AND SHOULD BE REMOVED  #
+# WHEN ALL PROJECTS ARE MIGRATED                     #
+######################################################
 def _smf_insert_custom_credentials(jenkinsFile)
   jenkinsFileData = jenkinsFile
   case @platform
   when :ios, :macos, :apple
+    _smf_custom_credential_deprecation_warning
+
     for custom_credential in CUSTOM_IOS_CREDENTIALS
       if @smf_fastlane_config[:project][:custom_credentials] && @smf_fastlane_config[:project][:custom_credentials][custom_credential.to_sym]
         custom_credential_key = @smf_fastlane_config[:project][:custom_credentials][custom_credential.to_sym]
