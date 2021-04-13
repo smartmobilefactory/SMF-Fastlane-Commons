@@ -15,7 +15,6 @@ CUSTOM_IOS_CREDENTIALS = [
 ]
 
 # iOS/macOS Templates
-IOS_APP_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_iOS.template'
 POD_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_iOS_Framework.template'
 MACOS_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_macOS.template'
 APPLE_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Apple.template'
@@ -64,8 +63,6 @@ end
 def _smf_jenkins_file_template_path
 
   case @platform
-  when :ios
-    path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{IOS_APP_TEMPLATE_JENKINS_FILE}"
   when :android
     if @smf_fastlane_config[:project][:type] == 'framework'
       path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{ANDROID_FRAMEWORK_TEMPLATE_JENKINS_FILE}"
@@ -78,7 +75,7 @@ def _smf_jenkins_file_template_path
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{POD_TEMPLATE_JENKINS_FILE}"
   when :macos
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{MACOS_TEMPLATE_JENKINS_FILE}"
-  when :apple
+  when :apple, :ios
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{APPLE_TEMPLATE_JENKINS_FILE}"
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
