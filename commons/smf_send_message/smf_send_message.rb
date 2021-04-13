@@ -1,6 +1,6 @@
 desc 'Sending a message to the given Slack channel'
 
-def _smf_should_skip_notifications_for_branch
+def _smf_should_skip_notifications_for_branch(project_name)
   branch = smf_workspace_dir_git_branch
 
   if branch.match(/^master$/) # iOS (A-Team)
@@ -19,7 +19,11 @@ def _smf_should_skip_notifications_for_branch
     return false
   end
 
-  return false # TODO: change to true before merge
+  if project_name.downcase.include?('playground')
+    return false
+  end
+
+  return true
 end
 
 private_lane :smf_send_message do |options|
@@ -79,7 +83,7 @@ private_lane :smf_send_message do |options|
 
   UI.message("Sending message \"#{content}\" to room \"#{slack_channel}\"")
 
-  if _smf_should_skip_notifications_for_branch
+  if _smf_should_skip_notifications_for_branch(project_name)
     UI.message("[WARNING]: skip slack notifications from development branches")
 
   elsif slack_channel && (slack_channel.include? '/') == false
@@ -98,7 +102,7 @@ private_lane :smf_send_message do |options|
         icon_url: icon_url,
         title: title,
         message: content,
-        channel: ci_error_log,
+        channel: project_name.downcase.include?('playground') ? 'ci-development' : ci_error_log,
         username: "#{project_name} CI",
         type: type,
         payload: payload,
