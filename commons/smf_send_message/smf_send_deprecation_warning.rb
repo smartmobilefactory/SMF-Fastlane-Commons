@@ -12,5 +12,4 @@ private_lane :smf_send_deprecation_warning do |options|
     type: 'error',
     slack_channel: slack_channel
   )
-
 end
