@@ -56,7 +56,7 @@ private_lane :smf_git_changelog do |options|
   end
 
   # Extract related Jira issues info
-  tickets_tags = smf_get_ticket_tags_from_changelog(cleaned_changelog_messages.uniq)
+  ticket_tags = smf_get_ticket_tags_from_changelog(cleaned_changelog_messages.uniq)
   UI.message("Jira tickets found: #{ticket_tags}")
   tickets = smf_generate_tickets_from_tags(ticket_tags)
 
