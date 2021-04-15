@@ -156,7 +156,6 @@ def _smf_find_ticket_tags_in_related_pr(commit_message)
 
   UI.message("Analysing merge commit for PR-#{pull_number} ...")
   pr_data = _smf_fetch_pull_request_data(pull_number)
-  UI.message(pr_data)
   ticket_tags = smf_find_jira_ticket_tags_in_pr(pr_data)
   UI.message("Jira ticket(s) found for merge commit (##{pull_number}): #{ticket_tags}")
 
