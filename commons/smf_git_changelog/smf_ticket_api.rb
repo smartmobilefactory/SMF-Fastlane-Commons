@@ -67,6 +67,7 @@ def _try_dig(map, key)
   value = nil
   begin
     value = map.dig(key)
+    UI.message("{ '#{key}' : '#{value}' }")
   rescue
     value = nil
   end
@@ -83,11 +84,14 @@ def _smf_fetch_pull_request_data(pr_number)
 
   base_url = "https://api.github.com/repos/#{repo_owner}/#{repo_name}/pulls/#{pr_number}"
 
+  UI.message("API call: #{base_url}")
   pull_request = _smf_https_get_request(
     base_url,
     :token,
     ENV[$SMF_GITHUB_TOKEN_ENV_KEY]
   )
+
+  UI.message(pull_request)
 
   title = _try_dig(pull_request, :title)
   body = _try_dig(pull_request, :body)
