@@ -113,7 +113,7 @@ def _smf_changelog_slack_markdown_temp_path
 end
 
 def _smf_ticket_tags_temp_path
-  "#{@fastlane_commons_dir_path}/#{$CHANGELOG_TEMP_FILE_SLACK_MARKDOWN}"
+  "#{@fastlane_commons_dir_path}/#{$TICKET_TAGS_TEMP_FILE}"
 end
 
 def smf_remote_repo_name
