@@ -1,16 +1,34 @@
 private_lane :smf_write_changelog do |options|
 
-  sh "rm #{_smf_changelog_temp_path}" if File.exist?(_smf_changelog_temp_path)
-  UI.message("Writing changelog temporarily to #{_smf_changelog_temp_path}")
-  File.write(_smf_changelog_temp_path, options[:changelog])
+  _write_changelog_to_disk(
+    _smf_changelog_temp_path,
+    options[:changelog],
+    "Writing changelog as TXT to #{_smf_changelog_temp_path}"
+  )
 
-  if !options[:html_changelog].nil?
-    UI.message("Writing changelog as html to temoprary file #{_smf_changelog_html_temp_path}")
-    File.write(_smf_changelog_html_temp_path, options[:html_changelog])
-  end
+  _write_changelog_to_disk(
+    _smf_changelog_html_temp_path,
+    options[:html_changelog],
+    "Writing changelog as HTML to #{_smf_changelog_html_temp_path}"
+  )
 
-  if !options[:slack_changelog].nil?
-    UI.message("Writing changelog as slack_markdown to temoprary file #{_smf_changelog_slack_markdown_temp_path}")
-    File.write(_smf_changelog_slack_markdown_temp_path, options[:slack_changelog])
+  _write_changelog_to_disk(
+    _smf_changelog_slack_markdown_temp_path,
+    options[:slack_changelog],
+    "Writing changelog as Slack Markdown to #{_smf_changelog_html_temp_path}"
+  )
+
+  _write_changelog_to_disk(
+    _smf_ticket_tags_temp_path,
+    options[:ticket_tags],
+    "Writing related ticket tags to #{_smf_ticket_tags_temp_path}"
+  )
+end
+
+def _write_changelog_to_disk(path, content, log)
+  if !content.nil?
+    UI.message(log)
+    sh "rm #{path}" if File.exist?(path)
+    File.write(path, content)
   end
 end

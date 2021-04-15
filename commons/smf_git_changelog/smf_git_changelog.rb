@@ -55,21 +55,27 @@ private_lane :smf_git_changelog do |options|
 
   end
 
-  # Limit the size of changelog as it's crashes if it's too long
-  tickets = smf_generate_tickets_from_changelog(cleaned_changelog_messages.uniq)
+  # Extract related Jira issues info
+  tickets_tags = smf_get_ticket_tags_from_changelog(cleaned_changelog_messages.uniq)
+  UI.message("Jira tickets found: #{ticket_tags}")
+  tickets = smf_generate_tickets_from_tags(ticket_tags)
 
+  # Limit the size of changelog as it's crashes if it's too long
   changelog = cleaned_changelog_messages.uniq.join("\n")
   changelog = "#{changelog[0..20_000]}#{'\\n...'}" if changelog.length > 20_000
   changelog = changelog.split("\n")
 
+  # Convert changelog to different output formats
   html_changelog = _smf_generate_changelog(changelog, tickets, :html)
   markdown_changelog = _smf_generate_changelog(changelog, tickets, :markdown)
   slack_changelog = _smf_generate_changelog(changelog, tickets, :slack_markdown)
+  ticket_tags = ticket_tags.join(' ') # convert array to string list
 
   smf_write_changelog(
     changelog: markdown_changelog,
     html_changelog: html_changelog,
-    slack_changelog: slack_changelog
+    slack_changelog: slack_changelog,
+    ticket_tags: ticket_tags
   )
 end
 
@@ -103,6 +109,10 @@ def _smf_changelog_html_temp_path
 end
 
 def _smf_changelog_slack_markdown_temp_path
+  "#{@fastlane_commons_dir_path}/#{$CHANGELOG_TEMP_FILE_SLACK_MARKDOWN}"
+end
+
+def _smf_ticket_tags_temp_path
   "#{@fastlane_commons_dir_path}/#{$CHANGELOG_TEMP_FILE_SLACK_MARKDOWN}"
 end
 
