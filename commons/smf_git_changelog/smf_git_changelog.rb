@@ -114,7 +114,7 @@ def smf_remote_repo_owner
   remote_url = `git config --get remote.origin.url`.strip
   result = remote_url.scan(/git@github.com:(.+)\//)
 
-  return nil? if result.first.nil?
+  return nil if result.first.nil?
 
   result.first.first
 end
