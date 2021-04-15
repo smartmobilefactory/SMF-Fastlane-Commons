@@ -74,6 +74,7 @@ def smf_generate_tickets_from_changelog(changelog)
     ticket_tags += _smf_find_ticket_tags_in_related_pr(commit_message)
   end
 
+  UI.message("Jira tickets found: #{ticket_tags}")
   smf_generate_tickets_from_tags(ticket_tags)
 end
 
@@ -153,8 +154,10 @@ def _smf_find_ticket_tags_in_related_pr(commit_message)
 
   pull_number = matches[0][0]
 
+  UI.message("Analysing merge commit for PR-#{pull_number} ...")
   pr_data = _smf_fetch_pull_request_data(pull_number)
   ticket_tags = smf_find_jira_ticket_tags_in_pr(pr_data)
+  UI.message("Jira ticket(s) found for merge commit (##{pull_number}): #{ticket_tags}")
 
   ticket_tags
 end

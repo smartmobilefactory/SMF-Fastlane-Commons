@@ -114,36 +114,7 @@ def smf_remote_repo_owner
   remote_url = `git config --get remote.origin.url`.strip
   result = remote_url.scan(/git@github.com:(.+)\//)
 
-  return nil? if result.first.nil?
+  return nil if result.first.nil?
 
   result.first.first
-end
-
-def _smf_extract_linked_issues(ticket_data, base_url)
-  linked_issues = []
-
-  return nil if ticket_data.nil? || base_url.nil?
-
-  issues = ticket_data.dig(:fields, :issuelinks)
-
-  return nil if issues.nil?
-
-  issues.each do |issue_data|
-    linked_issues.push(_smf_extract_issue(issue_data, :outwardIssue, base_url))
-    linked_issues.push(_smf_extract_issue(issue_data, :inwardIssue, base_url))
-  end
-
-  linked_issues.compact
-end
-
-def _smf_extract_issue(issue_data, type, base_url)
-  ticket = {}
-  issue = issue_data[type]
-  return nil if issue.nil?
-
-  ticket[:title] = issue.dig(:fields, :summary)
-  ticket[:tag] = issue[:key]
-  ticket[:link] = File.join(base_url, 'browse', ticket[:tag])
-
-  ticket
 end
