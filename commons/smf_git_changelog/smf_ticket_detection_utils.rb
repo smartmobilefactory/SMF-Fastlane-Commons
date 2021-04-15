@@ -3,7 +3,6 @@ TICKET_BLACKLIST = [
   /UNICODE*/,
 ]
 
-
 def smf_generate_tickets_from_tags(ticket_tags)
 
   tickets = {
@@ -60,7 +59,7 @@ def smf_generate_tickets_from_tags(ticket_tags)
   tickets
 end
 
-def smf_generate_tickets_from_changelog(changelog)
+def smf_get_ticket_tags_from_changelog(changelog)
 
   return nil if changelog.nil?
 
@@ -74,8 +73,7 @@ def smf_generate_tickets_from_changelog(changelog)
     ticket_tags += _smf_find_ticket_tags_in_related_pr(commit_message)
   end
 
-  UI.message("Jira tickets found: #{ticket_tags}")
-  smf_generate_tickets_from_tags(ticket_tags)
+  ticket_tags
 end
 
 def _smf_make_pr_reference(ticket_tag)
