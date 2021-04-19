@@ -2,10 +2,10 @@ require 'phrase'
 
 # LOCAL CONSTANTS
 # IOS
-IOS_LOCALE_DIR_POSTFIX = '.lproj'.freeze
-IOS_API_TOKEN_KEY = 'SMF_PHRASEAPP_ACCESS_TOKEN'.freeze
-IOS_CUSTOM_API_TOKEN_KEY = 'CUSTOM_PHRASE_APP_TOKEN'.freeze
-IOS_LOCALIZABLE_FORMAT = 'strings'.freeze
+APPLE_LOCALE_DIR_POSTFIX = '.lproj'.freeze
+APPLE_API_TOKEN_KEY = 'SMF_PHRASEAPP_ACCESS_TOKEN'.freeze
+APPLE_CUSTOM_API_TOKEN_KEY = 'CUSTOM_PHRASE_APP_TOKEN'.freeze
+APPLE_LOCALIZABLE_FORMAT = 'strings'.freeze
 
 # ANDROID
 ANDROID_UPLOAD_DIR_NAME = 'values'.freeze
@@ -151,7 +151,7 @@ def _smf_upload_translations(api_client, project_id, upload_resource_dir, langua
 
     case @platform
     when :ios
-      next unless item.end_with?(IOS_LOCALIZABLE_FORMAT)
+      next unless item.end_with?(APPLE_LOCALIZABLE_FORMAT)
       locale_id = languages.dig(base)
 
       tag = _smf_tag_from_file(item)
@@ -204,7 +204,7 @@ end
 
 def _smf_download_translations(api_client, project_id, download_resource_dir, languages, used_tags, is_kmpp)
   case @platform
-  when :ios
+  when :ios, :macos, :apple
     _smf_download_translations_ios(
       api_client,
       project_id,
@@ -228,7 +228,7 @@ def _smf_download_translations_ios(api_client, project_id, download_resource_dir
   languages.each do |language_key, locale_id|
     UI.message("Handling #{language_key} (id: #{locale_id})")
 
-    dir = File.join(download_resource_dir, language_key + IOS_LOCALE_DIR_POSTFIX)
+    dir = File.join(download_resource_dir, language_key + APPLE_LOCALE_DIR_POSTFIX)
     UI.message("Translation files directory is #{dir}")
 
     sh("mkdir -p #{dir}") # create the directory if it doesn't exit yet
@@ -248,7 +248,7 @@ def _smf_download_files_ios(api_client, project_id, dir, locale_id, used_tags)
 
   # First update files which are already there
   Dir.foreach(dir) do |item|
-    next unless item.end_with?(IOS_LOCALIZABLE_FORMAT)
+    next unless item.end_with?(APPLE_LOCALIZABLE_FORMAT)
 
     tag = _smf_tag_from_file(item)
     output_file = File.join(dir, tag)
@@ -261,7 +261,7 @@ def _smf_download_files_ios(api_client, project_id, dir, locale_id, used_tags)
       locale_id,
       output_file,
       tag,
-      IOS_LOCALIZABLE_FORMAT,
+      APPLE_LOCALIZABLE_FORMAT,
       true
     )
   end
@@ -276,7 +276,7 @@ def _smf_download_files_ios(api_client, project_id, dir, locale_id, used_tags)
       locale_id,
       file,
       tag,
-      IOS_LOCALIZABLE_FORMAT,
+      APPLE_LOCALIZABLE_FORMAT,
       true
     )
   end
@@ -373,9 +373,9 @@ end
 # returns the correct api token based on platform and possible custom token
 def _smf_api_token(use_custom_api_token)
   case @platform
-  when :ios
-    api_token_key = IOS_API_TOKEN_KEY
-    api_token_key = IOS_CUSTOM_API_TOKEN_KEY if use_custom_api_token
+  when :ios, :macos, :apple
+    api_token_key = APPLE_API_TOKEN_KEY
+    api_token_key = APPLE_CUSTOM_API_TOKEN_KEY if use_custom_api_token
 
   when :android
     api_token_key = ANDROID_API_TOKEN_KEY
@@ -409,7 +409,7 @@ def _smf_resource_dir(is_kmpp, resource_dir)
   return File.join(smf_workspace_dir, resource_dir) if resource_dir
 
   case @platform
-  when :ios
+  when :ios, :macos, :apple
     raise 'Error, missing resource directory. For iOS you have to pass a resource directory.'
   when :android
     resource_dir = File.join(smf_workspace_dir, ANDROID_RESOURCE_DIR)
@@ -424,8 +424,8 @@ def _smf_get_upload_resource_dir(is_kmpp, resource_dir, base, upload_resource_di
   return File.join(smf_workspace_dir, upload_resource_dir) if upload_resource_dir
 
   case @platform
-  when :ios
-    upload_resource_dir = File.join(resource_dir, base + IOS_LOCALE_DIR_POSTFIX)
+  when :ios, :macos, :apple
+    upload_resource_dir = File.join(resource_dir, base + APPLE_LOCALE_DIR_POSTFIX)
   when :android
     upload_resource_dir = File.join(resource_dir, ANDROID_UPLOAD_DIR_NAME)
     upload_resource_dir = File.join(resource_dir, ANDROID_UPLOAD_DIR_NAME_KMPP) if is_kmpp
@@ -439,7 +439,7 @@ def _smf_validate_languages(languages, base)
   raise 'Missing languages to translate' if !languages
 
   case @platform
-  when :ios
+  when :ios, :macos, :apple
     raise 'Base language is missing in languages mapping!' if !languages.dig(base)
   when :android
     raise 'default language is no set' if !languages.dig(ANDROID_DEFAULT_LANGUAGE_KEY)
@@ -482,7 +482,7 @@ end
 # and returns just the filename to be used as tag
 def _smf_tag_from_file(file)
   case @platform
-  when :ios
+  when :ios, :macos, :apple
     # For ios the tag is the filename+extension. For example Localizable.strings
     tag = File.basename(file)
   when :android
