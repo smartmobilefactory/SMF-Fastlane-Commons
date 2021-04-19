@@ -1,5 +1,7 @@
+########################## TICKETS API ##############################
+
 # Get the ticket title from jira
-def _smf_fetch_ticket_data_for(ticket_tag)
+def smf_jira_fetch_ticket_data_for(ticket_tag)
   res = nil
   base_url = nil
 
@@ -26,14 +28,12 @@ def _smf_fetch_ticket_data_for(ticket_tag)
   result
 end
 
-def _smf_fetch_remote_tickets_for(ticket_tag, base_url)
+def smf_jira_fetch_related_tickets_for(ticket_tag, base_url)
   res = _smf_https_get_request(
     File.join(base_url, 'rest/api/latest/issue', ticket_tag, 'remotelink'),
     :basic,
     ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
   )
-
-  UI.message("Result linked: #{res}")
 
   related_tickets = []
 
@@ -61,64 +61,6 @@ def _smf_fetch_remote_tickets_for(ticket_tag, base_url)
   end
 
   related_tickets.uniq
-end
-
-def _try_dig(map, key)
-  value = nil
-  begin
-    value = map.dig(key)
-  rescue
-    value = nil
-  end
-
-  value
-end
-
-# get PR body, title and commits for a certain pull request
-def _smf_fetch_pull_request_data(pr_number)
-  repo_name = smf_remote_repo_name
-
-  repo_owner = smf_remote_repo_owner
-  repo_owner = 'smartmobilefactory' if repo_owner.nil?
-
-  base_url = "https://api.github.com/repos/#{repo_owner}/#{repo_name}/pulls/#{pr_number}"
-
-  pull_request = _smf_https_get_request(
-    base_url,
-    :token,
-    ENV[$SMF_GITHUB_TOKEN_ENV_KEY]
-  )
-
-  title = _try_dig(pull_request, :title)
-  body = _try_dig(pull_request, :body)
-  pr_link = _try_dig(pull_request, :html_url)
-  branch = _try_dig(pull_request, :head)
-
-  unless branch.nil?
-    branch = _try_dig(branch, :ref)
-  end
-
-  commits = _smf_https_get_request(
-    base_url + '/commits',
-    :token,
-    ENV[$SMF_GITHUB_TOKEN_ENV_KEY]
-  )
-
-  begin
-    commits = commits.map {|commit| commit.dig(:commit, :message)}.compact.uniq
-  rescue
-    commits = nil
-  end
-
-  pr_data = {
-    body: body,
-    title: title,
-    commits: commits,
-    pr_link: pr_link,
-    branch: branch
-  }
-
-  pr_data
 end
 
 def _smf_extract_linked_issues(ticket_data, base_url)
@@ -149,3 +91,5 @@ def _smf_extract_issue(issue_data, type, base_url)
 
   ticket
 end
+
+########################## COMMENTS API ##############################

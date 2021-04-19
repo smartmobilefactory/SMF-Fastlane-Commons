@@ -410,3 +410,18 @@ def smf_get_podspec_versions(podspecs)
 
   versions.uniq
 end
+
+def smf_is_keychain_enabled
+  return ENV[$SMF_IS_KEYCHAIN_ENABLED].nil? ? true : ENV[$SMF_IS_KEYCHAIN_ENABLED] == "true"
+end
+
+def _try_dig(map, key)
+
+  begin
+    value = map.dig(key)
+  rescue
+    value = nil
+  end
+
+  value
+end
