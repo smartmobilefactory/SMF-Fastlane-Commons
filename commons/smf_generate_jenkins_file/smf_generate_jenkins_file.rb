@@ -86,8 +86,8 @@ def _smf_jenkins_file_template_path
 end
 
 def _smf_build_variant_platform_prefix_mapping(platform)
-  case platform
-  when 'macOS'
+  case platform.to_sym
+  when :macOS
     return $CATALYST_MAC_BUILD_VARIANT_PREFIX
   end
 
@@ -108,7 +108,7 @@ def _smf_possible_build_variants(remove_multi_build_variants)
 
     alt_platforms.each_key do |platform|
       build_variant_prefix = _smf_build_variant_platform_prefix_mapping(platform)
-
+      UI.message("DEBUGGING: build_varinat prefix: #{build_variant_prefix}")
       unless build_variant_prefix.nil?
         possible_build_variants.push("#{build_variant_prefix}#{build_variant}")
       end
