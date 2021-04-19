@@ -61,8 +61,7 @@ private_lane :smf_build_apple_app do |options|
     catalyst_platform: catalyst_platform
   }
 
-  # Debugging 
-  gym_parameters[:destination] = 'platform=macOS' if smf_is_catalyst_mac_build(build_variant)
+  gym_parameters[:destination] = 'platform=macOS,variant=Mac Catalyst' if smf_is_catalyst_mac_build(build_variant)
 
   gym(gym_parameters)
 
