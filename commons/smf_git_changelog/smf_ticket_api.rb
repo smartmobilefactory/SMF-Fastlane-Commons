@@ -63,6 +63,17 @@ def _smf_fetch_remote_tickets_for(ticket_tag, base_url)
   related_tickets.uniq
 end
 
+def _try_dig(map, key)
+  value = nil
+  begin
+    value = map.dig(key)
+  rescue
+    value = nil
+  end
+
+  value
+end
+
 # get PR body, title and commits for a certain pull request
 def _smf_fetch_pull_request_data(pr_number)
   repo_name = smf_remote_repo_name
@@ -78,16 +89,13 @@ def _smf_fetch_pull_request_data(pr_number)
     ENV[$SMF_GITHUB_TOKEN_ENV_KEY]
   )
 
-  begin
-    title = pull_request.dig(:title)
-    body = pull_request.dig(:body)
-    pr_link = pull_request.dig(:html_url)
-    branch = pull_request.dig(:head).dig(:ref)
-  rescue
-    title = nil
-    body = nil
-    pr_link = nil
-    branch = nil
+  title = _try_dig(pull_request, :title)
+  body = _try_dig(pull_request, :body)
+  pr_link = _try_dig(pull_request, :html_url)
+  branch = _try_dig(pull_request, :head)
+
+  unless branch.nil?
+    branch = _try_dig(branch, :ref)
   end
 
   commits = _smf_https_get_request(
@@ -111,4 +119,33 @@ def _smf_fetch_pull_request_data(pr_number)
   }
 
   pr_data
+end
+
+def _smf_extract_linked_issues(ticket_data, base_url)
+  linked_issues = []
+
+  return nil if ticket_data.nil? || base_url.nil?
+
+  issues = ticket_data.dig(:fields, :issuelinks)
+
+  return nil if issues.nil?
+
+  issues.each do |issue_data|
+    linked_issues.push(_smf_extract_issue(issue_data, :outwardIssue, base_url))
+    linked_issues.push(_smf_extract_issue(issue_data, :inwardIssue, base_url))
+  end
+
+  linked_issues.compact
+end
+
+def _smf_extract_issue(issue_data, type, base_url)
+  ticket = {}
+  issue = issue_data[type]
+  return nil if issue.nil?
+
+  ticket[:title] = issue.dig(:fields, :summary)
+  ticket[:tag] = issue[:key]
+  ticket[:link] = File.join(base_url, 'browse', ticket[:tag])
+
+  ticket
 end

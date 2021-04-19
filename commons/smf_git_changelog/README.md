@@ -24,21 +24,21 @@ To conveniently format the changelog, there are some helper functions in the `sm
 #### Jira Tickets Auto Detection
 
 For pull request, the pr title, pr body, branch name and commits are searched to automatically detect the Jira Issue associated with the Pull Request and add them to the danger log. When building an app, the changelog is automatically searched and detected tickets are added to it in an extra section.  The following constraints are set in the code to specify the appearance of a ticket tag:
- 
+
 | Constraint | Value |
 |:--|:--:|
 | min\_ticket\_name\_length | 2 |
 | max\_ticket\_name\_length | 14 |
 | min\_ticket\_number\_length | 1 |
 | max\_ticket\_number\_length | 8 |
- 
+
 Which means, it looks for the occurrence of a string like this: `<name>-<number>`. Where the `<name>` string is between `min_ticket_name_length` and `max_ticket_name_length` capital letters and the `<number>` is between `min_ticket_number_length` and `max_ticket_number_length` digits. If at some points ticket tags outgrow this bounds, these values can be changed accordingly.
 
 #### Ticket name blacklist
 In the file `smf_ticket_detection_utils.rb`, an array is defined (`TICKET_BLACKLIST`) which contains regex's to match ticket names which should be ignored. For example the regex `UTF-*` prevents strings containing something like `UTF-16` from being counted as a valid ticket tag.
 
 #### The special "ticket"
-Occurrences tags matching `PR-<some number>` are treated at PR references, these tags (with links to the related pull request) are displayed in an extra section in the PR/Changelog 
+Occurrences tags matching `PR-<some number>` are treated at PR references, these tags (with links to the related pull request) are displayed in an extra section in the PR/Changelog
 #### Custom Ticket Links
 The base url which is used to create the ticket links defaults to `https://smartmobilefactory.atlassian.net` which is provided by the lane `smf_super_atlassian_base_urls`. If a project might contain tickets from other atlassian instances, new base urls can be added by overriding the lane `smf_atlassian_base_urls` in the projects Fastfile. For example if the project also contains tickets from the 'dokulino space' one could add the following lines to the projects fastfile:
 ```
@@ -61,18 +61,20 @@ If the changelog contains more than 20 000 characters it will be shortened.
 
 
 # Global Changelog Availability With a Temporary Changelog File
+
 ### Reading
 The private lane `smf_read_changelog` reads the temporary changelog file and returns the changelog as a string.
-If the flag `hmtl` is set to true,  the html formatted changelog file is read and returned instead.
 
-Example: 
+By default the text format is returned. Other supported format are `html` and `slack_changelog`.
 
-```
-changelog = smf_read_changelog()
-```
+Example:
 
 ```
-changelog = smf_read_changelog(html: true) # returns the html formatted changelog
+changelog = smf_read_changelog() # returns by default the text format
+```
+
+```
+changelog = smf_read_changelog(type: html) # returns the html formatted changelog
 ```
 
 ### Writing
@@ -81,8 +83,10 @@ The private lane `smf_write_changelog` writes a given string to the temporary ch
 Exampel:
 
 ```
-changelog = smf_write_changelog(
-    changelog: "Some commit messages"  # The changelog which will be written to the file
-    html_changelog: "<b> Changelog as HTML </b>" # The changelog formatted in html
+smf_write_changelog(
+    changelog: "Some commit messages"  # The changelog as basic markdown / text format
+    html_changelog: "<b> Changelog as HTML </b>" # The changelog formatted in HTML
+    slack_changelog: "Some commit messages", # The changelog formatted in Slack-specific markdown
+    ticket_tags: "TICKET-1 TICKET-2 TICKET-3" # List of related Jira tickets
 )
 ```

@@ -55,21 +55,27 @@ private_lane :smf_git_changelog do |options|
 
   end
 
-  # Limit the size of changelog as it's crashes if it's too long
-  tickets = smf_generate_tickets_from_changelog(cleaned_changelog_messages.uniq)
+  # Extract related Jira issues info
+  ticket_tags = smf_get_ticket_tags_from_changelog(cleaned_changelog_messages.uniq)
+  UI.message("Jira tickets found: #{ticket_tags}")
+  tickets = smf_generate_tickets_from_tags(ticket_tags)
 
+  # Limit the size of changelog as it's crashes if it's too long
   changelog = cleaned_changelog_messages.uniq.join("\n")
   changelog = "#{changelog[0..20_000]}#{'\\n...'}" if changelog.length > 20_000
   changelog = changelog.split("\n")
 
+  # Convert changelog to different output formats
   html_changelog = _smf_generate_changelog(changelog, tickets, :html)
   markdown_changelog = _smf_generate_changelog(changelog, tickets, :markdown)
   slack_changelog = _smf_generate_changelog(changelog, tickets, :slack_markdown)
+  ticket_tags = ticket_tags.join(' ') # convert array to string list
 
   smf_write_changelog(
     changelog: markdown_changelog,
     html_changelog: html_changelog,
-    slack_changelog: slack_changelog
+    slack_changelog: slack_changelog,
+    ticket_tags: ticket_tags
   )
 end
 
@@ -106,6 +112,10 @@ def _smf_changelog_slack_markdown_temp_path
   "#{@fastlane_commons_dir_path}/#{$CHANGELOG_TEMP_FILE_SLACK_MARKDOWN}"
 end
 
+def _smf_ticket_tags_temp_path
+  "#{@fastlane_commons_dir_path}/#{$TICKET_TAGS_TEMP_FILE}"
+end
+
 def smf_remote_repo_name
   File.basename(`git config --get remote.origin.url`.strip).gsub('.git', '')
 end
@@ -114,36 +124,7 @@ def smf_remote_repo_owner
   remote_url = `git config --get remote.origin.url`.strip
   result = remote_url.scan(/git@github.com:(.+)\//)
 
-  return nil? if result.first.nil?
+  return nil if result.first.nil?
 
   result.first.first
-end
-
-def _smf_extract_linked_issues(ticket_data, base_url)
-  linked_issues = []
-
-  return nil if ticket_data.nil? || base_url.nil?
-
-  issues = ticket_data.dig(:fields, :issuelinks)
-
-  return nil if issues.nil?
-
-  issues.each do |issue_data|
-    linked_issues.push(_smf_extract_issue(issue_data, :outwardIssue, base_url))
-    linked_issues.push(_smf_extract_issue(issue_data, :inwardIssue, base_url))
-  end
-
-  linked_issues.compact
-end
-
-def _smf_extract_issue(issue_data, type, base_url)
-  ticket = {}
-  issue = issue_data[type]
-  return nil if issue.nil?
-
-  ticket[:title] = issue.dig(:fields, :summary)
-  ticket[:tag] = issue[:key]
-  ticket[:link] = File.join(base_url, 'browse', ticket[:tag])
-
-  ticket
 end
