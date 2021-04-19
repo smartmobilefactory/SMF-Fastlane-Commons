@@ -75,6 +75,7 @@ private_lane :smf_super_build do |options|
     build_variant: build_variant,
     skip_export: options[:skip_export],
     skip_package_pkg: smf_config_get(build_variant,:skip_package_pkg),
+    skip_package_ipa: smf_config_get(build_variant, :skip_package_ipa),
     scheme: smf_config_get(build_variant, :scheme),
     should_clean_project: smf_config_get(build_variant, :should_clean_project),
     required_xcode_version: smf_config_get(nil, :project, :xcode_version),
