@@ -207,7 +207,11 @@ private_lane :smf_super_create_dmg_and_gatekeeper do |options|
 
   build_variant = smf_build_variant(options)
 
-  next unless smf_is_mac_build(build_variant)
+
+  unless smf_is_mac_build(build_variant)
+    UI.message("Skipping lane for platform #{@platform} and build variant #{build_variant}")
+    next
+  end
 
   dmg_path = smf_create_dmg_from_app(
     team_id: smf_config_get(build_variant, :team_id),
@@ -258,7 +262,11 @@ end
 private_lane :smf_super_pipeline_upload_with_sparkle do |options|
 
   build_variant = smf_build_variant(options)
-  next unless smf_is_mac_build(build_variant)
+
+  unless smf_is_mac_build(build_variant)
+    UI.message("Skipping lane for platform #{@platform} and build variant #{build_variant}")
+    next
+  end
 
   if smf_config_get(build_variant, :use_sparkle) == true
     smf_upload_with_sparkle(
