@@ -108,7 +108,7 @@ def _smf_possible_build_variants(remove_multi_build_variants)
 
     alt_platforms.each_key do |platform|
       build_variant_prefix = _smf_build_variant_platform_prefix_mapping(platform)
-      UI.message("DEBUGGING: build_varinat prefix: #{build_variant_prefix}")
+
       unless build_variant_prefix.nil?
         possible_build_variants.push("#{build_variant_prefix}#{build_variant}")
       end
