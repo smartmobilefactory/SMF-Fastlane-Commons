@@ -86,8 +86,8 @@ def _smf_jenkins_file_template_path
 end
 
 def _smf_build_variant_platform_prefix_mapping(platform)
-  case @platform
-  when :macOS
+  case platform
+  when 'macOS'
     return $CATALYST_MAC_BUILD_VARIANT_PREFIX
   end
 
@@ -101,14 +101,17 @@ def _smf_possible_build_variants(remove_multi_build_variants)
   # check if the project is a catalyst project and generate build_variants for every
   # given platform
   build_variants.each do |build_variant|
-    alt_platforms = @smf_fastlane_config.dig(:build_variants, build_variant.to_sym, :alt_platforms)
-
     possible_build_variants.push(build_variant)
+
+    alt_platforms = @smf_fastlane_config.dig(:build_variants, build_variant.to_sym, :alt_platforms)
     next if alt_platforms.nil?
 
     alt_platforms.each_key do |platform|
       build_variant_prefix = _smf_build_variant_platform_prefix_mapping(platform)
-      possible_build_variants.push("#{build_variant_prefix}#{build_variant}")
+
+      unless build_variant_prefix.nil?
+        possible_build_variants.push("#{build_variant_prefix}#{build_variant}")
+      end
     end
   end
 
