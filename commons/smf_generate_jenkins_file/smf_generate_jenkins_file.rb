@@ -1,5 +1,76 @@
 require 'json'
 
+########## DEPRECATED CODE START #########
+# This code is deprecated and should be removed as soon as most
+# of the projects are migrated.
+# TICKET: https://smartmobilefactory.atlassian.net/browse/SMFIT-1867 (19.04.2021)
+# !!! Also search for "deprecated" in this file and remove the marked lines !!!
+
+FALLBACK_TEMPLATE_CREDENTIAL_KEY = 'PIPELINE_TEMPLATE_CREDENTIAL'
+CUSTOM_IOS_CREDENTIALS = [
+  '__CUSTOM_PHRASE_APP_TOKEN__',
+  '__CUSTOM_SPARKLE_PRIVATE_SSH_KEY__',
+  '__CUSTOM_SPARKLE_SIGNING_KEY__'
+]
+
+MACOS_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_macOS.template'
+
+def _smf_custom_credential_deprecation_warning
+  case @platform
+  when :ios, :macos, :apple
+
+    custom_credentials = smf_config_get(nil, :project, :custom_credentials)
+    UI.message(custom_credentials)
+    if custom_credentials.nil? == false && custom_credentials.empty? == false
+      _, credential_value = custom_credentials.first
+
+      if credential_value.is_a?(Hash) == false
+        migration_guide_url = 'https://smartmobilefactory.atlassian.net/l/c/QZebJa0M'
+        message = "This project uses a deprecated way to setup custom credentials, please update using this migration guide: #{migration_guide_url}"
+        estimated_time = '5m'
+        requirements = '- Access to the project on Github'
+
+        smf_send_deprecation_warning(
+          title: 'Custom Credential Passing',
+          message: message,
+          estimated_time: estimated_time,
+          requirements: requirements
+        )
+      end
+    end
+  end
+end
+
+def _smf_insert_custom_credentials(jenkinsFile)
+  jenkinsFileData = jenkinsFile
+  case @platform
+  when :ios, :macos, :apple
+    _smf_custom_credential_deprecation_warning
+
+    for custom_credential in CUSTOM_IOS_CREDENTIALS
+      if @smf_fastlane_config[:project][:custom_credentials] && @smf_fastlane_config[:project][:custom_credentials][custom_credential.to_sym]
+        custom_credential_key = @smf_fastlane_config[:project][:custom_credentials][custom_credential.to_sym]
+        jenkinsFileData = jenkinsFileData.gsub(custom_credential, custom_credential_key)
+      else
+        jenkinsFileData = jenkinsFileData.gsub(custom_credential, FALLBACK_TEMPLATE_CREDENTIAL_KEY)
+      end
+    end
+
+  when :android
+  when :flutter
+    UI.message('Inserting custom credentials for flutter is not implemented yet')
+  when :ios_framework
+  else
+    UI.message("There is no platform \"#{@platform}\", exiting...")
+    raise 'Unknown platform'
+  end
+
+  jenkinsFileData
+end
+
+############################ DEPRECATION END ################
+
+
 # Local Constants
 BUILD_VARIANTS_PATTERN = '__BUILD_VARIANTS__'
 POD_EXAMPLE_VARIANTS_PATTERN = '__EXAMPLE_VARIANTS__'
@@ -7,16 +78,9 @@ POD_EXAMPLE_VARIANTS_PATTERN = '__EXAMPLE_VARIANTS__'
 BUILD_NODES_PATTERN = '__BUILD_NODES__'
 NODE_XCODE_LABEL_PREFIX = 'xcode-'
 
-FALLBACK_TEMPLATE_CREDENTIAL_KEY = 'PIPELINE_TEMPLATE_CREDENTIAL'
-CUSTOM_IOS_CREDENTIALS = [
-    '__CUSTOM_PHRASE_APP_TOKEN__',
-    '__CUSTOM_SPARKLE_PRIVATE_SSH_KEY__',
-    '__CUSTOM_SPARKLE_SIGNING_KEY__'
-]
 
 # iOS/macOS Templates
 POD_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_iOS_Framework.template'
-MACOS_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_macOS.template'
 APPLE_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_Apple.template'
 
 # Android Templates
@@ -73,6 +137,7 @@ def _smf_jenkins_file_template_path
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{FLUTTER_APP_TEMPLATE_JENKINS_FILE}"
   when :ios_framework
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{POD_TEMPLATE_JENKINS_FILE}"
+  # Will be depreacted, remove this "when" case and add macos to the :apple, :ios case
   when :macos
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{MACOS_TEMPLATE_JENKINS_FILE}"
   when :apple, :ios
@@ -126,59 +191,6 @@ def _smf_possible_build_variants(remove_multi_build_variants)
   end
 
   possible_build_variants
-end
-
-def _smf_custom_credential_deprecation_warning
-  case @platform
-  when :ios, :macos, :apple
-
-    custom_credentials = smf_config_get(nil, :project, :custom_credentials)
-    UI.message(custom_credentials)
-    if custom_credentials.nil? == false && custom_credentials.empty? == false
-      _, credential_value = custom_credentials.first
-
-      if credential_value.is_a?(Hash) == false
-        migration_guide_url = 'https://smartmobilefactory.atlassian.net/l/c/QZebJa0M'
-        message = "This project uses a deprecated way to setup custom credentials, please update using this migration guide: #{migration_guide_url}"
-
-        smf_send_deprecation_warning(
-          title: 'Custom Credential Passing',
-          message: message
-        )
-      end
-    end
-  end
-end
-
-######################################################
-# THIS FUNCTION IS DEPRECATED AND SHOULD BE REMOVED  #
-# WHEN ALL PROJECTS ARE MIGRATED                     #
-######################################################
-def _smf_insert_custom_credentials(jenkinsFile)
-  jenkinsFileData = jenkinsFile
-  case @platform
-  when :ios, :macos, :apple
-    _smf_custom_credential_deprecation_warning
-
-    for custom_credential in CUSTOM_IOS_CREDENTIALS
-      if @smf_fastlane_config[:project][:custom_credentials] && @smf_fastlane_config[:project][:custom_credentials][custom_credential.to_sym]
-        custom_credential_key = @smf_fastlane_config[:project][:custom_credentials][custom_credential.to_sym]
-        jenkinsFileData = jenkinsFileData.gsub(custom_credential, custom_credential_key)
-      else
-        jenkinsFileData = jenkinsFileData.gsub(custom_credential, FALLBACK_TEMPLATE_CREDENTIAL_KEY)
-      end
-    end
-
-  when :android
-  when :flutter
-    UI.message('Inserting custom credentials for flutter is not implemented yet')
-  when :ios_framework
-  else
-    UI.message("There is no platform \"#{@platform}\", exiting...")
-    raise 'Unknown platform'
-  end
-
-  jenkinsFileData
 end
 
 # inserts an array with available build nodes (labels) into the jenkins file

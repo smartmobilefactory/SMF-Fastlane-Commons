@@ -5,6 +5,11 @@ private_lane :smf_send_deprecation_warning do |options|
 
   message = options[:message]
   title = options[:title]
+  estimated_time = options[:estimated_time]
+  requirements = options[:requirements]
+
+  message += "\n⏱ This Migration takes approximately: #{estimated_time}"
+  message += "\n🔐 Requirements\n#{requirements}"
 
   smf_send_message(
     title: "⚠️ #{name} DEPRECATION WARNING: #{title} ⚠️",

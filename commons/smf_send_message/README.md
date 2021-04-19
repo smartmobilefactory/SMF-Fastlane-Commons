@@ -32,5 +32,7 @@ This lane can be used to send a deprecation warning. This warning will be displa
 smf_send_deprecation_warning(
     title: "Use of deprecated phrase app scripts",
     message: "This projects uses deprecated phraseapp scripts!"
+    estimated_time: "10m",
+    requierments: "Access to Project on PhraseApp"
 )
 ```
