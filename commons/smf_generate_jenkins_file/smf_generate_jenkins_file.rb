@@ -13,8 +13,6 @@ CUSTOM_IOS_CREDENTIALS = [
   '__CUSTOM_SPARKLE_SIGNING_KEY__'
 ]
 
-MACOS_TEMPLATE_JENKINS_FILE = 'Jenkinsfile_macOS.template'
-
 def _smf_custom_credential_deprecation_warning
   case @platform
   when :ios, :macos, :apple
@@ -137,10 +135,7 @@ def _smf_jenkins_file_template_path
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{FLUTTER_APP_TEMPLATE_JENKINS_FILE}"
   when :ios_framework
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{POD_TEMPLATE_JENKINS_FILE}"
-  # Will be depreacted, remove this "when" case and add macos to the :apple, :ios case
-  when :macos
-    path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{MACOS_TEMPLATE_JENKINS_FILE}"
-  when :apple, :ios
+  when :apple, :ios, :macos
     path = "#{@fastlane_commons_dir_path}/commons/smf_generate_jenkins_file/#{APPLE_TEMPLATE_JENKINS_FILE}"
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
