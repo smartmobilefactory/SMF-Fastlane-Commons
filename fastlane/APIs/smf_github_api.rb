@@ -7,7 +7,7 @@ def smf_github_fetch_pull_request_data(pr_number)
 
   base_url = "https://api.github.com/repos/#{repo_owner}/#{repo_name}/pulls/#{pr_number}"
 
-  pull_request = _smf_https_get_request(
+  pull_request = smf_https_get_request(
     base_url,
     :token,
     ENV[$SMF_GITHUB_TOKEN_ENV_KEY]
@@ -22,7 +22,7 @@ def smf_github_fetch_pull_request_data(pr_number)
     branch = _try_dig(branch, :ref)
   end
 
-  commits = _smf_https_get_request(
+  commits = smf_https_get_request(
     base_url + '/commits',
     :token,
     ENV[$SMF_GITHUB_TOKEN_ENV_KEY]
