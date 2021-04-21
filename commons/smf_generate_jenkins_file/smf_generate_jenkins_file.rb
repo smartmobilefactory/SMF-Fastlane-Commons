@@ -16,7 +16,7 @@ CUSTOM_IOS_CREDENTIALS = [
 CUSTOM_CREDENTIALS_SECTION_KEY = '__CUSTOM_CREDENTIALS__'
 CUSTOM_CREDENTIALS_SECTION = """// This way of using custom credentials is deprecated and will be removed
 // as soon as most of the projects are migrated
-# TICKET: https://smartmobilefactory.atlassian.net/browse/SMFIT-1867 (19.04.2021)
+// TICKET: https://smartmobilefactory.atlassian.net/browse/SMFIT-1867 (19.04.2021)
 
 custom_credentials = [
 	'CUSTOM_PHRASE_APP_TOKEN': '__CUSTOM_PHRASE_APP_TOKEN__',
