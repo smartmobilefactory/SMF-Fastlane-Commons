@@ -18,7 +18,7 @@ CUSTOM_CREDENTIALS_SECTION = """// This way of using custom credentials is depre
 // as soon as most of the projects are migrated
 // TICKET: https://smartmobilefactory.atlassian.net/browse/SMFIT-1867 (19.04.2021)
 
-custom_credentials = [
+_custom_credentials = [
 	'CUSTOM_PHRASE_APP_TOKEN': '__CUSTOM_PHRASE_APP_TOKEN__',
 	'CUSTOM_SPARKLE_PRIVATE_SSH_KEY': '__CUSTOM_SPARKLE_PRIVATE_SSH_KEY__',
 	'CUSTOM_SPARKLE_SIGNING_KEY': '__CUSTOM_SPARKLE_SIGNING_KEY__'
