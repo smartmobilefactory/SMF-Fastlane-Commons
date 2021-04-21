@@ -60,7 +60,7 @@ def _smf_insert_custom_credentials(jenkinsFile)
   when :ios, :macos, :apple
     should_skip = _smf_custom_credential_deprecation_warning
 
-    return jenkinsFileData if should_skip
+    return jenkinsFileData.gsub(CUSTOM_CREDENTIALS_SECTION_KEY, '') if should_skip
 
     custom_credentials_section = CUSTOM_CREDENTIALS_SECTION
 
