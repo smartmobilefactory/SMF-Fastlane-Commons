@@ -353,28 +353,6 @@ def smf_get_flutter_binary_path
   return flutter_binary_path
 end
 
-# Helper function for basci https requests
-def _smf_https_get_request(url, auth_type, credentials)
-  uri = URI(url)
-
-  https = Net::HTTP.new(uri.host, uri.port)
-  https.use_ssl = true
-
-  req = Net::HTTP::Get.new(uri)
-  if auth_type == :basic
-    credentials = credentials.split(':')
-    req.basic_auth(credentials[0], credentials[1])
-  elsif auth_type == :token
-    req['Authorization'] = "token #{credentials}"
-  end
-
-  res = https.request(req)
-
-  return nil if res.code != '200'
-
-  JSON.parse(res.body, {symbolize_names: true})
-end
-
 def smf_build_variant(options)
   build_variant = options[:build_variant]
   return build_variant unless build_variant.nil?
