@@ -72,7 +72,7 @@ def _smf_insert_custom_credentials(jenkinsFile)
         custom_credential_key = @smf_fastlane_config[:project][:custom_credentials][custom_credential.to_sym]
         custom_credentials_section = custom_credentials_section.gsub(custom_credential, custom_credential_key)
       else
-        jenkinsFileData = jenkinsFileData.gsub(custom_credential, FALLBACK_TEMPLATE_CREDENTIAL_KEY)
+        custom_credentials_section = custom_credentials_section.gsub(custom_credential, FALLBACK_TEMPLATE_CREDENTIAL_KEY)
       end
     end
 
