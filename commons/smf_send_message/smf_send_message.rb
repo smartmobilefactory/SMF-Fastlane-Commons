@@ -19,7 +19,7 @@ def _smf_should_skip_notifications_for_branch(project_name)
     return false
   end
 
-  if project_name.downcase.include?('playground')
+  if project_name.downcase.include?('playground') && !branch.match(/^PR-.*$/)
     return false
   end
 
