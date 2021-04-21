@@ -138,8 +138,8 @@ private_lane :smf_generate_jenkins_file do |options|
 
   jenkinsFileData = jenkinsFileData.gsub("#{BUILD_VARIANTS_PATTERN}", JSON.dump(possible_build_variants))
 
-  # Deprecated, remove after migration, along with macos and ios jenkins file
-  jenkinsFileData = _smf_insert_custom_credentials(jenkinsFileData) unless @platform == :macos
+  # Deprecated, remove after migration,
+  jenkinsFileData = _smf_insert_custom_credentials(jenkinsFileData)
 
   jenkinsFileData = _smf_insert_build_nodes(jenkinsFileData, ios_build_nodes)
 
