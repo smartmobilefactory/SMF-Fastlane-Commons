@@ -6,14 +6,14 @@
 
 _build_variants = __BUILD_VARIANTS__
 
-__CUSTOM_CREDENTIALS__
-
 _build_nodes = __BUILD_NODES__
 
 _build_parameters = [
 	'build_variants': _build_variants,
-	'custom_credentials': _custom_credentials,
 	'build_nodes': _build_nodes
 ]
+
+__CUSTOM_CREDENTIALS__
+
 
 appleApp(_build_parameters)

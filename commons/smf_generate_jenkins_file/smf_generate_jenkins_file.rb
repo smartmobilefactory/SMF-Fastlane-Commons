@@ -22,7 +22,10 @@ custom_credentials = [
 	'CUSTOM_PHRASE_APP_TOKEN': '__CUSTOM_PHRASE_APP_TOKEN__',
 	'CUSTOM_SPARKLE_PRIVATE_SSH_KEY': '__CUSTOM_SPARKLE_PRIVATE_SSH_KEY__',
 	'CUSTOM_SPARKLE_SIGNING_KEY': '__CUSTOM_SPARKLE_SIGNING_KEY__'
-]"""
+]
+
+_build_parameters['custom_credentials'] = _custom_credentials
+"""
 
 def _smf_custom_credential_deprecation_warning
   case @platform
