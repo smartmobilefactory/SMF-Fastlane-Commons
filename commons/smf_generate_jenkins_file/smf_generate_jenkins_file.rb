@@ -13,6 +13,17 @@ CUSTOM_IOS_CREDENTIALS = [
   '__CUSTOM_SPARKLE_SIGNING_KEY__'
 ]
 
+CUSTOM_CREDENTIALS_SECTION_KEY = '__CUSTOM_CREDENTIALS__'
+CUSTOM_CREDENTIALS_SECTION = """// This way of using custom credentials is deprecated and will be removed
+// as soon as most of the projects are migrated
+# TICKET: https://smartmobilefactory.atlassian.net/browse/SMFIT-1867 (19.04.2021)
+
+custom_credentials = [
+	'CUSTOM_PHRASE_APP_TOKEN': '__CUSTOM_PHRASE_APP_TOKEN__',
+	'CUSTOM_SPARKLE_PRIVATE_SSH_KEY': '__CUSTOM_SPARKLE_PRIVATE_SSH_KEY__',
+	'CUSTOM_SPARKLE_SIGNING_KEY': '__CUSTOM_SPARKLE_SIGNING_KEY__'
+]"""
+
 def _smf_custom_credential_deprecation_warning
   case @platform
   when :ios, :macos, :apple
@@ -51,14 +62,18 @@ def _smf_insert_custom_credentials(jenkinsFile)
 
     return jenkinsFileData if should_skip
 
+    custom_credentials_section = CUSTOM_CREDENTIALS_SECTION
+
     for custom_credential in CUSTOM_IOS_CREDENTIALS
       if @smf_fastlane_config[:project][:custom_credentials] && @smf_fastlane_config[:project][:custom_credentials][custom_credential.to_sym]
         custom_credential_key = @smf_fastlane_config[:project][:custom_credentials][custom_credential.to_sym]
-        jenkinsFileData = jenkinsFileData.gsub(custom_credential, custom_credential_key)
+        custom_credentials_section = custom_credentials_section.gsub(custom_credential, custom_credential_key)
       else
         jenkinsFileData = jenkinsFileData.gsub(custom_credential, FALLBACK_TEMPLATE_CREDENTIAL_KEY)
       end
     end
+
+    jenkinsFileData = jenkinsFileData.gsub(CUSTOM_CREDENTIALS_SECTION_KEY, custom_credentials_section)
 
   when :android
   when :flutter
