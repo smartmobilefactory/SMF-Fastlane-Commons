@@ -341,11 +341,16 @@ end
 
 private_lane :smf_super_send_slack_notification do |options|
 
+  build_variant = options[:build_variant]
   slack_channel = @smf_fastlane_config[:project][:slack_channel]
 
   smf_send_default_build_success_notification(
-      name: smf_get_default_name_of_app(options[:build_variant]),
+      name: smf_get_default_name_of_app(build_variant),
       slack_channel: slack_channel
+  )
+
+  smf_make_jira_realease_comment(
+    build_variant: build_variant
   )
 end
 

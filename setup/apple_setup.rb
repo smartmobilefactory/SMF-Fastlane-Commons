@@ -372,6 +372,10 @@ private_lane :smf_super_send_slack_notification do |options|
     name: smf_get_default_name_of_app(build_variant),
     slack_channel: slack_channel
   )
+
+  smf_make_jira_realease_comment(
+    build_variant: build_variant
+  )
 end
 
 lane :smf_send_slack_notification do |options|
