@@ -481,7 +481,6 @@ def _smf_convert_to_utf_8_if_possible(upload_resource_dir, filename)
   end
 end
 
-
 # this function gets filename(+extension) of the whole path of a file as input
 # and returns just the filename to be used as tag
 def _smf_tag_from_file(file)

@@ -111,13 +111,13 @@ private_lane :smf_send_message do |options|
 
     begin
       _smf_send_slack_message(
-          icon_url: icon_url,
-          title: title,
-          message: content,
-          channel: slack_channel,
-          username: "#{project_name} CI",
-          type: type,
-          payload: payload,
+        icon_url: icon_url,
+        title: title,
+        message: content,
+        channel: slack_channel,
+        username: "#{project_name} CI",
+        type: type,
+        payload: payload
       )
     rescue => exception
       UI.important("Failed to send error message to #{slack_channel} Slack room. Exception: #{exception}")
