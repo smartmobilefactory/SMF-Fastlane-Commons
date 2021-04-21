@@ -34,16 +34,22 @@ def _smf_custom_credential_deprecation_warning
           estimated_time: estimated_time,
           requirements: requirements
         )
+
+        return false
       end
     end
   end
+
+  true
 end
 
 def _smf_insert_custom_credentials(jenkinsFile)
   jenkinsFileData = jenkinsFile
   case @platform
   when :ios, :macos, :apple
-    _smf_custom_credential_deprecation_warning
+    should_skip = _smf_custom_credential_deprecation_warning
+
+    return jenkinsFileData if should_skip
 
     for custom_credential in CUSTOM_IOS_CREDENTIALS
       if @smf_fastlane_config[:project][:custom_credentials] && @smf_fastlane_config[:project][:custom_credentials][custom_credential.to_sym]
