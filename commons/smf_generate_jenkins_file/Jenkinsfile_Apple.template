@@ -12,8 +12,5 @@ _build_parameters = [
 	'build_variants': _build_variants,
 	'build_nodes': _build_nodes
 ]
-
 __CUSTOM_CREDENTIALS__
-
-
 appleApp(_build_parameters)
