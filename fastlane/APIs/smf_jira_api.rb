@@ -1,3 +1,6 @@
+JIRA_API_ISSUE_BASE_URL = 'rest/api/3/issue'
+
+
 ########################## TICKETS API ##############################
 
 # Get the ticket title from jira
@@ -6,8 +9,8 @@ def smf_jira_fetch_ticket_data_for(ticket_tag)
   base_url = nil
 
   smf_atlassian_base_urls.each do |url|
-    res = _smf_https_get_request(
-      File.join(url, 'rest/api/latest/issue', ticket_tag),
+    res = smf_https_get_request(
+      File.join(url, JIRA_API_ISSUE_BASE_URL, ticket_tag),
       :basic,
       ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
     )
@@ -29,8 +32,8 @@ def smf_jira_fetch_ticket_data_for(ticket_tag)
 end
 
 def smf_jira_fetch_related_tickets_for(ticket_tag, base_url)
-  res = _smf_https_get_request(
-    File.join(base_url, 'rest/api/latest/issue', ticket_tag, 'remotelink'),
+  res = smf_https_get_request(
+    File.join(base_url, JIRA_API_ISSUE_BASE_URL, ticket_tag, 'remotelink'),
     :basic,
     ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
   )
@@ -93,3 +96,41 @@ def _smf_extract_issue(issue_data, type, base_url)
 end
 
 ########################## COMMENTS API ##############################
+
+def smf_jira_add_comment_to_ticket(ticket_tag, comment)
+  domain = smf_atlassian_base_urls.first
+
+  request_body = {
+    'body': {
+      'type': 'doc',
+      'version': 1,
+      'content': [
+        {
+          'type': 'paragraph',
+          'content': [
+            {
+              'text': comment,
+              'type': 'text',
+              'marks': [
+                {
+                  'type': 'strong'
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+
+  res = smf_https_post_request(
+    File.join(domain, JIRA_API_ISSUE_BASE_URL, ticket_tag, 'comment'),
+    :basic,
+    ENV[$JIRA_DEV_ACCESS_CREDENTIALS],
+    request_body
+  )
+
+  if res.nil?
+    UI.warning("Error commenting on ticket #{ticket_tag}!")
+  end
+end
