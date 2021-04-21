@@ -130,8 +130,6 @@ def smf_jira_add_comment_to_ticket(ticket_tag, comment)
     request_body
   )
 
-  UI.message(res)
-
   if res.nil?
     UI.important("Error commenting on ticket #{ticket_tag}!")
   end
