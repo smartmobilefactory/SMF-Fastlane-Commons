@@ -33,6 +33,6 @@ smf_send_deprecation_warning(
     title: "Use of deprecated phrase app scripts",
     message: "This projects uses deprecated phraseapp scripts!"
     estimated_time: "10m",
-    requierments: "Access to Project on PhraseApp"
+    requirements: "Access to Project on PhraseApp"
 )
 ```
