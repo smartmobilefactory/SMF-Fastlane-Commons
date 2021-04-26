@@ -73,7 +73,7 @@ def smf_get_ticket_tags_from_changelog(changelog)
     ticket_tags += _smf_find_ticket_tags_in_related_pr(commit_message)
   end
 
-  ticket_tags
+  ticket_tags.uniq
 end
 
 def _smf_make_pr_reference(ticket_tag)
