@@ -51,7 +51,7 @@ private_lane :smf_send_message do |options|
   build_url = !options[:build_url].nil? ? options[:build_url] : ENV['BUILD_URL']
   exception = options[:exception]
   additional_html_entries = !options[:additional_html_entries].nil? ? options[:additional_html_entries] : []
-  fail_build_job_on_error = (!options[:fail_build_job_on_error].nil? ? options[:additional_html_entries] : false)
+  fail_build_job_on_error = (!options[:fail_build_job_on_error].nil? ? options[:fail_build_job_on_error] : false)
   icon_url = 'https://avatars2.githubusercontent.com/u/1090089'
 
   # Log the exceptions to find out if there is useful information which can be added to the message
@@ -94,7 +94,7 @@ private_lane :smf_send_message do |options|
       'Git Branch' => smf_workspace_dir_git_branch
     }
 
-    payload['Notarization Log'] = ENV['FL_NOTARIZE_LOG_FILE_URL'] if @platform == :mac and !ENV['FL_NOTARIZE_LOG_FILE_URL'].nil?
+    payload['Notarization Log'] = ENV['FL_NOTARIZE_LOG_FILE_URL'] if @platform == :macos and !ENV['FL_NOTARIZE_LOG_FILE_URL'].nil?
 
     # Send failure messages also to CI to notice them so that we can see if they can be improved
     if type == 'error' && !(slack_channel.eql? ci_error_log)
