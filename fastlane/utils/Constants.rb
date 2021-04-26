@@ -28,7 +28,6 @@ $XCRESULT_DIR = 'build/derivedData/Logs/Test'
 $SMF_CI_IOS_ERROR_LOG = 'ci-ios-error-log'
 $SMF_CI_ANDROID_ERROR_LOG = 'ci-android-error-log'
 $SMF_CI_FLUTTER_ERROR_LOG = 'ci-flutter-error-log'
-$SMF_CI_METADB_ERROR_LOG = 'metadb-error-log'
 $SMF_CI_DIAGNOSTIC_CHANNEL = 'ci-diagnostic-messages'
 
 # PhraseApp

@@ -18,9 +18,10 @@ private_lane :smf_meta_report do |options|
   rescue Exception => ex
     UI.message("Meta report could not be performed: #{ex.message}")
     project_name = @smf_fastlane_config[:project][:project_name]
-    smf_send_diagnostic_message(
-        title: "#{project_name} smf_meta_report failed",
-        message: "#{ex.message}, #{ex}"
+    smf_send_message(
+      title: "#{project_name} smf_meta_report failed",
+      message: "#{ex.message}, #{ex}"
+      slack_channel: $SMF_CI_DIAGNOSTIC_CHANNEL
     )
   end
 end
@@ -42,7 +43,7 @@ private_lane :smf_owasp_report do |options|
     smf_send_message(
       title: "#{project_name} smf_owasp_report failed",
       message: "#{ex.message}, #{ex}",
-      slack_channel: $SMF_CI_METADB_ERROR_LOG
+      slack_channel: $SMF_CI_DIAGNOSTIC_CHANNEL
     )
   end
   # TODO report owasp report to metadb
@@ -86,7 +87,7 @@ private_lane :smf_report_depencencies do |options|
     smf_send_message(
       title: "#{project_name} report dependencies failed",
       message: "#{ex.message}, #{ex}",
-      slack_channel: $SMF_CI_METADB_ERROR_LOG
+      slack_channel: $SMF_CI_DIAGNOSTIC_CHANNEL
     )
   end
 
