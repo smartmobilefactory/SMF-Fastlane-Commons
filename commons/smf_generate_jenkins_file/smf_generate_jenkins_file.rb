@@ -32,12 +32,12 @@ def _smf_custom_credential_deprecation_warning
   case @platform
   when :ios, :macos, :apple
 
-    custom_credentials = smf_config_get(nil, :project, :custom_credentials)
+    custom_credential_keys = smf_config_get(nil, :project, :custom_credentials)
 
-    if custom_credentials.nil? == false && custom_credentials.empty? == false
-      _, credential_value = custom_credentials.first
+    if custom_credential_keys.nil? == false && custom_credential_keys.empty? == false
+      _, credential_key = custom_credential_keys.first
 
-      if credential_value.is_a?(Hash) == false
+      if credential_key.is_a?(Hash) == false
         migration_guide_url = 'https://smartmobilefactory.atlassian.net/l/c/QZebJa0M'
         message = "This project uses a deprecated way to setup custom credentials, please update using this migration guide: #{migration_guide_url}"
         estimated_time = '5m'
@@ -68,20 +68,20 @@ def _smf_insert_custom_credentials(jenkinsFile)
 
     custom_credentials_section = CUSTOM_CREDENTIALS_SECTION
 
-    CUSTOM_IOS_CREDENTIALS.each do |custom_credential|
+    CUSTOM_IOS_CREDENTIALS.each do |custom_credential_placeholder|
       custom_credential_key = smf_config_get(
         nil,
-        :project, :custom_credentials, custom_credential.to_sym
+        :project, :custom_credentials, custom_credential_placeholder.to_sym
       )
 
       if custom_credential_key
-        custom_credentials_section = custom_credentials_section.gsub(custom_credential, custom_credential_key)
+        custom_credentials_section.gsub!(custom_credential_placeholder, custom_credential_key)
       else
-        custom_credentials_section = custom_credentials_section.gsub(custom_credential, FALLBACK_TEMPLATE_CREDENTIAL_KEY)
+        custom_credentials_section.gsub!(custom_credential_placeholder, FALLBACK_TEMPLATE_CREDENTIAL_KEY)
       end
     end
 
-    jenkinsFileData = jenkinsFileData.gsub(CUSTOM_CREDENTIALS_SECTION_KEY, custom_credentials_section)
+    jenkinsFileData.gsub!(CUSTOM_CREDENTIALS_SECTION_KEY, custom_credentials_section)
 
   when :android
   when :flutter
