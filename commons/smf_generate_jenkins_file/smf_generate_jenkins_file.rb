@@ -33,7 +33,7 @@ def _smf_custom_credential_deprecation_warning
   when :ios, :macos, :apple
 
     custom_credentials = smf_config_get(nil, :project, :custom_credentials)
-    UI.message(custom_credentials)
+
     if custom_credentials.nil? == false && custom_credentials.empty? == false
       _, credential_value = custom_credentials.first
 
@@ -68,9 +68,13 @@ def _smf_insert_custom_credentials(jenkinsFile)
 
     custom_credentials_section = CUSTOM_CREDENTIALS_SECTION
 
-    for custom_credential in CUSTOM_IOS_CREDENTIALS
-      if @smf_fastlane_config[:project][:custom_credentials] && @smf_fastlane_config[:project][:custom_credentials][custom_credential.to_sym]
-        custom_credential_key = @smf_fastlane_config[:project][:custom_credentials][custom_credential.to_sym]
+    CUSTOM_IOS_CREDENTIALS.each do |custom_credential|
+      custom_credential_key = smf_config_get(
+        nil,
+        :project, :custom_credentials, custom_credential.to_sym
+      )
+
+      if custom_credential_key
         custom_credentials_section = custom_credentials_section.gsub(custom_credential, custom_credential_key)
       else
         custom_credentials_section = custom_credentials_section.gsub(custom_credential, FALLBACK_TEMPLATE_CREDENTIAL_KEY)
