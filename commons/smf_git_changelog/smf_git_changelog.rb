@@ -40,7 +40,7 @@ private_lane :smf_git_changelog do |options|
   changelog_messages = '' if changelog_messages.nil?
 
   cleaned_changelog_messages = []
-  ignored_commits = [/Release Pod.*/, /Increment build number.*/, /Updating i18n/]
+  ignored_commits = [/Release Pod.*/, /Increment build number.*/, /Updating i18n/, /Updated strings from Phrase/]
   changelog_messages.split(/\n+/).each do |commit_message|
     if _smf_should_commit_be_ignored_in_changelog(commit_message, ignored_commits)
       next
