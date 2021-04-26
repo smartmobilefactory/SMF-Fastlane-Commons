@@ -41,7 +41,7 @@ def _smf_custom_credential_deprecation_warning
         migration_guide_url = 'https://smartmobilefactory.atlassian.net/l/c/QZebJa0M'
         message = "This project uses a deprecated way to setup custom credentials, please update using this migration guide: #{migration_guide_url}"
         estimated_time = '5m'
-        requirements = '- Access to the project on Github'
+        requirements = ['Access to the project on Github']
 
         smf_send_deprecation_warning(
           title: 'Custom Credential Passing',
