@@ -132,5 +132,5 @@ def smf_jira_add_comment_to_ticket(ticket_tag, comment)
 
   unless res.nil?
     UI.message("Error posting release comment on jira:\n" + res)
-
+  end
 end
