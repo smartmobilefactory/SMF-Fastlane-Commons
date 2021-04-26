@@ -17,7 +17,7 @@ CUSTOM_CREDENTIALS_SECTION = """
 // as soon as most of the projects are migrated
 // TICKET: https://smartmobilefactory.atlassian.net/browse/SMFIT-1867 (19.04.2021)
 
-custom_credentials = [
+_custom_credentials = [
   'CUSTOM_PHRASE_APP_TOKEN': '__CUSTOM_PHRASE_APP_TOKEN__',
 ]
 
