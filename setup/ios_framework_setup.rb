@@ -260,6 +260,10 @@ private_lane :smf_super_release_pod do |options|
       podspec_path: podspec_path
   )
 
+  smf_make_jira_realease_comment(
+    build_variant: build_variant
+  )
+
 end
 
 lane :smf_release_pod do |options|
