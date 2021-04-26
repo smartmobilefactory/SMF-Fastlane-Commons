@@ -108,11 +108,5 @@ def _smf_send_dependency_report(report, project_name)
   req.basic_auth auth[0], auth[1]
 
   res = https.request(req)
-
-  UI.message("dependency data were reported:\n#{res.body}")
-  smf_send_message(
-    title: "#{project_name} dependency data were reported to metaDB!",
-    message: "Debug notification to monitor how often the metaDB integration succeed",
-    slack_channel: $SMF_CI_METADB_SUCCESS_LOG
-  )
+  UI.message("Dependency data were reported to metaDB:\n#{res.body}")
 end
