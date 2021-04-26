@@ -41,8 +41,12 @@ def smf_https_post_request(url, auth_type, credentials, body)
 
   res = https.request(req)
 
-  return nil if res.code != '200'
+  case res
+  when Net::HTTPSuccess
+    return nil
+  else
+    return "POST: #{res.uri}\nSTATUS: #{res.code}\nMESSAGE: #{res.msg}"
+  end
 
-  JSON.parse(res.body, {symbolize_names: true})
 end
 

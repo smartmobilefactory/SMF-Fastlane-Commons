@@ -1,4 +1,4 @@
-JIRA_API_ISSUE_BASE_URL = 'rest/api/3/issue'
+JIRA_API_ISSUE_BASE_URL = '/rest/api/3/issue/'
 
 
 ########################## TICKETS API ##############################
@@ -10,7 +10,7 @@ def smf_jira_fetch_ticket_data_for(ticket_tag)
 
   smf_atlassian_base_urls.each do |url|
     res = smf_https_get_request(
-      File.join(url, JIRA_API_ISSUE_BASE_URL, ticket_tag),
+      URI.join(url, JIRA_API_ISSUE_BASE_URL, ticket_tag),
       :basic,
       ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
     )
@@ -33,7 +33,7 @@ end
 
 def smf_jira_fetch_related_tickets_for(ticket_tag, base_url)
   res = smf_https_get_request(
-    File.join(base_url, JIRA_API_ISSUE_BASE_URL, ticket_tag, 'remotelink'),
+    URI.join(base_url, JIRA_API_ISSUE_BASE_URL, ticket_tag + '/', 'remotelink'),
     :basic,
     ENV[$JIRA_DEV_ACCESS_CREDENTIALS]
   )
@@ -124,13 +124,13 @@ def smf_jira_add_comment_to_ticket(ticket_tag, comment)
   }
 
   res = smf_https_post_request(
-    File.join(domain, JIRA_API_ISSUE_BASE_URL, ticket_tag, 'comment'),
+    URI.join(domain, JIRA_API_ISSUE_BASE_URL, ticket_tag + '/', 'comment'),
     :basic,
     ENV[$JIRA_DEV_ACCESS_CREDENTIALS],
     request_body
   )
 
-  if res.nil?
-    UI.important("Error commenting on ticket #{ticket_tag}!")
-  end
+  unless res.nil?
+    UI.message("Error posting release comment on jira:\n" + res)
+
 end
