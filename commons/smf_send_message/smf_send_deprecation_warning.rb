@@ -8,15 +8,19 @@ private_lane :smf_send_deprecation_warning do |options|
   estimated_time = options[:estimated_time]
   requirements = options[:requirements]
 
-  message += "\n⏱ This migration takes approximately: #{estimated_time}"
-
-  requirements_section = "\n🔐 Requirements"
-
-  requirements.each do |requirement|
-    requirements_section += "\n‣ #{requirement}"
+  if estimated_time
+    message += "\n⏱ This migration takes approximately: #{estimated_time}"
   end
 
-  message += requirements_section
+  if requirements
+    requirements_section = "\n🔐 Requirements"
+
+    requirements.each do |requirement|
+      requirements_section += "\n‣ #{requirement}"
+    end
+
+    message += requirements_section
+  end
 
   smf_send_message(
     title: "⚠️ #{name} DEPRECATION WARNING: #{title} ⚠️",
