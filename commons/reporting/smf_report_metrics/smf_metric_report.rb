@@ -20,7 +20,7 @@ private_lane :smf_meta_report do |options|
     project_name = @smf_fastlane_config[:project][:project_name]
     smf_send_message(
       title: "#{project_name} smf_meta_report failed",
-      message: "#{ex.message}, #{ex}"
+      message: "#{ex.message}, #{ex}",
       slack_channel: $SMF_CI_DIAGNOSTIC_CHANNEL
     )
   end
