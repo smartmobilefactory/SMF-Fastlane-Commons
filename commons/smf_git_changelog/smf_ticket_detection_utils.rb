@@ -23,7 +23,7 @@ def smf_generate_tickets_from_tags(ticket_tags)
       next
     end
 
-    fetched_data = _smf_fetch_ticket_data_for(ticket_tag)
+    fetched_data = smf_jira_fetch_ticket_data_for(ticket_tag)
     title = fetched_data[:title]
     base_url = fetched_data[:base_url]
     linked_issues = fetched_data[:linked_tickets]
@@ -38,7 +38,7 @@ def smf_generate_tickets_from_tags(ticket_tags)
 
     linked_tickets = linked_issues
     # get remote links and check them for tickets
-    linked_tickets += _smf_fetch_remote_tickets_for(ticket_tag, base_url)
+    linked_tickets += smf_jira_fetch_related_tickets_for(ticket_tag, base_url)
 
     new_ticket = {
       tag: ticket_tag,
@@ -73,7 +73,7 @@ def smf_get_ticket_tags_from_changelog(changelog)
     ticket_tags += _smf_find_ticket_tags_in_related_pr(commit_message)
   end
 
-  ticket_tags
+  ticket_tags.uniq
 end
 
 def _smf_make_pr_reference(ticket_tag)
@@ -81,7 +81,7 @@ def _smf_make_pr_reference(ticket_tag)
   pr_number_matches = ticket_tag.scan(/^PR-([0-9]+)$/)
   return nil if pr_number_matches.empty?
 
-  pr_link = _smf_fetch_pull_request_data(pr_number_matches.first.first).dig(:pr_link)
+  pr_link = smf_github_fetch_pull_request_data(pr_number_matches.first.first).dig(:pr_link)
   new_ticket = {
     tag: ticket_tag,
     link: pr_link
@@ -153,7 +153,7 @@ def _smf_find_ticket_tags_in_related_pr(commit_message)
   pull_number = matches[0][0]
 
   UI.message("Analysing merge commit for PR-#{pull_number} ...")
-  pr_data = _smf_fetch_pull_request_data(pull_number)
+  pr_data = smf_github_fetch_pull_request_data(pull_number)
   ticket_tags = smf_find_jira_ticket_tags_in_pr(pr_data)
   UI.message("Jira ticket(s) found for merge commit (##{pull_number}): #{ticket_tags}")
 
