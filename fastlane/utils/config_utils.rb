@@ -21,9 +21,9 @@ end
 
 def smf_is_mac_build(build_variant)
   is_catalyst_mac = smf_is_catalyst_mac_build(build_variant)
-  is_mac = smf_config_get(build_variant.to_sym, :is_mac_app)
+  platform = smf_config_get(build_variant.to_sym, :platform)
 
-  is_catalyst_mac || is_mac
+  is_catalyst_mac || platform == 'mac'
 end
 
 # access helper to get the correct config.json entry for a given
