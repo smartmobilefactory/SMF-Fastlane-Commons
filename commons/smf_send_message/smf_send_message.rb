@@ -1,6 +1,6 @@
 desc 'Sending a message to the given Slack channel'
 
-def _smf_should_skip_notifications_for_branch
+def _smf_should_skip_notifications_for_branch(project_name)
   branch = smf_workspace_dir_git_branch
 
   if branch.match(/^master$/) # iOS (A-Team)
@@ -16,6 +16,10 @@ def _smf_should_skip_notifications_for_branch
   end
 
   if branch.match(/^kmpp$/) # Android (Eismann - temporary)
+    return false
+  end
+
+  if project_name.downcase.include?('playground') && !branch.match(/^PR-.*$/)
     return false
   end
 
@@ -47,7 +51,7 @@ private_lane :smf_send_message do |options|
   build_url = !options[:build_url].nil? ? options[:build_url] : ENV['BUILD_URL']
   exception = options[:exception]
   additional_html_entries = !options[:additional_html_entries].nil? ? options[:additional_html_entries] : []
-  fail_build_job_on_error = (!options[:fail_build_job_on_error].nil? ? options[:additional_html_entries] : false)
+  fail_build_job_on_error = (!options[:fail_build_job_on_error].nil? ? options[:fail_build_job_on_error] : false)
   icon_url = 'https://avatars2.githubusercontent.com/u/1090089'
 
   # Log the exceptions to find out if there is useful information which can be added to the message
@@ -79,7 +83,7 @@ private_lane :smf_send_message do |options|
 
   UI.message("Sending message \"#{content}\" to room \"#{slack_channel}\"")
 
-  if _smf_should_skip_notifications_for_branch
+  if _smf_should_skip_notifications_for_branch(project_name)
     UI.message("[WARNING]: skip slack notifications from development branches")
 
   elsif slack_channel && (slack_channel.include? '/') == false
@@ -90,7 +94,7 @@ private_lane :smf_send_message do |options|
       'Git Branch' => smf_workspace_dir_git_branch
     }
 
-    payload['Notarization Log'] = ENV['FL_NOTARIZE_LOG_FILE_URL'] if @platform == :mac and !ENV['FL_NOTARIZE_LOG_FILE_URL'].nil?
+    payload['Notarization Log'] = ENV['FL_NOTARIZE_LOG_FILE_URL'] if @platform == :macos and !ENV['FL_NOTARIZE_LOG_FILE_URL'].nil?
 
     # Send failure messages also to CI to notice them so that we can see if they can be improved
     if type == 'error' && !(slack_channel.eql? ci_error_log)
@@ -98,7 +102,7 @@ private_lane :smf_send_message do |options|
         icon_url: icon_url,
         title: title,
         message: content,
-        channel: ci_error_log,
+        channel: project_name.downcase.include?('playground') ? 'ci-development' : ci_error_log,
         username: "#{project_name} CI",
         type: type,
         payload: payload,
@@ -107,13 +111,13 @@ private_lane :smf_send_message do |options|
 
     begin
       _smf_send_slack_message(
-          icon_url: icon_url,
-          title: title,
-          message: content,
-          channel: slack_channel,
-          username: "#{project_name} CI",
-          type: type,
-          payload: payload,
+        icon_url: icon_url,
+        title: title,
+        message: content,
+        channel: slack_channel,
+        username: "#{project_name} CI",
+        type: type,
+        payload: payload
       )
     rescue => exception
       UI.important("Failed to send error message to #{slack_channel} Slack room. Exception: #{exception}")

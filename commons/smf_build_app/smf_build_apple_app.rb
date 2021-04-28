@@ -40,26 +40,31 @@ private_lane :smf_build_apple_app do |options|
 
   smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
 
-  gym(
-      clean: clean_project,
-      workspace: !workspace.nil? ? workspace : "#{project_name}.xcworkspace",
-      scheme: scheme,
-      configuration: xcconfig_name,
-      codesigning_identity: code_signing_identity,
-      output_directory: 'build',
-      xcargs: smf_xcargs_for_build_system,
-      archive_path: "build/",
-      derived_data_path: "build/derivedData/",
-      output_name: output_name,
-      include_symbols: true,
-      include_bitcode: (upload_itc && upload_bitcode),
-      export_options: { iCloudContainerEnvironment: icloud_environment },
-      export_method: export_method,
-      skip_package_ipa: skip_package_ipa,
-      skip_package_pkg: skip_package_pkg,
-      xcpretty_formatter: _smf_get_xcpretty_formatter_path,
-      catalyst_platform: catalyst_platform
-  )
+  gym_parameters = {
+    clean: clean_project,
+    workspace: !workspace.nil? ? workspace : "#{project_name}.xcworkspace",
+    scheme: scheme,
+    configuration: xcconfig_name,
+    codesigning_identity: code_signing_identity,
+    output_directory: 'build',
+    xcargs: smf_xcargs_for_build_system,
+    archive_path: "build/",
+    derived_data_path: "build/derivedData/",
+    output_name: output_name,
+    include_symbols: true,
+    include_bitcode: (upload_itc && upload_bitcode),
+    export_options: { iCloudContainerEnvironment: icloud_environment },
+    export_method: export_method,
+    skip_package_ipa: skip_package_ipa,
+    skip_package_pkg: skip_package_pkg,
+    xcpretty_formatter: _smf_get_xcpretty_formatter_path,
+    catalyst_platform: catalyst_platform
+  }
+
+  gym_parameters[:destination] = 'platform=macOS,variant=Mac Catalyst' if smf_is_catalyst_mac_build(build_variant)
+
+  gym(gym_parameters)
+
 end
 
 def smf_xcargs_for_build_system

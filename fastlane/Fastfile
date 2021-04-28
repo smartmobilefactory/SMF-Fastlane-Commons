@@ -40,14 +40,10 @@ def smf_import_commons
   smf_import_all("#{@fastlane_commons_dir_path}/tools")
 
   case @platform
-  when :ios
-    setup_file_path = "#{@fastlane_commons_dir_path}/setup/ios_setup.rb"
+  when :ios, :macos, :apple
+    setup_file_path = "#{@fastlane_commons_dir_path}/setup/apple_setup.rb"
   when :ios_framework
     setup_file_path = "#{@fastlane_commons_dir_path}/setup/ios_framework_setup.rb"
-  when :apple
-    setup_file_path = "#{@fastlane_commons_dir_path}/setup/apple_setup.rb"
-  when :macos
-    setup_file_path = "#{@fastlane_commons_dir_path}/setup/macos_setup.rb"
   when :android
     setup_file_path = "#{@fastlane_commons_dir_path}/setup/android_setup.rb"
   when :flutter
@@ -70,13 +66,13 @@ def _smf_import_setup_file_at(path)
 end
 
 # Returns the path to the Config.json
-def fastlane_config_path
+def smf_fastlane_config_path
   smf_workspace_dir + '/Config.json'
 end
 
 # loads the config json content into the @smf_fastlane_config env variable
 def smf_load_fastlane_config
-  config_path = fastlane_config_path
+  config_path = smf_fastlane_config_path
   UI.message("Reading the SMF Fastlane config from \"#{config_path}\"")
   config_file = File.read(config_path)
   if config_file
