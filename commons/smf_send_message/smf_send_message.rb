@@ -36,9 +36,9 @@ private_lane :smf_send_message do |options|
   when :ios, :ios_framework, :macos, :apple
     ci_error_log = smf_ci_ios_error_log
   when :android
-    ci_error_log = ci_android_error_log
+    ci_error_log = $SMF_CI_ANDROID_ERROR_LOG.to_s
   when :flutter
-    ci_error_log = ci_flutter_error_log
+    ci_error_log = $SMF_CI_FLUTTER_ERROR_LOG.to_s
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
