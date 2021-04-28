@@ -22,4 +22,17 @@ smf_send_message(
 ## Exception
 If an error occurs the error_info from the exception will be added to the message.
 
+# smf_send_deprecation_warning
 
+This lane can be used to send a deprecation warning. This warning will be displayed as a build error message (color style red) but it WILL NOT fail the build. Its just to raise more attention.
+
+### Example
+
+```
+smf_send_deprecation_warning(
+    title: "Use of deprecated phrase app scripts",
+    message: "This projects uses deprecated phraseapp scripts!"
+    estimated_time: "10m",
+    requirements: ['Access to Project on PhraseApp', 'Access to something else']
+)
+```

@@ -1,21 +1,24 @@
 # ################################################################################
-# THIS LANE IS DEPRECATED AND SHOULD BE REMOVED AS SOON AS
+# THIS LANE IS DEPRECATED AND THE WHOLE FILE SHOULD BE REMOVED AS SOON AS
 # ALL PROJECTS ARE MIGRATED TO USE THE NEW SYSTEM (see lane smf_sync_with_phrase)
+# TICKET: https://smartmobilefactory.atlassian.net/browse/SMFIT-1855 (25.03.2021)
 # ################################################################################
 #
 def smf_send_phraseapp_deprecation_warning
 
-  name = @smf_fastlane_config.dig(:project, :project_name)
-  slack_channel = @smf_fastlane_config.dig(:project, :slack_channel)
-
   migration_guide_url = 'https://smartmobilefactory.atlassian.net/l/c/kXWib1if'
   message = "This project uses a deprecated lane to sync strings with phraseapp, please migrate to the new system using this migration guide: #{migration_guide_url}"
+  estimated_time = '30m to 1h'
+  requirements = [
+    'Access to the project on phrase.com',
+    'Access to the project on Github'
+  ]
 
-  smf_send_message(
-    title: "⚠️ WARNING: #{name} uses deprecated phraseapp scripts ⚠️",
+  smf_send_deprecation_warning(
+    title: 'Use of deprecated phrase app scripts',
     message: message,
-    type: 'error',
-    slack_channel: slack_channel
+    estimated_time: estimated_time,
+    requirements: requirements
   )
 end
 
