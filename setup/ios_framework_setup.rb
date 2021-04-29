@@ -261,7 +261,7 @@ private_lane :smf_super_release_pod do |options|
   )
 
   smf_make_jira_realease_comment(
-    build_variant: build_variant
+    build_variant: nil
   )
 
 end
