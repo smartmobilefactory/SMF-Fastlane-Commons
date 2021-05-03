@@ -71,37 +71,26 @@ def smf_get_keystore_folder(build_variant)
   @smf_fastlane_config[:build_variants][build_variant.to_sym][:keystore]
 end
 
-def smf_get_default_name_of_app(build_variant)
+def smf_get_default_name_and_version(build_variant)
+  project_name = smf_config_get(nil, :project, :project_name)
+
+  # Simply return the projects name if no build variant is given / its nil
+  return project_name unless build_variant
+
   build_number = smf_get_build_number_of_app
-  project_name = @smf_fastlane_config[:project][:project_name]
 
-  if !build_variant.nil?
-    version_number = smf_get_version_number(build_variant)
+  # this will be nil for none ios framework projects,
+  # which is fine see smf_get_version_number()
+  podspec_path = smf_config_get(build_variant, :podspec_path)
+  version_number = smf_get_version_number(build_variant, podspec_path)
+  version_number_string = "#{version_number} "
 
-    if version_number.nil?
-      version_number = ''
-    else
-      version_number += ' '
-    end
-
-    return "#{project_name} #{build_variant.upcase} #{version_number}(#{build_number})"
-  else
-    return project_name
-  end
-end
-
-# Uses Config file to access project name. Should be changed in the future.
-def smf_get_default_name_of_pod(build_variant)
-
-  version = ''
-  if !build_variant.nil?
-    podspec_path = @smf_fastlane_config[:build_variants][build_variant.to_sym][:podspec_path]
-    version = read_podspec(path: podspec_path)['version']
+  unless @platform == :ios_framework
+    build_variant_string = "#{build_variant.upcase} "
+    build_number_string = "(#{build_number})"
   end
 
-  project_name = @smf_fastlane_config[:project][:project_name]
-
-  "#{project_name} #{version}"
+  "#{project_name} #{build_variant_string}#{version_number_string}#{build_number_string}".strip
 end
 
 def smf_get_build_number_of_app
