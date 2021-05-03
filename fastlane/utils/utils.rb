@@ -83,14 +83,13 @@ def smf_get_default_name_and_version(build_variant)
   # which is fine see smf_get_version_number()
   podspec_path = smf_config_get(build_variant, :podspec_path)
   version_number = smf_get_version_number(build_variant, podspec_path)
-  version_number_string = "#{version_number} "
 
   unless @platform == :ios_framework
     build_variant_string = "#{build_variant.upcase} "
     build_number_string = "(#{build_number})"
   end
 
-  "#{project_name} #{build_variant_string}#{version_number_string}#{build_number_string}".strip
+  "#{project_name} #{build_variant_string}#{version_number} #{build_number_string}".strip
 end
 
 def smf_get_build_number_of_app
