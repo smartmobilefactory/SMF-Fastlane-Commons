@@ -75,8 +75,8 @@ def _smf_sentry_raise_warning(exception, build_variant, slack_channel)
   UI.important('Warning: Dsyms could not be uploaded to Sentry !')
 
   smf_send_message(
-    title: "Failed to upload dsyms to Sentry for #{smf_get_default_name_of_app(build_variant)} 😢",
-    type: "warning",
+    title: "Failed to upload dsyms to Sentry for #{smf_get_default_name_and_version(build_variant)} 😢",
+    type: 'warning',
     exception: exception,
     slack_channel: slack_channel
   )

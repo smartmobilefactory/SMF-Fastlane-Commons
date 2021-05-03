@@ -261,7 +261,7 @@ private_lane :smf_super_release_pod do |options|
   )
 
   smf_make_jira_realease_comment(
-    build_variant: nil
+    build_variant: :framework
   )
 
 end
@@ -278,7 +278,7 @@ private_lane :smf_super_pod_send_slack_notification do |options|
   slack_channel = @smf_fastlane_config[:project][:slack_channel]
 
   smf_send_default_build_success_notification(
-      name: smf_get_default_name_of_pod('framework'),
+      name: smf_get_default_name_and_version(:framework),
       slack_channel: slack_channel
   )
 end

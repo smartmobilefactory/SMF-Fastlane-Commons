@@ -47,7 +47,7 @@ def _smf_itunes_precheck(build_variant, slack_channel, bundle_identifier, userna
 
   rescue => exception
 
-    title = "Fastlane Precheck found Metadata issues in iTunes Connect for #{smf_get_default_name_of_app(build_variant)} 😢"
+    title = "Fastlane Precheck found Metadata issues in iTunes Connect for #{smf_get_default_name_and_version(build_variant)} 😢"
     message = "The build will continue to upload to iTunes Connect, but you may need to fix the Metadata issues before releasing the app."
 
     smf_send_message(

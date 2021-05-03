@@ -283,7 +283,7 @@ private_lane :smf_super_send_slack_notification do |options|
   slack_channel = @smf_fastlane_config[:project][:slack_channel]
 
   smf_send_default_build_success_notification(
-      name: smf_get_default_name_of_app(build_variant),
+      name: smf_get_default_name_and_version(build_variant),
       slack_channel: slack_channel
   )
 end
