@@ -96,13 +96,16 @@ end
 def smf_get_build_number_of_app
   UI.message('Get the build number of project.')
   case @platform
-  when :ios, :ios_framework, :macos, :apple
+  when :ios, :macos, :apple
     project_name = @smf_fastlane_config[:project][:project_name]
     build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
   when :android
     build_number = @smf_fastlane_config[:app_version_code].to_s
   when :flutter
     build_number = YAML.load(File.read("#{smf_workspace_dir}/pubspec.yaml"))['version'].split('+').last
+  when :ios_framework
+    # No build number for frameworks
+    build_number = ''
   else
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
