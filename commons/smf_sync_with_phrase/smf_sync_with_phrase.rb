@@ -360,11 +360,9 @@ def _smf_download_file(api_client, project_id, locale_id, output_file, tags, fil
     UI.message("Dowloading translation file #{File.basename(output_file)} with ID: #{locale_id}")
     result = api_client.locale_download(project_id, locale_id, options)
     data = result.data
-    UI.message("Download data: #{data}")
     if remove_quote_escape
-      UI.message("__________ ATTEMPTING TO ESCAPE _________")
+      UI.message("Attempting to remove escaped quotes")
       data = data.gsub('\"', '"')
-      UI.message("Download data: #{data}")
     end
     File.write(output_file, data) unless result.data.nil? || result.data.empty?
   rescue Phrase::ApiError => e
