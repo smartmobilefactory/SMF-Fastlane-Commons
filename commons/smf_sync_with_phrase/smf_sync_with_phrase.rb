@@ -266,6 +266,7 @@ def _smf_download_files_apple(api_client, project_id, dir, locale_id, used_tags)
       output_file,
       tag,
       APPLE_LOCALIZABLE_FORMAT,
+      false,
       true
     )
   end
@@ -281,6 +282,7 @@ def _smf_download_files_apple(api_client, project_id, dir, locale_id, used_tags)
       file,
       tag,
       APPLE_LOCALIZABLE_FORMAT,
+      false,
       true
     )
   end
@@ -307,7 +309,8 @@ def _smf_download_translations_android(api_client, project_id, download_resource
         api_client,
         project_id,
         dir,
-        locale_id
+        locale_id,
+        is_kmpp
       )
     else
       output_file = File.join(dir, ANDROID_DEFAULT_FILE_NAME)
@@ -318,13 +321,14 @@ def _smf_download_translations_android(api_client, project_id, download_resource
         locale_id,
         output_file,
         nil,
-        ANDROID_LOCALIZABLE_FORMAT
+        ANDROID_LOCALIZABLE_FORMAT,
+        is_kmpp
       )
     end
   end
 end
 
-def _smf_download_files_android(api_client, project_id, dir, locale_id)
+def _smf_download_files_android(api_client, project_id, dir, locale_id, is_kmpp)
   Dir.foreach(dir) do |item|
     next unless item.start_with?('strings')
 
@@ -337,12 +341,13 @@ def _smf_download_files_android(api_client, project_id, dir, locale_id)
       locale_id,
       output_file,
       tag,
-      ANDROID_LOCALIZABLE_FORMAT
+      ANDROID_LOCALIZABLE_FORMAT,
+      is_kmpp
     )
   end
 end
 
-def _smf_download_file(api_client, project_id, locale_id, output_file, tags, file_format, include_empty_translations = false)
+def _smf_download_file(api_client, project_id, locale_id, output_file, tags, file_format, remove_quote_escape, include_empty_translations = false)
   options = {
     return_type: 'String', # This is a workaround as there is currently no other way to get the downloaded content see https://github.com/phrase/phrase-ruby/issues/7
     file_format: file_format,
@@ -354,7 +359,14 @@ def _smf_download_file(api_client, project_id, locale_id, output_file, tags, fil
   begin
     UI.message("Dowloading translation file #{File.basename(output_file)} with ID: #{locale_id}")
     result = api_client.locale_download(project_id, locale_id, options)
-    File.write(output_file, result.data) unless result.data.nil? || result.data.empty?
+    data = result.data
+    UI.message("Download data: #{data}")
+    if remove_quote_escape
+      UI.message("__________ ATTEMPTING TO ESCAPE _________")
+      data = data.gsub('\"', '"')
+      UI.message("Download data: #{data}")
+    end
+    File.write(output_file, data) unless result.data.nil? || result.data.empty?
   rescue Phrase::ApiError => e
     puts "Exception while downloading locale with ID #{locale_id}: #{e}"
   end
