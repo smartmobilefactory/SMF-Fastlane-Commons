@@ -20,9 +20,6 @@ end
 
 private_lane :smf_super_setup_dependencies do |options|
 
-  # TODO: REMOVE
-  UI.message("Job name: #{ENV['JOB_NAME']}")
-
   build_variant = smf_build_variant(options)
 
   smf_build_precheck(
