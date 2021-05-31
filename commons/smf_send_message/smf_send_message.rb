@@ -114,7 +114,9 @@ private_lane :smf_send_message do |options|
       )
     end
 
-    unless _smf_should_skip_main_channel_slack_notifications
+    if _smf_should_skip_main_channel_slack_notifications
+      UI.message("[INFO]: Skipping slack notifications for main channel")
+    else
       begin
         _smf_send_slack_message(
           icon_url: icon_url,
