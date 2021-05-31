@@ -65,6 +65,9 @@ $REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME_ANDROID = 'android'
 $REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME_APPLE = 'apple'
 $REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME_PLAYGROUND = 'playground'
 
+# If set, error slack messages to the projects main slack channel are omitted
+$SEND_ERRORS_TO_CI_SLACK_CHANNEL_ONLY_KEY = 'SEND_ERRORS_TO_CI_SLACK_CHANNEL_ONLY'
+
 ### Config.json Keys ###
 
 # Deprecated files/folders in repository

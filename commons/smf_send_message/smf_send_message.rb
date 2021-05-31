@@ -1,4 +1,3 @@
-desc 'Sending a message to the given Slack channel'
 
 def _smf_should_skip_notifications_for_branch(project_name)
   branch = smf_workspace_dir_git_branch
@@ -26,6 +25,12 @@ def _smf_should_skip_notifications_for_branch(project_name)
   return true
 end
 
+
+def _smf_should_skip_main_channel_slack_notifications
+  return true if ENV[$SEND_ERRORS_TO_CI_SLACK_CHANNEL_ONLY_KEY]
+end
+
+desc 'Sending a message to the given Slack channel'
 private_lane :smf_send_message do |options|
 
   title = "*#{options[:title]}*"
@@ -105,23 +110,25 @@ private_lane :smf_send_message do |options|
         channel: project_name.downcase.include?('playground') ? 'ci-development' : ci_error_log,
         username: "#{project_name} CI",
         type: type,
-        payload: payload,
-        )
-    end
-
-    begin
-      _smf_send_slack_message(
-        icon_url: icon_url,
-        title: title,
-        message: content,
-        channel: slack_channel,
-        username: "#{project_name} CI",
-        type: type,
         payload: payload
       )
-    rescue => exception
-      UI.important("Failed to send error message to #{slack_channel} Slack room. Exception: #{exception}")
-      raise exception if fail_build_job_on_error
+    end
+
+    unless _smf_should_skip_main_channel_slack_notifications
+      begin
+        _smf_send_slack_message(
+          icon_url: icon_url,
+          title: title,
+          message: content,
+          channel: slack_channel,
+          username: "#{project_name} CI",
+          type: type,
+          payload: payload
+        )
+      rescue => exception
+        UI.important("Failed to send message to #{slack_channel} Slack room. Exception: #{exception}")
+        raise exception if fail_build_job_on_error
+      end
     end
 
   elsif slack_channel
