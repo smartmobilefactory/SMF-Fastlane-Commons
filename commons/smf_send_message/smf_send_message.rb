@@ -86,7 +86,9 @@ private_lane :smf_send_message do |options|
     content << entry.to_s
   end
 
-  UI.message("Sending message \"#{content}\" to room \"#{slack_channel}\"")
+  unless _smf_should_skip_main_channel_slack_notifications || (slack_channel.eql? ci_error_log)
+    UI.message("Sending message \"#{content}\" to room \"#{slack_channel}\"")
+  end
 
   if _smf_should_skip_notifications_for_branch(project_name)
     UI.message("[WARNING]: skip slack notifications from development branches")
