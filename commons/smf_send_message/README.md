@@ -18,6 +18,9 @@ smf_send_message(
     fail_build_job_on_error: false, #Optional, false by default
 )
 ```
+### Special Parameters
+
+If the environment variable `SEND_ERRORS_TO_CI_SLACK_CHANNEL_ONLY` is set, error messages to the project's main slack channel are omitted.
 
 ## Exception
 If an error occurs the error_info from the exception will be added to the message.
