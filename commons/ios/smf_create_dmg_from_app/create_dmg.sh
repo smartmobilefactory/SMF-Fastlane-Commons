@@ -21,8 +21,7 @@ export PATH
 
 CREATE_DMG=true
 CODE_SIGN_ID=
-UPLOAD_TO_HOCKEY=false
-HOCKEYAPP_TOKEN=
+TEMPLATE_PATH=
 
 #
 # Variables
@@ -35,14 +34,14 @@ APPPATH=""
 #
 
 function usage() {
-	echo "Script to create a DMG from .app and upload it"
+	echo "Script to create a DMG from .app"
 	echo
 	echo "Required parameters:"
 	echo -e "--appPath, -p\t\t: Path to the .app"
 	echo
 	echo "Optional"
 	echo -e "--codesignid, -ci\t: Code signing identity, required if --codesign or -cs was used"
-	echo -e "--upload, -u\t\t: Upload the DMG to HockeyApp; HockeyApp Token and HockeyApp AppID need to be configurated; default off"
+	echo -e "--template, -t\t\t: Build the DMG from a template. If not specified, DMG will be created without a template"
 	echo
 	exit 0
 }
@@ -62,8 +61,8 @@ while [ $# -gt 0 ]; do
 			CODE_SIGN_ID=$2
 			shift 2
 			;;
-		--upload | -u)
-			UPLOAD_TO_HOCKEY=true
+		--template | -t)
+			TEMPLATE_PATH=$2
 			shift
 			;;
 		-*)
@@ -90,6 +89,43 @@ SRCFOLDER=${APPDIR}/${APPFULLNAME}
 #
 # DMG
 #
+
+# WITH TEMPLATE
+
+# Copy template
+
+# Convert template
+hdiutil convert -format UDSB -o testWritable.dmg test.dmg
+
+# Resize template
+hdiutil resize -size 200M testWritable.dmg.sparsebundle
+
+# Mount bundle - Returns path to volume
+
+$ORIGINAL_SPARSE_VOLUME_PATH=$(hdiutil attach testWritable.dmg.sparsebundle | egrep -o '/Volumes/[a-zA-Z]+$')
+
+# Rename Volume
+diskutil rename $ORIGINAL_SPARSE_VOLUME_PATH $VOLNAME
+
+# Empty dummy app
+rm -fr /Volumes/${VOLNAME}/HiDrive.app/*
+
+# Replace dummy app with real content - TODO: call the dummy app something generic
+ditto ${APPPATH} /Volumes/${VOLNAME}/HiDrive.app
+
+# Rename app
+mv /Volumes/${VOLNAME}/HiDrive.app /Volumes/${VOLNAME}/${NAME}.app
+
+# Detach
+hdiutil detach /Volumes/${VOLNAME}
+
+# Compact sparse bundle
+hdiutil compact testWritable.dmg.sparsebundle
+
+# Convert to final form
+hdiutil convert -format UDZO -o HiDrive_Alpha.dmg testWritable.dmg.sparsebundle
+
+# WITHOUT TEMPLATE
 
 if [ $CREATE_DMG = true ]; then
     rm -rf "${SRCFOLDER}"
