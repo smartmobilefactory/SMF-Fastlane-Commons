@@ -115,9 +115,14 @@ if [ "$USE_TEMPLATE" = "true" ]; then
     # Resize template
     hdiutil resize -size ${APP_SIZE_WITH_BUFFER}M templateWritable.dmg.sparsebundle
     
-    # Mount bundle - Returns path to volume
-    ORIGINAL_SPARSE_VOLUME_PATH=$(hdiutil attach templateWritable.dmg.sparsebundle | egrep -o '/Volumes/[a-zA-Z]+$')
-    
+    # Mount bundle - Returns path to Volume (the Volume name can have spaces, dashes, digits and other chars, so the regex covers basically all)
+    ORIGINAL_SPARSE_VOLUME_PATH=$(hdiutil attach templateWritable.dmg.sparsebundle | egrep -o '/Volumes/(.*?)+$')
+
+	echo "Volume mounted at ${ORIGINAL_SPARSE_VOLUME_PATH}"
+
+	# Make sure there is nothing mounted at ${VOLNAME} (`|| :` is there to make sure the command can fail without interrupting the script)
+    hdiutil detach /Volumes/"${VOLNAME}" || :
+	
 	sleep 1
 
     # Rename Volume
