@@ -90,6 +90,13 @@ private_lane :smf_super_build do |options|
 end
 
 lane :smf_build do |options|
+  dmg_template_path = smf_config_get(build_variant, :dmg_template_path) 
+  UI.message("dmg_template_path build variant #{dmg_template_path}")
+  dmg_template_path = smf_config_get(nil, :dmg_template_path) unless !dmg_template_path.nil?
+  UI.message("dmg_template_path project #{dmg_template_path}")
+  # Then we make it a proper path
+  dmg_template_path = (smf_workspace_dir + dmg_template_path) unless dmg_template_path.nil?
+  UI.message("dmg_template_path proper #{dmg_template_path}")
   smf_super_build(options)
 end
 
@@ -216,9 +223,12 @@ private_lane :smf_super_create_dmg_and_gatekeeper do |options|
   # The `dmg_template_path` key can be at the project level or at the build_variant level. The build_variant level overrides the project one.
   # If nothing is found, no template will be used for the DMG creation
   dmg_template_path = smf_config_get(build_variant, :dmg_template_path) 
+  UI.message("dmg_template_path build variant #{dmg_template_path}")
   dmg_template_path = smf_config_get(nil, :dmg_template_path) unless !dmg_template_path.nil?
+  UI.message("dmg_template_path project #{dmg_template_path}")
   # Then we make it a proper path
   dmg_template_path = (smf_workspace_dir + dmg_template_path) unless dmg_template_path.nil?
+  UI.message("dmg_template_path proper #{dmg_template_path}")
 
   # TODO: update doc
   dmg_path = smf_create_dmg_from_app(
