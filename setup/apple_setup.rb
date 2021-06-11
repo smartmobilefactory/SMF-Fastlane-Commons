@@ -52,7 +52,7 @@ private_lane :smf_super_build do |options|
   # DEBUG
   dmg_template_path = smf_config_get(build_variant, :dmg_template_path) 
   UI.message("dmg_template_path build variant #{dmg_template_path}")
-  dmg_template_path = smf_config_get(nil, :dmg_template_path) unless !dmg_template_path.nil?
+  dmg_template_path = smf_config_get(nil, :project, :dmg_template_path) unless !dmg_template_path.nil?
   UI.message("dmg_template_path project #{dmg_template_path}")
   # Then we make it a proper path
   dmg_template_path = (smf_workspace_dir + dmg_template_path) unless dmg_template_path.nil?
@@ -227,7 +227,7 @@ private_lane :smf_super_create_dmg_and_gatekeeper do |options|
   # If nothing is found, no template will be used for the DMG creation
   dmg_template_path = smf_config_get(build_variant, :dmg_template_path) 
   UI.message("dmg_template_path build variant #{dmg_template_path}")
-  dmg_template_path = smf_config_get(nil, :dmg_template_path) unless !dmg_template_path.nil?
+  dmg_template_path = smf_config_get(nil, :project, :dmg_template_path) unless !dmg_template_path.nil?
   UI.message("dmg_template_path project #{dmg_template_path}")
   # Then we make it a proper path
   dmg_template_path = (smf_workspace_dir + dmg_template_path) unless dmg_template_path.nil?
