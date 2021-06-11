@@ -15,6 +15,7 @@ private_lane :smf_create_dmg_from_app do |options|
   if dmg_template_path.nil?
   sh "#{@fastlane_commons_dir_path}/commons/ios/smf_create_dmg_from_app/create_dmg.sh -p #{app_path.shellescape} -ci '#{signing_id}'"
   else
+  UI.message("Will use DMG template at #{dmg_template_path} to generate the DMG")
   sh "#{@fastlane_commons_dir_path}/commons/ios/smf_create_dmg_from_app/create_dmg.sh -p #{app_path.shellescape} -ci '#{signing_id}' -t #{dmg_template_path.shellescape}"  
   end
 
