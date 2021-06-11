@@ -11,6 +11,7 @@
 # 04.09.2018
 
 #set -x
+set -e
 
 PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH
 export PATH
@@ -19,10 +20,8 @@ export PATH
 # Setup
 #
 
-CREATE_DMG=true
 CODE_SIGN_ID=
 USE_TEMPLATE=
-
 
 #
 # Variables
@@ -97,8 +96,6 @@ APPFULLNAME=${NAME}-${APPVERSION}
 #
 
 if [ "$USE_TEMPLATE" = "true" ]; then
-
-    # WITH TEMPLATE
 	cd "${APPDIR}"
     
     # Copy template
@@ -106,31 +103,38 @@ if [ "$USE_TEMPLATE" = "true" ]; then
     
     # Convert template
     hdiutil convert -format UDSB -o templateWritable.dmg template.dmg
+
+	# Get app size
+	APP_SIZE=$(du -sm "${APPPATH}" | egrep -o '[[:digit:]]*')
+	echo "SIZE ${APP_SIZE}"
+
+	# We add a buffer to be on the safe side
+	APP_SIZE_WITH_BUFFER=$((${APP_SIZE} + 20))
+	echo "SIZE with buffer ${APP_SIZE_WITH_BUFFER}"
     
-    # Resize template TODO: dynamic size ?
-    hdiutil resize -size 200M templateWritable.dmg.sparsebundle
+    # Resize template
+    hdiutil resize -size ${APP_SIZE_WITH_BUFFER}M templateWritable.dmg.sparsebundle
     
     # Mount bundle - Returns path to volume
-    
     ORIGINAL_SPARSE_VOLUME_PATH=$(hdiutil attach templateWritable.dmg.sparsebundle | egrep -o '/Volumes/[a-zA-Z]+$')
     
 	sleep 1
 
     # Rename Volume
-    diskutil rename $ORIGINAL_SPARSE_VOLUME_PATH "${VOLNAME}"
+    diskutil rename "${ORIGINAL_SPARSE_VOLUME_PATH}" "${VOLNAME}"
 
 	sleep 1
     
     # Empty dummy app content
-    rm -fr /Volumes/"${VOLNAME}"/HiDrive.app/*
+    rm -fr "/Volumes/${VOLNAME}/HiDrive.app/*"
     
     # Replace dummy app with real content - TODO: call the dummy app something generic
-    ditto "${APPPATH}" /Volumes/"${VOLNAME}"/HiDrive.app
+    ditto "${APPPATH}" "/Volumes/${VOLNAME}/HiDrive.app"
 
 	sleep 1
     
     # Rename app
-    mv /Volumes/"${VOLNAME}"/HiDrive.app /Volumes/"${VOLNAME}"/"${NAME}".app
+    mv "/Volumes/${VOLNAME}/HiDrive.app" "/Volumes/${VOLNAME}/${NAME}.app"
 
 	sleep 1
     
@@ -154,7 +158,7 @@ if [ "$USE_TEMPLATE" = "true" ]; then
 	rm -fr templateWritable.dmg.sparsebundle
 else
     # WITHOUT TEMPLATE
-	SRCFOLDER=${APPDIR}/${APPFULLNAME}
+	SRCFOLDER="${APPDIR}"/"${APPFULLNAME}"
     
     rm -rf "${SRCFOLDER}"
     mkdir -p "${SRCFOLDER}"
