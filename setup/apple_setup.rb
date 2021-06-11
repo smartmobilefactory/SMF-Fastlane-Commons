@@ -49,6 +49,16 @@ private_lane :smf_super_build do |options|
 
   build_variant = smf_build_variant(options)
 
+  # DEBUG
+  dmg_template_path = smf_config_get(build_variant, :dmg_template_path) 
+  UI.message("dmg_template_path build variant #{dmg_template_path}")
+  dmg_template_path = smf_config_get(nil, :dmg_template_path) unless !dmg_template_path.nil?
+  UI.message("dmg_template_path project #{dmg_template_path}")
+  # Then we make it a proper path
+  dmg_template_path = (smf_workspace_dir + dmg_template_path) unless dmg_template_path.nil?
+  UI.message("dmg_template_path proper #{dmg_template_path}")
+  #END DEBUG
+
   extension_suffixes = smf_config_get(build_variant, :extensions_suffixes)
   extension_suffixes = smf_config_get(nil, :extensions_suffixes) if extension_suffixes.nil?
 
@@ -90,13 +100,6 @@ private_lane :smf_super_build do |options|
 end
 
 lane :smf_build do |options|
-  dmg_template_path = smf_config_get(build_variant, :dmg_template_path) 
-  UI.message("dmg_template_path build variant #{dmg_template_path}")
-  dmg_template_path = smf_config_get(nil, :dmg_template_path) unless !dmg_template_path.nil?
-  UI.message("dmg_template_path project #{dmg_template_path}")
-  # Then we make it a proper path
-  dmg_template_path = (smf_workspace_dir + dmg_template_path) unless dmg_template_path.nil?
-  UI.message("dmg_template_path proper #{dmg_template_path}")
   smf_super_build(options)
 end
 
