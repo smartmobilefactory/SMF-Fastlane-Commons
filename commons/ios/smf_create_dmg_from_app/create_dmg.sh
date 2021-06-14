@@ -129,12 +129,13 @@ if [ "$USE_TEMPLATE" = "true" ]; then
     # Get dummy .app path
     APP_LIST=(/Volumes/"${VOLNAME}"/*.app)
 
-    # Verify that there is only one app in the template
+    # Verify that there is only one app in the template (`#array[@]` gives the amount of items)
     if [ ${#APP_LIST[@]} -ne 1 ]; then
         echo "Abort: Found no apps or more than one app in DMG template"
         exit 1
     fi
 
+    # Put dummy app path in a variable (`APP_LIST[@]` returns the array content, it works here because we know that there is only one element)
     DUMMY_APP_PATH=${APP_LIST[@]}
 
     echo "Found dummy app at path ${DUMMY_APP_PATH}"
