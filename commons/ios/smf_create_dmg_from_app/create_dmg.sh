@@ -103,6 +103,8 @@ if [ "$USE_TEMPLATE" = "true" ]; then
     
     # Convert template
     hdiutil convert -format UDSB -o templateWritable.dmg template.dmg
+
+    sleep 1
     
     # Get app size
     APP_SIZE=$(du -sm "${APP_PATH}" | egrep -o '[[:digit:]]*')
@@ -112,6 +114,8 @@ if [ "$USE_TEMPLATE" = "true" ]; then
     
     # Resize template
     hdiutil resize -size ${APP_SIZE_WITH_BUFFER}M templateWritable.dmg.sparsebundle
+
+    sleep 1
     
     # Mount bundle - Returns path to Volume (the Volume name can have spaces, dashes, digits and other chars, so the regex covers basically all)
     ORIGINAL_SPARSE_VOLUME_PATH=$(hdiutil attach templateWritable.dmg.sparsebundle | egrep -o '/Volumes/(.*?)+$')
@@ -142,6 +146,8 @@ if [ "$USE_TEMPLATE" = "true" ]; then
     
     # Empty dummy app content
     rm -fr "${DUMMY_APP_PATH}"/*
+
+    sleep 1
     
     # Replace dummy app with real content
     ditto "${APP_PATH}" "${DUMMY_APP_PATH}"
