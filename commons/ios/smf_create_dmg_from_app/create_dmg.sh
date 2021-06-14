@@ -141,7 +141,7 @@ if [ "$USE_TEMPLATE" = "true" ]; then
     echo "Found dummy app at path ${DUMMY_APP_PATH}"
     
     # Empty dummy app content
-    rm -fr "/Volumes/${VOLNAME}/${DUMMY_APP_PATH}/*"
+    rm -fr "${DUMMY_APP_PATH}"/*
     
     # Replace dummy app with real content
     ditto "${APP_PATH}" "${DUMMY_APP_PATH}"
