@@ -96,74 +96,70 @@ APPFULLNAME=${NAME}-${APPVERSION}
 #
 
 if [ "$USE_TEMPLATE" = "true" ]; then
-	cd "${APPDIR}"
+    cd "${APPDIR}"
     
     # Copy template
-	cp "${TEMPLATE_PATH}" "${APPDIR}"/template.dmg
+    cp "${TEMPLATE_PATH}" "${APPDIR}"/template.dmg
     
     # Convert template
     hdiutil convert -format UDSB -o templateWritable.dmg template.dmg
-
-	# Get app size
-	APP_SIZE=$(du -sm "${APPPATH}" | egrep -o '[[:digit:]]*')
-	echo "SIZE ${APP_SIZE}"
-
-	# We add a buffer to be on the safe side
-	APP_SIZE_WITH_BUFFER=$((${APP_SIZE} + 20))
-	echo "SIZE with buffer ${APP_SIZE_WITH_BUFFER}"
+    
+    # Get app size
+    APP_SIZE=$(du -sm "${APPPATH}" | egrep -o '[[:digit:]]*')
+    
+    # We add a buffer to be on the safe side
+    APP_SIZE_WITH_BUFFER=$((${APP_SIZE} + 20))
     
     # Resize template
     hdiutil resize -size ${APP_SIZE_WITH_BUFFER}M templateWritable.dmg.sparsebundle
     
     # Mount bundle - Returns path to Volume (the Volume name can have spaces, dashes, digits and other chars, so the regex covers basically all)
     ORIGINAL_SPARSE_VOLUME_PATH=$(hdiutil attach templateWritable.dmg.sparsebundle | egrep -o '/Volumes/(.*?)+$')
-
-	echo "Volume mounted at ${ORIGINAL_SPARSE_VOLUME_PATH}"
-
-	# Make sure there is nothing mounted at ${VOLNAME} (`|| :` is there to make sure the command can fail without interrupting the script)
+    
+    # Make sure there is nothing mounted at ${VOLNAME} (`|| :` is there to make sure the command can fail without interrupting the script)
     hdiutil detach /Volumes/"${VOLNAME}" || :
-	
-	sleep 1
-
+    
+    sleep 1
+    
     # Rename Volume
     diskutil rename "${ORIGINAL_SPARSE_VOLUME_PATH}" "${VOLNAME}"
-
-	sleep 1
+    
+    sleep 1
     
     # Empty dummy app content
     rm -fr "/Volumes/${VOLNAME}/HiDrive.app/*"
     
     # Replace dummy app with real content - TODO: call the dummy app something generic
     ditto "${APPPATH}" "/Volumes/${VOLNAME}/HiDrive.app"
-
-	sleep 1
+    
+    sleep 1
     
     # Rename app
     mv "/Volumes/${VOLNAME}/HiDrive.app" "/Volumes/${VOLNAME}/${NAME}.app"
-
-	sleep 1
+    
+    sleep 1
     
     # Detach
     hdiutil detach /Volumes/"${VOLNAME}"
-
-	sleep 1
+    
+    sleep 1
     
     # Compact sparse bundle
     hdiutil compact templateWritable.dmg.sparsebundle
-
-	sleep 1
+    
+    sleep 1
     
     # Convert to final form
     hdiutil convert -format UDZO -o "${NAME}".dmg templateWritable.dmg.sparsebundle
-
-	sleep 1
+    
+    sleep 1
     
     # Cleanup
-	rm template.dmg
-	rm -fr templateWritable.dmg.sparsebundle
+    rm template.dmg
+    rm -fr templateWritable.dmg.sparsebundle
 else
     # WITHOUT TEMPLATE
-	SRCFOLDER="${APPDIR}"/"${APPFULLNAME}"
+    SRCFOLDER="${APPDIR}"/"${APPFULLNAME}"
     
     rm -rf "${SRCFOLDER}"
     mkdir -p "${SRCFOLDER}"
@@ -174,10 +170,10 @@ else
     hdiutil create "${NAME}".dmg -fs HFS+ -format UDZO -volname "${VOLNAME}" -srcfolder "${SRCFOLDER}"
 fi
 
-    if [ $? -gt 0 ]; then
-        echo "Abort: Error creating DMG"
-        exit 1
-    fi
+if [ $? -gt 0 ]; then
+    echo "Abort: Error creating DMG"
+    exit 1
+fi
 
 #
 # Code Sign
