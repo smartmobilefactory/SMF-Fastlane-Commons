@@ -27,7 +27,7 @@ USE_TEMPLATE=
 # Variables
 #
 
-APPPATH=""
+APP_PATH=""
 TEMPLATE_PATH=""
 
 #
@@ -55,7 +55,7 @@ while [ $# -gt 0 ]; do
     case "$1" in
         --appPath | -p)
             # Path where the App is stored after a successful build
-            APPPATH="$2"
+            APP_PATH="$2"
             shift 2
         ;;
         --codesignid | -ci)
@@ -74,7 +74,7 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-if [ -z "$APPPATH" ]; then
+if [ -z "$APP_PATH" ]; then
     usage
 fi
 
@@ -82,12 +82,12 @@ if [ "$USE_TEMPLATE" = "true" ] && [ -z "$TEMPLATE_PATH" ]; then
     usage
 fi
 
-INFO_PLIST="$APPPATH"/Contents/Info.plist
+INFO_PLIST="$APP_PATH"/Contents/Info.plist
 NAME=$(defaults read "$INFO_PLIST" CFBundleName)
 VOLNAME=$NAME
 VERSION=$(defaults read "$INFO_PLIST" CFBundleShortVersionString)
 SHORT_VERSION=$(defaults read "$INFO_PLIST" CFBundleVersion)
-APPDIR=$(dirname "$APPPATH")
+APPDIR=$(dirname "$APP_PATH")
 APPVERSION=${VERSION}-${SHORT_VERSION}
 APPFULLNAME=${NAME}-${APPVERSION}
 
@@ -105,7 +105,7 @@ if [ "$USE_TEMPLATE" = "true" ]; then
     hdiutil convert -format UDSB -o templateWritable.dmg template.dmg
     
     # Get app size
-    APP_SIZE=$(du -sm "${APPPATH}" | egrep -o '[[:digit:]]*')
+    APP_SIZE=$(du -sm "${APP_PATH}" | egrep -o '[[:digit:]]*')
     
     # We add a buffer to be on the safe side
     APP_SIZE_WITH_BUFFER=$((${APP_SIZE} + 20))
@@ -125,17 +125,30 @@ if [ "$USE_TEMPLATE" = "true" ]; then
     diskutil rename "${ORIGINAL_SPARSE_VOLUME_PATH}" "${VOLNAME}"
     
     sleep 1
+
+    # Get dummy .app path
+    APP_LIST=(/Volumes/"${VOLNAME}"/*.app)
+
+    # Verify that there is only one app in the template
+    if [ ${#APP_LIST[@]} -ne 1 ]; then
+        echo "Abort: Found no apps or more than one app in DMG template"
+        exit 1
+    fi
+
+    DUMMY_APP_PATH=${APP_LIST[@]}
+
+    echo "Found dummy app at path ${DUMMY_APP_PATH}"
     
     # Empty dummy app content
-    rm -fr "/Volumes/${VOLNAME}/HiDrive.app/*"
+    rm -fr "/Volumes/${VOLNAME}/${DUMMY_APP_PATH}/*"
     
-    # Replace dummy app with real content - TODO: call the dummy app something generic
-    ditto "${APPPATH}" "/Volumes/${VOLNAME}/HiDrive.app"
+    # Replace dummy app with real content
+    ditto "${APP_PATH}" "${DUMMY_APP_PATH}"
     
     sleep 1
     
     # Rename app
-    mv "/Volumes/${VOLNAME}/HiDrive.app" "/Volumes/${VOLNAME}/${NAME}.app"
+    mv "${DUMMY_APP_PATH}" "/Volumes/${VOLNAME}/${NAME}.app"
     
     sleep 1
     
@@ -163,7 +176,7 @@ else
     
     rm -rf "${SRCFOLDER}"
     mkdir -p "${SRCFOLDER}"
-    cp -R "${APPPATH}" "${SRCFOLDER}"
+    cp -R "${APP_PATH}" "${SRCFOLDER}"
     cd "${SRCFOLDER}"
     ln -s /Applications .
     cd ..
