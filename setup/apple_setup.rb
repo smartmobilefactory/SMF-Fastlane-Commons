@@ -220,7 +220,6 @@ private_lane :smf_super_create_dmg_and_gatekeeper do |options|
   # Then we make it a proper path
   dmg_template_path = "#{smf_workspace_dir}/#{dmg_template_path}" unless dmg_template_path.nil?
 
-  # TODO: update doc
   dmg_path = smf_create_dmg_from_app(
     team_id: smf_config_get(build_variant, :team_id),
     code_signing_identity: smf_config_get(build_variant, :code_signing_identity),
