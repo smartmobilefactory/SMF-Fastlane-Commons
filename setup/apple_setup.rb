@@ -208,15 +208,22 @@ private_lane :smf_super_create_dmg_and_gatekeeper do |options|
 
   build_variant = smf_build_variant(options)
 
-
   unless smf_is_mac_build(build_variant)
     UI.message("Skipping lane for platform #{@platform} and build variant #{build_variant}")
     next
   end
 
+  # The `dmg_template_path` key can be at the project level or at the build_variant level. The build_variant level overrides the project one.
+  # If nothing is found, no template will be used for the DMG creation
+  dmg_template_path = smf_config_get(build_variant, :dmg_template_path) 
+  dmg_template_path = smf_config_get(nil, :project, :dmg_template_path) unless !dmg_template_path.nil?
+  # Then we make it a proper path
+  dmg_template_path = "#{smf_workspace_dir}/#{dmg_template_path}" unless dmg_template_path.nil?
+
   dmg_path = smf_create_dmg_from_app(
     team_id: smf_config_get(build_variant, :team_id),
-    code_signing_identity: smf_config_get(build_variant, :code_signing_identity)
+    code_signing_identity: smf_config_get(build_variant, :code_signing_identity),
+    dmg_template_path: dmg_template_path
   )
 
   should_notarize = smf_config_get(build_variant, :notarize) && smf_is_mac_build(build_variant)
