@@ -44,8 +44,11 @@ end
 def _smf_perform_build_precheck_for_pods_spec_repo_url(pods_specs_repo = false)
 
   podfile = @platform == :flutter ? "#{smf_workspace_dir}/ios/Podfile" : "#{smf_workspace_dir}/Podfile"
-  podfile_content = File.read(podfile)
-  https_in_podfile = !podfile_content.match(/source 'https:\/\/github\.com\/smartmobilefactory\/SMF-CocoaPods-Specs(.git)?'/m).nil?
+  if File.exist?(podfile)
+    podfile_content = File.read(podfile)
+    https_in_podfile = !podfile_content.match(/source 'https:\/\/github\.com\/smartmobilefactory\/SMF-CocoaPods-Specs(.git)?'/m).nil?
+  end
+
   https_in_config = pods_specs_repo == 'https://github.com/smartmobilefactory/SMF-CocoaPods-Specs'
 
   if https_in_podfile || https_in_config
