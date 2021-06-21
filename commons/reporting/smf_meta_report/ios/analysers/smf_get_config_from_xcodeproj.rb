@@ -19,9 +19,12 @@ def smf_xcodeproj_settings(options={})
       scheme = "-scheme \"#{scheme_name}\""
     end
   end
-  
+
+  UI.important("DEBUG: accessing the project settings")
   json_string = `xcodebuild -project "#{smf_xcodeproj_file_path}" #{scheme} -showBuildSettings -json`
+  UI.important("DEBUG: after accessing the project settings")
   xcode_settings = JSON.parse(json_string)
+  UI.important("DEBUG: After parsing the project settings")
   return xcode_settings
 end
 
