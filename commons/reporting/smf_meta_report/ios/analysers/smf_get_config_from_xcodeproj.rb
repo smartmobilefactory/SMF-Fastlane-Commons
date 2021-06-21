@@ -20,12 +20,22 @@ def smf_xcodeproj_settings(options={})
     end
   end
 
-  UI.important("DEBUG: accessing the project settings")
-  json_string = `xcodebuild -project "#{smf_xcodeproj_file_path}" #{scheme} -showBuildSettings -json`
-  UI.important("DEBUG: after accessing the project settings")
-  xcode_settings = JSON.parse(json_string)
-  UI.important("DEBUG: After parsing the project settings")
-  return xcode_settings
+  return {} unless File.exist?(smf_xcodeproj_file_path)
+
+  retry_counter = 0
+  max_retries = 3
+
+  while retry_counter < max_retries do
+    begin
+      json_string = `xcodebuild -project "#{smf_xcodeproj_file_path}" #{scheme} -showBuildSettings -json`
+      xcode_settings = JSON.parse(json_string)
+      return xcode_settings
+    rescue
+      retry_counter += 1
+    end
+  end
+
+  return {}
 end
 
 def smf_xcodeproj_targets
