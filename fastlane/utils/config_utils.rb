@@ -53,6 +53,10 @@ end
 
 #################### SPECIAL GETTER ####################
 
+def smf_get_xcodeproj_file_name
+  "#{@smf_fastlane_config[:project][:project_name]}.xcodeproj"
+end
+
 def smf_get_icloud_environment(build_variant)
 
   icloud_environment = 'Development'
