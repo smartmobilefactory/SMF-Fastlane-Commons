@@ -78,7 +78,9 @@ private_lane :smf_pod_super_unit_tests do |options|
 
     build_variant_config = @smf_fastlane_config[:build_variants][variant.to_sym]
     testing_for_mac = build_variant_config[:platform] == 'mac'
-
+ 
+    UI.important("DEBUGGING: #{variant}")
+    UI.important("DEBUGGING: build variants #{@smf_fastlane_config[:build_variants]}")
     UI.important("DEBUGGING: #{build_variant_config}")
 
     if build_variant_config[:download_provisioning_profiles] != false
