@@ -25,6 +25,8 @@ def smf_xcodeproj_settings(options={})
   retry_counter = 0
   max_retries = 3
 
+  # Retry loop because sometimes the xcodebuild .. call fails and produces no valid json string
+  # which causes the JSON.parse call to fail
   while retry_counter < max_retries do
     begin
       json_string = `xcodebuild -project "#{smf_xcodeproj_file_path}" #{scheme} -showBuildSettings -json`
