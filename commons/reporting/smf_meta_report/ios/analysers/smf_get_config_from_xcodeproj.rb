@@ -8,9 +8,7 @@ require 'json'
 # '-configuration' the 'Release' configuration is taken by default
 # '-scheme' by default xcodebuild uses the first scheme. We shall specify the scheme
 # in case we want to analyze a non-default one.
-def smf_xcodeproj_settings(options={})
-  json_string = ""
-  scheme = ""
+def smf_xcodeproj_settings(options = {})
 
   build_variant = options[:build_variant]
   if !build_variant.nil? && build_variant != ''
