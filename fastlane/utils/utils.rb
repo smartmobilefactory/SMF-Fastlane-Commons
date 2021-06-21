@@ -277,7 +277,16 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
       end
     end
   when :ios_framework
-    version_number = version_get_podspec(path: podspec_path)
+    begin
+      # This fails if the version contains anything but digits in the first three components
+      version_number = version_get_podspec(path: podspec_path)
+    rescue
+      # If the above failed, use simple regex to find the version in the podspec
+      podspec_content = File.read(podspec_path)
+      version_regex = /version\s+=\s"(?<version>.+)"/i
+      version_number = podspec_content.match(version_regex)[:version]
+    end
+
   when :android
     version_number = nil
   when :flutter

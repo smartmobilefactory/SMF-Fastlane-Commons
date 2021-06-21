@@ -81,7 +81,7 @@ def _smf_bump_pod_version(podspec_path, bump_type, dry_run = false)
 
     elsif bump_type == 'internal'
       appendix = 0
-      currentVersionNumberComponents = version_get_podspec(path: podspec_path).split('.').map(&:to_i)
+      currentVersionNumberComponents = smf_get_version_number(nil, podspec_path).split('.').map(&:to_i)
 
       if currentVersionNumberComponents.length >= 4
         appendix = currentVersionNumberComponents[3]
