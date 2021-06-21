@@ -1,7 +1,7 @@
 #!/usr/bin/ruby
 
 # returns the analysed property
-def smf_analyse_swift_version(xcode_settings={}, options={})
+def smf_analyse_swift_version(xcode_settings = {}, options = {})
   UI.message("Analyser: #{__method__.to_s} ...")
 
   # Grab custom swift version, if any
