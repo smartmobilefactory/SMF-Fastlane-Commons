@@ -46,7 +46,7 @@ def _smf_update_build_number_in_project(build_number)
   when :ios, :ios_framework, :macos, :apple
     increment_build_number(build_number: build_number.to_s)
     commit_version_bump(
-        xcodeproj: "#{smf_get_project_name}.xcodeproj",
+        xcodeproj: smf_get_xcodeproj_file_name,
         message: "Increment build number to #{build_number}",
         force: true
     )

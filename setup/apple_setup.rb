@@ -362,10 +362,8 @@ private_lane :smf_super_push_git_tag_release do |options|
   smf_git_pull(local_branch)
   smf_push_to_git_remote(local_branch: local_branch)
 
-  project_name = smf_config_get(nil, :project, :project_name)
-
   # Create the GitHub release
-  build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
+  build_number = get_build_number(xcodeproj: smf_get_xcodeproj_file_name)
   smf_create_github_release(
     build_number: build_number,
     tag: smf_get_tag_of_app(build_variant, build_number),

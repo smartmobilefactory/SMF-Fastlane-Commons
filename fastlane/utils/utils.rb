@@ -39,10 +39,6 @@ def smf_get_build_variant_from_config(build_variant)
   @smf_fastlane_config[:build_variants][build_variant.to_sym][:variant]
 end
 
-def smf_get_project_name
-  @smf_fastlane_config[:project][:project_name]
-end
-
 def smf_get_appcenter_destination_groups(build_variant, additional_destinations)
   destinations = []
 
@@ -98,7 +94,7 @@ def smf_get_build_number_of_app
   case @platform
   when :ios, :macos, :apple
     project_name = @smf_fastlane_config[:project][:project_name]
-    build_number = get_build_number(xcodeproj: "#{project_name}.xcodeproj")
+    build_number = get_build_number(xcodeproj: smf_get_xcodeproj_file_name)
   when :android
     build_number = @smf_fastlane_config[:app_version_code].to_s
   when :flutter
@@ -250,7 +246,7 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
     begin
       # First we try to get the version number from the plist via fastlane
       version_number = get_version_number(
-          xcodeproj: "#{smf_get_project_name}.xcodeproj",
+          xcodeproj: smf_get_xcodeproj_file_name,
           target: (target.nil? ? scheme : target),
           configuration: configuration
       )
@@ -265,7 +261,8 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
           required_xcode_version = smf_config_get(nil, :project, :xcode_version)
           smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
 
-          workspacePath = "#{smf_workspace_dir}/#{smf_get_project_name}.xcworkspace"
+          project_name = @smf_fastlane_config[:project][:project_name]
+          workspacePath = "#{smf_workspace_dir}/#{project_name}.xcworkspace"
           buildConfigurationString = `xcodebuild -workspace "#{workspacePath}" -scheme "#{scheme}" -configuration "#{configuration}" -showBuildSettings -json`
           buildConfigurationJSON = JSON.parse(buildConfigurationString)
           version_number = buildConfigurationJSON.first['buildSettings']["MARKETING_VERSION"]
@@ -277,7 +274,16 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
       end
     end
   when :ios_framework
-    version_number = version_get_podspec(path: podspec_path)
+    begin
+      # This fails if the version contains anything but digits in the first three components
+      version_number = version_get_podspec(path: podspec_path)
+    rescue
+      # If the above failed, use simple regex to find the version in the podspec
+      podspec_content = File.read(File.join(smf_workspace_dir, podspec_path))
+      version_regex = /version\s+=\s"(?<version>.+)"/i
+      version_number = podspec_content.match(version_regex)[:version]
+    end
+
   when :android
     version_number = nil
   when :flutter
