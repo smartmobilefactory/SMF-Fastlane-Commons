@@ -3,6 +3,7 @@ private_lane :smf_increment_build_number do |options|
   UI.important('increment build number')
 
   current_build_number = options[:current_build_number]
+  skip_update_in_plists = options[:skip_build_nr_update_in_plists]
   NO_GIT_TAG_FAILURE = 'NO_GIT_TAG_FAILURE'
 
   # Pull all the tags so the change log collector finds the latest tag
@@ -37,25 +38,30 @@ private_lane :smf_increment_build_number do |options|
     end
   end
 
-  _smf_update_build_number_in_project(incremented_build_number)
+  _smf_update_build_number_in_project(incremented_build_number, skip_update_in_plists)
 end
 
 
-def _smf_update_build_number_in_project(build_number)
+def _smf_update_build_number_in_project(build_number, skip_update_in_plists)
   case @platform
   when :ios, :ios_framework, :macos, :apple
-    increment_build_number(build_number: build_number.to_s)
+
+    increment_build_number(
+      build_number: build_number.to_s,
+      skip_info_plist: skip_update_in_plists == true
+    )
+
     commit_version_bump(
-        xcodeproj: smf_get_xcodeproj_file_name,
-        message: "Increment build number to #{build_number}",
-        force: true
+      xcodeproj: smf_get_xcodeproj_file_name,
+      message: "Increment build number to #{build_number}",
+      force: true
     )
   when :android
     new_config = @smf_fastlane_config
     new_config[:app_version_code] = build_number.to_i
     smf_update_config(
-        new_config,
-        "Increment build number to #{build_number}")
+      new_config,
+      "Increment build number to #{build_number}")
   when :flutter
     pubspec_path = "#{smf_workspace_dir}/pubspec.yaml"
     pubspec = File.read(pubspec_path)

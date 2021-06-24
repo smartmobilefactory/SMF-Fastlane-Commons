@@ -177,7 +177,8 @@ end
 private_lane :smf_super_pipeline_increment_build_number do |options|
 
   smf_increment_build_number(
-    current_build_number: smf_get_build_number_of_app
+    current_build_number: smf_get_build_number_of_app,
+    skip_build_nr_update_in_plists: smf_config_get(nil, :skip_build_nr_update_in_plists)
   )
 end
 
