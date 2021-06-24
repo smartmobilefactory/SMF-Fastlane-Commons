@@ -1,9 +1,14 @@
 private_lane :smf_increment_build_number do |options|
 
-  UI.important('increment build number')
+  UI.important('Incrementing build number ...')
 
   current_build_number = options[:current_build_number]
   skip_update_in_plists = options[:skip_build_nr_update_in_plists]
+
+  if skip_update_in_plists == true
+    UI.message('Will not update build number in projects .plists files')
+  end
+
   NO_GIT_TAG_FAILURE = 'NO_GIT_TAG_FAILURE'
 
   # Pull all the tags so the change log collector finds the latest tag
