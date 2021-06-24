@@ -84,7 +84,7 @@ $CONFIG_REQUIRED_PROJECT_KEYS_FLUTTER = ['xcode_version']
 
 # Optional Config.json/project keys
 $CONFIG_OPTIONAL_PROJECT_KEYS_COMMONS = ['meta_db_name', 'sentry_org_slug', 'sentry_project_slug']
-$CONFIG_OPTIONAL_PROJECT_KEYS_IOS = ['custom_credentials', 'dmg_template_path']
+$CONFIG_OPTIONAL_PROJECT_KEYS_IOS = ['custom_credentials', 'dmg_template_path', 'skip_build_nr_update_in_plists']
 $CONFIG_OPTIONAL_PROJECT_KEYS_ANDROID = []
 $CONFIG_OPTIONAL_PROJECT_KEYS_FLUTTER = []
 
