@@ -6,7 +6,8 @@ This lane increments the build number of the project if an app is built and retu
 Increment the build number.
 ```
 smf_increment_build_number(
-    current_build_number: <some number>
+    current_build_number: <some number>,
+    skip_build_nr_update_in_plists: false # optional, default to false, if true, the build number will not be updated in plists files
 )
 ```
 

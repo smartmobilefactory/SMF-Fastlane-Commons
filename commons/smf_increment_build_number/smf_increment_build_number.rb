@@ -1,8 +1,14 @@
 private_lane :smf_increment_build_number do |options|
 
-  UI.important('increment build number')
+  UI.important('Incrementing build number ...')
 
   current_build_number = options[:current_build_number]
+  skip_update_in_plists = options[:skip_build_nr_update_in_plists]
+
+  if skip_update_in_plists == true
+    UI.message('Will not update build number in projects .plists files')
+  end
+
   NO_GIT_TAG_FAILURE = 'NO_GIT_TAG_FAILURE'
 
   # Pull all the tags so the change log collector finds the latest tag
@@ -37,25 +43,30 @@ private_lane :smf_increment_build_number do |options|
     end
   end
 
-  _smf_update_build_number_in_project(incremented_build_number)
+  _smf_update_build_number_in_project(incremented_build_number, skip_update_in_plists)
 end
 
 
-def _smf_update_build_number_in_project(build_number)
+def _smf_update_build_number_in_project(build_number, skip_update_in_plists)
   case @platform
   when :ios, :ios_framework, :macos, :apple
-    increment_build_number(build_number: build_number.to_s)
+
+    _smf_increment_build_number(
+      build_number.to_s,
+      skip_update_in_plists == true
+    )
+
     commit_version_bump(
-        xcodeproj: smf_get_xcodeproj_file_name,
-        message: "Increment build number to #{build_number}",
-        force: true
+      xcodeproj: smf_get_xcodeproj_file_name,
+      message: "Increment build number to #{build_number}",
+      force: true
     )
   when :android
     new_config = @smf_fastlane_config
     new_config[:app_version_code] = build_number.to_i
     smf_update_config(
-        new_config,
-        "Increment build number to #{build_number}")
+      new_config,
+      "Increment build number to #{build_number}")
   when :flutter
     pubspec_path = "#{smf_workspace_dir}/pubspec.yaml"
     pubspec = File.read(pubspec_path)
@@ -69,4 +80,22 @@ def _smf_update_build_number_in_project(build_number)
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
   end
+end
+
+# 02.07.2021
+# This function replaces fastlanes 'increment_build_number' function
+# because we need the skip_plist_option but for now can't update fastlane to 2.187.0 which
+# is the version where this option was introduced
+# When fastlane is updated, calls to this function can be replaced with:
+#
+#     increment_build_number(
+#       build_number: build_number.to_s,
+#       skip_info_plist: skip_update_in_plists == true
+#     )
+#
+# and this function can be removed
+
+def _smf_increment_build_number(build_number, skip_update_in_plists)
+  flags = skip_update_in_plists == true ? '' : '-all '
+  `cd #{smf_workspace_dir} && agvtool new-version #{flags}#{build_number}`
 end
