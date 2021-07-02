@@ -51,9 +51,9 @@ def _smf_update_build_number_in_project(build_number, skip_update_in_plists)
   case @platform
   when :ios, :ios_framework, :macos, :apple
 
-    increment_build_number(
-      build_number: build_number.to_s,
-      skip_info_plist: skip_update_in_plists == true
+    _smf_increment_build_number(
+      build_number.to_s,
+      skip_update_in_plists == true
     )
 
     commit_version_bump(
@@ -80,4 +80,22 @@ def _smf_update_build_number_in_project(build_number, skip_update_in_plists)
     UI.message("There is no platform \"#{@platform}\", exiting...")
     raise 'Unknown platform'
   end
+end
+
+# 02.07.2021
+# This function replaces fastlanes 'increment_build_number' function
+# because we need the skip_plist_option but for now can't update fastlane to 2.187.0 which
+# is the version where this option was introduced
+# When fastlane is updated, calls to this function can be replaced with:
+#
+#     increment_build_number(
+#       build_number: build_number.to_s,
+#       skip_info_plist: skip_update_in_plists == true
+#     )
+#
+# and this function can be removed
+
+def _smf_increment_build_number(build_number, skip_update_in_plists)
+  flags = skip_update_in_plists == true ? '' : '-all '
+  `cd #{smf_workspace_dir} && agvtool new-version #{flags}#{build_number}`
 end
