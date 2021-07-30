@@ -49,6 +49,8 @@ def _smf_google_api_start_request(request, uri)
   request['Accept'] = 'application/json'
   request['Authorization'] = "Bearer #{bearer_token}"
 
+  File.write("debugging_reporting.request", request.pretty_print)
+
   response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |client|
     client.request(request)
   end
@@ -81,8 +83,6 @@ def smf_google_api_upload_csv_to_spreadsheet(spreadsheet_id, sheet_id, csv_data)
   uri = URI.parse"https://sheets.googleapis.com/v4/spreadsheets/#{spreadsheet_id}:batchUpdate"
   request = Net::HTTP::Post.new(uri)
 
-  escaped_csv_data = csv_data.gsub('"', '\"')
-
   data = {
     "requests": [{
         "pasteData": {
@@ -91,7 +91,7 @@ def smf_google_api_upload_csv_to_spreadsheet(spreadsheet_id, sheet_id, csv_data)
             "rowIndex": "0",
             "columnIndex": "0"
           },
-          "data": escaped_csv_data,
+          "data": csv_data,
           "type": "PASTE_NORMAL",
           "delimiter": ";",
         }
