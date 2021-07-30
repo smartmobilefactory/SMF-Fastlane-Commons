@@ -49,7 +49,7 @@ def _smf_google_api_start_request(request, uri)
   request['Accept'] = 'application/json'
   request['Authorization'] = "Bearer #{bearer_token}"
 
-  File.write("./debugging_reporting.request", request.to_json.to_s)
+  File.write("./debugging_reporting.request", request.body)
 
   response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |client|
     client.request(request)
