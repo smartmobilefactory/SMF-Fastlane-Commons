@@ -62,7 +62,7 @@ def _smf_google_api_start_request(request, uri)
       raise 'Error parsing response body'
     end
   else
-    raise "API error: #{response.code}:'#{response.message}' for request: #{uri}"
+    raise "API error: #{response.code}:'#{response.message}' for request: #{uri}\n Body: #{response.body}"
   end
 end
 
