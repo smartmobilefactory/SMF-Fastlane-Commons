@@ -82,7 +82,7 @@ def smf_google_api_upload_csv_to_spreadsheet(spreadsheet_id, sheet_id, csv_data)
   #uri = URI.parse"https://hookb.in/zrr6Jzw1q3Uol3MMlrnr"
   request = Net::HTTP::Post.new(uri)
 
-  escaped_csv_data = csv_data.gsub('""', "'").gsub('"', "")
+  escaped_csv_data = csv_data.gsub('""', "'")
 
   data = {
     "requests": [{
