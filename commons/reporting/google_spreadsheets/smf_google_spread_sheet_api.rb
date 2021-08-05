@@ -81,8 +81,8 @@ def smf_google_api_upload_csv_to_spreadsheet(spreadsheet_id, sheet_id, csv_data)
   uri = URI.parse"https://sheets.googleapis.com/v4/spreadsheets/#{spreadsheet_id}:batchUpdate"
   request = Net::HTTP::Post.new(uri)
 
-  #escaped_csv_data = csv_data.gsub('"', '')
-  #File.write("./debugging.csv", escaped_csv_data)
+  escaped_csv_data = csv_data.gsub('"', '')
+  File.write("./debugging.csv", escaped_csv_data)
 
   data = {
     "requests": [{
