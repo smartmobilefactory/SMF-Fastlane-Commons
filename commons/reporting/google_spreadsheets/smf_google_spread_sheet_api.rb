@@ -2,6 +2,7 @@
 require 'json'
 require 'net/http'
 require 'date'
+require 'stringio'
 
 # Retrieves a temporary access token to the google spread sheets
 # use to then upload/add/append new data to google spread sheets
@@ -62,7 +63,7 @@ def _smf_google_api_start_request(request, uri)
       raise 'Error parsing response body'
     end
   else
-    raise "API error '#{response.message}' for request: #{uri}"
+    raise "API error: #{response.code}:'#{response.message}' for request: #{uri}\n Body: #{response.body}"
   end
 end
 
@@ -82,21 +83,32 @@ def smf_google_api_upload_csv_to_spreadsheet(spreadsheet_id, sheet_id, csv_data)
   request = Net::HTTP::Post.new(uri)
 
   data = {
-    "requests": [{
-        "pasteData": {
-          "coordinate": {
-            "sheetId": sheet_id,
-            "rowIndex": "0",
-            "columnIndex": "0"
+    "requests" =>  [{
+        "pasteData" => {
+          "coordinate" => {
+            "sheetId" => sheet_id,
+            "rowIndex" => "0",
+            "columnIndex" => "0"
           },
-          "data": csv_data,
-          "type": "PASTE_NORMAL",
-          "delimiter": ";",
+          "data" => csv_data,
+          "type" => "PASTE_NORMAL",
+          "delimiter" => ";"
         }
     }]
   }
 
-  request.body = data.to_json
+  json_data_string = data.to_json
+  # IMPROTANT: ruby 2.6.0 has a bug where sometimes in large http requests
+  # parts of the body get trimmed, this can cause the json we send to be invalid
+  # and thus causing an error
+  # for the bug see https://github.com/ruby/ruby/pull/2058 and
+  # https://mensfeld.pl/2019/01/exploring-a-critical-netprotocol-issue-in-ruby-2-6-0p0-and-how-it-can-lead-to-a-security-problem/
+  # This is fixed in ruby 2.6.1, but we haven't update to that version yet
+  # because it could cause problems somewhere else
+  # so for now we are using a fix (body_stream)
+  # which is presented in the above mentioned article
+  request.body_stream = StringIO.new(json_data_string)
+  request.content_length = json_data_string.bytesize
 
   _smf_google_api_start_request(request, uri)
 end
