@@ -78,8 +78,8 @@ end
 # Using a temporary access token, upload a CSV string to a spreadsheet's page
 def smf_google_api_upload_csv_to_spreadsheet(spreadsheet_id, sheet_id, csv_data)
 
-  #uri = URI.parse"https://sheets.googleapis.com/v4/spreadsheets/#{spreadsheet_id}:batchUpdate"
-  uri = URI.parse "https://hookb.in/033yPaQmwet3J0ooJLEY"
+  uri = URI.parse"https://sheets.googleapis.com/v4/spreadsheets/#{spreadsheet_id}:batchUpdate"
+  #uri = URI.parse "https://hookb.in/033yPaQmwet3J0ooJLEY"
   request = Net::HTTP::Post.new(uri)
 
   data = {
@@ -98,8 +98,8 @@ def smf_google_api_upload_csv_to_spreadsheet(spreadsheet_id, sheet_id, csv_data)
   }
 
   #request.body = data.to_json
-  form_data = { "body" => data}
-  request.set_form_data(form_data)
+  #form_data = { "body" => data}
+  request.set_form_data(data)
 
   File.write("./debugging_data.json", data.to_json)
 
