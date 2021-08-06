@@ -97,7 +97,8 @@ def smf_google_api_upload_csv_to_spreadsheet(spreadsheet_id, sheet_id, csv_data)
     }]
   }
 
-  request.body = data.to_json
+  #request.body = data.to_json
+  request.set_form_data(data)
 
   File.write("./debugging_data.json", data.to_json)
 
