@@ -2,6 +2,7 @@
 require 'json'
 require 'net/http'
 require 'date'
+require 'stringio'
 
 # Retrieves a temporary access token to the google spread sheets
 # use to then upload/add/append new data to google spread sheets
@@ -97,7 +98,9 @@ def smf_google_api_upload_csv_to_spreadsheet(spreadsheet_id, sheet_id, csv_data)
     }]
   }
 
-  request.body = data.to_json
+  json_data_string = data.to_json
+  request.body_stream = StringIO.new(json_data_string)
+  request.content_length = json_data_string.bytesize
 
   _smf_google_api_start_request(request, uri)
 end
