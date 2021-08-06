@@ -83,16 +83,16 @@ def smf_google_api_upload_csv_to_spreadsheet(spreadsheet_id, sheet_id, csv_data)
   request = Net::HTTP::Post.new(uri)
 
   data = {
-    "requests": [{
-        "pasteData": {
-          "coordinate": {
-            "sheetId": sheet_id,
-            "rowIndex": "0",
-            "columnIndex": "0"
+    "requests" =>  [{
+        "pasteData" => {
+          "coordinate" => {
+            "sheetId" => sheet_id,
+            "rowIndex" => "0",
+            "columnIndex" => "0"
           },
-          "data": csv_data,
-          "type": "PASTE_NORMAL",
-          "delimiter": ";"
+          "data" => csv_data,
+          "type" => "PASTE_NORMAL",
+          "delimiter" => ";"
         }
     }]
   }
