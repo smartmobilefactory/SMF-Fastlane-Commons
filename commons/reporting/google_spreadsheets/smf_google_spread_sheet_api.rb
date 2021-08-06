@@ -99,12 +99,13 @@ def smf_google_api_upload_csv_to_spreadsheet(spreadsheet_id, sheet_id, csv_data)
 
   json_data_string = data.to_json
   # IMPROTANT: ruby 2.6.0 has a bug where sometimes in large http requests
-  # parts of the body get trimmed, this can cause the the json we send to be invalid
+  # parts of the body get trimmed, this can cause the json we send to be invalid
   # and thus causing an error
   # for the bug see https://github.com/ruby/ruby/pull/2058 and
   # https://mensfeld.pl/2019/01/exploring-a-critical-netprotocol-issue-in-ruby-2-6-0p0-and-how-it-can-lead-to-a-security-problem/
-  # This is fixed in ruby 2.6.1, btu because we haven't update to that version yet
-  # because it could cause problems somewhere else we are using a fix (body_stream)
+  # This is fixed in ruby 2.6.1, but we haven't update to that version yet
+  # because it could cause problems somewhere else
+  # so for now we are using a fix (body_stream)
   # which is presented in the above mentioned article
   request.body_stream = StringIO.new(json_data_string)
   request.content_length = json_data_string.bytesize
