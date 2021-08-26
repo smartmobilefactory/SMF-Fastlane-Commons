@@ -24,7 +24,7 @@ private_lane :smf_ios_monitor_unit_tests do |options|
     UI.message("No .xcresult files found in #{xcresult_dir}")
     next
   end
-  
+
   # Only use one test coverage report
   filename = xcresult_file_names.first
   json_result_string = `xcrun xccov view --report --json #{File.join(xcresult_dir, filename)}`
