@@ -24,20 +24,15 @@ private_lane :smf_ios_monitor_unit_tests do |options|
     UI.message("No .xcresult files found in #{xcresult_dir}")
     next
   end
-
-  UI.message("XC Result file names: #{xcresult_file_names}")
+  
   # Only use one test coverage report
   filename = xcresult_file_names.first
-  UI.message("Filename: #{filename}")
-  UI.message("Running command: 'xcrun xccov view --report --json #{File.join(xcresult_dir, filename)}'")
   json_result_string = `xcrun xccov view --report --json #{File.join(xcresult_dir, filename)}`
   result_parsed = JSON.parse(json_result_string)
-  UI.message("Result parsed: #{result_parsed}")
 
   # Gather unit-tests count
   json_result_string = `xcrun xcresulttool get --path #{File.join(xcresult_dir, filename)} --format json`
   tests_results = JSON.parse(json_result_string)
-  UI.message("Test results: #{tests_results}")
   tests_count = tests_results.dig('metrics', 'testsCount', '_value')
 
   entry_data = {
