@@ -33,7 +33,10 @@ private_lane :smf_ios_monitor_unit_tests do |options|
   # Gather unit-tests count
   json_result_string = `xcrun xcresulttool get --path #{File.join(xcresult_dir, filename)} --format json`
   tests_results = JSON.parse(json_result_string)
-  tests_count = tests_results.dig('metrics').dig('testsCount').dig('_value')
+  tests_count = tests_results.dig('metrics', 'testsCount', '_value')
+
+  # set test_count to 0 if is is nil
+  tests_count ||= 0
 
   entry_data = {
     :project_name => project_name,
