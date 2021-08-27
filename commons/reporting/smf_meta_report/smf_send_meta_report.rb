@@ -9,7 +9,6 @@ def smf_send_meta_report(project_data, type)
   }
 
   # Select sheet in spreadsheet
-  sheet_name = ''
   case type
     when :ANDROID_META_REPORTING
       sheet_name = $REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME_ANDROID

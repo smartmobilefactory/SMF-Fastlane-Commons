@@ -28,6 +28,11 @@ def _should_send_ios_report_data(options)
     return true
   end
 
+  # TODO Remove after testing
+  if  options[:branch].match(/^SMFIT-1923$/)
+    return true
+  end
+
   return false
 end
 
@@ -41,6 +46,7 @@ def _smf_analyse_ios_project(options)
   analysis_json[:idfa] = smf_analyse_idfa_usage
   analysis_json[:swiftlint_warnings] = smf_swift_lint_number_of_warnings
   analysis_json[:ats] = smf_analyse_ats_exception
+  analysis_json[:build_number] = smf_meta_report_build_number_and_version(options[:build_variant])
 
   # Analysers that are also used by Danger to add warnings to the PR checks
   xcode_settings = smf_xcodeproj_settings(options)
