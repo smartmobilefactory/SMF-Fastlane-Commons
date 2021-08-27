@@ -209,13 +209,13 @@ end
 def _smf_apple_meta_reporting_spreadsheet_entry_to_line(entry)
   # The order of the elements in this array directly correspond to the table columns in the google spread sheet
   # thus it is VERY IMPORTANT to not change the order!
-  [entry[:date], entry[:repo], entry[:platform], entry[:branch], entry[:xcode_version], entry[:idfa], entry[:bitcode], entry[:swiftlint_warnings], entry[:ats], entry[:swift_version], entry[:deployment_target], entry[:build_number]]
+  [entry[:date], entry[:repo], entry[:platform], entry[:branch], entry[:xcode_version], entry[:idfa], entry[:bitcode], entry[:swiftlint_warnings], entry[:ats], entry[:swift_version], entry[:deployment_target], entry[:build_number], entry[:appcenter_crashes]]
 end
 
 def _smf_android_meta_reporting_spreadsheet_entry_to_line(entry)
   # The order of the elements in this array directly correspond to the table columns in the google spread sheet
   # thus it is VERY IMPORTANT to not change the order!
-  [entry[:date], entry[:repo], entry[:platform], entry[:branch], entry[:min_sdk_version], entry[:target_sdk_version], entry[:kotlin_version], entry[:gradle_version], entry[:appcenter_crashes]]
+  [entry[:date], entry[:repo], entry[:platform], entry[:branch], entry[:min_sdk_version], entry[:target_sdk_version], entry[:kotlin_version], entry[:gradle_version]]
 end
 
 def _smf_financial_reporting_spreadsheet_entry_to_line(entry)
