@@ -215,7 +215,7 @@ end
 def _smf_android_meta_reporting_spreadsheet_entry_to_line(entry)
   # The order of the elements in this array directly correspond to the table columns in the google spread sheet
   # thus it is VERY IMPORTANT to not change the order!
-  [entry[:date], entry[:repo], entry[:platform], entry[:branch], entry[:min_sdk_version], entry[:target_sdk_version], entry[:kotlin_version], entry[:gradle_version]]
+  [entry[:date], entry[:repo], entry[:platform], entry[:branch], entry[:min_sdk_version], entry[:target_sdk_version], entry[:kotlin_version], entry[:gradle_version], entry[:appcenter_crashes]]
 end
 
 def _smf_financial_reporting_spreadsheet_entry_to_line(entry)
