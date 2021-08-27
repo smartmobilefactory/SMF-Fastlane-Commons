@@ -28,11 +28,6 @@ def _should_send_ios_report_data(options)
     return true
   end
 
-  # TODO Remove after testing
-  if  options[:branch].match(/^SMFIT-1923$/)
-    return true
-  end
-
   return false
 end
 
