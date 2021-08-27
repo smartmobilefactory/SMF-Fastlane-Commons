@@ -41,6 +41,12 @@ def _smf_analyse_ios_project(options)
   analysis_json[:idfa] = smf_analyse_idfa_usage
   analysis_json[:swiftlint_warnings] = smf_swift_lint_number_of_warnings
   analysis_json[:ats] = smf_analyse_ats_exception
+  analysis_json[:build_number] = smf_meta_report_build_number_and_version(options[:build_variant])
+  # Pod analysis
+  analysis_json[:appcenter_crashes] = smf_analyse_appcenter_crash_report_usage
+  analysis_json[:sentry] = smf_analyse_sentry_usage
+  analysis_json[:qakit] = smf_analyse_qakit_usage
+  analysis_json[:debug_menu] = smf_analyse_debug_menu_usage
 
   # Analysers that are also used by Danger to add warnings to the PR checks
   xcode_settings = smf_xcodeproj_settings(options)
