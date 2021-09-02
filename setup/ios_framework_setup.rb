@@ -86,7 +86,7 @@ private_lane :smf_pod_super_unit_tests do |options|
       # If force match was passed as option from jenkins (e.g. manually enabled for the build)
       # then use it, if its nil or false the value from the config json is used
       force_match = options[:force_match]
-      force_match ||= smf_config_get(build_variant, :match, :force)
+      force_match ||= smf_config_get(variant, :match, :force)
 
       smf_download_provisioning_profiles(
           team_id: build_variant_config[:team_id],
