@@ -62,6 +62,11 @@ private_lane :smf_super_ios_build do |options|
 
   sh("cd #{smf_workspace_dir} && #{smf_get_flutter_binary_path} build ios --release --no-codesign --flavor #{build_variant}")
 
+  # If force match was passed as option from jenkins (e.g. manually enabled for the build)
+  # then use it, if its nil or false the value from the config json is used
+  force_match = options[:force_match]
+  force_match ||= smf_config_get(build_variant, :match, :force)
+
   smf_download_provisioning_profiles(
       team_id: build_variant_ios_config[:team_id],
       apple_id: build_variant_ios_config[:apple_id],
@@ -73,7 +78,7 @@ private_lane :smf_super_ios_build do |options|
       template_name: build_variant_ios_config.dig(:match, :template_name),
       extensions_suffixes: !build_variant_config[:extensions_suffixes].nil? ? build_variant_config[:extensions_suffixes] : @smf_fastlane_config[:extensions_suffixes],
       build_variant: build_variant,
-      force: build_variant_config.dig(:match, :force)
+      force: force_match
   )
   smf_build_apple_app(
       skip_export: options[:skip_export].nil? ? false : options[:skip_export],
