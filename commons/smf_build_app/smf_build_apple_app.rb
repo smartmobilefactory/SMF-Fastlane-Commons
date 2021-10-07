@@ -50,7 +50,7 @@ private_lane :smf_build_apple_app do |options|
     xcargs: smf_xcargs_for_build_system,
     archive_path: $IOS_ARCHIVE_PATH,
     derived_data_path: $IOS_DERIVED_DATA_PATH,
-    result_bundle: true,
+    result_bundle: false,
     result_bundle_path: $RESULT_BUNDLE_PATH,
     output_name: output_name,
     include_symbols: true,
