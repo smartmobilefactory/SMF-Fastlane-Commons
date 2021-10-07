@@ -40,6 +40,7 @@ private_lane :smf_build_apple_app do |options|
 
   smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
 
+  UI.message("Result bundle path is: #{$IOS_RESULT_BUNDLE_PATH}")
   gym_parameters = {
     clean: clean_project,
     workspace: !workspace.nil? ? workspace : "#{project_name}.xcworkspace",
