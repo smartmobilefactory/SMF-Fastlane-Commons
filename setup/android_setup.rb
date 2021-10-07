@@ -169,15 +169,6 @@ private_lane :smf_super_upload_to_appcenter do |options|
   destinations = build_variant_config[:appcenter_destinations]
 
   # Upload to AppCenter
-  apk_path = smf_get_file_path(apk_file_regex)
-  smf_android_upload_to_appcenter(
-    destinations: smf_get_appcenter_destination_groups(build_variant, destinations),
-    build_variant: build_variant,
-    apk_path: apk_path,
-    app_id: appcenter_app_id
-  ) if apk_path != '' && !appcenter_app_id.nil?
-
-  # Upload to AppCenter
   aab_path = smf_get_file_path(aab_file_regex)
   smf_android_upload_to_appcenter(
     destinations: smf_get_appcenter_destination_groups(build_variant, destinations),
@@ -185,6 +176,15 @@ private_lane :smf_super_upload_to_appcenter do |options|
     aab_path: aab_path,
     app_id: appcenter_app_id
   ) if aab_path != '' && !appcenter_app_id.nil?
+
+  # Upload to AppCenter
+  apk_path = smf_get_file_path(apk_file_regex)
+  smf_android_upload_to_appcenter(
+    destinations: smf_get_appcenter_destination_groups(build_variant, destinations),
+    build_variant: build_variant,
+    apk_path: apk_path,
+    app_id: appcenter_app_id
+  ) if apk_path != '' && !appcenter_app_id.nil?
 
 end
 
