@@ -112,7 +112,7 @@ end
 
 puts "Danger: Xcode warnings"
 ## XCODE WARNINGS
-if File.exist?('build/reports/errors.json')
+if File.exist?(ENV['DANGER_RESULT_BUNDLE_PATH'])
   xcode_summary.inline_mode = true
   xcode_summary.ignored_files = 'Pods/**'
 
@@ -125,7 +125,7 @@ if File.exist?('build/reports/errors.json')
       end
   }
 
-  xcode_summary.report 'build/reports/errors.json'
+  xcode_summary.report ENV['DANGER_RESULT_BUNDLE_PATH']
 end
 
 xcode_warnings = [
