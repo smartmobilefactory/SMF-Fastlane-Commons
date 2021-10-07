@@ -63,7 +63,7 @@ private_lane :smf_build_apple_app do |options|
     catalyst_platform: catalyst_platform
   }
 
-  UI.message("Gym Params: #{JSON.pretty_print(gym_parameters)}")
+  UI.message("Gym Params: #{gym_parameters}")
 
   gym_parameters[:destination] = 'platform=macOS,variant=Mac Catalyst' if smf_is_catalyst_mac_build(build_variant)
 
