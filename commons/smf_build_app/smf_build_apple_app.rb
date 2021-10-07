@@ -40,7 +40,6 @@ private_lane :smf_build_apple_app do |options|
 
   smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
 
-  UI.message("Result bundle path is: #{$IOS_RESULT_BUNDLE_PATH}")
   gym_parameters = {
     clean: clean_project,
     workspace: !workspace.nil? ? workspace : "#{project_name}.xcworkspace",
@@ -63,6 +62,8 @@ private_lane :smf_build_apple_app do |options|
     xcpretty_formatter: _smf_get_xcpretty_formatter_path,
     catalyst_platform: catalyst_platform
   }
+
+  UI.message("Gym Params: #{JSON.pretty_print(gym_parameters)}")
 
   gym_parameters[:destination] = 'platform=macOS,variant=Mac Catalyst' if smf_is_catalyst_mac_build(build_variant)
 
