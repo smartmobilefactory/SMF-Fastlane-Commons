@@ -17,10 +17,6 @@ private_lane :smf_build_android_app do |options|
     end
   end
 
-  letters = build_variant.split('')
-  letters[0] = letters[0].upcase if letters.length >= 1
-  build_variant = letters.join('')
-
   gradle(
     tasks: ['assemble', 'bundle'],
     flavor: build_variant,
