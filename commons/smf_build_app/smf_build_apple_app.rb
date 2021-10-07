@@ -51,7 +51,7 @@ private_lane :smf_build_apple_app do |options|
     archive_path: $IOS_ARCHIVE_PATH,
     derived_data_path: $IOS_DERIVED_DATA_PATH,
     result_bundle: true,
-    result_bundle_path: $RESULT_BUNDLE_PATH,
+    result_bundle_path: $IOS_RESULT_BUNDLE_PATH,
     output_name: output_name,
     include_symbols: true,
     include_bitcode: (upload_itc && upload_bitcode),
@@ -62,8 +62,6 @@ private_lane :smf_build_apple_app do |options|
     xcpretty_formatter: _smf_get_xcpretty_formatter_path,
     catalyst_platform: catalyst_platform
   }
-
-  UI.message("Gym Params: #{gym_parameters}")
 
   gym_parameters[:destination] = 'platform=macOS,variant=Mac Catalyst' if smf_is_catalyst_mac_build(build_variant)
 
