@@ -179,6 +179,7 @@ private_lane :smf_super_upload_to_appcenter do |options|
 
   # Upload to AppCenter
   apk_path = smf_get_file_path(apk_file_regex)
+  UI.message("APK PATH before Apccenter call: #{apk_path}")
   smf_android_upload_to_appcenter(
     destinations: smf_get_appcenter_destination_groups(build_variant, destinations),
     build_variant: build_variant,
