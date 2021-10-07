@@ -45,9 +45,9 @@ $POD_DEFAULT_VARIANTS = ['patch', 'minor', 'major', 'current', 'breaking', 'inte
 $CATALYST_MAC_BUILD_VARIANT_PREFIX = 'macOS_'
 
 $IOS_BUILD_OUTPUT_DIR = 'build'
-$XCRESULT_DIR = File.join($IOS_DERIVED_DATA_PATH, 'Logs/Test')
 $IOS_ARCHIVE_PATH = File.join($IOS_BUILD_OUTPUT_DIR, '/')
 $IOS_DERIVED_DATA_PATH = File.join($IOS_BUILD_OUTPUT_DIR, 'derivedData/')
+$XCRESULT_DIR = File.join($IOS_DERIVED_DATA_PATH, 'Logs/Test')
 $IOS_RESULT_BUNDLE_PATH = File.join($IOS_BUILD_OUTPUT_DIR, 'reports/bundleResults')
 
 $PODSPEC_REPO_SOURCES = ['git@github.com:smartmobilefactory/SMF-CocoaPods-Specs', 'https://github.com/CocoaPods/Specs']
