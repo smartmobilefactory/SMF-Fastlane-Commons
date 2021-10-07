@@ -8,14 +8,14 @@ private_lane :smf_build_android_app do |options|
   build_variant = letters.join('')
 
   task = ["assemble#{build_variant}"]
-  task += "bundle#{build_variant}"
+  task.push("bundle#{build_variant}")
 
   unless keystore_folder.nil?
     keystore_values = smf_pull_keystore(folder: keystore_folder)
 
     if keystore_values[:keystore_file]
 
-      task += "bundle#{build_variant}"
+      task.push("bundle#{build_variant}")
       properties = {
         "android.injected.signing.store.file" => keystore_values[:keystore_file],
         "android.injected.signing.store.password" => keystore_values[:keystore_password],
