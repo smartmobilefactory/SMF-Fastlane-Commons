@@ -27,9 +27,8 @@ private_lane :smf_android_upload_to_appcenter do |options|
         notify_testers: true,
         release_notes: smf_read_changelog
     )
-  end
-
-  appcenter_upload(
+  else
+    appcenter_upload(
       api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
       owner_name: owner_name,
       app_name: app_name,
@@ -37,8 +36,8 @@ private_lane :smf_android_upload_to_appcenter do |options|
       destinations: destinations,
       notify_testers: true,
       release_notes: smf_read_changelog
-  )
-
+    )
+  end
 
   smf_appcenter_notify_destination_groups(app_id, app_name, owner_name, destinations)
 end
