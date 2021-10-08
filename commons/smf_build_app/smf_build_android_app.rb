@@ -7,14 +7,14 @@ private_lane :smf_build_android_app do |options|
   letters[0] = letters[0].upcase if letters.length >= 1
   build_variant = letters.join('')
 
-  task = ["assemble#{build_variant}"]
+  tasks = ["assemble#{build_variant}"]
 
   unless keystore_folder.nil?
     keystore_values = smf_pull_keystore(folder: keystore_folder)
 
     if keystore_values[:keystore_file]
 
-      task.push("bundle#{build_variant}")
+      tasks.push("bundle#{build_variant}")
       properties = {
         "android.injected.signing.store.file" => keystore_values[:keystore_file],
         "android.injected.signing.store.password" => keystore_values[:keystore_password],
@@ -26,7 +26,7 @@ private_lane :smf_build_android_app do |options|
   end
 
   gradle(
-    tasks: task,
+    tasks: tasks,
     properties: properties
   )
 end
