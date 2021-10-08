@@ -18,14 +18,14 @@ private_lane :smf_android_upload_to_appcenter do |options|
   UI.message('Upload android app to AppCenter.')
   if !aab_path.nil?
     appcenter_upload(
-        api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
-        owner_name: owner_name,
-        app_name: app_name,
-        file: aab_path,
-        destination_type: 'store',
-        destinations: destinations,
-        notify_testers: true,
-        release_notes: smf_read_changelog
+      api_token: ENV[$SMF_APPCENTER_API_TOKEN_ENV_KEY],
+      owner_name: owner_name,
+      app_name: app_name,
+      file: aab_path,
+      destination_type: 'store',
+      destinations: destinations,
+      notify_testers: true,
+      release_notes: smf_read_changelog
     )
   else
     appcenter_upload(
