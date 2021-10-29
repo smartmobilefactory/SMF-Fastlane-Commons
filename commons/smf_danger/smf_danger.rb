@@ -40,7 +40,7 @@ private_lane :smf_danger do |options|
     end
   end
 
-  ENV['DANGER_RESULT_BUNDLE_PATH'] = $IOS_RESULT_BUNDLE_PATH + '.xcresult'
+  ENV['DANGER_RESULT_BUNDLE_PATH'] = $IOS_RESULT_BUNDLE_PATH
 
   _check_common_project_setup_files
 
