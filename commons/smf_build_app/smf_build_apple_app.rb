@@ -46,10 +46,12 @@ private_lane :smf_build_apple_app do |options|
     scheme: scheme,
     configuration: xcconfig_name,
     codesigning_identity: code_signing_identity,
-    output_directory: 'build',
+    output_directory: $IOS_BUILD_OUTPUT_DIR,
     xcargs: smf_xcargs_for_build_system,
-    archive_path: "build/",
-    derived_data_path: "build/derivedData/",
+    archive_path: $IOS_ARCHIVE_PATH,
+    derived_data_path: $IOS_DERIVED_DATA_PATH,
+    result_bundle: true,
+    result_bundle_path: $IOS_RESULT_BUNDLE_PATH,
     output_name: output_name,
     include_symbols: true,
     include_bitcode: (upload_itc && upload_bitcode),
@@ -57,7 +59,6 @@ private_lane :smf_build_apple_app do |options|
     export_method: export_method,
     skip_package_ipa: skip_package_ipa,
     skip_package_pkg: skip_package_pkg,
-    xcpretty_formatter: _smf_get_xcpretty_formatter_path,
     catalyst_platform: catalyst_platform
   }
 
@@ -101,18 +102,3 @@ def smf_is_using_old_build_system
   return true if (contents.match(regex) != nil)
 
 end
-
-def _smf_get_xcpretty_formatter_path
-  # Because currently bundler is printing a lot of gem warnings, we have to take the last line of the output which actually is the correct path we want
-  path = sh('xcpretty-json-formatter').split("\n").last
-
-  if path.nil?
-    UI.message('Error getting path to xcpretty-json-formatter. Seems like the Gem (https://github.com/marcelofabri/xcpretty-json-formatter) is not (corrrectly) installed!')
-    raise 'Error getting path to xcpretty-json-formatter'
-  else
-    UI.message("Found path to xcpretty-formatter: #{path}")
-  end
-
-  path
-end
-

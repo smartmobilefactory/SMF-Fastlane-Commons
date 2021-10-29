@@ -22,7 +22,6 @@ $KEYCHAIN_JENKINS_ENV_KEY = 'JENKINS'
 $XCODE_EXECUTABLE_PATH_PREFIX = '/Applications/Xcode-'
 $XCODE_EXECUTABLE_PATH_POSTFIX = '.app'
 $DEVELOPMENT_DIRECTORY_KEY = 'DEVELOPMENT_DIR'
-$XCRESULT_DIR = 'build/derivedData/Logs/Test'
 
 # Default Slack channel to send logs to
 $SMF_CI_IOS_ERROR_LOG = 'ci-ios-error-log'
@@ -44,6 +43,12 @@ $TICKET_TAGS_TEMP_FILE = 'temp_ticket_tags.text'
 # Build Options
 $POD_DEFAULT_VARIANTS = ['patch', 'minor', 'major', 'current', 'breaking', 'internal']
 $CATALYST_MAC_BUILD_VARIANT_PREFIX = 'macOS_'
+
+$IOS_BUILD_OUTPUT_DIR = 'build'
+$IOS_ARCHIVE_PATH = File.join($IOS_BUILD_OUTPUT_DIR, '/')
+$IOS_DERIVED_DATA_PATH = File.join($IOS_BUILD_OUTPUT_DIR, 'derivedData/')
+$XCRESULT_DIR = File.join($IOS_DERIVED_DATA_PATH, 'Logs/Test')
+$IOS_RESULT_BUNDLE_PATH = File.join($IOS_BUILD_OUTPUT_DIR, 'reports/bundleResults.xcresult')
 
 $PODSPEC_REPO_SOURCES = ['git@github.com:smartmobilefactory/SMF-CocoaPods-Specs', 'https://github.com/CocoaPods/Specs']
 

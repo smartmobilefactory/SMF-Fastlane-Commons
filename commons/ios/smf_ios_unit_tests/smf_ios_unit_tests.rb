@@ -37,7 +37,7 @@ private_lane :smf_ios_unit_tests do |options|
         disable_concurrent_testing: true,
         reset_simulator: true,
         code_coverage: true,
-        derived_data_path: "build/derivedData/",
+        derived_data_path: $IOS_DERIVED_DATA_PATH,
         output_directory: 'build',
         output_types: "html,junit,json-compilation-database",
         output_files: "report.html,report.junit,report.json",
