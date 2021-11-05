@@ -41,7 +41,8 @@ private_lane :smf_ios_unit_tests do |options|
         output_directory: 'build',
         output_types: "html,junit,json-compilation-database",
         output_files: "report.html,report.junit,report.json",
-        number_of_retries: 1
+        number_of_retries: 1,
+        thread_sanitizer: true
     )
   end
 
