@@ -41,7 +41,9 @@ private_lane :smf_ios_unit_tests do |options|
         output_directory: 'build',
         output_types: "html,junit,json-compilation-database",
         output_files: "report.html,report.junit,report.json",
+        result_bundle: true,
         #number_of_retries: 1,
+        # We should see if we can detect if thread_sanitizer should be enabled
         thread_sanitizer: true
     )
   end
