@@ -170,9 +170,18 @@ end
 def _smf_extract_thread_sanitizer_warnings_from_directory(unit_tests_logs_directory) 
   log_file = Dir["#{unit_tests_logs_directory}/*.log"].first
 
+  # Sanitizer warnings start with:
+  # ==================
+  # WARNING: ThreadSanitizer:
+  #
+  # And ends with:
+  # ==================
+
+  # This command returns: `lineNumber-WARNING: ThreadSanitizer` -> `cut` takes care of removing everything except the line number
   start_line_string = `grep "==================" -n -A 1 #{log_file} | grep "WARNING: ThreadSanitizer" | cut -f1 -d-`
   start_line = start_line_string.to_i
 
+  # This command returns: `lineNumber::==================` -> `cut` takes care of removing everything except the line number
   end_line_string = `tail -n +#{start_line} #{log_file} | grep -in "==================" | cut -f1 -d:`
   end_line = start_line + (end_line_string.to_i - 1)
 
