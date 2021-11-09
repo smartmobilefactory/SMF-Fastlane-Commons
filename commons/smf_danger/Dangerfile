@@ -131,7 +131,7 @@ end
 puts "Danger: Thread sanitizer"
 ## Thread sanitizer
 unless ENV['DANGER_SANITIZER_WARNINGS'].nil?
-  warning(ENV['DANGER_SANITIZER_WARNINGS'])
+  warn(ENV['DANGER_SANITIZER_WARNINGS'])
 end
 
 xcode_warnings = [
