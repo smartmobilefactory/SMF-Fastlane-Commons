@@ -162,7 +162,8 @@ def _smf_extract_thread_sanitizer_warnings
 
   sanitizer_warning = _smf_extract_thread_sanitizer_warnings_from_directory(unit_tests_logs_directory)
 
-  ENV['DANGER_SANITIZER_WARNINGS'] = sanitizer_warning
+  html = "<b>Thread sanitizer found issues while running unit tests</b><br><br><pre><code>#{sanitizer_warning}</code></pre>"
+  ENV['DANGER_SANITIZER_WARNINGS'] = html
 
 end
 
