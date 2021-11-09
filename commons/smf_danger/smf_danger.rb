@@ -55,6 +55,7 @@ private_lane :smf_danger do |options|
   _smf_check_repo_files_folders
   _smf_check_config_build_variant_keys
   _smf_check_valid_xcode_config(options)
+  _smf_extract_thread_sanitizer_warnings
 
   dangerfile = "#{File.expand_path(File.dirname(__FILE__))}/Dangerfile"
   puts "Loading Dangerfile: #{dangerfile}"
@@ -149,4 +150,33 @@ def _smf_check_valid_xcode_config(options)
   # env: 'DANGER_TVOS_DEPLOYMENT_TARGET'
   # env: 'DANGER_WATCHOS_DEPLOYMENT_TARGET'
   smf_analyse_deployment_targets(xcode_settings, options)
+end
+
+def _smf_extract_thread_sanitizer_warnings
+  unless _is_apple_platform
+    return
+  end
+
+  # Load unit test log file
+  unit_tests_logs_directory = File.join(smf_workspace_dir, $IOS_UNIT_TESTS_BUILD_LOGS_DIRECTORY)
+
+  sanitizer_warning = _smf_extract_thread_sanitizer_warnings_from_directory(unit_tests_logs_directory)
+
+  ENV['DANGER_SANITIZER_WARNINGS'] = sanitizer_warning
+
+end
+
+# unit_tests_logs_directory: full path to the logs directory. The function will look for the first .log file and use it.
+def _smf_extract_thread_sanitizer_warnings_from_directory(unit_tests_logs_directory) 
+  log_file = Dir["#{unit_tests_logs_directory}/*.log"].first
+
+  start_line_string = `grep "==================" -n -A 1 #{log_file} | grep "WARNING: ThreadSanitizer" | cut -f1 -d-`
+  start_line = start_line_string.to_i
+
+  end_line_string = `tail -n +#{start_line} #{log_file} | grep -in "==================" | cut -f1 -d:`
+  end_line = start_line + (end_line_string.to_i - 1)
+
+  sanitizer_warning = `sed -n '#{(start_line - 1)},#{end_line}p' #{log_file}`
+
+  sanitizer_warning
 end
