@@ -42,7 +42,6 @@ private_lane :smf_ios_unit_tests do |options|
         output_types: "html,junit,json-compilation-database",
         output_files: "report.html,report.junit,report.json",
         buildlog_path: $IOS_UNIT_TESTS_BUILD_LOGS_DIRECTORY,
-        result_bundle: true,
         number_of_retries: 1,
     )
   end
