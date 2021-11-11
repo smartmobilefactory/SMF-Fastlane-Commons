@@ -128,6 +128,12 @@ if File.exist?(ENV['DANGER_RESULT_BUNDLE_PATH'])
   xcode_summary.report ENV['DANGER_RESULT_BUNDLE_PATH']
 end
 
+## Thread sanitizer
+unless ENV['DANGER_SANITIZER_WARNINGS'].nil?
+  puts "Danger: Thread sanitizer"
+  warn(ENV['DANGER_SANITIZER_WARNINGS'])
+end
+
 xcode_warnings = [
   'DANGER_ENABLE_BITCODE',
   'DANGER_SWIFT_VERSION',
