@@ -162,9 +162,10 @@ def _smf_extract_thread_sanitizer_warnings
 
   sanitizer_warning = _smf_extract_thread_sanitizer_warnings_from_directory(unit_tests_logs_directory)
 
-  content = "**Thread sanitizer found issues while running unit tests**\n\n**Please run the unit tests on your local machine with the thread sanitizer enabled and fix the issues**\n\n```\n#{sanitizer_warning}\n```\n"
-  ENV['DANGER_SANITIZER_WARNINGS'] = content
-
+  if !sanitizer_warning.nil? 
+    content = "**Thread sanitizer found issues while running unit tests**\n\n**Please run the unit tests on your local machine with the thread sanitizer enabled and fix the issues**\n\n```\n#{sanitizer_warning}\n```\n"
+    ENV['DANGER_SANITIZER_WARNINGS'] = content
+  end
 end
 
 # unit_tests_logs_directory: full path to the logs directory. The function will look for the first `.log` file in the given directory and use it.
