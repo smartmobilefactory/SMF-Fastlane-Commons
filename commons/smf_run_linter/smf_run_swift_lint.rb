@@ -35,6 +35,17 @@ private_lane :smf_run_swift_lint do
       executable: swift_lint_executable_path
   )
 
+  # TODO: check if compiler log path exists, put output_file in variable
+  swiftlint(
+    mode: :analyze,      # SwiftLint mode: :lint (default) or :autocorrect
+    output_file: "#{smf_workspace_dir}/swiftlint-analyze.xml", # The path of the output file (optional)
+    config_file: swift_lint_yml,     # The path of the configuration file (optional)
+    reporter: 'checkstyle',
+    ignore_exit_status: true,    # Allow fastlane to continue even if SwiftLint returns a non-zero exit status
+    executable: swift_lint_executable_path,
+    compiler_log_path: "buildLog/CI-iOS-App-Playground-Alpha-CI-iOS-App-Playground-Alpha.log"
+  )
+
   # Perform a seconf lint using the 'json' reporter for the unused rules report
   swiftlint(
       output_file: smf_swift_lint_output_json_path,
