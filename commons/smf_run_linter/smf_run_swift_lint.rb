@@ -35,7 +35,11 @@ private_lane :smf_run_swift_lint do
       executable: swift_lint_executable_path
   )
 
+
+  unit_tests_logs_directory = File.join(smf_workspace_dir, $IOS_UNIT_TESTS_BUILD_LOGS_DIRECTORY)
+  compiler_log_path = Dir["#{unit_tests_logs_directory}/*.log"].first
   # TODO: check if compiler log path exists, put output_file in variable
+  # TODO: deal with the fact that unit test needs to be run to have a build log
   swiftlint(
     mode: :analyze,      # SwiftLint mode: :lint (default) or :autocorrect
     output_file: "#{smf_workspace_dir}/swiftlint-analyze.xml", # The path of the output file (optional)
@@ -43,7 +47,7 @@ private_lane :smf_run_swift_lint do
     reporter: 'checkstyle',
     ignore_exit_status: true,    # Allow fastlane to continue even if SwiftLint returns a non-zero exit status
     executable: swift_lint_executable_path,
-    compiler_log_path: "buildLog/CI-iOS-App-Playground-Alpha-CI-iOS-App-Playground-Alpha.log"
+    compiler_log_path: compiler_log_path
   )
 
   # Perform a seconf lint using the 'json' reporter for the unused rules report
