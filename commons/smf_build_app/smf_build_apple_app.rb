@@ -52,7 +52,6 @@ private_lane :smf_build_apple_app do |options|
     derived_data_path: $IOS_DERIVED_DATA_PATH,
     result_bundle: true,
     result_bundle_path: $IOS_RESULT_BUNDLE_PATH,
-    # TODO: this log path is for unit tests
     buildlog_path: $IOS_ARCHIVE_BUILD_LOGS_DIRECTORY,
     output_name: output_name,
     include_symbols: true,

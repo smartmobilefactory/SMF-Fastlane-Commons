@@ -39,7 +39,7 @@ private_lane :smf_ios_unit_tests do |options|
         code_coverage: true,
         skip_build: true,
         derived_data_path: $IOS_DERIVED_DATA_PATH,
-        output_directory: 'build',
+        output_directory: $IOS_BUILD_OUTPUT_DIR,
         output_types: "html,junit,json-compilation-database",
         output_files: "report.html,report.junit,report.json",
         buildlog_path: $IOS_UNIT_TESTS_BUILD_LOGS_DIRECTORY,
@@ -61,8 +61,6 @@ def _smf_can_unit_tests_be_preformed(project_name, scheme, unit_test_xcconfig_na
         scheme: scheme,
         configuration: unit_test_xcconfig_name,
         destination: destination,
-        derived_data_path: $IOS_DERIVED_DATA_PATH,
-        buildlog_path: $IOS_UNIT_TESTS_BUILD_LOGS_DIRECTORY,
         clean: false,
         skip_build: true,
         xcargs: "-dry-run #{smf_xcargs_for_build_system}"
