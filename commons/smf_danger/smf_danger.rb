@@ -11,7 +11,6 @@ private_lane :smf_danger do |options|
   end
 
   if File.exist?(smf_swift_lint_analyze_xml_path)
-    UI.important("Using analyze file at #{smf_swift_lint_analyze_xml_path}")
     checkstyle_paths.push(smf_swift_lint_analyze_xml_path)
   end
 
