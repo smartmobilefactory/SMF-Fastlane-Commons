@@ -10,10 +10,9 @@ private_lane :smf_danger do |options|
     UI.important("There is no SwiftLint output file at #{smf_swift_lint_output_xml_path}. Is SwiftLint enabled?")
   end
 
-  swiftlint_analyze_path = "#{smf_workspace_dir}/swiftlint-analyze.xml"
-  if File.exist?(swiftlint_analyze_path)
-    UI.important("Using analyze file at #{swiftlint_analyze_path}")
-    checkstyle_paths.push(swiftlint_analyze_path)
+  if File.exist?(smf_swift_lint_analyze_xml_path)
+    UI.important("Using analyze file at #{smf_swift_lint_analyze_xml_path}")
+    checkstyle_paths.push(smf_swift_lint_analyze_xml_path)
   end
 
   if @platform == :android

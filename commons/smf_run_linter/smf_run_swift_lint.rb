@@ -3,6 +3,7 @@ require 'fileutils'
 # Constants
 SWIFT_LINT_OUTPUT_BASE_DIR = 'build/'
 SWIFT_LINT_OUTPUT_XML_PATH = 'build/swiftlint.result.xml'
+SWIFT_LINT_ANALYZE_OUTPUT_XML_PATH = 'build/swiftlint-analyze.result.xml'
 SWIFT_LINT_OUTPUT_JSON_PATH = 'build/swiftlint.result.json'
 SWIFT_LINT_RULES_REPORT_PATH = 'build/swiftlint-rules-report.txt'
 
@@ -35,20 +36,21 @@ private_lane :smf_run_swift_lint do
       executable: swift_lint_executable_path
   )
 
-
-  build_logs_directory = File.join(smf_workspace_dir, $IOS_ARCHIVE_BUILD_LOGS_DIRECTORY)
-  compiler_log_path = Dir["#{build_logs_directory}/*.log"].first
-  # TODO: check if compiler log path exists, put output_file in variable
-  # TODO: deal with the fact that unit test needs to be run to have a build log
-  swiftlint(
-    mode: :analyze,      # SwiftLint mode: :lint (default) or :autocorrect
-    output_file: "#{smf_workspace_dir}/swiftlint-analyze.xml", # The path of the output file (optional)
-    config_file: swift_lint_yml,     # The path of the configuration file (optional)
-    reporter: 'checkstyle',
-    ignore_exit_status: true,    # Allow fastlane to continue even if SwiftLint returns a non-zero exit status
-    executable: swift_lint_executable_path,
-    compiler_log_path: compiler_log_path
-  )
+  # Swiftlint Analyze
+  compiler_log_path = _smf_get_build_logs_for_analyze
+  if compiler_log_path.nil? == false
+    swiftlint(
+      mode: :analyze, 
+      output_file: smf_swift_lint_analyze_xml_path,
+      config_file: swift_lint_yml,    
+      reporter: 'checkstyle',
+      ignore_exit_status: true,
+      executable: swift_lint_executable_path,
+      compiler_log_path: compiler_log_path # compiler_log_path is required for `analyze` 
+    )
+  else
+    UI.important("Skipping SwiftLint analyze: build logs not found.")
+  end
 
   # Perform a seconf lint using the 'json' reporter for the unused rules report
   swiftlint(
@@ -67,6 +69,21 @@ private_lane :smf_run_swift_lint do
   end
 
   sh("#{swift_lint_report} #{smf_workspace_dir} #{smf_workspace_dir}/#{SWIFT_LINT_RULES_REPORT_PATH}")
+end
+
+# Returns absolute path to the build logs.
+# Will first look for the unit tests build logs (in order to cover also the unit tests class with `analyze`)
+# If not found, will default to the archive build logs
+def _smf_get_build_logs_for_analyze
+  unit_tests_build_logs_directory = File.join(smf_workspace_dir, $IOS_UNIT_TESTS_BUILD_LOGS_DIRECTORY)
+  compiler_log_path = Dir["#{unit_tests_build_logs_directory}/*.log"].first
+
+  if compiler_log_path.nil?
+    archive_build_logs_directory = File.join(smf_workspace_dir, $IOS_ARCHIVE_BUILD_LOGS_DIRECTORY)
+    compiler_log_path = Dir["#{archive_build_logs_directory}/*.log"].first
+  end
+
+  return compiler_log_path
 end
 
 # Generate the .swiftlint.yml and perform a first lint.
@@ -117,8 +134,14 @@ def _smf_create_output_base_folder
   end
 end
 
+# Path to the `lint` report
 def smf_swift_lint_output_xml_path
   "#{smf_workspace_dir}/#{SWIFT_LINT_OUTPUT_XML_PATH}"
+end
+
+# Path to the `analyze` report
+def smf_swift_lint_analyze_xml_path
+  "#{smf_workspace_dir}/#{SWIFT_LINT_ANALYZE_OUTPUT_XML_PATH}"
 end
 
 def smf_swift_lint_output_json_path
