@@ -36,8 +36,8 @@ private_lane :smf_run_swift_lint do
   )
 
 
-  unit_tests_logs_directory = File.join(smf_workspace_dir, $IOS_UNIT_TESTS_BUILD_LOGS_DIRECTORY)
-  compiler_log_path = Dir["#{unit_tests_logs_directory}/*.log"].first
+  build_logs_directory = File.join(smf_workspace_dir, $IOS_ARCHIVE_BUILD_LOGS_DIRECTORY)
+  compiler_log_path = Dir["#{build_logs_directory}/*.log"].first
   # TODO: check if compiler log path exists, put output_file in variable
   # TODO: deal with the fact that unit test needs to be run to have a build log
   swiftlint(
