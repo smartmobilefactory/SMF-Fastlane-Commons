@@ -50,14 +50,17 @@ private_lane :smf_upload_to_sentry do |options|
 
     while fail_count < MAX_RETRIES && !success
       begin
-        sentry_upload_dsym(
-            auth_token: ENV[$SENTRY_AUTH_TOKEN],
-            org_slug: org_slug,
-            project_slug: project_slug,
-            url: 'https://sentry.solutions.smfhq.com/',
-            dsym_path: dsym_path
-        )
+      # 06.12.2021: not using Fastlane because it requires a higher version of the CLI than what we have.
+      # We can try again with Fastlane once our Sentry instance is updated (https://smartmobilefactory.atlassian.net/browse/SMFIT-1967)
+      #   sentry_upload_dsym(
+      #     auth_token: ENV[$SENTRY_AUTH_TOKEN],
+      #     org_slug: org_slug,
+      #     project_slug: project_slug,
+      #     url: 'https://sentry.solutions.smfhq.com/',
+      #     dsym_path: dsym_path
+      # )
 
+        `sentry-cli --url https://sentry.solutions.smfhq.com/ --auth-token #{ENV[$SENTRY_AUTH_TOKEN]} upload-dsym --org #{org_slug} --project #{project_slug} #{dsym_path}`
         success = true
       rescue => exception
         UI.message("Upload attempt ##{fail_count} failed, retrying... ")
