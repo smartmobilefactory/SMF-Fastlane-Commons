@@ -30,7 +30,6 @@ private_lane :smf_run_swift_lint do
   # Perform a first lint using the 'checkstyle' reporter for the Danger output in the PR
   swiftlint(
       output_file: smf_swift_lint_output_xml_path,
-      config_file: swift_lint_yml,
       reporter: 'checkstyle',
       ignore_exit_status: true,
       executable: swift_lint_executable_path
@@ -42,7 +41,6 @@ private_lane :smf_run_swift_lint do
     swiftlint(
       mode: :analyze, 
       output_file: smf_swift_lint_analyze_xml_path,
-      config_file: swift_lint_yml,    
       reporter: 'checkstyle',
       ignore_exit_status: true,
       executable: swift_lint_executable_path,
@@ -55,11 +53,11 @@ private_lane :smf_run_swift_lint do
   # Perform a seconf lint using the 'json' reporter for the unused rules report
   swiftlint(
       output_file: smf_swift_lint_output_json_path,
-      config_file: swift_lint_yml,
       reporter: 'json',
       ignore_exit_status: true,
       executable: swift_lint_executable_path
   )
+
   # Generate Rules Report
   UI.important('Generating report of unused Swiftlint rules')
   swift_lint_report = "#{smf_workspace_dir}/Submodules/SMF-iOS-CommonProjectSetupFiles/SwiftLint/check_missing_rule_configurations.sh"
