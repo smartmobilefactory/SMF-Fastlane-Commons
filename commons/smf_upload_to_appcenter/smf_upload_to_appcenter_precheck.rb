@@ -10,10 +10,22 @@ private_lane :smf_upload_to_appcenter_precheck do |options|
     destinations: destinations
   )
 
-  smf_upload_to_appcenter_precheck_webhooks(
-    app_name: app_name,
-    owner_name: owner_name
-  )
+  begin
+    smf_upload_to_appcenter_precheck_webhooks(
+      app_name: app_name,
+      owner_name: owner_name
+    )
+  rescue => exception
+    title = "AppCenter webhook precheck failed"
+    message = "The build will still be uploaded to AppCenter. If the issue persist it should be investigated."
+
+    smf_send_message(
+        title: title,
+        message: message,
+        type: "warning",
+        exception: exception
+    )
+  end
 end
 
 private_lane :smf_upload_to_appcenter_precheck_destination_groups do |options|
