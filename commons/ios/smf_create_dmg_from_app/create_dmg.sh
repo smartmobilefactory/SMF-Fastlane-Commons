@@ -120,14 +120,17 @@ if [ "$USE_TEMPLATE" = "true" ]; then
     # Mount bundle - Returns path to Volume (the Volume name can have spaces, dashes, digits and other chars, so the regex covers basically all)
     ORIGINAL_SPARSE_VOLUME_PATH=$(hdiutil attach templateWritable.dmg.sparsebundle | egrep -o '/Volumes/(.*?)+$')
     
-    # Make sure there is nothing mounted at ${VOLNAME} (`|| :` is there to make sure the command can fail without interrupting the script)
-    hdiutil detach /Volumes/"${VOLNAME}" || :
+    # We don't want to detach if the name matches because it would make the script fail
+    if [ "/Volumes/${VOLNAME}" != $ORIGINAL_SPARSE_VOLUME_PATH ]; then
+        # Make sure there is nothing mounted at ${VOLNAME} remaining from previous runs (`|| :` is there to make sure the command can fail without interrupting the script)
+        hdiutil detach /Volumes/"${VOLNAME}" || :
+    fi
     
     sleep 1
     
     # Rename Volume
     diskutil rename "${ORIGINAL_SPARSE_VOLUME_PATH}" "${VOLNAME}"
-    
+
     sleep 1
 
     # Get dummy .app path
@@ -154,8 +157,8 @@ if [ "$USE_TEMPLATE" = "true" ]; then
     
     sleep 1
     
-    # Rename app
-    mv "${DUMMY_APP_PATH}" "/Volumes/${VOLNAME}/${NAME}.app"
+    # Rename app  (`|| :` is there to make sure the command can fail without interrupting the script) -> It can fail if the app is already named correctly
+    mv "${DUMMY_APP_PATH}" "/Volumes/${VOLNAME}/${NAME}.app" || :
     
     sleep 1
     
