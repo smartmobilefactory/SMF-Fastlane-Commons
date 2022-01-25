@@ -120,7 +120,7 @@ if [ "$USE_TEMPLATE" = "true" ]; then
     # Mount bundle - Returns path to Volume (the Volume name can have spaces, dashes, digits and other chars, so the regex covers basically all)
     ORIGINAL_SPARSE_VOLUME_PATH=$(hdiutil attach templateWritable.dmg.sparsebundle | egrep -o '/Volumes/(.*?)+$')
     
-    # We don't want to detach if the name matches because it would make the script fail
+    # We don't want to detach if the path matches because it would make the script fail
     if [ "/Volumes/${VOLNAME}" != $ORIGINAL_SPARSE_VOLUME_PATH ]; then
         # Make sure there is nothing mounted at ${VOLNAME} remaining from previous runs (`|| :` is there to make sure the command can fail without interrupting the script)
         hdiutil detach /Volumes/"${VOLNAME}" || :
