@@ -104,6 +104,8 @@ private_lane :smf_super_unit_tests do |options|
 
   build_variant = smf_build_variant(options)
   testing_for_mac = smf_is_mac_build(build_variant)
+  project_use_thread_sanitizer = smf_config_get(nil, :project, :use_thread_sanitizer)
+  use_thread_sanitizer = project_use_thread_sanitizer.nil? ? true : project_use_thread_sanitizer
 
   smf_ios_unit_tests(
     project_name: smf_config_get(nil, :project, :project_name),
@@ -112,7 +114,8 @@ private_lane :smf_super_unit_tests do |options|
     unit_test_xcconfig_name: smf_config_get(build_variant, :xcconfig_name, :unittests),
     device: smf_config_get(build_variant, 'tests.device_to_test_against'.to_sym),
     required_xcode_version: smf_config_get(nil, :project, :xcode_version),
-    testing_for_mac: testing_for_mac
+    testing_for_mac: testing_for_mac,
+    use_thread_sanitizer: use_thread_sanitizer
   )
 
 end
