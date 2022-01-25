@@ -114,7 +114,7 @@ private_lane :smf_pod_super_unit_tests do |options|
         device: build_variant_config["tests.device_to_test_against".to_sym],
         required_xcode_version: @smf_fastlane_config[:project][:xcode_version],
         testing_for_mac: testing_for_mac,
-        use_thread_sanitizer: @smf_fastlane_config[:project][:use_thread_sanitizer]
+        skip_thread_sanitizer_for_unit_tests: @smf_fastlane_config[:project][:skip_thread_sanitizer_for_unit_tests]
     )
   }
 end
