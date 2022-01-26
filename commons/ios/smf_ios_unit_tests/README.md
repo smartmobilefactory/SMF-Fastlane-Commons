@@ -13,5 +13,6 @@ smf_ios_unit_tests(
       device: <test_device_name_to_test_against>,                       # Name of the device to use for the unit tests
       get_required_xcode_version: "10.2",                               # The xcode version used to build this project
       unit_testing_for_mac_os: false                                    # Optional, set to true if running unit tests for platform mac os
+      use_thread_sanitizer: <use_thread_sanitizer>                      # Use Thread Sanitizer, true by default
   )
 ```

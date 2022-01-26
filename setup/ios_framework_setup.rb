@@ -105,6 +105,8 @@ private_lane :smf_pod_super_unit_tests do |options|
     end
 
     UI.message("Running unit tests for variant '#{variant}' for PR Check")
+    
+    use_thread_sanitizer = !(smf_config_get(nil, :project, :skip_thread_sanitizer_for_unit_tests) == true)
 
     smf_ios_unit_tests(
         project_name: @smf_fastlane_config[:project][:project_name],
@@ -113,7 +115,8 @@ private_lane :smf_pod_super_unit_tests do |options|
         unit_test_xcconfig_name: !build_variant_config[:xcconfig_name].nil? ? build_variant_config[:xcconfig_name][:unittests] : nil,
         device: build_variant_config["tests.device_to_test_against".to_sym],
         required_xcode_version: @smf_fastlane_config[:project][:xcode_version],
-        testing_for_mac: testing_for_mac
+        testing_for_mac: testing_for_mac,
+        use_thread_sanitizer: use_thread_sanitizer
     )
   }
 end
