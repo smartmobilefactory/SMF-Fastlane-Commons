@@ -106,8 +106,7 @@ private_lane :smf_pod_super_unit_tests do |options|
 
     UI.message("Running unit tests for variant '#{variant}' for PR Check")
     
-    project_skip_thread_sanitizer_for_unit_tests = smf_config_get(nil, :project, :skip_thread_sanitizer_for_unit_tests)
-    use_thread_sanitizer = project_skip_thread_sanitizer_for_unit_tests.nil? ? true : !project_skip_thread_sanitizer_for_unit_tests
+    use_thread_sanitizer = !(smf_config_get(nil, :project, :skip_thread_sanitizer_for_unit_tests) == true)
 
     smf_ios_unit_tests(
         project_name: @smf_fastlane_config[:project][:project_name],
