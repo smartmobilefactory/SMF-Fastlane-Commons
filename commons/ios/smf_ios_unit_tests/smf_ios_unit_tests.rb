@@ -7,7 +7,7 @@ private_lane :smf_ios_unit_tests do |options|
   device = options[:device]
   required_xcode_version = options[:required_xcode_version]
   testing_for_mac = options[:testing_for_mac]
-  use_thread_sanitizer = options[:skip_thread_sanitizer_for_unit_tests]
+  use_thread_sanitizer = options[:use_thread_sanitizer]
 
   scheme_to_use = unit_test_scheme.nil? ? scheme : unit_test_scheme
 
