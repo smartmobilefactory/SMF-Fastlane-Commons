@@ -12,7 +12,6 @@ private_lane :smf_run_swift_lint do |options|
 
   required_xcode_version = options[:required_xcode_version]
   if !required_xcode_version.nil?
-    UI.important("TEST SETTING XCODE VERSION TO #{required_xcode_version}")
     smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
   end
 
