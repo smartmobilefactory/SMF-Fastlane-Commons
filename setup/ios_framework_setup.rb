@@ -132,7 +132,9 @@ end
 # Linter
 
 private_lane :smf_pod_super_linter do
-  smf_run_swift_lint
+
+  required_xcode_version = smf_config_get(nil, :project, :xcode_version)
+  smf_run_swift_lint(required_xcode_version: required_xcode_version)
 end
 
 lane :smf_pod_linter do
