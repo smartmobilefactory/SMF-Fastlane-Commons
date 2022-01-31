@@ -137,7 +137,7 @@ end
 
 private_lane :smf_super_linter do |options|
 
-  required_xcode_version = @smf_fastlane_config[:project][:xcode_version]
+  required_xcode_version = smf_config_get(nil, :project, :xcode_version)
   smf_run_swift_lint(required_xcode_version: required_xcode_version)
 end
 
