@@ -7,8 +7,13 @@ SWIFT_LINT_ANALYZE_OUTPUT_XML_PATH = 'build/swiftlint-analyze.result.xml'
 SWIFT_LINT_OUTPUT_JSON_PATH = 'build/swiftlint.result.json'
 SWIFT_LINT_RULES_REPORT_PATH = 'build/swiftlint-rules-report.txt'
 
-private_lane :smf_run_swift_lint do
+private_lane :smf_run_swift_lint do |options|
   _smf_create_output_base_folder
+
+  required_xcode_version = options[:required_xcode_version]
+  if !required_xcode_version.nil?
+    smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
+  end
 
   swift_lint_executable_path = "#{smf_workspace_dir}/Submodules/SMF-iOS-CommonProjectSetupFiles/SwiftLint/portable_swiftlint/swiftlint"
   swift_lint_yml = "#{smf_workspace_dir}/.swiftlint.yml"
