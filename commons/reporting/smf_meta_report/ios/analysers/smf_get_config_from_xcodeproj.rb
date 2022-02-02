@@ -84,7 +84,7 @@ def smf_xcodeproj_settings_get(config_key, xcode_settings = {}, options = {}, ig
   return nil if targets.empty?
 
   for target in targets
-    unless ignore_unit_tests_targets && target == 'AppTests'
+    unless ignore_unit_tests_targets && target.end_with?("Tests")
 
       target_settings = smf_xcodeproj_target_settings(target)
       target_config_value = target_settings.dig(config_key)
