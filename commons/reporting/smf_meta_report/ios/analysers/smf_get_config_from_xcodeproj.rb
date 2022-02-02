@@ -70,7 +70,7 @@ end
 #                     If empty or not specified the function `smf_xcodeproj_settings`
 #                     will be called.
 #   - options: the current job options containing the build_variant
-#   - ignore_unit_tests_targets: if set to true 'AppTests' targets will be skipped
+#   - ignore_unit_tests_targets: if set to true test targets will be skipped
 def smf_xcodeproj_settings_get(config_key, xcode_settings = {}, options = {}, ignore_unit_tests_targets = false)
   if xcode_settings.empty?
     xcode_settings = smf_xcodeproj_settings(options)
