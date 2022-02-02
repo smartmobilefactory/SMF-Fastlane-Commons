@@ -70,7 +70,8 @@ end
 #                     If empty or not specified the function `smf_xcodeproj_settings`
 #                     will be called.
 #   - options: the current job options containing the build_variant
-def smf_xcodeproj_settings_get(config_key, xcode_settings = {}, options = {})
+#   - ignore_unit_tests_targets: if set to true 'AppTests' targets will be skipped
+def smf_xcodeproj_settings_get(config_key, xcode_settings = {}, options = {}, ignore_unit_tests_targets = false)
   if xcode_settings.empty?
     xcode_settings = smf_xcodeproj_settings(options)
   end
@@ -83,29 +84,31 @@ def smf_xcodeproj_settings_get(config_key, xcode_settings = {}, options = {})
   return nil if targets.empty?
 
   for target in targets
-    target_settings = smf_xcodeproj_target_settings(target)
-    target_config_value = target_settings.dig(config_key)
+    unless ignore_unit_tests_targets && target == 'AppTests'
 
-    if !target_config_value.nil? && target_config_value != ''
-      puts "Target '#{target}': { #{config_key}: #{target_config_value} }"
-    end
+      target_settings = smf_xcodeproj_target_settings(target)
+      target_config_value = target_settings.dig(config_key)
 
-    if config_value.nil?
-      config_value = target_config_value
-    elsif !target_config_value.nil? && target_config_value != '' && config_value != target_config_value
-      message = "Multiple #{config_key} were found in the \"#{@smf_fastlane_config[:project][:project_name]}\": '#{config_value}' and '#{target_config_value}'"
-      ENV["DANGER_#{config_key}"] = message
-      # Send a Slack notification if the current build is not a PR check but a build release.
-      # For PRs, Danger checks the ENV variables and adds warnings directly on GitHub during the PR review.
-      if ENV['CHANGE_ID'].nil?
-        smf_send_message(
-          title: 'Inconsistent configuration in xcodeproj',
-          message: message,
-          type: 'error'
-        )
+      if !target_config_value.nil? && target_config_value != ''
+        puts "Target '#{target}': { #{config_key}: #{target_config_value} }"
+      end
+
+      if config_value.nil?
+        config_value = target_config_value
+      elsif !target_config_value.nil? && target_config_value != '' && config_value != target_config_value
+        message = "Multiple #{config_key} were found in the \"#{@smf_fastlane_config[:project][:project_name]}\": '#{config_value}' and '#{target_config_value}'"
+        ENV["DANGER_#{config_key}"] = message
+        # Send a Slack notification if the current build is not a PR check but a build release.
+        # For PRs, Danger checks the ENV variables and adds warnings directly on GitHub during the PR review.
+        if ENV['CHANGE_ID'].nil?
+          smf_send_message(
+            title: 'Inconsistent configuration in xcodeproj',
+            message: message,
+            type: 'error'
+          )
+        end
       end
     end
   end
-
   return config_value
 end
