@@ -108,6 +108,8 @@ def smf_xcodeproj_settings_get(config_key, xcode_settings = {}, options = {}, ig
           )
         end
       end
+    else 
+      puts "Target: #{target} ignored for #{config_key} check"
     end
   end
   return config_value
