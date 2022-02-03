@@ -4,7 +4,7 @@
 def smf_analyse_bitcode(xcode_settings = {}, options = {})
   UI.message("Analyser: #{__method__.to_s} ...")
 
-  bitcode_configuration =  smf_xcodeproj_settings_get('ENABLE_BITCODE', xcode_settings, options)
+  bitcode_configuration =  smf_xcodeproj_settings_get('ENABLE_BITCODE', xcode_settings, options, ignore_unit_tests_targets = true)
 
   bitcode_usage = 'enabled'
   if (bitcode_configuration == 'NO')
