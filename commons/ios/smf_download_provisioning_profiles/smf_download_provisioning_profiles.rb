@@ -48,6 +48,8 @@ private_lane :smf_download_provisioning_profiles do |options|
         platform != 'macos'
           regex = /com\.smartmobilefactory\.enterprise/
           if bundle_identifier.match(regex) != nil
+
+            UI.message("### DEBUG Extensions in 1: " + extension_suffixes.to_s)
             smf_download_provisioning_profile_using_match(
               app_identifier: app_identifier,
               type: 'enterprise',
@@ -80,6 +82,7 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
 
   git_url = $FASTLANE_MATCH_REPO_URL
 
+  UI.message("### DEBUG extension suffixes 2: " + extensions_suffixes.to_s)
   extension_identifiers = []
   if extensions_suffixes
     extensions_suffixes.each do |extension_suffix|
@@ -87,6 +90,7 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
     end
   end
 
+  UI.message("### DEBUG extension identifiers: " + extension_identifiers.to_s)
   if apple_id.nil? || team_id.nil?
     raise "Error username or team id for fastlane match is nil"
   end
@@ -105,7 +109,7 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
     force: force,
     platform: platform
   )
-
+  UI.message("### DEBUG extension identifiers empty: " + extension_identifiers.empty?)
   match(
     type: type,
     readonly: read_only,
