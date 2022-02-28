@@ -70,7 +70,6 @@ Table of Contents
      * [Android App Setup](#android-app-setup)
        + [Pull Request Lanes](#pull-request-lanes-2)
          - [`smf_setup_dependencies_pr_check`/`smf_setup_dependencies_build`](#-smf-setup-dependencies-pr-check---smf-setup-dependencies-build--2)
-         - [`smf_pipeline_update_android_commons`](#-smf-pipeline-update-android-commons-)
          - [`smf_build`](#-smf-build--2)
          - [`smf_run_unit_tests`](#-smf-run-unit-tests-)
          - [`smf_linter`](#-smf-linter--2)
@@ -305,9 +304,6 @@ This lane pushes changes to GitHub using the created tag. Is also creates a GitH
 
 #### `smf_setup_dependencies_pr_check`/`smf_setup_dependencies_build`
 These lanes do nothing, yet. :grin: You could overwrite one to use Phraseapp. To get to know how, have a look at the [example](#Example`). :wink:
-
-#### `smf_pipeline_update_android_commons`
-This lane updates the Android Commons and generates the Jenkins file if it was outdated.
 
 #### `smf_build`
 This lane builds the app and saves the apk. :floppy_disk: The Keystore will be pulled if the keystore folder is defined in the Config.json. To add a folder name just add `keystore` to the build variant config. :key:
