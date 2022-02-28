@@ -12,7 +12,7 @@ end
 puts "Danger: Common-Project-Setup-Files check"
 ## COMMON PROJECT SETUP FILES CHECK
 if ENV['COMMON_PROJECT_SETUP_FILES_OUTDATED'] == 'true'
-  warn('The SMF-iOS-CommonProjectSetupFiles are not up to date with origin/master !')
+  warn('The SMF-iOS-CommonProjectSetupFiles or the android-commons are not up to date with origin/master !')
 end
 
 puts "Danger: Github Warnings"
