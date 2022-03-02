@@ -46,7 +46,7 @@ private_lane :smf_danger do |options|
 
   ENV['DANGER_RESULT_BUNDLE_PATH'] = $IOS_RESULT_BUNDLE_PATH
 
-  _check_common_project_setup_files
+  _check_common_project_setup_files(@platform)
 
   _smf_create_jira_ticket_links
 
@@ -92,10 +92,10 @@ def _swift_lint_count_unused_rules
   end
 end
 
-def _check_common_project_setup_files
+def _check_common_project_setup_files(platform)
   path = ''
 
-  if @platform == :android
+  if platform == :android
     path = 'android-commons'
   else
     path = 'Submodules/SMF-iOS-CommonProjectSetupFiles'
