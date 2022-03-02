@@ -109,7 +109,7 @@ def _check_common_project_setup_files
   remote_head_commit = `cd #{submodule_directory}; git rev-parse origin/master`.gsub("\n", '')
 
   if current_head_commit != remote_head_commit
-    ENV['COMMON_PROJECT_SETUP_FILES_OUTDATED'] = 'true'
+    ENV['COMMON_PROJECT_SETUP_FILES_OUTDATED'] = path
   end
 end
 
