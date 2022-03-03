@@ -15,17 +15,6 @@ lane :smf_setup_dependencies_build do |options|
 end
 
 
-# Update Android Commons
-
-private_lane :smf_super_update_android_commons do |options|
-  smf_update_android_commons(options)
-end
-
-lane :smf_pipeline_update_android_commons do |options|
-  smf_super_update_android_commons(options)
-end
-
-
 # Build (Build to Release)
 
 private_lane :smf_super_build do |options|

@@ -46,7 +46,7 @@ private_lane :smf_danger do |options|
 
   ENV['DANGER_RESULT_BUNDLE_PATH'] = $IOS_RESULT_BUNDLE_PATH
 
-  _check_common_project_setup_files
+  _check_common_project_setup_files(@platform)
 
   _smf_create_jira_ticket_links
 
@@ -92,8 +92,16 @@ def _swift_lint_count_unused_rules
   end
 end
 
-def _check_common_project_setup_files
-  submodule_directory = File.join(smf_workspace_dir, 'Submodules/SMF-iOS-CommonProjectSetupFiles')
+def _check_common_project_setup_files(platform)
+  path = ''
+
+  if platform == :android
+    path = 'android-commons'
+  else
+    path = 'Submodules/SMF-iOS-CommonProjectSetupFiles'
+  end
+
+  submodule_directory = File.join(smf_workspace_dir, path)
 
   return unless Dir.exist?(submodule_directory)
 
@@ -101,7 +109,7 @@ def _check_common_project_setup_files
   remote_head_commit = `cd #{submodule_directory}; git rev-parse origin/master`.gsub("\n", '')
 
   if current_head_commit != remote_head_commit
-    ENV['COMMON_PROJECT_SETUP_FILES_OUTDATED'] = 'true'
+    ENV['COMMON_PROJECT_SETUP_FILES_OUTDATED'] = path
   end
 end
 
