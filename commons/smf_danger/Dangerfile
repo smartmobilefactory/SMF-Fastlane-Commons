@@ -11,7 +11,7 @@ end
 
 puts "Danger: Common-Project-Setup-Files check"
 ## COMMON PROJECT SETUP FILES CHECK
-if not ENV['COMMON_PROJECT_SETUP_FILES_OUTDATED'].nil? || ENV['COMMON_PROJECT_SETUP_FILES_OUTDATED'].empty?
+if not ENV['COMMON_PROJECT_SETUP_FILES_OUTDATED'].nil?
   warn("The #{ENV['COMMON_PROJECT_SETUP_FILES_OUTDATED']} are not up to date with origin/master !")
 end
 
