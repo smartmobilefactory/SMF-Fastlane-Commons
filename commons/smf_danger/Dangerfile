@@ -15,6 +15,17 @@ if not ENV['COMMON_PROJECT_SETUP_FILES_OUTDATED'].nil?
   warn("The #{ENV['COMMON_PROJECT_SETUP_FILES_OUTDATED']} are not up to date with origin/master !")
 end
 
+puts "Danger: Config.json check"
+## CONFIG.JSON CHECK FOR UNDEFINED PROPERTIES
+if ENV['UNDEFINED_PROPERTIES_IN_CONFIG_JSON']
+  warn("There are SMF-UNDEFINED/SMF-UNKOWN properties in the iOS config.json")
+end
+
+puts "Danger: Build configuration check"
+if ENV['UNDEFINED_PROPERTIES_IN_BUILD_CONFIGURATION']
+  warn("There are SMF-UNDEFINED/SMF_UNKOWN properties in the iOS build configuration")
+end
+
 puts "Danger: Github Warnings"
 ## WARNINGS:
 if (github.pr_body + github.pr_title).include?("WIP")
