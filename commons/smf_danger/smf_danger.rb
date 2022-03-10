@@ -48,6 +48,8 @@ private_lane :smf_danger do |options|
 
   _check_common_project_setup_files(@platform)
 
+  _check_for_undefined_keys(@smf_fastlane_config)
+
   _smf_create_jira_ticket_links
 
   _swift_lint_count_unused_rules
