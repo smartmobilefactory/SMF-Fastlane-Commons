@@ -123,7 +123,7 @@ def _check_for_undefined_keys(iosConfig)
 
   config_project = iosConfig[:project]
   config_project.each do |key, value|
-    if property_checkarray.include? value
+    if properties_to_check.include? value
       ENV['UNDEFINED_PROPERTIES_IN_CONFIG_JSON'] = true
     end
   end
