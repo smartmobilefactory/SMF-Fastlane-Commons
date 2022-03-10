@@ -113,6 +113,46 @@ def _check_common_project_setup_files(platform)
   end
 end
 
+def _check_for_undefined_keys(iosConfig)
+  unless _is_apple_platform
+    return
+  end
+  properties_to_check = ['SMF_UNKNOWN', 'SMF-UNKNOWN', 'SMF_UNDEFINED', 'SMF-UNDEFINED']
+
+  config_project = iosConfig[:project]
+  config_project.each do |key, value|
+    if property_checkarray.include? value
+      ENV['UNDEFINED_PROPERTIES_IN_CONFIG_JSON'] = true
+    end
+  end
+
+
+  config_variants = iosConfig[:build_variants]
+  config_variants.each do |build_variant, build_variant_info|
+    build_variant_info.each do |key, value|
+      if properties_to_check.include? value
+        ENV['UNDEFINED_PROPERTIES_IN_CONFIG_JSON'] = true
+      end
+    end
+  end 
+
+  targets = smf_xcodeproj_targets
+  if targets.empty?
+    return
+  end
+  targets.each do |target|
+    target_settings = smf_xcodeproj_target_settings(target)
+    if target_settings.empty?
+      return
+    end
+    target_settings['buildSettings'].each do |key, value|
+      if properties_to_check.include? value
+        ENV['UNDEFINED_PROPERTIES_IN_BUILD_CONFIGURATION'] = true
+      end
+    end 
+  end
+end
+
 def _smf_find_paths_of(filename)
   paths = []
   Dir["#{smf_workspace_dir}/**/#{filename}"].each do |file|
