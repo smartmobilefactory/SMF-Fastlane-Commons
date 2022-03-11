@@ -147,7 +147,7 @@ def _check_for_undefined_keys(iosConfig)
     if target_settings.empty?
       return
     end
-    target_settings['buildSettings'].each do |key, value|
+    target_settings[0]['buildSettings'].each do |key, value|
       if properties_to_check.include? value
         ENV['UNDEFINED_PROPERTIES_IN_BUILD_CONFIGURATION'] = 'true'
       end
