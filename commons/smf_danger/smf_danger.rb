@@ -124,7 +124,7 @@ def _check_for_undefined_keys(iosConfig)
   config_project = iosConfig[:project]
   config_project.each do |key, value|
     if properties_to_check.include? value
-      ENV['UNDEFINED_PROPERTIES_IN_CONFIG_JSON'] = true
+      ENV['UNDEFINED_PROPERTIES_IN_CONFIG_JSON'] = 'true'
     end
   end
 
@@ -133,7 +133,7 @@ def _check_for_undefined_keys(iosConfig)
   config_variants.each do |build_variant, build_variant_info|
     build_variant_info.each do |key, value|
       if properties_to_check.include? value
-        ENV['UNDEFINED_PROPERTIES_IN_CONFIG_JSON'] = true
+        ENV['UNDEFINED_PROPERTIES_IN_CONFIG_JSON'] = 'true'
       end
     end
   end 
@@ -149,7 +149,7 @@ def _check_for_undefined_keys(iosConfig)
     end
     target_settings['buildSettings'].each do |key, value|
       if properties_to_check.include? value
-        ENV['UNDEFINED_PROPERTIES_IN_BUILD_CONFIGURATION'] = true
+        ENV['UNDEFINED_PROPERTIES_IN_BUILD_CONFIGURATION'] = 'true'
       end
     end 
   end
