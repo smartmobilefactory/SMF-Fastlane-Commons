@@ -119,22 +119,18 @@ def _check_for_undefined_keys(iosConfig)
   unless _is_apple_platform
     return
   end
-  properties_to_check = ['SMF_UNKNOWN', 'SMF-UNKNOWN', 'SMF_UNDEFINED', 'SMF-UNDEFINED']
+  properties_to_check = $PROPERTIES_TO_CHECK
 
   config_project = iosConfig[:project]
   config_project.each do |key, value|
-    if properties_to_check.include? value
-      ENV['UNDEFINED_PROPERTIES_IN_CONFIG_JSON'] = 'true'
-    end
+    _check_for_properties(value, properties_to_check, $DANGER_UNDEFINED_PROPERTIES_CONFIG_JSON)
   end
 
 
   config_variants = iosConfig[:build_variants]
   config_variants.each do |build_variant, build_variant_info|
     build_variant_info.each do |key, value|
-      if properties_to_check.include? value
-        ENV['UNDEFINED_PROPERTIES_IN_CONFIG_JSON'] = 'true'
-      end
+      _check_for_properties(value, properties_to_check, $DANGER_UNDEFINED_PROPERTIES_CONFIG_JSON)
     end
   end 
 
@@ -148,10 +144,14 @@ def _check_for_undefined_keys(iosConfig)
       return
     end
     target_settings.each do |key, value|
-      if properties_to_check.include? value
-        ENV['UNDEFINED_PROPERTIES_IN_BUILD_CONFIGURATION'] = 'true'
-      end
+      _check_for_properties(value, properties_to_check, $DANGER_UNDEFINED_PROPERTIES_BUILD_CONFIG)
     end 
+  end
+end
+
+def _check_for_properties(value, properties_to_check, env_key)
+  if properties_to_check.include? value
+    ENV[env_key] = 'true'
   end
 end
 

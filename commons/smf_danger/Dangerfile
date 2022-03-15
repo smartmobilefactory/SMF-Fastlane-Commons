@@ -17,12 +17,12 @@ end
 
 puts "Danger: Config.json check"
 ## CONFIG.JSON CHECK FOR UNDEFINED PROPERTIES
-if ENV['UNDEFINED_PROPERTIES_IN_CONFIG_JSON'] == 'true'
+if ENV[$DANGER_UNDEFINED_PROPERTIES_CONFIG_JSON] == 'true'
   warn("There are SMF-UNDEFINED/SMF-UNKOWN properties in the iOS config.json")
 end
 
 puts "Danger: Build configuration check"
-if ENV['UNDEFINED_PROPERTIES_IN_BUILD_CONFIGURATION'] == 'true'
+if ENV[$DANGER_UNDEFINED_PROPERTIES_BUILD_CONFIG] == 'true'
   warn("There are SMF-UNDEFINED/SMF_UNKOWN properties in the iOS build configuration")
 end
 
