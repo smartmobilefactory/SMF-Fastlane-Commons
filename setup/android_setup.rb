@@ -109,9 +109,9 @@ end
 
 private_lane :smf_super_generate_changelog do |options|
 
-  build_variant = options[:build_variant]
+ # build_variant = options[:build_variant]
 
-  smf_git_changelog(build_variant: build_variant)
+ # smf_git_changelog(build_variant: build_variant)
 end
 
 lane :smf_generate_changelog do |options|
