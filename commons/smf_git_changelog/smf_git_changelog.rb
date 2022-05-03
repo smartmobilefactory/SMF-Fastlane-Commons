@@ -55,11 +55,6 @@ private_lane :smf_git_changelog do |options|
 
   end
 
-  # Extract related Jira issues info
-  ticket_tags = smf_get_ticket_tags_from_changelog(cleaned_changelog_messages.uniq)
-  UI.message("Jira tickets found: #{ticket_tags}")
-  tickets = smf_generate_tickets_from_tags(ticket_tags)
-
   # Limit the size of changelog as it's crashes if it's too long
   changelog = cleaned_changelog_messages.uniq.join("\n")
   changelog = "#{changelog[0..20_000]}#{'\\n...'}" if changelog.length > 20_000
@@ -69,13 +64,12 @@ private_lane :smf_git_changelog do |options|
   html_changelog = _smf_generate_changelog(changelog, tickets, :html)
   markdown_changelog = _smf_generate_changelog(changelog, tickets, :markdown)
   slack_changelog = _smf_generate_changelog(changelog, tickets, :slack_markdown)
-  ticket_tags = ticket_tags.join(' ') # convert array to string list
 
   smf_write_changelog(
     changelog: markdown_changelog,
     html_changelog: html_changelog,
     slack_changelog: slack_changelog,
-    ticket_tags: ticket_tags
+    ticket_tags: []
   )
 end
 
