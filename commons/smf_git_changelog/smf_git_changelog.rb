@@ -61,9 +61,9 @@ private_lane :smf_git_changelog do |options|
   changelog = changelog.split("\n")
 
   # Convert changelog to different output formats
-  html_changelog = _smf_generate_changelog(changelog, tickets, :html)
-  markdown_changelog = _smf_generate_changelog(changelog, tickets, :markdown)
-  slack_changelog = _smf_generate_changelog(changelog, tickets, :slack_markdown)
+  html_changelog = _smf_generate_changelog(changelog, [], :html)
+  markdown_changelog = _smf_generate_changelog(changelog, [], :markdown)
+  slack_changelog = _smf_generate_changelog(changelog, [], :slack_markdown)
 
   smf_write_changelog(
     changelog: markdown_changelog,
