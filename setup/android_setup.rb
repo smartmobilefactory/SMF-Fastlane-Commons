@@ -115,7 +115,7 @@ private_lane :smf_super_generate_changelog do |options|
 end
 
 lane :smf_generate_changelog do |options|
-  smf_super_generate_changelog(options)
+  # smf_super_generate_changelog(options)
 end
 
 
