@@ -204,9 +204,9 @@ private_lane :smf_super_push_git_tag_release do |options|
     changelog: changelog
   )
 
-  smf_make_jira_realease_comment(
-    build_variant: build_variant
-  )
+  #smf_make_jira_realease_comment(
+  #  build_variant: build_variant
+  #)
 end
 
 lane :smf_push_git_tag_release do |options|
