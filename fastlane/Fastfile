@@ -132,7 +132,7 @@ end
 
 # sets the commons dir path and clones the fastlane repo
 lane :smf_setup_workspace do
-  smf_git_pull("")
+  # smf_git_pull("")
 end
 
 
