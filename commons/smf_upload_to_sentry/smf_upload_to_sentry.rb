@@ -49,14 +49,13 @@ private_lane :smf_upload_to_sentry do |options|
     # this retry loop should be removed.
     #
     #
-    UI.message("$PATH is: #{ENV["PATH"]}")
 
     while fail_count < MAX_RETRIES && !success
       begin
         # 06.12.2021: https://smartmobilefactory.atlassian.net/browse/SMFIT-1971
         # We are not using Fastlane because it requires a higher version of the CLI than what we have.
         # We can try again with Fastlane once our Sentry instance is updated (https://smartmobilefactory.atlassian.net/browse/SMFIT-1967)
-        `/opt/homebrew/bin/sentry-cli --url https://sentry.solutions.smfhq.com/ --auth-token #{ENV[$SENTRY_AUTH_TOKEN]} upload-dsym --org #{org_slug} --project #{project_slug} #{dsym_path}`
+        `sentry-cli --url https://sentry.solutions.smfhq.com/ --auth-token #{ENV[$SENTRY_AUTH_TOKEN]} upload-dsym --org #{org_slug} --project #{project_slug} #{dsym_path}`
         success = true
       rescue => exception
         UI.message("Upload attempt ##{fail_count} failed, retrying... ")
@@ -66,7 +65,6 @@ private_lane :smf_upload_to_sentry do |options|
     end
 
     _smf_sentry_raise_warning(latest_exception, build_variant, slack_channel) unless success
-
   end
 end
 
