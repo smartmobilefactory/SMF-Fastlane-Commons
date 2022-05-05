@@ -77,7 +77,7 @@ end
 private_lane :smf_super_report do |options|
   build_variant = options[:build_variant]
   smf_linter(options)
-  smf_report_metrics(build_variant: build_variant, smf_get_meta_db_project_name: smf_get_meta_db_project_name)
+  #smf_report_metrics(build_variant: build_variant, smf_get_meta_db_project_name: smf_get_meta_db_project_name)
 end
 
 lane :smf_report do |options|
@@ -109,9 +109,9 @@ end
 
 private_lane :smf_super_generate_changelog do |options|
 
-  build_variant = options[:build_variant]
+ # build_variant = options[:build_variant]
 
-  smf_git_changelog(build_variant: build_variant)
+ # smf_git_changelog(build_variant: build_variant)
 end
 
 lane :smf_generate_changelog do |options|
@@ -204,9 +204,9 @@ private_lane :smf_super_push_git_tag_release do |options|
     changelog: changelog
   )
 
-  smf_make_jira_realease_comment(
-    build_variant: build_variant
-  )
+  #smf_make_jira_realease_comment(
+  #  build_variant: build_variant
+  #)
 end
 
 lane :smf_push_git_tag_release do |options|
