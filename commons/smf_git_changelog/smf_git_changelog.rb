@@ -61,15 +61,14 @@ private_lane :smf_git_changelog do |options|
   changelog = changelog.split("\n")
 
   # Convert changelog to different output formats
-  html_changelog = _smf_generate_changelog(changelog, [], :html)
-  markdown_changelog = _smf_generate_changelog(changelog, [], :markdown)
-  slack_changelog = _smf_generate_changelog(changelog, [], :slack_markdown)
+  html_changelog = _smf_generate_changelog(changelog, :html)
+  markdown_changelog = _smf_generate_changelog(changelog, :markdown)
+  slack_changelog = _smf_generate_changelog(changelog, :slack_markdown)
 
   smf_write_changelog(
     changelog: markdown_changelog,
     html_changelog: html_changelog,
-    slack_changelog: slack_changelog,
-    ticket_tags: []
+    slack_changelog: slack_changelog
   )
 end
 
@@ -104,10 +103,6 @@ end
 
 def _smf_changelog_slack_markdown_temp_path
   "#{@fastlane_commons_dir_path}/#{$CHANGELOG_TEMP_FILE_SLACK_MARKDOWN}"
-end
-
-def _smf_ticket_tags_temp_path
-  "#{@fastlane_commons_dir_path}/#{$TICKET_TAGS_TEMP_FILE}"
 end
 
 def smf_remote_repo_name

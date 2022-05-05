@@ -17,12 +17,6 @@ private_lane :smf_write_changelog do |options|
     options[:slack_changelog],
     "Writing changelog as Slack Markdown to #{_smf_changelog_slack_markdown_temp_path}"
   )
-
-  _write_changelog_to_disk(
-    _smf_ticket_tags_temp_path,
-    options[:ticket_tags],
-    "Writing related ticket tags to #{_smf_ticket_tags_temp_path}"
-  )
 end
 
 def _write_changelog_to_disk(path, content, log)
