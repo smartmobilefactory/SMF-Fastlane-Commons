@@ -5,14 +5,14 @@ private_lane :smf_pull_keystore do |options|
   keystore_folder = options[:folder]
 
   Dir.chdir(clone_root_folder) do
-    sh("rm -r -f ./Android-Keystores")
-    sh("git clone https://github.com/smartmobilefactory/Android-Keystores.git")
-    sh("cd ./Android-Keystores; sh crypto.sh -decrypt #{keystore_folder}")
+    sh("rm -r -f ./Eismann-Android-Keystores")
+    sh("git clone https://github.com/smartmobilefactory/Eismann-Android-Keystores.git")
+    sh("cd ./Eismann-Android-Keystores; sh crypto.sh -decrypt #{keystore_folder}")
   end
 
-  properties = load_properties("#{clone_root_folder}/Android-Keystores/keystores/#{keystore_folder}/keystore.properties")
+  properties = load_properties("#{clone_root_folder}/Eismann-Android-Keystores/keystores/#{keystore_folder}/keystore.properties")
   keystore_values = {}
-  keystore_values[:keystore_file] = File.absolute_path("#{clone_root_folder}/Android-Keystores/keystores/#{keystore_folder}/keystore.jks")
+  keystore_values[:keystore_file] = File.absolute_path("#{clone_root_folder}/Eismann-Android-Keystores/keystores/#{keystore_folder}/keystore.jks")
   keystore_values[:keystore_password] = properties['KEYSTORE_PASSWORD']
   keystore_values[:keystore_key_alias] = properties['KEYSTORE_KEY_ALIAS']
   keystore_values[:keystore_key_password] = properties['KEYSTORE_KEY_PASSWORD']
