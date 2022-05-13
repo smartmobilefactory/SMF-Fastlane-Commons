@@ -6,7 +6,7 @@ private_lane :smf_pull_keystore do |options|
 
   Dir.chdir(clone_root_folder) do
     sh("rm -r -f ./Eismann-Android-Keystores")
-    sh("git clone https://github.com/smartmobilefactory/Eismann-Android-Keystores.git")
+    sh("git clone https://github.com/eismann-digital/Eismann-Android-Keystores.git")
     sh("cd ./Eismann-Android-Keystores; sh crypto.sh -decrypt #{keystore_folder}")
   end
 
