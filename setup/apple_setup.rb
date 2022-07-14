@@ -164,7 +164,7 @@ private_lane :smf_super_report do |options|
 end
 
 lane :smf_report do |options|
-  smf_super_report(options)
+  # smf_super_report(options)
 end
 
 ########## ADDITIONAL LANES USED FOR BUILDING ##########
