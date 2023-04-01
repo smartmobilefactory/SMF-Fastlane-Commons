@@ -70,7 +70,7 @@ private_lane :smf_build_apple_app do |options|
 end
 
 def smf_xcargs_for_build_system
-  smf_is_using_old_build_system ? "" : "-UseNewBuildSystem=YES"
+  smf_is_using_old_build_system ? "" : "-UseNewBuildSystem=YES CODE_SIGN_STYLE=Manual"
 end
 
 def smf_is_using_old_build_system
