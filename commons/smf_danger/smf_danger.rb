@@ -48,6 +48,8 @@ private_lane :smf_danger do |options|
 
   _check_common_project_setup_files(@platform)
 
+  _check_for_undefined_keys(@smf_fastlane_config)
+
   _smf_create_jira_ticket_links
 
   _swift_lint_count_unused_rules
@@ -110,6 +112,46 @@ def _check_common_project_setup_files(platform)
 
   if current_head_commit != remote_head_commit
     ENV['COMMON_PROJECT_SETUP_FILES_OUTDATED'] = path
+  end
+end
+
+def _check_for_undefined_keys(iosConfig)
+  unless _is_apple_platform
+    return
+  end
+  properties_to_check = $PROPERTIES_TO_CHECK
+
+  config_project = iosConfig[:project]
+  config_project.each do |key, value|
+    _check_for_properties(value, properties_to_check, $DANGER_UNDEFINED_PROPERTIES_CONFIG_JSON)
+  end
+
+
+  config_variants = iosConfig[:build_variants]
+  config_variants.each do |build_variant, build_variant_info|
+    build_variant_info.each do |key, value|
+      _check_for_properties(value, properties_to_check, $DANGER_UNDEFINED_PROPERTIES_CONFIG_JSON)
+    end
+  end 
+
+  targets = smf_xcodeproj_targets
+  if targets.empty?
+    return
+  end
+  targets.each do |target|
+    target_settings = smf_xcodeproj_target_settings(target)
+    if target_settings.empty?
+      return
+    end
+    target_settings.each do |key, value|
+      _check_for_properties(value, properties_to_check, $DANGER_UNDEFINED_PROPERTIES_BUILD_CONFIG)
+    end 
+  end
+end
+
+def _check_for_properties(value, properties_to_check, env_key)
+  if properties_to_check.include? value
+    ENV[env_key] = 'true'
   end
 end
 
