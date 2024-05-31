@@ -353,7 +353,8 @@ def _smf_download_file(api_client, project_id, locale_id, output_file, tags, fil
     file_format: file_format,
     tags: tags,
     encoding: FILE_ENCODING,
-    include_empty_translations: include_empty_translations
+    include_empty_translations: include_empty_translations,
+	format_options: { convert_placeholder : true }
   }
 
   begin
