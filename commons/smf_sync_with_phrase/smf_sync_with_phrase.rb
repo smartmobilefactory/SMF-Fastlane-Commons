@@ -164,7 +164,7 @@ def _smf_upload_translations(api_client, project_id, upload_resource_dir, langua
       utf8_converted_file = _smf_convert_to_utf_8_if_possible(upload_resource_dir, item)
       file = utf8_converted_file unless utf8_converted_file.nil?
 
-      _smf_upload_translation_file(api_client, project_id, locale_id, file, tag)
+      _smf_upload_translation_file(api_client, project_id, locale_id, file, tag, APPLE_LOCALIZABLE_FORMAT)
 
       # remove file if it was a utf-8 converted copy
       if utf8_converted_file
@@ -178,14 +178,14 @@ def _smf_upload_translations(api_client, project_id, upload_resource_dir, langua
       tag = _smf_tag_from_file(item)
       tags.push(tag)
 
-      _smf_upload_translation_file(api_client, project_id, locale_id, file, tag)
+      _smf_upload_translation_file(api_client, project_id, locale_id, file, tag, ANDROID_LOCALIZABLE_FORMAT)
     end
   end
 
   tags
 end
 
-def _smf_upload_translation_file(api_client, project_id, locale_id, file, tags)
+def _smf_upload_translation_file(api_client, project_id, locale_id, file, tags, format)
 
   options = {
     tags: tags,
@@ -195,16 +195,8 @@ def _smf_upload_translation_file(api_client, project_id, locale_id, file, tags)
 
   begin
     UI.message("Uploading translation file: #{File.basename(file)}")
-    case @platform
-    when :ios, :macos, :apple
-      next unless item.end_with?(APPLE_LOCALIZABLE_FORMAT)
-      result = api_client.upload_create(project_id, file, APPLE_LOCALIZABLE_FORMAT, locale_id, options)
-      UI.message("Updated #{File.basename(file)} at #{result.updated_at} UTC")
-    when :android
-      next unless item.start_with?('strings')
-      result = api_client.upload_create(project_id, file, ANDROID_LOCALIZABLE_FORMAT, locale_id, options)
-      UI.message("Updated #{File.basename(file)} at #{result.updated_at} UTC")
-    end
+    result = api_client.upload_create(project_id, file, format, locale_id, options)
+    UI.message("Updated #{File.basename(file)} at #{result.updated_at} UTC")
   rescue Phrase::ApiError => e
     puts "Exception while uploading translation file #{file}: #{e}"
   end
