@@ -198,11 +198,11 @@ def _smf_upload_translation_file(api_client, project_id, locale_id, file, tags)
     case @platform
     when :ios, :macos, :apple
       next unless item.end_with?(APPLE_LOCALIZABLE_FORMAT)
-      result = api_client.upload_create(project_id, File.new(file), APPLE_LOCALIZABLE_FORMAT, locale_id, options)
+      result = api_client.upload_create(project_id, file, APPLE_LOCALIZABLE_FORMAT, locale_id, options)
       UI.message("Updated #{File.basename(file)} at #{result.updated_at} UTC")
     when :android
       next unless item.start_with?('strings')
-      result = api_client.upload_create(project_id, File.new(file), ANDROID_LOCALIZABLE_FORMAT, locale_id, options)
+      result = api_client.upload_create(project_id, file, ANDROID_LOCALIZABLE_FORMAT, locale_id, options)
       UI.message("Updated #{File.basename(file)} at #{result.updated_at} UTC")
     end
   rescue Phrase::ApiError => e
