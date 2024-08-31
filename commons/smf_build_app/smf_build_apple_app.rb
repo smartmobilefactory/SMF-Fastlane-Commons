@@ -47,7 +47,7 @@ private_lane :smf_build_apple_app do |options|
     configuration: xcconfig_name,
     codesigning_identity: code_signing_identity,
     output_directory: $IOS_BUILD_OUTPUT_DIR,
-    xcargs: smf_xcargs_for_build_system,
+    xcargs: "#{smf_xcargs_for_build_system} CODE_SIGN_STYLE=Manual -skipPackagePluginValidation",
     archive_path: $IOS_ARCHIVE_PATH,
     derived_data_path: $IOS_DERIVED_DATA_PATH,
     result_bundle: true,
