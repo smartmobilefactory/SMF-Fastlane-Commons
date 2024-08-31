@@ -188,8 +188,6 @@ end
 def _smf_upload_translation_file(api_client, project_id, locale_id, file, tags)
 
   options = {
-    file: File.new(file),
-    locale_id: locale_id,
     tags: tags,
     update_translations: false, # REALLY important, otherwise translations might be overriden
     file_encoding: FILE_ENCODING
