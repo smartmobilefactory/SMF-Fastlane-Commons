@@ -52,8 +52,8 @@ def smf_get_appcenter_destination_groups(build_variant, additional_destinations)
 end
 
 def smf_get_firebase_id(build_variant, platform = nil)
-  firebase_id = smf_config_get(build_variant, :firebase_id)
-  firebase_id = smf_config_get(build_variant, platform.to_sym, :appcenter_id) unless platform.nil?
+  firebase_id = smf_config_get(build_variant, :firebase_app_id)
+  firebase_id = smf_config_get(build_variant, platform.to_sym, :firebase_app_id) unless platform.nil?
 
   firebase_id
 end
