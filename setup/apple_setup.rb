@@ -363,7 +363,9 @@ private_lane :smf_super_upload_to_firebase do |options|
   )
 end
 
-
+lane :smf_upload_to_firebase do |options|
+  smf_super_upload_to_firebase(options)
+end
 
 # Upload to iTunes
 
