@@ -35,7 +35,7 @@ private_lane :smf_ios_upload_to_firebase do |options|
       app: app_id,
       release_notes: smf_read_changelog,
       service_credentials_file: service_credentials_file,
-      groups: groups,
+      groups: destinations,
       ipa_path: app_path,
     )
   end
