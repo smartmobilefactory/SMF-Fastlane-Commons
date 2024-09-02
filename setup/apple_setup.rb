@@ -333,6 +333,38 @@ lane :smf_upload_to_appcenter do |options|
 end
 
 
+#Upload to Firebase
+private_lane :smf_super_upload_to_firebase do |options|
+
+  build_variant = smf_build_variant(options)
+  
+  service_credentials_file = ENV['FIREBASE_CREDENTIALS']
+
+  firebase_app_id = smf_get_firebase_id(build_variant)
+  destinations = smf_config_get(build_variant, :firebase_destinations) || "RWC"
+
+
+  if service_credentials_file.nil?
+    UI.message("Skipping upload to Firebase because Firebase credentials are missing.")
+    return
+  end
+
+  if firebase_app_id.nil?
+    UI.message("Skipping upload to Firebase because Firebase app id is missing.")
+    return
+  end
+
+  smf_ios_upload_to_firebase(
+    build_variant: build_variant,
+    app_id: firebase_app_id,
+    destinations: destinations,
+    escaped_filename: smf_config_get(build_variant, :scheme).gsub(' ', "\ "),
+    path_to_ipa_or_app: smf_path_to_ipa_or_app
+  )
+end
+
+
+
 # Upload to iTunes
 
 private_lane :smf_super_upload_to_itunes do |options|
