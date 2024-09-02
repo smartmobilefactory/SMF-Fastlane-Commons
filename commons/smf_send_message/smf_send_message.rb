@@ -66,7 +66,7 @@ private_lane :smf_send_message do |options|
   UI.message("exception.backtrace: #{exception.backtrace}") if exception.respond_to?(:backtrace)
   UI.message("exception.backtrace_locations: #{exception.backtrace_locations}") if exception.respond_to?(:backtrace_locations)
   UI.message("exception.error_info: #{exception.error_info}") if exception.respond_to?(:error_info)
-  slack_channel = URI.unescape(slack_channel) == slack_channel ? URI.escape(slack_channel) : slack_channel
+  slack_channel = URI.decode_www_form_component(slack_channel) == slack_channel ? URI.escape(slack_channel) : slack_channel
 
   unless exception.nil?
     error_info = exception.respond_to?(:error_info) ? exception.error_info : nil
