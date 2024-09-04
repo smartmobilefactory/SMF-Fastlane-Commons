@@ -27,9 +27,13 @@ private_lane :smf_ios_upload_to_firebase do |options|
     
     app_path = path_to_ipa_or_app
   
-    raise("Binary file #{app_path} does not exist. Nothing to upload.") unless File.exist?(app_path)
+    unless File.exist?(app_path)
+        app_path = nil
+        UI.message("Binary file #{app_path} does not exist. Nothing to upload.")
+        raise("Binary file #{app_path} does not exist. Nothing to upload.")
+    end
     
-    UI.message('Uploading iOS app to Firebase App Distribution.')
+    UI.message("Uploading iOS app to Firebase App Distribution: #{app_path}")
     
     firebase_app_distribution(
       app: app_id,
@@ -37,6 +41,7 @@ private_lane :smf_ios_upload_to_firebase do |options|
       service_credentials_file: service_credentials_file,
       groups: destinations,
       ipa_path: app_path,
+      dsym_path: dsym_path
     )
   end
   
