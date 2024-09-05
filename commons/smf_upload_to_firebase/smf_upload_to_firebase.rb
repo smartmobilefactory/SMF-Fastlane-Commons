@@ -44,3 +44,41 @@ private_lane :smf_ios_upload_to_firebase do |options|
     )
   end
   
+  private_lane :smf_android_upload_to_firebase do |options|
+
+    android_artifact_path = options[:aab_path] || options[:apk_path] # Prioritize AAB, fallback to APK
+    android_artifact_type = options[:aab_path] ? "AAB" : "APK"
+    app_id = options[:app_id]
+    destinations = options[:destinations]
+    
+    if app_id.nil? || app_id.empty?
+      UI.message("Skipping upload to Firebase as the Firebase App ID is missing.")
+      return
+    end
+    
+    service_credentials_file = ENV['FIREBASE_CREDENTIALS']
+    
+    if service_credentials_file.nil?
+      UI.message("Skipping upload to Firebase as Firebase credentials are missing.")
+      return
+    end
+  
+    if android_artifact_path.nil? || !File.exist?(android_artifact_path)
+      UI.message("No valid APK or AAB file found to upload.")
+      raise("Binary file #{android_artifact_path} does not exist. Nothing to upload.")
+    end
+  
+    UI.message("Uploading Android #{android_artifact_type} to Firebase App Distribution: #{android_artifact_path}")
+  
+    # Upload the AAB or APK to Firebase App Distribution
+    firebase_app_distribution(
+      app: app_id,
+      release_notes: smf_read_changelog, # You can customize this with your changelog method
+      service_credentials_file: service_credentials_file,
+      groups: destinations,
+      android_artifact_path: android_artifact_path, # Path to APK or AAB
+      android_artifact_type: android_artifact_type # Specify whether it's an APK or AAB
+    )
+  end
+  
+  
