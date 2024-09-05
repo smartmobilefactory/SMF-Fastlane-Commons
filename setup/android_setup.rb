@@ -19,6 +19,12 @@ end
 
 private_lane :smf_super_build do |options|
 
+  if options.nil?
+    UI.important("No options were provided. 'options' is nil.")
+  else
+    UI.message("Options provided: #{options.inspect}")
+  end
+
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
   variant = smf_get_build_variant_from_config(build_variant)
   keystore_folder = smf_get_keystore_folder(build_variant)
