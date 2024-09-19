@@ -46,8 +46,8 @@ private_lane :smf_ios_upload_to_firebase do |options|
   
   private_lane :smf_android_upload_to_firebase do |options|
 
-    android_artifact_path = options[:aab_path] ? options[:aab_path] : options[:apk_path]  # Prioritize AAB, fallback to APK
-    android_artifact_type = options[:aab_path] ? "AAB" : "APK"
+    android_artifact_path = options[:android_artifact_path]
+    android_artifact_type = options[:android_artifact_type]
 
     app_id = options[:app_id]
     destinations = options[:destinations]
