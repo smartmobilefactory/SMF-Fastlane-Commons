@@ -56,7 +56,7 @@ private_lane :smf_super_build do |options|
   match_platform = smf_config_get(build_variant, :match, :platform)
   platform = match_platform.nil? ? default_platform : match_platform
 
-  if options[:skip_match] == false {
+  if options[:skip_match] == false
     # If force match was passed as option from jenkins (e.g. manually enabled for the build)
     # then use it, if its nil or false the value from the config json is used
     force_match = options[:force_match]
@@ -76,7 +76,7 @@ private_lane :smf_super_build do |options|
       force: force_match,
       platform: platform
     )
-  }
+  end
 
   smf_build_apple_app(
     build_variant: build_variant,
