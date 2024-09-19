@@ -204,6 +204,8 @@ private_lane :smf_super_upload_to_firebase do |options|
 
   firebase_app_id = smf_get_firebase_id(build_variant)
   destinations = smf_config_get(build_variant, :firebase_destinations) || "RWC"
+  apk_file_regex = smf_get_apk_file_regex(build_variant)
+  aab_file_regex = smf_get_aab_file_regex(build_variant)
 
 
   if service_credentials_file.nil?
