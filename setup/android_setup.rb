@@ -221,24 +221,21 @@ private_lane :smf_super_upload_to_firebase do |options|
 
   aab_path = smf_get_file_path(aab_file_regex)
   UI.message("Path for AAB binary: #{aab_path}")
+  smf_android_upload_to_firebase(
+    app_id: firebase_app_id,
+    destinations: destinations,
+    android_artifact_path: aab_path,
+    android_artifact_type: "AAB"
+  ) if aab_path != ''
 
-  if !aab_path.nil?
-    smf_android_upload_to_firebase(
-      app_id: firebase_app_id,
-      destinations: destinations,
-      android_artifact_path: aab_path,
-      android_artifact_type: "AAB"
-    )
-  else
-    apk_path = smf_get_file_path(apk_file_regex)
-    UI.message("Path for APK binary: #{apk_path}")
-    smf_android_upload_to_firebase(
-      app_id: firebase_app_id,
-      destinations: destinations,
-      android_artifact_path: apk_path,
-      android_artifact_type: "APK"
-    )
-  end
+  apk_path = smf_get_file_path(apk_file_regex)
+  UI.message("Path for APK binary: #{apk_path}")
+  smf_android_upload_to_firebase(
+    app_id: firebase_app_id,
+    destinations: destinations,
+    android_artifact_path: apk_path,
+    android_artifact_type: "APK"
+  ) if apk_path != ''
 end
 
 lane :smf_upload_to_firebase do |options|
