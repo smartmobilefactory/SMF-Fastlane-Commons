@@ -46,10 +46,14 @@ private_lane :smf_ios_upload_to_firebase do |options|
   
   private_lane :smf_android_upload_to_firebase do |options|
 
-    android_artifact_path = options[:aab_path] || options[:apk_path] # Prioritize AAB, fallback to APK
+    android_artifact_path = options[:aab_path] ? options[:aab_path] : options[:apk_path]  # Prioritize AAB, fallback to APK
     android_artifact_type = options[:aab_path] ? "AAB" : "APK"
+
     app_id = options[:app_id]
     destinations = options[:destinations]
+
+    UI.message("Binary type #{android_artifact_type}")
+    UI.message("Path for binary: #{android_artifact_path}")
     
     if app_id.nil? || app_id.empty?
       UI.message("Skipping upload to Firebase as the Firebase App ID is missing.")
