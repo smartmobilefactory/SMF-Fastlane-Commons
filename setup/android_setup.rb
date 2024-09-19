@@ -19,9 +19,23 @@ end
 
 private_lane :smf_super_build do |options|
 
+  if options.nil?
+    UI.important("No options were provided. 'options' is nil.")
+  else
+    UI.message("Options provided: #{options.inspect}")
+  end
+
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : smf_get_first_variant_from_config
+
+  UI.message("Build variant: #{build_variant}")
+
   variant = smf_get_build_variant_from_config(build_variant)
+
+  UI.message("Variant: #{variant}")
+
   keystore_folder = smf_get_keystore_folder(build_variant)
+
+  UI.message("Keystore: #{keystore_folder}")
 
   smf_build_android_app(
       build_variant: variant,
