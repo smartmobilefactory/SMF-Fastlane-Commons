@@ -356,7 +356,7 @@ private_lane :smf_super_upload_to_firebase do |options|
     return
   end
 
-  increment_build_number
+  smf_increment_build_number
 
   smf_ios_upload_to_firebase(
     build_variant: build_variant,
