@@ -40,7 +40,7 @@ private_lane :smf_build_apple_app do |options|
 
   smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
 
-  smf_increment_build_number
+  increment_build_number
 
   gym_parameters = {
     clean: clean_project,
