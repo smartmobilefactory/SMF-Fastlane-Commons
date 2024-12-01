@@ -40,10 +40,6 @@ private_lane :smf_build_apple_app do |options|
 
   smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
 
-  increment_build_number(
-    build_number: "6"
-  )
-
   gym_parameters = {
     clean: clean_project,
     workspace: !workspace.nil? ? workspace : "#{project_name}.xcworkspace",
