@@ -91,7 +91,7 @@ end
 private_lane :smf_super_report do |options|
   build_variant = options[:build_variant]
   smf_linter(options)
-  smf_report_metrics(build_variant: build_variant, smf_get_meta_db_project_name: smf_get_meta_db_project_name)
+  smf_report_metrics(build_variant: build_variant)
 end
 
 lane :smf_report do |options|
@@ -160,40 +160,8 @@ lane :smf_pipeline_create_git_tag do |options|
 end
 
 
-# Upload to AppCenter
-
-private_lane :smf_super_upload_to_appcenter do |options|
-
-  build_variant = options[:build_variant]
-  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
-  apk_file_regex = smf_get_apk_file_regex(build_variant)
-  aab_file_regex = smf_get_aab_file_regex(build_variant)
-  appcenter_app_id = smf_get_appcenter_id(build_variant)
-  destinations = build_variant_config[:appcenter_destinations]
-
-  # Upload to AppCenter
-  aab_path = smf_get_file_path(aab_file_regex)
-  smf_android_upload_to_appcenter(
-    destinations: smf_get_appcenter_destination_groups(build_variant, destinations),
-    build_variant: build_variant,
-    aab_path: aab_path,
-    app_id: appcenter_app_id
-  ) if aab_path != '' && !appcenter_app_id.nil?
-
-  # Upload to AppCenter
-  apk_path = smf_get_file_path(apk_file_regex)
-  smf_android_upload_to_appcenter(
-    destinations: smf_get_appcenter_destination_groups(build_variant, destinations),
-    build_variant: build_variant,
-    apk_path: apk_path,
-    app_id: appcenter_app_id
-  ) if apk_path != '' && !appcenter_app_id.nil?
-
-end
-
-lane :smf_upload_to_appcenter do |options|
-  smf_super_upload_to_appcenter(options)
-end
+# Upload to AppCenter (Deprecated - AppCenter service discontinued)
+# This functionality has been removed as AppCenter is no longer available
 
 
 # Push Git Tag / Release

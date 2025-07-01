@@ -167,60 +167,8 @@ lane :smf_upload_dsyms do |options|
 end
 
 
-# Upload to AppCenter
-
-private_lane :smf_super_pipeline_android_upload_to_appcenter do |options|
-
-  build_variant = options[:build_variant]
-  build_variant_config_android = @smf_fastlane_config[:build_variants][build_variant.to_sym][:android]
-  appcenter_app_id = smf_get_appcenter_id(build_variant, 'android')
-  destinations = build_variant_config_android[:appcenter_destinations]
-
-  # Upload APK to AppCenter
-  apk_path = smf_get_file_path(smf_get_apk_file_regex(build_variant))
-  smf_android_upload_to_appcenter(
-      destinations: smf_get_appcenter_destination_groups(build_variant, destinations),
-      build_variant: build_variant,
-      apk_path: apk_path,
-      app_id: appcenter_app_id
-  ) if apk_path != '' && !appcenter_app_id.nil?
-
-  # Upload AAB to AppCenter
-  aab_path = smf_get_file_path(smf_get_aab_file_regex(build_variant))
-  smf_android_upload_to_appcenter(
-      destinations: smf_get_appcenter_destination_groups(build_variant, destinations),
-      build_variant: build_variant,
-      aab_path: aab_path,
-      app_id: appcenter_app_id
-  ) if aab_path != '' && !appcenter_app_id.nil?
-
-end
-
-lane :smf_pipeline_android_upload_to_appcenter do |options|
-  smf_super_pipeline_android_upload_to_appcenter(options)
-end
-
-private_lane :smf_super_pipeline_ios_upload_to_appcenter do |options|
-  build_variant = options[:build_variant]
-  build_variant_config = @smf_fastlane_config[:build_variants][build_variant.to_sym]
-  build_variant_config_ios = build_variant_config[:ios]
-  scheme = build_variant_config[:flavor]
-  appcenter_app_id = smf_get_appcenter_id(build_variant, 'ios')
-  app_file_regex = "#{scheme}.ipa"
-  destinations = build_variant_config_ios[:appcenter_destinations]
-
-  # Upload the IPA to AppCenter
-  smf_ios_upload_to_appcenter(
-      destinations: smf_get_appcenter_destination_groups(build_variant, destinations),
-      app_id: appcenter_app_id,
-      escaped_filename: build_variant_config[:flavor].gsub(' ', "\ "),
-      path_to_ipa_or_app: smf_get_file_path(app_file_regex)
-  ) if !appcenter_app_id.nil?
-end
-
-lane :smf_pipeline_ios_upload_to_appcenter do |options|
-  smf_super_pipeline_ios_upload_to_appcenter(options)
-end
+# Upload to AppCenter (Deprecated - AppCenter service discontinued)
+# This functionality has been removed as AppCenter is no longer available
 
 # Upload to iTunes
 

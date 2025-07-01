@@ -39,24 +39,6 @@ def smf_get_build_variant_from_config(build_variant)
   @smf_fastlane_config[:build_variants][build_variant.to_sym][:variant]
 end
 
-def smf_get_appcenter_destination_groups(build_variant, additional_destinations)
-  destinations = []
-
-  unless additional_destinations.nil?
-    destinations = destinations + additional_destinations.split(',')
-  end
-
-  destinations.push('Collaborators')
-
-  destinations.uniq.join(',')
-end
-
-def smf_get_appcenter_id(build_variant, platform = nil)
-  appcenter_id = smf_config_get(build_variant, :appcenter_id)
-  appcenter_id = smf_config_get(build_variant, platform.to_sym, :appcenter_id) unless platform.nil?
-
-  appcenter_id
-end
 
 def smf_get_keystore_folder(build_variant)
 

@@ -109,9 +109,3 @@ def smf_get_xcconfig_name(build_variant)
   xcconfig_name
 end
 
-def smf_get_meta_db_project_name
-  name = @smf_fastlane_config.dig(:project, :meta_db_name)
-  return @smf_fastlane_config.dig(:project, :project_name) if name.nil?
-
-  name
-end

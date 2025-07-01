@@ -6,7 +6,7 @@ def smf_meta_report_android(options)
   analysis_data = _smf_analyse_android_project(options)
 
   if _should_send_android_report_data(analysis_data)
-    # Format and upload data to Google Spreadsheet
+    # Meta reporting to Google Sheets is disabled
     smf_send_meta_report(analysis_data, :ANDROID_META_REPORTING)
   else
     puts "Meta Reporting disabled for branch: '#{analysis_data[:branch]}'"

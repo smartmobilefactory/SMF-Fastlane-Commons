@@ -1,12 +1,12 @@
 # ################################################################################
 # THIS LANE IS DEPRECATED AND THE WHOLE FILE SHOULD BE REMOVED AS SOON AS
 # ALL PROJECTS ARE MIGRATED TO USE THE NEW SYSTEM (see lane smf_sync_with_phrase)
-# TICKET: https://smartmobilefactory.atlassian.net/browse/SMFIT-1855 (25.03.2021)
+# TICKET: https://sosimple.atlassian.net/browse/SMFIT-1855 (25.03.2021)
 # ################################################################################
 #
 def smf_send_phraseapp_deprecation_warning
 
-  migration_guide_url = 'https://smartmobilefactory.atlassian.net/l/c/kXWib1if'
+  migration_guide_url = 'https://sosimple.atlassian.net/l/c/kXWib1if'
   message = "This project uses a deprecated lane to sync strings with phraseapp, please migrate to the new system using this migration guide: #{migration_guide_url}"
   estimated_time = '30m to 1h'
   requirements = [

@@ -6,7 +6,7 @@ def smf_meta_report_ios(options)
   analysis_data = _smf_analyse_ios_project(options)
 
   if _should_send_ios_report_data(analysis_data)
-    # Format and upload data to Google Spreadsheet
+    # Meta reporting to Google Sheets is disabled
     smf_send_meta_report(analysis_data, :APPLE_META_REPORTING)
   else
     puts "Meta Reporting disabled for branch: '#{analysis_data[:branch]}'"
@@ -43,7 +43,7 @@ def _smf_analyse_ios_project(options)
   analysis_json[:ats] = smf_analyse_ats_exception
   analysis_json[:build_number] = smf_meta_report_build_number_and_version(options[:build_variant])
   # Pod analysis
-  analysis_json[:appcenter_crashes] = smf_analyse_appcenter_crash_report_usage
+  analysis_json[:appcenter_crashes] = nil  # AppCenter discontinued
   analysis_json[:sentry] = smf_analyse_sentry_usage
   analysis_json[:qakit] = smf_analyse_qakit_usage
   analysis_json[:debug_menu] = smf_analyse_debug_menu_usage

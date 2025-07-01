@@ -160,7 +160,7 @@ end
 private_lane :smf_super_report do |options|
   build_variant = smf_build_variant(options)
   smf_linter(options)
-  smf_report_metrics(build_variant: build_variant, smf_get_meta_db_project_name: smf_get_meta_db_project_name)
+  smf_report_metrics(build_variant: build_variant)
 end
 
 lane :smf_report do |options|
@@ -307,30 +307,8 @@ lane :smf_pipeline_upload_with_sparkle do |options|
 end
 
 
-# Upload to AppCenter
-
-private_lane :smf_super_upload_to_appcenter do |options|
-  build_variant = smf_build_variant(options)
-
-  appcenter_app_id = smf_get_appcenter_id(build_variant)
-  destinations = smf_config_get(build_variant, :appcenter_destinations)
-
-  # Upload the IPA to AppCenter
-  smf_ios_upload_to_appcenter(
-    destinations: smf_get_appcenter_destination_groups(build_variant, destinations),
-    build_variant: build_variant,
-    build_number: smf_get_build_number_of_app,
-    app_id: appcenter_app_id,
-    escaped_filename: smf_config_get(build_variant, :scheme).gsub(' ', "\ "),
-    path_to_ipa_or_app: smf_path_to_ipa_or_app,
-    is_mac_app: smf_is_mac_build(build_variant),
-    podspec_path: smf_config_get(build_variant, :podspec_path)
-  ) unless appcenter_app_id.nil?
-end
-
-lane :smf_upload_to_appcenter do |options|
-  smf_super_upload_to_appcenter(options)
-end
+# Upload to AppCenter (Deprecated - AppCenter service discontinued)
+# This functionality has been removed as AppCenter is no longer available
 
 
 # Upload to iTunes

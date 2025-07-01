@@ -27,7 +27,7 @@ end
 def _smf_perform_build_precheck(upload_itc, itc_apple_id)
 
   if upload_itc == true && itc_apple_id.nil?
-    message = 'itc_apple_id not set in Config.json. Please Read: https://smartmobilefactory.atlassian.net/wiki/spaces/SMFIOS/pages/669646876/Missing+itc+apple+id '
+    message = 'itc_apple_id not set in Config.json. Please Read: https://sosimple.atlassian.net/wiki/spaces/SMFIOS/pages/669646876/Missing+itc+apple+id '
 
     smf_send_message(
       title: 'Build Precheck Error',
@@ -56,7 +56,7 @@ def _smf_perform_build_precheck_for_pods_spec_repo_url(pods_specs_repo = false)
     prefix_config = https_in_config ? 'in the Config.json' : ''
     connector = https_in_podfile && https_in_config ? ' and ' : ''
 
-    message = "⛔️ The HTTPS podspec repo url is still present #{prefix_podfile}#{connector}#{prefix_config}. Please update to use the ssh url. See https://smartmobilefactory.atlassian.net/wiki/spaces/SMFIOS/pages/674201953/Wrong+cocoapods+repo+in... for more information"
+    message = "⛔️ The HTTPS podspec repo url is still present #{prefix_podfile}#{connector}#{prefix_config}. Please update to use the ssh url. See https://sosimple.atlassian.net/wiki/spaces/SMFIOS/pages/674201953/Wrong+cocoapods+repo+in... for more information"
 
     UI.error(message)
 

@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-FILES_TO_IGNORE = ['BITHockeyManager.h', 'create-project-json.sh']
+FILES_TO_IGNORE = ['create-project-json.sh']
 DIR_TO_IGNORE = ['.xcarchive', '.fastlane-smf-commons', $IOS_BUILD_OUTPUT_DIR]
 
 # returns the analysed property

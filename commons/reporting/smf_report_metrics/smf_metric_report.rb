@@ -1,6 +1,6 @@
 private_lane :smf_report_metrics do |options|
   smf_report_depencencies(options)
-  # Disabled for now as the owasp data are not sent to metaDB.
+  # OWASP reporting is disabled
   # smf_owasp_report(options)
   smf_meta_report(options)
 end
@@ -39,75 +39,17 @@ private_lane :smf_owasp_report do |options|
     UI.message("OWASP REPORT: #{report.to_json}")
   rescue Exception => ex
     UI.message("Platform dependencies could not be reported: #{ex.message}")
-    project_name = options[:smf_get_meta_db_project_name]
+    project_name = @smf_fastlane_config[:project][:project_name]
     smf_send_message(
       title: "#{project_name} smf_owasp_report failed",
       message: "#{ex.message}, #{ex}",
       slack_channel: $SMF_CI_DIAGNOSTIC_CHANNEL
     )
   end
-  # TODO report owasp report to metadb
+  # OWASP reporting functionality removed
 end
 
 private_lane :smf_report_depencencies do |options|
-
-  build_variant = options[:build_variant]
-  project_name = options[:smf_get_meta_db_project_name]
-  dependencyReports = []
-
-  prepare_api_data = ->(data) {
-    data['environment'] = build_variant
-    data['project'] = project_name
-    data
-  }
-
-  begin
-    case @platform
-    when :android
-      dependencyReports.push(prepare_api_data.call(smf_general_dependency_report_android))
-      dependencyReports.push(prepare_api_data.call(smf_development_dependency_report_android))
-      dependencyReports.push(prepare_api_data.call(smf_dependency_report_android))
-    when :ios
-      report = smf_dependency_report_cocoapods
-      report['project_type'] = smf_meta_report_platform_friendly_name
-      dependencyReports.push(prepare_api_data.call(report))
-    when :macos
-      report = smf_dependency_report_cocoapods
-      report['project_type'] = smf_meta_report_platform_friendly_name
-      dependencyReports.push(prepare_api_data.call(report))
-    when :apple
-      report = smf_dependency_report_cocoapods
-      report['project_type'] = smf_is_catalyst_mac_build(build_variant) ? 'macOS' : 'iOS'
-      dependencyReports.push(prepare_api_data.call(report))
-    else
-      UI.message("The platform \"#{@platform}\" does not support metric reports")
-    end
-  rescue Exception => ex
-    UI.message("Platform dependencies could not be reported: #{ex.message}")
-    smf_send_message(
-      title: "#{project_name} report dependencies failed",
-      message: "#{ex.message}, #{ex}",
-      slack_channel: $SMF_CI_DIAGNOSTIC_CHANNEL
-    )
-  end
-
-  dependencyReports.each { |value|
-    _smf_send_dependency_report(value, project_name)
-  }
+  UI.message("Dependency reporting has been disabled")
 end
 
-def _smf_send_dependency_report(report, project_name)
-  UI.message("report data:\n#{report.to_json}")
-  uri = URI('https://metadb.solutions.smfhq.com/api/v1/software')
-
-  https = Net::HTTP.new(uri.host, uri.port)
-  https.use_ssl = true
-
-  req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
-  req.body = report.to_json
-  auth = ENV[$SMF_METADB_API_CREDENTIALS].split(':')
-  req.basic_auth auth[0], auth[1]
-
-  res = https.request(req)
-  UI.message("Dependency data were reported to metaDB:\n#{res.body}")
-end

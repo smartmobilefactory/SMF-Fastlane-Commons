@@ -1,16 +1,12 @@
 # Environmental variables keys
 $SMF_GITHUB_TOKEN_ENV_KEY = 'GITHUB_TOKEN'
-$SMF_METADB_API_CREDENTIALS = 'METADB_API_CREDENTIALS'
-$SMF_HOCKEYAPP_API_TOKEN_ENV_KEY = 'HOCKEYAPP_API_TOKEN'
-$SMF_APPCENTER_API_TOKEN_ENV_KEY = 'APPCENTER_API_TOKEN'
 $SMF_SLACK_URL = 'SMF_SLACK_URL_IDENTIFIER'
 $JIRA_DEV_ACCESS_CREDENTIALS = 'JIRA_TOKEN_FASTLANE_ACCESS'
 $SENTRY_AUTH_TOKEN = 'SENTRY_API_ACCESS_TOKEN'
 $DANGER_GITHUB_TOKEN_KEY = 'DANGER_GITHUB_API_TOKEN'
 
 # External URLs
-$JIRA_BASE_URL = 'https://smartmobilefactory.atlassian.net'
-$SMF_APPCENTER_WEBHOOK_URL = 'https://us-central1-smf-hub.cloudfunctions.net/appcenter'
+$JIRA_BASE_URL = 'https://sosimple.atlassian.net'
 $FASTLANE_MATCH_REPO_URL = 'git@github.com:smartmobilefactory/SMF-iOS-Fastlane-Match.git'
 
 # Keychain
@@ -55,22 +51,7 @@ $IOS_RESULT_BUNDLE_PATH = File.join($IOS_BUILD_OUTPUT_DIR, 'reports/bundleResult
 $PODSPEC_REPO_SOURCES = ['git@github.com:smartmobilefactory/SMF-CocoaPods-Specs', 'https://github.com/CocoaPods/Specs']
 
 ### Reporting ###
-
-# Google Sheets API
-$REPORTING_GOOGLE_SHEETS_CLIENT_ID_KEY = 'REPORTING_CLIENT_ID'
-$REPORTING_GOOGLE_SHEETS_CLIENT_SECRET_KEY = 'REPORTING_CLIENT_SECRET'
-$REPORTING_GOOGLE_SHEETS_REFRESH_TOKEN_KEY = 'REPORTING_REFRESH_TOKEN'
-
-## Google Spreadsheet identifier for reporting. Name: "Automatic_Reporting"
-$REPORTING_GOOGLE_SHEETS_UNIT_TESTS_DOC_ID_KEY = 'AUTOMATIC_REPORTING_SPREADSHEET_ID'
-$REPORTING_GOOGLE_SHEETS_UNIT_TESTS_SHEET_NAME = 'unit-tests'
-$REPORTING_GOOGLE_SHEETS_UNIT_TESTS_SHEET_NAME_PLAYGROUND = 'playground'
-
-## Google Spreadsheet identifier for the meta info (ex: metaJSON analyzer). Name: Meta_Reporting
-$REPORTING_GOOGLE_SHEETS_META_INFO_DOC_ID_KEY = 'META_REPORTING_SPREADSHEET_ID'
-$REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME_ANDROID = 'android'
-$REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME_APPLE = 'apple'
-$REPORTING_GOOGLE_SHEETS_META_INFO_SHEET_NAME_PLAYGROUND = 'playground'
+# Google Sheets reporting has been disabled
 
 # If set, error slack messages to the projects main slack channel are omitted
 $SEND_ERRORS_TO_CI_SLACK_CHANNEL_ONLY_KEY = 'SEND_ERRORS_TO_CI_SLACK_CHANNEL_ONLY'
@@ -90,7 +71,7 @@ $CONFIG_REQUIRED_PROJECT_KEYS_ANDROID = []
 $CONFIG_REQUIRED_PROJECT_KEYS_FLUTTER = ['xcode_version']
 
 # Optional Config.json/project keys
-$CONFIG_OPTIONAL_PROJECT_KEYS_COMMONS = ['meta_db_name', 'sentry_org_slug', 'sentry_project_slug']
+$CONFIG_OPTIONAL_PROJECT_KEYS_COMMONS = ['sentry_org_slug', 'sentry_project_slug']
 $CONFIG_OPTIONAL_PROJECT_KEYS_IOS = ['custom_credentials', 'dmg_template_path', 'skip_build_nr_update_in_plists', 'skip_thread_sanitizer_for_unit_tests']
 $CONFIG_OPTIONAL_PROJECT_KEYS_ANDROID = []
 $CONFIG_OPTIONAL_PROJECT_KEYS_FLUTTER = []

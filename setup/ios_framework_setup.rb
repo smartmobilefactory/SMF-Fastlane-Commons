@@ -173,7 +173,7 @@ end
 private_lane :smf_super_pod_meta_reporting do |options|
   build_variant = smf_build_variant(options)
   smf_pod_linter
-  smf_report_metrics(build_variant: build_variant, smf_get_meta_db_project_name: smf_get_meta_db_project_name)
+  smf_report_metrics(build_variant: build_variant)
 end
 
 lane :smf_pod_meta_reporting do |options|

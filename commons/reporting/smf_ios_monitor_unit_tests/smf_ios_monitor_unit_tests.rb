@@ -48,15 +48,29 @@ private_lane :smf_ios_monitor_unit_tests do |options|
     :unit_test_count => tests_count
   }
 
-  # Prepare raw data for the spreadsheet entry
-  new_entry = smf_create_spreadsheet_entry(entry_data)
-  sheet_entries.push(new_entry) unless new_entry.nil?
-
-  # Gather API credentiels and format data for the API
-  sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_UNIT_TESTS_DOC_ID_KEY]
-  sheet_name = $REPORTING_GOOGLE_SHEETS_UNIT_TESTS_SHEET_NAME
-  sheet_data = smf_create_sheet_data_from_entries(sheet_entries, :AUTOMATIC_REPORTING)
-
-  # Push to monitoring data to Google Spreadsheet via the API
-  smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, sheet_data)
+  # Display unit test results in build log instead of external reporting
+  UI.header("📊 iOS Unit Test Analysis")
+  UI.message("📱 Project: #{project_name}")
+  UI.message("🌿 Branch: #{branch}")
+  UI.message("🔧 Platform: #{platform}")
+  UI.message("📦 Build Variant: #{build_variant}")
+  
+  if entry_data[:unit_test_count] && entry_data[:unit_test_count] > 0
+    UI.success("✅ Unit Tests: #{entry_data[:unit_test_count]} tests executed")
+  else
+    UI.important("⚠️  Unit Tests: No tests found or executed")
+  end
+  
+  if entry_data[:test_coverage]
+    coverage_percent = (entry_data[:test_coverage] * 100).round(1)
+    if coverage_percent >= 80
+      UI.success("✅ Test Coverage: #{coverage_percent}% (#{entry_data[:covered_lines]} lines)")
+    elsif coverage_percent >= 60
+      UI.important("⚠️  Test Coverage: #{coverage_percent}% (#{entry_data[:covered_lines]} lines) - Consider improving")
+    else
+      UI.error("❌ Test Coverage: #{coverage_percent}% (#{entry_data[:covered_lines]} lines) - Low coverage detected")
+    end
+  else
+    UI.message("ℹ️  Test Coverage: Not available")
+  end
 end

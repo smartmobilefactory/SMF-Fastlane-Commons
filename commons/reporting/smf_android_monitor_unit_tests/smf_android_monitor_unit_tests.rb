@@ -20,15 +20,16 @@ private_lane :smf_android_monitor_unit_tests do |options|
     end
   end
 
-  # Prepare raw data for the spreadsheet entry
-  options[:unit_test_count] = test_count
-  sheet_entry = smf_create_spreadsheet_entry(options)
-
-  # Gather API credentiels and format data for the API
-  sheet_id = ENV[$REPORTING_GOOGLE_SHEETS_UNIT_TESTS_DOC_ID_KEY]
-  sheet_name = $REPORTING_GOOGLE_SHEETS_UNIT_TESTS_SHEET_NAME
-  sheet_data = smf_create_sheet_data_from_entries([sheet_entry], :AUTOMATIC_REPORTING)
-
-  # Push to monitoring data to Google Spreadsheet via the API
-  smf_google_api_append_data_to_spread_sheet(sheet_id, sheet_name, sheet_data)
+  # Display unit test results in build log instead of external reporting
+  UI.header("📊 Android Unit Test Analysis")
+  UI.message("📱 Project: #{options[:project_name] || 'Unknown'}")
+  UI.message("🌿 Branch: #{options[:branch] || 'Unknown'}")
+  UI.message("🔧 Platform: #{options[:platform] || 'Android'}")
+  UI.message("📦 Build Variant: #{options[:build_variant] || 'Unknown'}")
+  
+  if test_count > 0
+    UI.success("✅ Unit Tests: #{test_count} tests executed")
+  else
+    UI.important("⚠️  Unit Tests: No tests found or executed")
+  end
 end

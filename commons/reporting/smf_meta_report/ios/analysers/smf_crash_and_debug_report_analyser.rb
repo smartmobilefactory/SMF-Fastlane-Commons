@@ -3,7 +3,6 @@
 PODFILE_LOCK_NAME = 'Podfile.lock'
 
 # Pods to analyse
-APPCENTER_CRASHES_PODNAME = 'AppCenter/Crashes'
 SENTRY_PODNAME = 'Sentry'
 DEBUG_MENU_PODNAME = 'SMF-Debug-Menu'
 QAKIT_PODNAME = 'QAKit'
@@ -31,9 +30,6 @@ end
 
 # POD ANALYSIS
 
-def smf_analyse_appcenter_crash_report_usage
-  _smf_analyse_pod_usage_for(APPCENTER_CRASHES_PODNAME)
-end
 
 def smf_analyse_sentry_usage
   _smf_analyse_pod_usage_for(SENTRY_PODNAME)

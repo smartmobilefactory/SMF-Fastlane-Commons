@@ -3,7 +3,7 @@ require 'json'
 ########## DEPRECATED CODE START #########
 # This code is deprecated and should be removed as soon as most
 # of the projects are migrated.
-# TICKET: https://smartmobilefactory.atlassian.net/browse/SMFIT-1867 (19.04.2021)
+# TICKET: https://sosimple.atlassian.net/browse/SMFIT-1867 (19.04.2021)
 # !!! Also search for "deprecated" in this file and remove the marked lines !!!
 
 FALLBACK_TEMPLATE_CREDENTIAL_KEY = 'PIPELINE_TEMPLATE_CREDENTIAL'
@@ -15,7 +15,7 @@ CUSTOM_CREDENTIALS_SECTION_KEY = '__CUSTOM_CREDENTIALS__'
 CUSTOM_CREDENTIALS_SECTION = """
 // This way of using custom credentials is deprecated and will be removed
 // as soon as most of the projects are migrated
-// TICKET: https://smartmobilefactory.atlassian.net/browse/SMFIT-1867 (19.04.2021)
+// TICKET: https://sosimple.atlassian.net/browse/SMFIT-1867 (19.04.2021)
 
 _custom_credentials = [
   'CUSTOM_PHRASE_APP_TOKEN': '__CUSTOM_PHRASE_APP_TOKEN__',
@@ -34,7 +34,7 @@ def _smf_custom_credential_deprecation_warning
       _, credential_key = custom_credential_keys.first
 
       if credential_key.is_a?(Hash) == false
-        migration_guide_url = 'https://smartmobilefactory.atlassian.net/l/c/QZebJa0M'
+        migration_guide_url = 'https://sosimple.atlassian.net/l/c/QZebJa0M'
         message = "This project uses a deprecated way to setup custom credentials, please update using this migration guide: #{migration_guide_url}"
         estimated_time = '10m'
         requirements = ['Access to the project on Github']
