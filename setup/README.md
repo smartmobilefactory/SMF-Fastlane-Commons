@@ -41,7 +41,6 @@ Table of Contents
          - [`smf_pipeline_increment_build_number`](#-smf-pipeline-increment-build-number--1)
          - [`smf_pipeline_create_git_tag`](#-smf-pipeline-create-git-tag--1)
          - [`smf_upload_dsyms`](#-smf-upload-dsyms-)
-         - [`smf_upload_to_appcenter`](#-smf-upload-to-appcenter-)
          - [`smf_upload_to_itunes`](#-smf-upload-to-itunes-)
          - [`smf_push_git_tag_release`](#-smf-push-git-tag-release-)
          - [`smf_send_slack_notification`](#-smf-send-slack-notification--1)
@@ -63,7 +62,6 @@ Table of Contents
          - [`smf_create_dmg_and_gatekeeper`](#-smf-create-dmg-and-gatekeeper-)
          - [`smf_upload_dsyms`](#-smf-upload-dsyms--1)
          - [`smf_pipeline_upload_with_sparkle`](#-smf-pipeline-upload-with-sparkle-)
-         - [`smf_upload_to_appcenter`](#-smf-upload-to-appcenter--1)
          - [`smf_upload_to_itunes`](#-smf-upload-to-itunes--1)
          - [`smf_push_git_tag_release`](#-smf-push-git-tag-release--1)
          - [`smf_send_slack_notification`](#-smf-send-slack-notification--2)
@@ -78,7 +76,6 @@ Table of Contents
          - [`smf_generate_changelog`](#-smf-generate-changelog--3)
          - [`smf_pipeline_increment_build_number`](#-smf-pipeline-increment-build-number--3)
          - [`smf_pipeline_create_git_tag`](#-smf-pipeline-create-git-tag--3)
-         - [`smf_upload_to_appcenter`](#-smf-upload-to-appcenter--2)
          - [`smf_push_git_tag_release`](#-smf-push-git-tag-release--2)
          - [`smf_send_slack_notification`](#-smf-send-slack-notification--3)
      * [Flutter App Setup](#flutter-app-setup)
@@ -95,8 +92,6 @@ Table of Contents
          - [`smf_pipeline_increment_build_number`](#-smf-pipeline-increment-build-number--4)
          - [`smf_pipeline_create_git_tag`](#-smf-pipeline-create-git-tag--4)
          - [`smf_upload_dsyms`](#-smf-upload-dsyms--2)
-         - [`smf_pipeline_ios_upload_to_appcenter`](#-smf-pipeline-ios-upload-to-appcenter-)
-         - [`smf_pipeline_android_upload_to_appcenter`](#-smf-pipeline-android-upload-to-appcenter-)
          - [`smf_upload_to_itunes`](#-smf-upload-to-itunes--2)
          - [`smf_push_git_tag_release`](#-smf-push-git-tag-release--3)
          - [`smf_send_slack_notification`](#-smf-send-slack-notification--4)
@@ -115,7 +110,6 @@ Table of Contents
          - [`smf_create_dmg_and_gatekeeper`](#-smf-create-dmg-and-gatekeeper--1)
          - [`smf_upload_dsyms`](#-smf-upload-dsyms--3)
          - [`smf_pipeline_upload_with_sparkle`](#-smf-pipeline-upload-with-sparkle--1)
-         - [`smf_upload_to_appcenter`](#-smf-upload-to-appcenter--3)
          - [`smf_push_git_tag_release`](#-smf-push-git-tag-release--4)
          - [`smf_send_slack_notification`](#-smf-send-slack-notification--5)
    - [Custom Behaviour](#custom-behaviour)
@@ -188,14 +182,6 @@ This lane runs lint tasks like swift lint.
 #### `smf_upload_dsyms`
 This lane uploads the symbolication files to sentry. :arrow_up:
 
-#### `smf_upload_to_appcenter`
-This lane uploads the IPA to App Center if an `appcenter_id` is given for the build variant in the Config.json. :arrow_up:
-```
- "live": {
-       "variant": "productionRelease",
-       "appcenter_id": "ExampleID"
-     }
-```
 #### `smf_upload_to_itunes`
 This lane uploads the app to Testflight. :arrow_up::airplane:
 
@@ -227,7 +213,6 @@ The Apple app setup is use for iOS-Apps which are catalyst enabled. This means t
     "alt_platforms" : {
         "macOS": {
             "code_signing_identity"	: "<code siginig identity for the macOS build of this build variant>",
-            "appcenter_id"			: "...",
             "upload_itc"			: false,
             "notarize"				: true,
             "match": {
@@ -280,14 +265,6 @@ This lane uploads the symbolication files to sentry. :arrow_up:
 #### `smf_pipeline_upload_with_sparkle`
 This lane uploads the dmg with sparkle.
 
-#### `smf_upload_to_appcenter`
-This lane uploads the IPA to App Center if an `appcenter_id` is given for the build variant in the Config.json. :arrow_up:
-```
- "live": {
-       "variant": "productionRelease",
-       "appcenter_id": "ExampleID"
-     }
-```
 #### `smf_upload_to_itunes`
 This lane uploads the app to Testflight. :arrow_up::airplane:
 
@@ -334,15 +311,6 @@ This lane runs lint tasks like klint.
 #### `smf_pipeline_create_git_tag`
 [See this lane in Common Setup](#smf_pipeline_create_git_tag)
 
-#### `smf_upload_to_appcenter`
-This lane uploads the apk to App Center if an `appcenter_id` is defined for the build variant Config.json. :arrow_up:
-```
- "live": {
-       "variant": "productionRelease",
-       "keystore": "Example",
-       "appcenter_id": "ExampleID"
-     }
-```
 
 #### `smf_push_git_tag_release`
 This lane pushes changes to GitHub using the created tag.
@@ -398,11 +366,6 @@ This lane runs flutter unit tests by using flutter command `test`.
 #### `smf_upload_dsyms`
 This lane uploads the symbolication files to sentry. :arrow_up:
 
-#### `smf_pipeline_ios_upload_to_appcenter`
-This lane uploads the IPA to AppCenter. :arrow_up:
-
-#### `smf_pipeline_android_upload_to_appcenter`
-This lane uploads the APK to AppCenter. :arrow_up:
 
 #### `smf_upload_to_itunes`
 This lane uploads the app to Testflight. :arrow_up::airplane:
@@ -458,8 +421,6 @@ This lane uploads the dsyms to sentry.
 #### `smf_pipeline_upload_with_sparkle`
 This lane uploads the dmg with sparkle.
 
-#### `smf_upload_to_appcenter`
-This lane uploads the dmg to AppCenter.
 
 #### `smf_push_git_tag_release`
 This lane pushes changes to GitHub using the created tag. It also creates a GitHub release.
