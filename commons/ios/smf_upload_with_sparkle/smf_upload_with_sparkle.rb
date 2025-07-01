@@ -17,7 +17,7 @@ private_lane :smf_upload_with_sparkle do |options|
   sparkle_private_key = options[:sparkle_private_key]
 
   # If the DMG's Info.plist contains a valid URL for key SMFSUAlternativeFeedURL, we will create a second Sparkle package in a sub-folder named `alternative_channel_directory_name`
-  # Changing this value here will have some impacts on alternative channel URLs for mac apps. See https://smartmobilefactory.atlassian.net/browse/STRMAC-2306
+  # Changing this value here will have some impacts on alternative channel URLs for mac apps. See https://sosimple.atlassian.net/browse/STRMAC-2306
   alternative_channel_directory_name = 'test'
 
   # Optional

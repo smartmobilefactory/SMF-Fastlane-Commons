@@ -15,5 +15,5 @@ smf_create_dmg_from_app(
 
 ### Informations about DMG templates
 
-- Use the Config.json key `dmg_template_path` -> See Config.json documentation at https://smartmobilefactory.atlassian.net/l/c/8fz5gkco
+- Use the Config.json key `dmg_template_path` -> See Config.json documentation at https://sosimple.atlassian.net/l/c/8fz5gkco
 - The template will be copied, and the newly built app will be put in it, keeping the original DMG layout.

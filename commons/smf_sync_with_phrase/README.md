@@ -99,4 +99,4 @@ For iOS, we try to convert the locale file to UTF-8 encoding to prevent wrong in
 
 ### Deprecated Lane `smf_sync_with_phrase_app`
 
-The lane `smf_sync_with_phrase_app` is deprecated. It is kept in the commons for backwards compatibility. If used it sends a deprecation warning to the projects slack channel with a link to a migration [guide](https://smartmobilefactory.atlassian.net/wiki/spaces/SMFCI/pages/2150498338/PhraseApp+CLI+migration).
+The lane `smf_sync_with_phrase_app` is deprecated. It is kept in the commons for backwards compatibility. If used it sends a deprecation warning to the projects slack channel with a link to a migration [guide](https://sosimple.atlassian.net/wiki/spaces/SMFCI/pages/2150498338/PhraseApp+CLI+migration).

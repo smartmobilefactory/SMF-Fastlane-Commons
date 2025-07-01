@@ -40,7 +40,7 @@ In the file `smf_ticket_detection_utils.rb`, an array is defined (`TICKET_BLACKL
 #### The special "ticket"
 Occurrences tags matching `PR-<some number>` are treated at PR references, these tags (with links to the related pull request) are displayed in an extra section in the PR/Changelog
 #### Custom Ticket Links
-The base url which is used to create the ticket links defaults to `https://smartmobilefactory.atlassian.net` which is provided by the lane `smf_super_atlassian_base_urls`. If a project might contain tickets from other atlassian instances, new base urls can be added by overriding the lane `smf_atlassian_base_urls` in the projects Fastfile. For example if the project also contains tickets from the 'dokulino space' one could add the following lines to the projects fastfile:
+The base url which is used to create the ticket links defaults to `https://sosimple.atlassian.net` which is provided by the lane `smf_super_atlassian_base_urls`. If a project might contain tickets from other atlassian instances, new base urls can be added by overriding the lane `smf_atlassian_base_urls` in the projects Fastfile. For example if the project also contains tickets from the 'dokulino space' one could add the following lines to the projects fastfile:
 ```
 override_lane :smf_atlassian_base_urls do
   smf_super_atlassian_base_urls + ['https://dokulinonext.atlassian.net']
