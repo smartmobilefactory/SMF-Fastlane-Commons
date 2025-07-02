@@ -56,25 +56,27 @@ private_lane :smf_super_build do |options|
   match_platform = smf_config_get(build_variant, :match, :platform)
   platform = match_platform.nil? ? default_platform : match_platform
 
-  # If force match was passed as option from jenkins (e.g. manually enabled for the build)
-  # then use it, if its nil or false the value from the config json is used
-  force_match = options[:force_match]
-  force_match ||= smf_config_get(build_variant, :match, :force)
+  if options[:skip_match] == false
+    # If force match was passed as option from jenkins (e.g. manually enabled for the build)
+    # then use it, if its nil or false the value from the config json is used
+    force_match = options[:force_match]
+    force_match ||= smf_config_get(build_variant, :match, :force)
 
-  smf_download_provisioning_profiles(
-    team_id: smf_config_get(build_variant, :team_id),
-    apple_id: smf_config_get(build_variant, :apple_id),
-    use_wildcard_signing: smf_config_get(build_variant, :use_wildcard_signing),
-    bundle_identifier: smf_config_get(build_variant, :bundle_identifier),
-    use_default_match_config: smf_config_get(build_variant, :match).nil?,
-    match_read_only: smf_config_get(build_variant, :match, :read_only),
-    match_type: smf_config_get(build_variant, :match, :type),
-    template_name: smf_config_get(build_variant, :match, :template_name),
-    extensions_suffixes: extension_suffixes,
-    build_variant: build_variant,
-    force: force_match,
-    platform: platform
-  )
+    smf_download_provisioning_profiles(
+      team_id: smf_config_get(build_variant, :team_id),
+      apple_id: smf_config_get(build_variant, :apple_id),
+      use_wildcard_signing: smf_config_get(build_variant, :use_wildcard_signing),
+      bundle_identifier: smf_config_get(build_variant, :bundle_identifier),
+      use_default_match_config: smf_config_get(build_variant, :match).nil?,
+      match_read_only: smf_config_get(build_variant, :match, :read_only),
+      match_type: smf_config_get(build_variant, :match, :type),
+      template_name: smf_config_get(build_variant, :match, :template_name),
+      extensions_suffixes: extension_suffixes,
+      build_variant: build_variant,
+      force: force_match,
+      platform: platform
+    )
+  end
 
   smf_build_apple_app(
     build_variant: build_variant,
@@ -310,6 +312,40 @@ end
 # Upload to AppCenter (Deprecated - AppCenter service discontinued)
 # This functionality has been removed as AppCenter is no longer available
 
+
+#Upload to Firebase
+private_lane :smf_super_upload_to_firebase do |options|
+
+  build_variant = smf_build_variant(options)
+  
+  service_credentials_file = ENV['FIREBASE_CREDENTIALS']
+
+  firebase_app_id = smf_get_firebase_id(build_variant)
+  destinations = smf_config_get(build_variant, :firebase_destinations) || "RWC"
+
+
+  if service_credentials_file.nil?
+    UI.message("Skipping upload to Firebase because Firebase credentials are missing.")
+    return
+  end
+
+  if firebase_app_id.nil?
+    UI.message("Skipping upload to Firebase because Firebase app id is missing.")
+    return
+  end
+
+  smf_ios_upload_to_firebase(
+    build_variant: build_variant,
+    app_id: firebase_app_id,
+    destinations: destinations,
+    escaped_filename: smf_config_get(build_variant, :scheme).gsub(' ', "\ "),
+    path_to_ipa_or_app: smf_path_to_ipa_or_app
+  )
+end
+
+lane :smf_upload_to_firebase do |options|
+  smf_super_upload_to_firebase(options)
+end
 
 # Upload to iTunes
 

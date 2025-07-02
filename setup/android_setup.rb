@@ -163,6 +163,52 @@ end
 # Upload to AppCenter (Deprecated - AppCenter service discontinued)
 # This functionality has been removed as AppCenter is no longer available
 
+#Upload to Firebase
+private_lane :smf_super_upload_to_firebase do |options|
+
+  build_variant = smf_build_variant(options)
+  
+  service_credentials_file = ENV['FIREBASE_CREDENTIALS']
+
+  firebase_app_id = smf_get_firebase_id(build_variant)
+  destinations = smf_config_get(build_variant, :firebase_destinations) || "RWC"
+  apk_file_regex = smf_get_apk_file_regex(build_variant)
+  aab_file_regex = smf_get_aab_file_regex(build_variant)
+
+  UI.message("Regex for binary: #{apk_file_regex}")
+
+  if service_credentials_file.nil?
+    UI.message("Skipping upload to Firebase because Firebase credentials are missing.")
+    return
+  end
+
+  if firebase_app_id.nil?
+    UI.message("Skipping upload to Firebase because Firebase app id is missing.")
+    return
+  end
+
+  aab_path = smf_get_file_path(aab_file_regex)
+  UI.message("Path for AAB binary: #{aab_path}")
+  smf_android_upload_to_firebase(
+    app_id: firebase_app_id,
+    destinations: destinations,
+    android_artifact_path: aab_path,
+    android_artifact_type: "AAB"
+  ) if aab_path != ''
+
+  apk_path = smf_get_file_path(apk_file_regex)
+  UI.message("Path for APK binary: #{apk_path}")
+  smf_android_upload_to_firebase(
+    app_id: firebase_app_id,
+    destinations: destinations,
+    android_artifact_path: apk_path,
+    android_artifact_type: "APK"
+  ) if apk_path != ''
+end
+
+lane :smf_upload_to_firebase do |options|
+  smf_super_upload_to_firebase(options)
+end
 
 # Push Git Tag / Release
 

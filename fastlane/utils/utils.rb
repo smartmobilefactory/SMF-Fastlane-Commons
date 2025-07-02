@@ -39,6 +39,12 @@ def smf_get_build_variant_from_config(build_variant)
   @smf_fastlane_config[:build_variants][build_variant.to_sym][:variant]
 end
 
+def smf_get_firebase_id(build_variant, platform = nil)
+  firebase_id = smf_config_get(build_variant, :firebase_app_id)
+  firebase_id = smf_config_get(build_variant, platform.to_sym, :firebase_app_id) unless platform.nil?
+
+  firebase_id
+end
 
 def smf_get_keystore_folder(build_variant)
 
