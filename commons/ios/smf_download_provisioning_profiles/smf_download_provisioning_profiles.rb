@@ -93,6 +93,12 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
 
   # Create App Store Connect API key if environment variables are available
   api_key = nil
+  
+  # Debug: Check environment variables
+  UI.message("API Key ID set: #{ENV['APP_STORE_CONNECT_API_KEY_ID'] ? 'YES' : 'NO'}")
+  UI.message("API Key Issuer ID set: #{ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'] ? 'YES' : 'NO'}")
+  UI.message("API Key Path set: #{ENV['APP_STORE_CONNECT_API_KEY_PATH'] ? 'YES' : 'NO'}")
+  
   if ENV['APP_STORE_CONNECT_API_KEY_ID'] && ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'] && ENV['APP_STORE_CONNECT_API_KEY_PATH']
     UI.message('Using App Store Connect API key for provisioning profiles')
     api_key = app_store_connect_api_key(
