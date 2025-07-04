@@ -14,6 +14,21 @@ private_lane :smf_upload_to_testflight do |options|
   skip_waiting_for_build_processing = options[:skip_waiting_for_build_processing] == true
   itc_platform = options[:itc_platform]
 
+  # Create App Store Connect API key if environment variables are available
+  api_key = nil
+  if ENV['APP_STORE_CONNECT_API_KEY_ID'] && ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'] && ENV['APP_STORE_CONNECT_API_KEY_PATH']
+    UI.message('Using App Store Connect API key for authentication')
+    api_key = app_store_connect_api_key(
+      key_id: ENV['APP_STORE_CONNECT_API_KEY_ID'],
+      issuer_id: ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'],
+      key_filepath: ENV['APP_STORE_CONNECT_API_KEY_PATH'],
+      duration: 1200,
+      in_house: false
+    )
+  else
+    UI.message('Using username/password authentication (fallback)')
+  end
+
   ENV["FASTLANE_ITC_TEAM_ID"] = itc_team_id
 
   smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
@@ -29,7 +44,8 @@ private_lane :smf_upload_to_testflight do |options|
   upload_to_testflight(
       apple_id: itc_apple_id,
       team_id: itc_team_id,
-      username: username,
+      api_key: api_key,
+      username: api_key ? nil : username,
       skip_waiting_for_build_processing: skip_waiting_for_build_processing,
       ipa: smf_path_to_ipa_or_app.gsub('.zip', ''),
       app_platform: itc_platform
@@ -40,8 +56,21 @@ def _smf_itunes_precheck(build_variant, slack_channel, bundle_identifier, userna
 
   begin
 
+    # Create API key for precheck if available
+    api_key_for_precheck = nil
+    if ENV['APP_STORE_CONNECT_API_KEY_ID'] && ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'] && ENV['APP_STORE_CONNECT_API_KEY_PATH']
+      api_key_for_precheck = app_store_connect_api_key(
+        key_id: ENV['APP_STORE_CONNECT_API_KEY_ID'],
+        issuer_id: ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'],
+        key_filepath: ENV['APP_STORE_CONNECT_API_KEY_PATH'],
+        duration: 1200,
+        in_house: false
+      )
+    end
+
     precheck(
-        username: username.nil? ? nil : username,
+        api_key: api_key_for_precheck,
+        username: api_key_for_precheck ? nil : username,
         app_identifier: bundle_identifier
     )
 

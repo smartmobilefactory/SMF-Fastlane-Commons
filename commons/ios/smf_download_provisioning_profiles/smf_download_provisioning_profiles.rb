@@ -91,11 +91,27 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
     raise "Error username or team id for fastlane match is nil"
   end
 
+  # Create App Store Connect API key if environment variables are available
+  api_key = nil
+  if ENV['APP_STORE_CONNECT_API_KEY_ID'] && ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'] && ENV['APP_STORE_CONNECT_API_KEY_PATH']
+    UI.message('Using App Store Connect API key for provisioning profiles')
+    api_key = app_store_connect_api_key(
+      key_id: ENV['APP_STORE_CONNECT_API_KEY_ID'],
+      issuer_id: ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'],
+      key_filepath: ENV['APP_STORE_CONNECT_API_KEY_PATH'],
+      duration: 1200,
+      in_house: false
+    )
+  else
+    UI.message('Using username/password authentication for provisioning profiles (fallback)')
+  end
+
   match(
     type: type,
     readonly: read_only,
     app_identifier: [app_identifier],
-    username: apple_id,
+    api_key: api_key,
+    username: api_key ? nil : apple_id,
     team_id: team_id,
     git_url: git_url,
     git_branch: team_id,
@@ -110,7 +126,8 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
     type: type,
     readonly: read_only,
     app_identifier: extension_identifiers,
-    username: apple_id,
+    api_key: api_key,
+    username: api_key ? nil : apple_id,
     team_id: team_id,
     git_url: git_url,
     git_branch: team_id,

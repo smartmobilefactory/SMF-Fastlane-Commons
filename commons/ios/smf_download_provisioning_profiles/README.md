@@ -2,6 +2,17 @@
 Fastlane match handles the provisioning profiles for each app. This lane is used to download and setup the correct profiles and certificates 
 to be used for building the app with the smf_build_apple_app lane.
 
+## Authentication
+
+This lane supports both modern App Store Connect API key authentication and legacy username/password authentication:
+
+1. **App Store Connect API Key (Recommended)**: If the following environment variables are set, the lane will use API key authentication:
+   - `APP_STORE_CONNECT_API_KEY_ID`
+   - `APP_STORE_CONNECT_API_KEY_ISSUER_ID`
+   - `APP_STORE_CONNECT_API_KEY_PATH`
+
+2. **Username/Password (Fallback)**: If API key environment variables are not available, the lane falls back to username/password authentication using the provided `apple_id` or the default `development@smfhq.com`.
+
 There are basically two cases for the match call:
 
 1. There is no match entry in the project Config.json. In this case it will be checked whether the job is an enterprise build. 
