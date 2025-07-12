@@ -463,10 +463,10 @@ end
 
 # Helper function to get release notes for marketing version
 def get_release_notes_for_version(marketing_version)
-  changelog_file = "fastlane/metadata/android/en-US/changelogs/#{marketing_version}.txt"
+  changelog_file = "fastlane/metadata/android/changelogs/#{marketing_version}.xml"
   
   if File.exist?(changelog_file)
-    UI.message("Found release notes file: #{changelog_file}")
+    UI.message("Found multilingual release notes: #{changelog_file}")
     return File.read(changelog_file).strip
   else
     UI.message("No release notes file found: #{changelog_file}")
