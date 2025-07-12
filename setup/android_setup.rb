@@ -550,6 +550,21 @@ def convert_xml_to_fastlane_changelogs(xml_content, build_variant)
   require 'rexml/document'
   require 'fileutils'
   
+  # Mapping from XML locale tags to Google Play Store locale codes
+  locale_mapping = {
+    'en-US' => 'en-US',
+    'de-DE' => 'de-DE',
+    'es-ES' => 'es-ES',
+    'fr-FR' => 'fr-FR',
+    'pl-PL' => 'pl-PL',
+    'bg-BG' => 'bg',      # Bulgarian - Google Play uses 'bg' not 'bg-BG'
+    'hr-HR' => 'hr',      # Croatian - Google Play uses 'hr' not 'hr-HR'
+    'hu-HU' => 'hu-HU',
+    'ru-RU' => 'ru-RU',
+    'sk-SK' => 'sk',      # Slovak - Google Play uses 'sk' not 'sk-SK'
+    'tr-TR' => 'tr-TR'
+  }
+  
   begin
     # Get version code for Fastlane structure
     version_code = smf_get_build_number_of_app
@@ -566,20 +581,27 @@ def convert_xml_to_fastlane_changelogs(xml_content, build_variant)
     
     # Extract each language and create corresponding changelog file
     xml_doc.root.elements.each do |element|
-      locale = element.name
+      xml_locale = element.name
       text = element.text&.strip
       
       next if text.nil? || text.empty?
       
+      # Map XML locale to Google Play locale
+      google_play_locale = locale_mapping[xml_locale]
+      if google_play_locale.nil?
+        UI.message("⚠️ Skipping unsupported locale: #{xml_locale}")
+        next
+      end
+      
       # Create locale directory and changelog file
-      locale_dir = File.join(metadata_dir, locale, 'changelogs')
+      locale_dir = File.join(metadata_dir, google_play_locale, 'changelogs')
       FileUtils.mkdir_p(locale_dir)
       
       changelog_file = File.join(locale_dir, "#{version_code}.txt")
       File.write(changelog_file, text)
       
       created_files << changelog_file
-      UI.message("📝 Created changelog: #{changelog_file}")
+      UI.message("📝 Created changelog: #{changelog_file} (#{xml_locale} → #{google_play_locale})")
     end
     
     if created_files.empty?
