@@ -260,9 +260,9 @@ lane :smf_send_slack_notification do |options|
   smf_super_send_slack_notification(options)
 end
 
-desc "Upload Android app to Google Play Store"
-
-private_lane :smf_super_upload_to_play_store do |options|
+# TODO: Legacy implementation - consider removing after migration to commons version
+desc "Upload Android app to Google Play Store (Legacy)"
+private_lane :smf_super_upload_to_play_store_legacy do |options|
   build_variant = options[:build_variant]
   
   # Get configuration from Config.json
@@ -422,7 +422,10 @@ def smf_get_package_name_from_variant(build_variant)
   end
 end
 
+# This lane delegates to the commons implementation
+# Remove the legacy implementation after confirming commons version works
 lane :smf_upload_to_play_store do |options|
+  # Use commons implementation instead of legacy
   smf_super_upload_to_play_store(options)
 end
 
