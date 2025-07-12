@@ -310,9 +310,10 @@ private_lane :smf_super_upload_to_play_store do |options|
       package_name: package_name,
       track: google_play_track,
       json_key: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON'],
-      release_status: 'completed',
+      release_status: 'draft',
       rollout: get_rollout_percentage(google_play_track).to_s,
       skip_upload_metadata: true,
+      changelogs_path: 'fastlane/metadata/android',
       skip_upload_changelogs: false,
       skip_upload_images: true,
       skip_upload_screenshots: true
@@ -375,6 +376,8 @@ def get_rollout_percentage(track)
     0.5  # 50% rollout for beta
   when 'production'
     0.1  # 10% rollout for production
+  when 'internal'
+    1.0  # 100% for internal testing
   else
     1.0  # Default to 100%
   end
