@@ -307,7 +307,13 @@ private_lane :smf_super_upload_to_play_store do |options|
   begin
     # Get marketing version for release notes
     marketing_version = smf_get_version_name
-    release_notes = get_release_notes_for_version(marketing_version)
+    release_notes_xml = get_release_notes_for_version(marketing_version)
+    
+    # Convert XML release notes to Fastlane structure if available
+    has_release_notes = false
+    if release_notes_xml
+      has_release_notes = convert_xml_to_fastlane_changelogs(release_notes_xml, build_variant)
+    end
     
     # Prepare upload parameters
     upload_params = {
@@ -316,7 +322,7 @@ private_lane :smf_super_upload_to_play_store do |options|
       json_key: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON'],
       release_status: 'draft',
       skip_upload_metadata: true,
-      skip_upload_changelogs: release_notes.nil?,
+      skip_upload_changelogs: !has_release_notes,
       skip_upload_images: true,
       skip_upload_screenshots: true
     }
@@ -330,10 +336,9 @@ private_lane :smf_super_upload_to_play_store do |options|
       UI.message("🎯 Rollout: Not applicable for #{google_play_track} track with draft status")
     end
     
-    # Add release notes if available
-    if release_notes
+    # Log release notes status
+    if has_release_notes
       UI.message("📝 Using release notes for version #{marketing_version}")
-      upload_params[:release_notes] = release_notes
     else
       UI.message("📝 No release notes found for version #{marketing_version}")
     end
@@ -538,6 +543,57 @@ def get_release_notes_for_version(marketing_version)
   
   UI.message("No release notes file found in any of these paths: #{changelog_paths.join(', ')}")
   return nil
+end
+
+# Helper function to convert XML release notes to Fastlane changelog structure
+def convert_xml_to_fastlane_changelogs(xml_content, build_variant)
+  require 'rexml/document'
+  require 'fileutils'
+  
+  begin
+    # Get version code for Fastlane structure
+    version_code = smf_get_build_number_of_app
+    UI.message("🔢 Using version code: #{version_code}")
+    
+    # Parse XML content
+    xml_doc = REXML::Document.new("<root>#{xml_content}</root>")
+    
+    # Create metadata directory structure
+    metadata_dir = 'metadata/android'
+    FileUtils.mkdir_p(metadata_dir)
+    
+    created_files = []
+    
+    # Extract each language and create corresponding changelog file
+    xml_doc.root.elements.each do |element|
+      locale = element.name
+      text = element.text&.strip
+      
+      next if text.nil? || text.empty?
+      
+      # Create locale directory and changelog file
+      locale_dir = File.join(metadata_dir, locale, 'changelogs')
+      FileUtils.mkdir_p(locale_dir)
+      
+      changelog_file = File.join(locale_dir, "#{version_code}.txt")
+      File.write(changelog_file, text)
+      
+      created_files << changelog_file
+      UI.message("📝 Created changelog: #{changelog_file}")
+    end
+    
+    if created_files.empty?
+      UI.message("⚠️ No valid locales found in XML")
+      return false
+    end
+    
+    UI.message("✅ Successfully converted XML to #{created_files.length} Fastlane changelog files")
+    return true
+    
+  rescue => e
+    UI.error("❌ Failed to convert XML release notes: #{e.message}")
+    return false
+  end
 end
 
 # Helper function to get package name from build variant
