@@ -416,49 +416,94 @@ end
 
 # Helper function to get marketing version name from build.gradle
 def smf_get_version_name
-  begin
-    # Read from build.gradle file
-    build_gradle = File.read('app/build.gradle')
-    UI.message("🔍 Reading version from build.gradle...")
-    
-    # Try multiple patterns for Kotlin DSL and Groovy
-    patterns = [
-      /versionName\s+"([^"]+)"/,           # versionName "2.3.2"
-      /versionName\s+'([^']+)'/,           # versionName '2.3.2'
-      /versionName\s*=\s*"([^"]+)"/,       # versionName = "2.3.2"
-      /versionName\s*=\s*'([^']+)'/        # versionName = '2.3.2'
-    ]
-    
-    patterns.each do |pattern|
-      match = build_gradle.match(pattern)
-      if match
-        version_name = match.captures.first
-        UI.message("✅ Found version: #{version_name}")
+  # Get current working directory for debugging
+  current_dir = Dir.pwd
+  UI.message("🔍 Current directory: #{current_dir}")
+  
+  # List all files in current directory for debugging
+  UI.message("📁 Directory contents: #{Dir.entries(current_dir).join(', ')}")
+  
+  # Try to find build.gradle in comprehensive locations
+  build_gradle_paths = [
+    'app/build.gradle',
+    'app/build.gradle.kts',
+    './app/build.gradle',
+    './app/build.gradle.kts',
+    File.join(current_dir, 'app', 'build.gradle'),
+    File.join(current_dir, 'app', 'build.gradle.kts'),
+    # Additional paths for different Jenkins workspace structures
+    'build.gradle',
+    './build.gradle',
+    File.join(current_dir, 'build.gradle')
+  ]
+  
+  # Also search recursively for build.gradle files
+  Dir.glob('**/build.gradle*').each do |file|
+    build_gradle_paths << file unless build_gradle_paths.include?(file)
+  end
+  
+  build_gradle_paths.each do |path|
+    begin
+      if File.exist?(path)
+        UI.message("📄 Reading version from: #{path}")
+        build_gradle = File.read(path)
+        
+        # Try multiple patterns for Kotlin DSL and Groovy
+        patterns = [
+          /versionName\s+"([^"]+)"/,           # versionName "2.3.2"
+          /versionName\s+'([^']+)'/,           # versionName '2.3.2'
+          /versionName\s*=\s*"([^"]+)"/,       # versionName = "2.3.2"
+          /versionName\s*=\s*'([^']+)'/        # versionName = '2.3.2'
+        ]
+        
+        patterns.each do |pattern|
+          match = build_gradle.match(pattern)
+          if match
+            version_name = match.captures.first
+            UI.message("✅ Found version: #{version_name} in #{path}")
+            return version_name
+          end
+        end
+        
+        UI.message("⚠️ No versionName pattern matched in #{path}")
+      else
+        UI.message("📄 File not found: #{path}")
+      end
+    rescue => e
+      UI.message("❌ Error reading #{path}: #{e.message}")
+    end
+  end
+  
+  # Fallback to gradle.properties in multiple locations
+  gradle_properties_paths = [
+    'gradle.properties',
+    './gradle.properties',
+    File.join(current_dir, 'gradle.properties'),
+    'app/gradle.properties',
+    './app/gradle.properties',
+    File.join(current_dir, 'app', 'gradle.properties')
+  ]
+  
+  # Also search recursively for gradle.properties files
+  Dir.glob('**/gradle.properties').each do |file|
+    gradle_properties_paths << file unless gradle_properties_paths.include?(file)
+  end
+  
+  gradle_properties_paths.each do |path|
+    begin
+      if File.exist?(path) && File.read(path).include?('versionName')
+        gradle_properties = File.read(path)
+        version_name = gradle_properties.match(/versionName\s*=\s*(.+)/)&.captures&.first&.strip&.gsub(/["']/, '')
+        UI.message("✅ Found version in gradle.properties: #{version_name}")
         return version_name
       end
+    rescue => e
+      UI.message("⚠️ Could not read #{path}: #{e.message}")
     end
-    
-    UI.message("⚠️ No versionName pattern matched in build.gradle")
-    
-  rescue => e
-    UI.message("❌ Error reading build.gradle: #{e.message}")
   end
   
-  # Fallback to gradle.properties
-  begin
-    gradle_properties = File.read('gradle.properties')
-    if gradle_properties.include?('versionName')
-      version_name = gradle_properties.match(/versionName\s*=\s*(.+)/)&.captures&.first&.strip&.gsub(/["']/, '')
-      UI.message("✅ Found version in gradle.properties: #{version_name}")
-      return version_name
-    end
-  rescue => e
-    UI.message("⚠️ Could not read gradle.properties: #{e.message}")
-  end
-  
-  # Final fallback
-  UI.message("❌ Using fallback version: unknown")
-  "unknown"
+  # No version found - raise error instead of fallback
+  UI.user_error!("❌ Could not find versionName in any build.gradle or gradle.properties files. Please ensure your Android project has a valid versionName defined.")
 end
 
 # Helper function to get release notes for marketing version
