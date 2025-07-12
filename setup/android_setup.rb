@@ -1,5 +1,4 @@
 
-
 ########## PULLREQUEST CHECK LANES ##########
 
 # Setup Dependencies
@@ -262,6 +261,7 @@ lane :smf_send_slack_notification do |options|
 end
 
 desc "Upload Android app to Google Play Store"
+
 private_lane :smf_super_upload_to_play_store do |options|
   build_variant = options[:build_variant]
   
