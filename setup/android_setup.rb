@@ -416,18 +416,49 @@ end
 
 # Helper function to get marketing version name from build.gradle
 def smf_get_version_name
-  # Read from build.gradle file
-  build_gradle = File.read('app/build.gradle') rescue ''
-  version_name = build_gradle.match(/versionName\s+["'](.+)["']/)&.captures&.first
+  begin
+    # Read from build.gradle file
+    build_gradle = File.read('app/build.gradle')
+    UI.message("🔍 Reading version from build.gradle...")
+    
+    # Try multiple patterns for Kotlin DSL and Groovy
+    patterns = [
+      /versionName\s+"([^"]+)"/,           # versionName "2.3.2"
+      /versionName\s+'([^']+)'/,           # versionName '2.3.2'
+      /versionName\s*=\s*"([^"]+)"/,       # versionName = "2.3.2"
+      /versionName\s*=\s*'([^']+)'/        # versionName = '2.3.2'
+    ]
+    
+    patterns.each do |pattern|
+      match = build_gradle.match(pattern)
+      if match
+        version_name = match.captures.first
+        UI.message("✅ Found version: #{version_name}")
+        return version_name
+      end
+    end
+    
+    UI.message("⚠️ No versionName pattern matched in build.gradle")
+    
+  rescue => e
+    UI.message("❌ Error reading build.gradle: #{e.message}")
+  end
   
   # Fallback to gradle.properties
-  if version_name.nil?
-    gradle_properties = File.read('gradle.properties') rescue ''
-    version_name = gradle_properties.match(/versionName\s*=\s*(.+)/)&.captures&.first&.strip&.gsub(/["']/, '') if gradle_properties.include?('versionName')
+  begin
+    gradle_properties = File.read('gradle.properties')
+    if gradle_properties.include?('versionName')
+      version_name = gradle_properties.match(/versionName\s*=\s*(.+)/)&.captures&.first&.strip&.gsub(/["']/, '')
+      UI.message("✅ Found version in gradle.properties: #{version_name}")
+      return version_name
+    end
+  rescue => e
+    UI.message("⚠️ Could not read gradle.properties: #{e.message}")
   end
   
   # Final fallback
-  version_name || "unknown"
+  UI.message("❌ Using fallback version: unknown")
+  "unknown"
 end
 
 # Helper function to get release notes for marketing version
