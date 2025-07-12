@@ -311,7 +311,7 @@ private_lane :smf_super_upload_to_play_store do |options|
       track: google_play_track,
       json_key: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON'],
       release_status: 'completed',
-      rollout: get_rollout_percentage(google_play_track),
+      rollout: get_rollout_percentage(google_play_track).to_s,
       skip_upload_metadata: true,
       skip_upload_changelogs: false,
       skip_upload_images: true,
