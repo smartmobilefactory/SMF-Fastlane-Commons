@@ -315,12 +315,20 @@ private_lane :smf_super_upload_to_play_store do |options|
       track: google_play_track,
       json_key: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON'],
       release_status: 'draft',
-      rollout: get_rollout_percentage(google_play_track).to_s,
       skip_upload_metadata: true,
       skip_upload_changelogs: release_notes.nil?,
       skip_upload_images: true,
       skip_upload_screenshots: true
     }
+    
+    # Add rollout percentage only for tracks that support it and when not draft
+    if should_include_rollout(google_play_track, 'draft')
+      rollout_percentage = get_rollout_percentage(google_play_track).to_s
+      upload_params[:rollout] = rollout_percentage
+      UI.message("🎯 Rollout: #{rollout_percentage}")
+    else
+      UI.message("🎯 Rollout: Not applicable for #{google_play_track} track with draft status")
+    end
     
     # Add release notes if available
     if release_notes
@@ -374,6 +382,18 @@ def find_best_upload_file(build_variant)
   
   # No suitable file found
   return nil
+end
+
+# Helper function to determine if rollout should be included
+def should_include_rollout(track, release_status)
+  # Draft releases don't support rollout percentage
+  return false if release_status == 'draft'
+  
+  # Internal testing doesn't typically use rollout
+  return false if track == 'internal'
+  
+  # Alpha, beta, and production tracks support rollout when not draft
+  ['alpha', 'beta', 'production'].include?(track)
 end
 
 # Helper function to get rollout percentage based on track
