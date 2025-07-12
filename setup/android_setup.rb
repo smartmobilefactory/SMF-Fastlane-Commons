@@ -305,6 +305,10 @@ private_lane :smf_super_upload_to_play_store do |options|
   UI.message("ℹ️  Detection: #{upload_file_info[:detection_reason]}")
   
   begin
+    # Get marketing version for release notes
+    marketing_version = smf_get_version_name
+    release_notes = get_release_notes_for_version(marketing_version)
+    
     # Prepare upload parameters
     upload_params = {
       package_name: package_name,
@@ -313,11 +317,18 @@ private_lane :smf_super_upload_to_play_store do |options|
       release_status: 'draft',
       rollout: get_rollout_percentage(google_play_track).to_s,
       skip_upload_metadata: true,
-      changelogs_path: 'fastlane/metadata/android',
-      skip_upload_changelogs: false,
+      skip_upload_changelogs: release_notes.nil?,
       skip_upload_images: true,
       skip_upload_screenshots: true
     }
+    
+    # Add release notes if available
+    if release_notes
+      UI.message("📝 Using release notes for version #{marketing_version}")
+      upload_params[:release_notes] = release_notes
+    else
+      UI.message("📝 No release notes found for version #{marketing_version}")
+    end
     
     # Add the appropriate file parameter
     if file_type == "AAB"
@@ -380,6 +391,19 @@ def get_rollout_percentage(track)
     1.0  # 100% for internal testing
   else
     1.0  # Default to 100%
+  end
+end
+
+# Helper function to get release notes for marketing version
+def get_release_notes_for_version(marketing_version)
+  changelog_file = "fastlane/metadata/android/en-US/changelogs/#{marketing_version}.txt"
+  
+  if File.exist?(changelog_file)
+    UI.message("Found release notes file: #{changelog_file}")
+    return File.read(changelog_file).strip
+  else
+    UI.message("No release notes file found: #{changelog_file}")
+    return nil
   end
 end
 
