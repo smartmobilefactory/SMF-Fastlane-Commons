@@ -434,7 +434,15 @@ def smf_get_version_name
     # Additional paths for different Jenkins workspace structures
     'build.gradle',
     './build.gradle',
-    File.join(current_dir, 'build.gradle')
+    File.join(current_dir, 'build.gradle'),
+    # Go up one directory from fastlane folder
+    '../app/build.gradle',
+    '../app/build.gradle.kts',
+    File.join(current_dir, '..', 'app', 'build.gradle'),
+    File.join(current_dir, '..', 'app', 'build.gradle.kts'),
+    '../build.gradle',
+    '../build.gradle.kts',
+    File.join(current_dir, '..', 'build.gradle')
   ]
   
   # Also search recursively for build.gradle files
@@ -481,7 +489,12 @@ def smf_get_version_name
     File.join(current_dir, 'gradle.properties'),
     'app/gradle.properties',
     './app/gradle.properties',
-    File.join(current_dir, 'app', 'gradle.properties')
+    File.join(current_dir, 'app', 'gradle.properties'),
+    # Go up one directory from fastlane folder
+    '../gradle.properties',
+    '../app/gradle.properties',
+    File.join(current_dir, '..', 'gradle.properties'),
+    File.join(current_dir, '..', 'app', 'gradle.properties')
   ]
   
   # Also search recursively for gradle.properties files
