@@ -394,6 +394,22 @@ def get_rollout_percentage(track)
   end
 end
 
+# Helper function to get marketing version name from build.gradle
+def smf_get_version_name
+  # Read from build.gradle file
+  build_gradle = File.read('app/build.gradle') rescue ''
+  version_name = build_gradle.match(/versionName\s+["'](.+)["']/)&.captures&.first
+  
+  # Fallback to gradle.properties
+  if version_name.nil?
+    gradle_properties = File.read('gradle.properties') rescue ''
+    version_name = gradle_properties.match(/versionName\s*=\s*(.+)/)&.captures&.first&.strip&.gsub(/["']/, '') if gradle_properties.include?('versionName')
+  end
+  
+  # Final fallback
+  version_name || "unknown"
+end
+
 # Helper function to get release notes for marketing version
 def get_release_notes_for_version(marketing_version)
   changelog_file = "fastlane/metadata/android/en-US/changelogs/#{marketing_version}.txt"
