@@ -1,4 +1,6 @@
 
+import '../commons/smf_upload_to_play_store/smf_upload_to_play_store.rb'
+
 ########## PULLREQUEST CHECK LANES ##########
 
 # Setup Dependencies
@@ -258,4 +260,26 @@ end
 
 lane :smf_send_slack_notification do |options|
   smf_super_send_slack_notification(options)
+end
+
+desc "Upload Android app to Google Play Store"
+lane :smf_upload_to_play_store do |options|
+  smf_super_upload_to_play_store(options)
+end
+
+desc "Upload Android app to both Firebase and Google Play Store"
+lane :smf_upload_to_all_platforms do |options|
+  build_variant = options[:build_variant]
+  
+  # Upload to Firebase App Distribution
+  if smf_config_get(build_variant, :firebase_app_id)
+    UI.message("🔥 Uploading to Firebase App Distribution...")
+    smf_upload_to_firebase(options)
+  end
+  
+  # Upload to Google Play Store
+  if smf_config_get(build_variant, :google_play_upload)
+    UI.message("🎯 Uploading to Google Play Store...")
+    smf_upload_to_play_store(options)
+  end
 end
