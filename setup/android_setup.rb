@@ -521,15 +521,23 @@ end
 
 # Helper function to get release notes for marketing version
 def get_release_notes_for_version(marketing_version)
-  changelog_file = "fastlane/metadata/android/changelogs/#{marketing_version}.xml"
+  # Try multiple possible paths for release notes
+  changelog_paths = [
+    "metadata/android/changelogs/#{marketing_version}.xml",
+    "fastlane/metadata/android/changelogs/#{marketing_version}.xml",
+    "./metadata/android/changelogs/#{marketing_version}.xml",
+    "../fastlane/metadata/android/changelogs/#{marketing_version}.xml"
+  ]
   
-  if File.exist?(changelog_file)
-    UI.message("Found multilingual release notes: #{changelog_file}")
-    return File.read(changelog_file).strip
-  else
-    UI.message("No release notes file found: #{changelog_file}")
-    return nil
+  changelog_paths.each do |changelog_file|
+    if File.exist?(changelog_file)
+      UI.message("Found multilingual release notes: #{changelog_file}")
+      return File.read(changelog_file).strip
+    end
   end
+  
+  UI.message("No release notes file found in any of these paths: #{changelog_paths.join(', ')}")
+  return nil
 end
 
 # Helper function to get package name from build variant
