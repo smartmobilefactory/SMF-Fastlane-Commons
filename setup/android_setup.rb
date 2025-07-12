@@ -1,5 +1,4 @@
 
-import '../commons/smf_upload_to_play_store/smf_upload_to_play_store.rb'
 
 ########## PULLREQUEST CHECK LANES ##########
 
