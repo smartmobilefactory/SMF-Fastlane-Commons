@@ -268,7 +268,7 @@ private_lane :smf_super_upload_to_play_store do |options|
   # Get configuration from Config.json
   google_play_track = smf_config_get(build_variant, :google_play_track)
   google_play_upload = smf_config_get(build_variant, :google_play_upload)
-  google_play_service_account = smf_config_get(:google_play_service_account_json)
+  google_play_service_account = smf_config_get(nil, :google_play_service_account_json)
   
   # Skip if Google Play upload is disabled for this variant
   unless google_play_upload
