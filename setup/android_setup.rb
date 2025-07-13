@@ -309,11 +309,8 @@ private_lane :smf_super_upload_to_play_store do |options|
     marketing_version = smf_get_version_name
     release_notes_xml = get_release_notes_for_version(marketing_version)
     
-    # Convert XML release notes to Fastlane structure if available
-    has_release_notes = false
-    if release_notes_xml
-      has_release_notes = convert_xml_to_fastlane_changelogs(release_notes_xml, build_variant)
-    end
+    # Use XML release notes directly if available
+    has_release_notes = !release_notes_xml.nil?
     
     # Prepare upload parameters
     upload_params = {
@@ -322,10 +319,15 @@ private_lane :smf_super_upload_to_play_store do |options|
       json_key: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON'],
       release_status: 'draft',
       skip_upload_metadata: true,
-      skip_upload_changelogs: !has_release_notes,
+      skip_upload_changelogs: true,  # Always skip, we use release_notes parameter instead
       skip_upload_images: true,
       skip_upload_screenshots: true
     }
+    
+    # Add release notes directly as XML if available
+    if has_release_notes
+      upload_params[:release_notes] = release_notes_xml
+    end
     
     # Add rollout percentage only for tracks that support it and when not draft
     if should_include_rollout(google_play_track, 'draft')
@@ -545,78 +547,6 @@ def get_release_notes_for_version(marketing_version)
   return nil
 end
 
-# Helper function to convert XML release notes to Fastlane changelog structure
-def convert_xml_to_fastlane_changelogs(xml_content, build_variant)
-  require 'rexml/document'
-  require 'fileutils'
-  
-  # Mapping from XML locale tags to Google Play Store locale codes
-  locale_mapping = {
-    'en-US' => 'en-US',
-    'de-DE' => 'de-DE',
-    'es-ES' => 'es-ES',
-    'fr-FR' => 'fr-FR',
-    'pl-PL' => 'pl-PL',
-    'bg-BG' => 'bg',      # Bulgarian - Google Play uses 'bg' not 'bg-BG'
-    'hr-HR' => 'hr',      # Croatian - Google Play uses 'hr' not 'hr-HR'
-    'hu-HU' => 'hu-HU',
-    'ru-RU' => 'ru-RU',
-    'sk-SK' => 'sk',      # Slovak - Google Play uses 'sk' not 'sk-SK'
-    'tr-TR' => 'tr-TR'
-  }
-  
-  begin
-    # Get version code for Fastlane structure
-    version_code = smf_get_build_number_of_app
-    UI.message("🔢 Using version code: #{version_code}")
-    
-    # Parse XML content
-    xml_doc = REXML::Document.new("<root>#{xml_content}</root>")
-    
-    # Create metadata directory structure
-    metadata_dir = 'metadata/android'
-    FileUtils.mkdir_p(metadata_dir)
-    
-    created_files = []
-    
-    # Extract each language and create corresponding changelog file
-    xml_doc.root.elements.each do |element|
-      xml_locale = element.name
-      text = element.text&.strip
-      
-      next if text.nil? || text.empty?
-      
-      # Map XML locale to Google Play locale
-      google_play_locale = locale_mapping[xml_locale]
-      if google_play_locale.nil?
-        UI.message("⚠️ Skipping unsupported locale: #{xml_locale}")
-        next
-      end
-      
-      # Create locale directory and changelog file
-      locale_dir = File.join(metadata_dir, google_play_locale, 'changelogs')
-      FileUtils.mkdir_p(locale_dir)
-      
-      changelog_file = File.join(locale_dir, "#{version_code}.txt")
-      File.write(changelog_file, text)
-      
-      created_files << changelog_file
-      UI.message("📝 Created changelog: #{changelog_file} (#{xml_locale} → #{google_play_locale})")
-    end
-    
-    if created_files.empty?
-      UI.message("⚠️ No valid locales found in XML")
-      return false
-    end
-    
-    UI.message("✅ Successfully converted XML to #{created_files.length} Fastlane changelog files")
-    return true
-    
-  rescue => e
-    UI.error("❌ Failed to convert XML release notes: #{e.message}")
-    return false
-  end
-end
 
 # Helper function to get package name from build variant
 def smf_get_package_name_from_variant(build_variant)
