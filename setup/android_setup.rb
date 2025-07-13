@@ -309,11 +309,9 @@ private_lane :smf_super_upload_to_play_store do |options|
     marketing_version = smf_get_version_name
     release_notes_xml = get_release_notes_for_version(marketing_version)
     
-    # Copy XML release notes to Fastlane's default changelog location if available
-    has_release_notes = false
-    if release_notes_xml
-      has_release_notes = copy_xml_to_default_changelog(release_notes_xml)
-    end
+    # Skip automated release notes upload - add manually in Google Play Console if needed
+    UI.message("📝 Skipping automated release notes upload")
+    UI.message("💡 Add release notes manually in Google Play Console for better control")
     
     # Prepare upload parameters
     upload_params = {
@@ -322,7 +320,7 @@ private_lane :smf_super_upload_to_play_store do |options|
       json_key: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON'],
       release_status: 'draft',
       skip_upload_metadata: true,
-      skip_upload_changelogs: !has_release_notes,
+      skip_upload_changelogs: true,  # Always skip to avoid Fastlane structure conflicts
       skip_upload_images: true,
       skip_upload_screenshots: true
     }
