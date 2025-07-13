@@ -309,8 +309,11 @@ private_lane :smf_super_upload_to_play_store do |options|
     marketing_version = smf_get_version_name
     release_notes_xml = get_release_notes_for_version(marketing_version)
     
-    # Use XML release notes directly if available
-    has_release_notes = !release_notes_xml.nil?
+    # Copy XML release notes to Fastlane's default changelog location if available
+    has_release_notes = false
+    if release_notes_xml
+      has_release_notes = copy_xml_to_default_changelog(release_notes_xml)
+    end
     
     # Prepare upload parameters
     upload_params = {
@@ -319,15 +322,10 @@ private_lane :smf_super_upload_to_play_store do |options|
       json_key: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON'],
       release_status: 'draft',
       skip_upload_metadata: true,
-      skip_upload_changelogs: true,  # Always skip, we use release_notes parameter instead
+      skip_upload_changelogs: !has_release_notes,
       skip_upload_images: true,
       skip_upload_screenshots: true
     }
-    
-    # Add release notes directly as XML if available
-    if has_release_notes
-      upload_params[:release_notes] = release_notes_xml
-    end
     
     # Add rollout percentage only for tracks that support it and when not draft
     if should_include_rollout(google_play_track, 'draft')
@@ -547,6 +545,29 @@ def get_release_notes_for_version(marketing_version)
   return nil
 end
 
+# Helper function to copy XML to Fastlane's default changelog location
+def copy_xml_to_default_changelog(xml_content)
+  require 'fileutils'
+  
+  begin
+    # Create metadata directory structure
+    changelog_dir = 'metadata/android/changelogs'
+    FileUtils.mkdir_p(changelog_dir)
+    
+    # Write XML content to default.txt for Fastlane to find
+    default_changelog = File.join(changelog_dir, 'default.txt')
+    File.write(default_changelog, xml_content)
+    
+    UI.message("📝 Created default changelog: #{default_changelog}")
+    UI.message("📋 XML content ready for Google Play")
+    
+    return true
+    
+  rescue => e
+    UI.error("❌ Failed to create default changelog: #{e.message}")
+    return false
+  end
+end
 
 # Helper function to get package name from build variant
 def smf_get_package_name_from_variant(build_variant)
