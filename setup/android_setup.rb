@@ -526,12 +526,12 @@ end
 
 # Helper function to get release notes for marketing version
 def get_release_notes_for_version(marketing_version)
-  # Try multiple possible paths for release notes
+  # Try multiple possible paths for release notes (avoiding metadata/ to prevent Fastlane conflicts)
   changelog_paths = [
-    "metadata/android/changelogs/#{marketing_version}.xml",
-    "fastlane/metadata/android/changelogs/#{marketing_version}.xml",
-    "./metadata/android/changelogs/#{marketing_version}.xml",
-    "../fastlane/metadata/android/changelogs/#{marketing_version}.xml"
+    "release_notes/#{marketing_version}.xml",
+    "fastlane/release_notes/#{marketing_version}.xml", 
+    "./release_notes/#{marketing_version}.xml",
+    "../fastlane/release_notes/#{marketing_version}.xml"
   ]
   
   changelog_paths.each do |changelog_file|
