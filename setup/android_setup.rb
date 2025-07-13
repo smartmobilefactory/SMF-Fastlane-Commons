@@ -335,8 +335,8 @@ private_lane :smf_super_upload_to_play_store do |options|
     end
     
     # Log release notes status
-    if has_release_notes
-      UI.message("📝 Using release notes for version #{marketing_version}")
+    if release_notes_xml
+      UI.message("📝 Release notes found for version #{marketing_version} but skipping automated upload")
     else
       UI.message("📝 No release notes found for version #{marketing_version}")
     end
