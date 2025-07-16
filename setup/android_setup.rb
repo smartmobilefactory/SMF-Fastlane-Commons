@@ -340,6 +340,7 @@ private_lane :smf_super_upload_to_play_store do |options|
   begin
     # Get marketing version for release notes
     marketing_version = smf_get_version_name
+    UI.message("📋 Using marketing version as release name: #{marketing_version}")
     release_notes_xml = get_release_notes_for_version(marketing_version)
     
     # Skip automated release notes upload - add manually in Google Play Console if needed
@@ -352,6 +353,7 @@ private_lane :smf_super_upload_to_play_store do |options|
       track: google_play_track,
       json_key: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON'],
       release_status: 'draft',
+      release_name: marketing_version,  # Use versionName (e.g., "3.3.2") instead of auto-generated versionCode
       skip_upload_metadata: true,
       skip_upload_changelogs: true,  # Always skip to avoid Fastlane structure conflicts
       skip_upload_images: true,
