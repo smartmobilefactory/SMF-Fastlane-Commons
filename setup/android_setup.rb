@@ -571,7 +571,7 @@ def smf_get_version_name
     
     if @smf_fastlane_config && @smf_fastlane_config.is_a?(Hash)
       UI.message("🔍 Config.json keys: #{@smf_fastlane_config.keys}")
-      app_version_name = @smf_fastlane_config['app_version_name']
+      app_version_name = @smf_fastlane_config[:app_version_name]
       UI.message("🔍 app_version_name value: #{app_version_name}")
       
       if app_version_name && !app_version_name.empty?
