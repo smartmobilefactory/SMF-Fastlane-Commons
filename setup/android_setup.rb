@@ -173,10 +173,9 @@ private_lane :smf_super_upload_to_firebase do |options|
 
   firebase_app_id = smf_get_firebase_id(build_variant)
   destinations = smf_config_get(build_variant, :firebase_destinations) || "RWC"
-  apk_file_regex = smf_get_apk_file_regex(build_variant)
-  aab_file_regex = smf_get_aab_file_regex(build_variant)
-
-  UI.message("Regex for binary: #{apk_file_regex}")
+  
+  # Check if use_aab flag is set for this build variant
+  use_aab = smf_config_get(build_variant, :use_aab) || false
 
   if service_credentials_file.nil?
     UI.message("Skipping upload to Firebase because Firebase credentials are missing.")
@@ -188,23 +187,50 @@ private_lane :smf_super_upload_to_firebase do |options|
     return
   end
 
-  aab_path = smf_get_file_path(aab_file_regex)
-  UI.message("Path for AAB binary: #{aab_path}")
-  smf_android_upload_to_firebase(
-    app_id: firebase_app_id,
-    destinations: destinations,
-    android_artifact_path: aab_path,
-    android_artifact_type: "AAB"
-  ) if aab_path != ''
+  if use_aab
+    # AAB-only mode: only upload AAB files
+    aab_file_regex = smf_get_aab_file_regex(build_variant)
+    aab_path = smf_get_file_path(aab_file_regex)
+    
+    UI.message("AAB-only mode (use_aab=true)")
+    UI.message("Path for AAB binary: #{aab_path}")
+    
+    if aab_path != ''
+      smf_android_upload_to_firebase(
+        app_id: firebase_app_id,
+        destinations: destinations,
+        android_artifact_path: aab_path,
+        android_artifact_type: "AAB"
+      )
+    else
+      UI.user_error!("use_aab=true but no AAB file found for variant: #{build_variant}")
+    end
+  else
+    # Legacy mode: upload both AAB and APK if they exist
+    apk_file_regex = smf_get_apk_file_regex(build_variant)
+    aab_file_regex = smf_get_aab_file_regex(build_variant)
+    
+    UI.message("Legacy mode (use_aab=false or not set)")
+    UI.message("Regex for binary: #{apk_file_regex}")
 
-  apk_path = smf_get_file_path(apk_file_regex)
-  UI.message("Path for APK binary: #{apk_path}")
-  smf_android_upload_to_firebase(
-    app_id: firebase_app_id,
-    destinations: destinations,
-    android_artifact_path: apk_path,
-    android_artifact_type: "APK"
-  ) if apk_path != ''
+    aab_path = smf_get_file_path(aab_file_regex)
+    UI.message("Path for AAB binary: #{aab_path}")
+    smf_android_upload_to_firebase(
+      app_id: firebase_app_id,
+      destinations: destinations,
+      android_artifact_path: aab_path,
+      android_artifact_type: "AAB"
+    ) if aab_path != ''
+
+    apk_path = smf_get_file_path(apk_file_regex)
+    UI.message("Path for APK binary: #{apk_path}")
+    smf_android_upload_to_firebase(
+      app_id: firebase_app_id,
+      destinations: destinations,
+      android_artifact_path: apk_path,
+      android_artifact_type: "APK"
+    ) if apk_path != ''
+  end
 end
 
 lane :smf_upload_to_firebase do |options|
@@ -359,28 +385,47 @@ private_lane :smf_super_upload_to_play_store do |options|
   end
 end
 
-# Helper function to find the best upload file (APK preferred, AAB fallback)
+# Helper function to find the best upload file (respects use_aab flag)
 def find_best_upload_file(build_variant)
-  # Try to find APK first (preferred for current SMF projects)
-  apk_path = smf_get_file_path(smf_get_apk_file_regex(build_variant))
+  # Check if use_aab flag is set for this build variant
+  use_aab = smf_config_get(build_variant, :use_aab) || false
   
-  if apk_path && File.exist?(apk_path)
-    return {
-      path: apk_path,
-      type: "APK",
-      detection_reason: "APK found and preferred for legacy compatibility"
-    }
-  end
-  
-  # Fallback to AAB (for projects that are fully migrated)
-  aab_path = smf_get_file_path(smf_get_aab_file_regex(build_variant))
-  
-  if aab_path && File.exist?(aab_path)
-    return {
-      path: aab_path,
-      type: "AAB",
-      detection_reason: "AAB found as fallback (no APK available)"
-    }
+  if use_aab
+    # AAB-only mode: only look for AAB files
+    aab_path = smf_get_file_path(smf_get_aab_file_regex(build_variant))
+    
+    if aab_path && File.exist?(aab_path)
+      return {
+        path: aab_path,
+        type: "AAB",
+        detection_reason: "AAB found (use_aab=true)"
+      }
+    else
+      # No AAB found but use_aab is true - this is an error
+      UI.user_error!("use_aab=true but no AAB file found for variant: #{build_variant}")
+    end
+  else
+    # Legacy mode: APK preferred, AAB fallback
+    apk_path = smf_get_file_path(smf_get_apk_file_regex(build_variant))
+    
+    if apk_path && File.exist?(apk_path)
+      return {
+        path: apk_path,
+        type: "APK",
+        detection_reason: "APK found and preferred for legacy compatibility"
+      }
+    end
+    
+    # Fallback to AAB (for projects that are fully migrated)
+    aab_path = smf_get_file_path(smf_get_aab_file_regex(build_variant))
+    
+    if aab_path && File.exist?(aab_path)
+      return {
+        path: aab_path,
+        type: "AAB",
+        detection_reason: "AAB found as fallback (no APK available)"
+      }
+    end
   end
   
   # No suitable file found
