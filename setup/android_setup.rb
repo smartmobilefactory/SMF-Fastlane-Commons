@@ -563,8 +563,21 @@ def smf_get_version_name
     end
   end
   
+  # Final fallback: Try to get version from Config.json
+  begin
+    if @smf_fastlane_config && @smf_fastlane_config.is_a?(Hash)
+      app_version_name = @smf_fastlane_config['app_version_name']
+      if app_version_name && !app_version_name.empty?
+        UI.message("✅ Found version in Config.json: #{app_version_name}")
+        return app_version_name
+      end
+    end
+  rescue => e
+    UI.message("⚠️ Could not read version from Config.json: #{e.message}")
+  end
+  
   # No version found - raise error instead of fallback
-  UI.user_error!("❌ Could not find versionName in any build.gradle or gradle.properties files. Please ensure your Android project has a valid versionName defined.")
+  UI.user_error!("❌ Could not find versionName in any build.gradle, gradle.properties, or Config.json files. Please ensure your Android project has a valid versionName defined.")
 end
 
 # Helper function to get release notes for marketing version
