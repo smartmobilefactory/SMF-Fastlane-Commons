@@ -565,12 +565,23 @@ def smf_get_version_name
   
   # Final fallback: Try to get version from Config.json
   begin
+    UI.message("🔍 Checking Config.json for app_version_name...")
+    UI.message("🔍 @smf_fastlane_config present: #{!@smf_fastlane_config.nil?}")
+    UI.message("🔍 @smf_fastlane_config type: #{@smf_fastlane_config.class}")
+    
     if @smf_fastlane_config && @smf_fastlane_config.is_a?(Hash)
+      UI.message("🔍 Config.json keys: #{@smf_fastlane_config.keys}")
       app_version_name = @smf_fastlane_config['app_version_name']
+      UI.message("🔍 app_version_name value: #{app_version_name}")
+      
       if app_version_name && !app_version_name.empty?
         UI.message("✅ Found version in Config.json: #{app_version_name}")
         return app_version_name
+      else
+        UI.message("⚠️ app_version_name is empty or nil in Config.json")
       end
+    else
+      UI.message("⚠️ @smf_fastlane_config is not a valid hash")
     end
   rescue => e
     UI.message("⚠️ Could not read version from Config.json: #{e.message}")
