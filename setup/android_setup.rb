@@ -649,17 +649,17 @@ def smf_get_package_name_from_variant(build_variant)
   
   # For Corporate Benefits project, use known package names based on build variant
   case build_variant
-  when /germany/i
+  when /de_/i, /germany/i
     base_package = "de.corporatebenefits.app"
-  when /austria/i
+  when /at_/i, /austria/i
     base_package = "at.corporatebenefits.app"
-  when /spain/i
+  when /es_/i, /spain/i
     base_package = "es.corporatebenefits.app"
-  when /switzerland/i
+  when /ch_/i, /switzerland/i
     base_package = "ch.corporatebenefits.app"
-  when /italy/i
+  when /it_/i, /italy/i
     base_package = "it.convenzioniaziendali.app"
-  when /benelux/i
+  when /be_/i, /benelux/i
     base_package = "club.benefitsatwork.app"
   else
     # Fallback: try to read from gradle.properties
