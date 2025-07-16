@@ -353,7 +353,7 @@ private_lane :smf_super_upload_to_play_store do |options|
       track: google_play_track,
       json_key: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON'],
       release_status: 'draft',
-      release_name: marketing_version,  # Use versionName (e.g., "3.3.2") instead of auto-generated versionCode
+      version_name: marketing_version,  # Use versionName (e.g., "3.3.2") for release name
       skip_upload_metadata: true,
       skip_upload_changelogs: true,  # Always skip to avoid Fastlane structure conflicts
       skip_upload_images: true,
