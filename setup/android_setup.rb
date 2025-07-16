@@ -638,25 +638,47 @@ end
 
 # Helper function to get package name from build variant
 def smf_get_package_name_from_variant(build_variant)
-  gradle_properties = File.read('gradle.properties') rescue ''
+  UI.message("🔍 Getting package name for build variant: #{build_variant}")
   
-  if gradle_properties.include?('applicationId')
-    base_package = gradle_properties.match(/applicationId\s*=\s*(.+)/)&.captures&.first&.strip&.gsub(/["']/, '')
+  # For Corporate Benefits project, use known package names based on build variant
+  case build_variant
+  when /germany/i
+    base_package = "de.corporatebenefits.app"
+  when /austria/i
+    base_package = "at.corporatebenefits.app"
+  when /spain/i
+    base_package = "es.corporatebenefits.app"
+  when /switzerland/i
+    base_package = "ch.corporatebenefits.app"
+  when /italy/i
+    base_package = "it.convenzioniaziendali.app"
+  when /benelux/i
+    base_package = "club.benefitsatwork.app"
   else
-    # Fallback: read from build.gradle
-    build_gradle = File.read('app/build.gradle') rescue ''
-    base_package = build_gradle.match(/applicationId\s+["'](.+)["']/)&.captures&.first
+    # Fallback: try to read from gradle.properties
+    gradle_properties = File.read('gradle.properties') rescue ''
+    
+    if gradle_properties.include?('applicationId')
+      base_package = gradle_properties.match(/applicationId\s*=\s*(.+)/)&.captures&.first&.strip&.gsub(/["']/, '')
+    else
+      # Fallback: read from build.gradle
+      build_gradle = File.read('app/build.gradle') rescue ''
+      base_package = build_gradle.match(/applicationId\s+["'](.+)["']/)&.captures&.first
+    end
   end
   
   # Apply variant-specific suffix if needed
   case build_variant
   when /alpha/i
-    "#{base_package}.alpha"
+    package_name = "#{base_package}.alpha"
   when /beta/i
-    "#{base_package}.beta"
+    package_name = "#{base_package}.beta"
   else
-    base_package
+    package_name = base_package
   end
+  
+  UI.message("✅ Package name for #{build_variant}: #{package_name}")
+  return package_name
 end
 
 lane :smf_upload_to_play_store do |options|
