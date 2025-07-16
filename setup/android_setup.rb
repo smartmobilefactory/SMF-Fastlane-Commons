@@ -312,7 +312,14 @@ private_lane :smf_super_upload_to_play_store do |options|
   end
   
   # Get package name from build variant configuration
+  UI.message("🔍 About to call smf_get_package_name_from_variant with: #{build_variant}")
   package_name = smf_get_package_name_from_variant(build_variant)
+  UI.message("🔍 Received package_name: #{package_name}")
+  
+  # Validate package_name
+  if package_name.nil? || package_name.empty?
+    UI.user_error!("Package name is nil or empty for build variant: #{build_variant}")
+  end
   
   # Find best upload file: APK preferred, AAB fallback
   upload_file_info = find_best_upload_file(build_variant)
