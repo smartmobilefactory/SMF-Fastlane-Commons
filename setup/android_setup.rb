@@ -461,7 +461,7 @@ def get_rollout_percentage(track)
   when 'alpha'
     1.0  # 100% for alpha testing
   when 'beta'
-    0.5  # 50% rollout for beta
+    1.0  # 100% rollout for beta
   when 'production'
     0.1  # 10% rollout for production
   when 'internal'
@@ -486,6 +486,7 @@ def smf_get_version_name
     'app/build.gradle.kts',
     './app/build.gradle',
     './app/build.gradle.kts',
+    './androidApp/build.gradle.kts',
     File.join(current_dir, 'app', 'build.gradle'),
     File.join(current_dir, 'app', 'build.gradle.kts'),
     # Additional paths for different Jenkins workspace structures
@@ -495,6 +496,7 @@ def smf_get_version_name
     # Go up one directory from fastlane folder
     '../app/build.gradle',
     '../app/build.gradle.kts',
+    '../androidApp/build.gradle.kts',
     File.join(current_dir, '..', 'app', 'build.gradle'),
     File.join(current_dir, '..', 'app', 'build.gradle.kts'),
     '../build.gradle',
