@@ -717,7 +717,12 @@ def extract_package_from_build_gradle
     './app/build.gradle',
     './app/build.gradle.kts',
     './composeApp/build.gradle.kts',
-    './androidApp/build.gradle.kts'
+    './androidApp/build.gradle.kts',
+    # From fastlane directory perspective (go up one level)
+    '../app/build.gradle',
+    '../app/build.gradle.kts',
+    '../composeApp/build.gradle.kts',
+    '../androidApp/build.gradle.kts'
   ]
   
   build_gradle_paths.each do |path|
