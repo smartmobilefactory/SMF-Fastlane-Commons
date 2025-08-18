@@ -712,8 +712,12 @@ def extract_package_from_build_gradle
   build_gradle_paths = [
     'app/build.gradle',
     'app/build.gradle.kts',
+    'composeApp/build.gradle.kts',
+    'androidApp/build.gradle.kts',
     './app/build.gradle',
-    './app/build.gradle.kts'
+    './app/build.gradle.kts',
+    './composeApp/build.gradle.kts',
+    './androidApp/build.gradle.kts'
   ]
   
   build_gradle_paths.each do |path|
