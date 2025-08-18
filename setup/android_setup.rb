@@ -649,38 +649,27 @@ end
 def smf_get_package_name_from_variant(build_variant)
   UI.message("🔍 Getting package name for build variant: #{build_variant}")
   
-  # For Corporate Benefits project, use known package names based on build variant
-  case build_variant
-  when /de_/i, /germany/i
-    base_package = "de.corporatebenefits.app"
-  when /at_/i, /austria/i
-    base_package = "at.corporatebenefits.app"
-  when /es_/i, /spain/i
-    base_package = "es.corporatebenefits.app"
-  when /ch_/i, /switzerland/i
-    base_package = "ch.corporatebenefits.app"
-  when /it_/i, /italy/i
-    base_package = "it.convenzioniaziendali.app"
-  when /be_/i, /benelux/i
-    base_package = "club.benefitsatwork.app"
-  else
-    # Fallback: try to read from gradle.properties
-    gradle_properties = File.read('gradle.properties') rescue ''
-    
-    if gradle_properties.include?('applicationId')
-      base_package = gradle_properties.match(/applicationId\s*=\s*(.+)/)&.captures&.first&.strip&.gsub(/["']/, '')
-    else
-      # Fallback: read from build.gradle
-      build_gradle = File.read('app/build.gradle') rescue ''
-      base_package = build_gradle.match(/applicationId\s+["'](.+)["']/)&.captures&.first
-    end
+  base_package = nil
+  
+  # Try to extract package name from AndroidManifest.xml (most reliable for built variants)
+  base_package = extract_package_from_manifest(build_variant) if base_package.nil?
+  
+  # Fallback: try to read from build.gradle (primary source)
+  base_package = extract_package_from_build_gradle if base_package.nil?
+  
+  # Fallback: try to read from gradle.properties
+  base_package = extract_package_from_gradle_properties if base_package.nil?
+  
+  # If still no package found, raise error
+  if base_package.nil? || base_package.empty?
+    UI.user_error!("❌ Could not extract package name from AndroidManifest.xml, build.gradle, or gradle.properties for variant: #{build_variant}")
   end
   
   # Apply variant-specific suffix if needed
   case build_variant
   when /alpha/i
     package_name = "#{base_package}.alpha"
-  when /beta/i
+  when /beta/i  
     package_name = "#{base_package}.beta"
   else
     package_name = base_package
@@ -688,6 +677,92 @@ def smf_get_package_name_from_variant(build_variant)
   
   UI.message("✅ Package name for #{build_variant}: #{package_name}")
   return package_name
+end
+
+# Helper function to extract package name from AndroidManifest.xml
+def extract_package_from_manifest(build_variant)
+  # Try different possible manifest locations
+  manifest_paths = [
+    "app/build/intermediates/merged_manifests/#{build_variant}/AndroidManifest.xml",
+    "app/build/intermediates/manifests/full/#{build_variant}/AndroidManifest.xml", 
+    "app/src/main/AndroidManifest.xml"
+  ]
+  
+  manifest_paths.each do |manifest_path|
+    if File.exist?(manifest_path)
+      UI.message("📄 Reading package from manifest: #{manifest_path}")
+      manifest_content = File.read(manifest_path)
+      package_match = manifest_content.match(/package="([^"]+)"/)
+      if package_match
+        package_name = package_match.captures.first
+        UI.message("✅ Found package in manifest: #{package_name}")
+        return package_name
+      end
+    end
+  end
+  
+  UI.message("⚠️ No AndroidManifest.xml found or package attribute missing")
+  return nil
+end
+
+# Helper function to extract package name from build.gradle
+def extract_package_from_build_gradle
+  build_gradle_paths = [
+    'app/build.gradle',
+    'app/build.gradle.kts',
+    './app/build.gradle',
+    './app/build.gradle.kts'
+  ]
+  
+  build_gradle_paths.each do |path|
+    if File.exist?(path)
+      UI.message("📄 Reading package from build.gradle: #{path}")
+      build_gradle = File.read(path)
+      
+      # Try multiple patterns for different formats
+      patterns = [
+        /applicationId\s+"([^"]+)"/,           # applicationId "package.name"
+        /applicationId\s+'([^']+)'/,           # applicationId 'package.name'
+        /applicationId\s*=\s*"([^"]+)"/,       # applicationId = "package.name"
+        /applicationId\s*=\s*'([^']+)'/,       # applicationId = 'package.name'
+        /applicationId\s*=\s*([^"\s\}]+)/      # applicationId = variable
+      ]
+      
+      patterns.each do |pattern|
+        match = build_gradle.match(pattern)
+        if match
+          package_name = match.captures.first.strip
+          UI.message("✅ Found package in build.gradle: #{package_name}")
+          return package_name
+        end
+      end
+    end
+  end
+  
+  UI.message("⚠️ No build.gradle found or applicationId missing")
+  return nil
+end
+
+# Helper function to extract package name from gradle.properties
+def extract_package_from_gradle_properties
+  gradle_properties_path = 'gradle.properties'
+  
+  if File.exist?(gradle_properties_path)
+    UI.message("📄 Reading package from gradle.properties")
+    gradle_properties = File.read(gradle_properties_path)
+    
+    if gradle_properties.include?('applicationId')
+      package_match = gradle_properties.match(/applicationId\s*=\s*(.+)/)
+      if package_match
+        package_name = package_match.captures.first.strip.gsub(/["']/, '')
+        UI.message("✅ Found package in gradle.properties: #{package_name}")
+        return package_name
+      end
+    end
+  end
+  
+  UI.message("⚠️ No gradle.properties found or applicationId missing")
+  return nil
 end
 
 lane :smf_upload_to_play_store do |options|
