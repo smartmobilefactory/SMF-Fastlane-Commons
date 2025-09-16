@@ -657,7 +657,7 @@ def smf_get_package_name_from_variant(build_variant)
   base_package = extract_package_from_manifest(build_variant) if base_package.nil?
   
   # Fallback: try to read from build.gradle (primary source)
-  base_package = extract_package_from_build_gradle if base_package.nil?
+  base_package = extract_package_from_build_gradle(build_variant) if base_package.nil?
   
   # Fallback: try to read from gradle.properties
   base_package = extract_package_from_gradle_properties if base_package.nil?
@@ -707,8 +707,8 @@ def extract_package_from_manifest(build_variant)
   return nil
 end
 
-# Helper function to extract package name from build.gradle
-def extract_package_from_build_gradle
+# Helper function to extract package name from build.gradle with product flavor support
+def extract_package_from_build_gradle(build_variant = nil)
   build_gradle_paths = [
     'app/build.gradle',
     'app/build.gradle.kts',
@@ -724,13 +724,22 @@ def extract_package_from_build_gradle
     '../composeApp/build.gradle.kts',
     '../androidApp/build.gradle.kts'
   ]
-  
+
   build_gradle_paths.each do |path|
     if File.exist?(path)
       UI.message("📄 Reading package from build.gradle: #{path}")
       build_gradle = File.read(path)
-      
-      # Try multiple patterns for different formats
+
+      # If we have a build variant, try to extract flavor-specific applicationId first
+      if build_variant
+        flavor_package = extract_flavor_application_id(build_gradle, build_variant)
+        if flavor_package
+          UI.message("✅ Found flavor-specific package in build.gradle: #{flavor_package}")
+          return flavor_package
+        end
+      end
+
+      # Fallback: try to find default applicationId
       patterns = [
         /applicationId\s+"([^"]+)"/,           # applicationId "package.name"
         /applicationId\s+'([^']+)'/,           # applicationId 'package.name'
@@ -738,19 +747,76 @@ def extract_package_from_build_gradle
         /applicationId\s*=\s*'([^']+)'/,       # applicationId = 'package.name'
         /applicationId\s*=\s*([^"\s\}]+)/      # applicationId = variable
       ]
-      
+
       patterns.each do |pattern|
         match = build_gradle.match(pattern)
         if match
           package_name = match.captures.first.strip
-          UI.message("✅ Found package in build.gradle: #{package_name}")
+          UI.message("✅ Found default package in build.gradle: #{package_name}")
           return package_name
         end
       end
     end
   end
-  
+
   UI.message("⚠️ No build.gradle found or applicationId missing")
+  return nil
+end
+
+# Helper function to extract flavor-specific applicationId from build.gradle content
+def extract_flavor_application_id(build_gradle_content, build_variant)
+  # Extract flavor name from build variant (e.g., "ch_live" -> "switzerland", "de_alpha" -> "germany")
+  flavor_mapping = {
+    'ch' => 'switzerland',
+    'de' => 'germany',
+    'at' => 'austria',
+    'es' => 'spain',
+    'it' => 'italy',
+    'be' => 'benelux',
+    'pt' => 'portugal',
+    'pl' => 'poland',
+    'tr' => 'turkey'
+  }
+
+  # Try to determine flavor from build variant
+  detected_flavor = nil
+  flavor_mapping.each do |prefix, flavor_name|
+    if build_variant.downcase.start_with?(prefix + '_') || build_variant.downcase.include?(flavor_name)
+      detected_flavor = flavor_name
+      break
+    end
+  end
+
+  return nil unless detected_flavor
+
+  UI.message("🔍 Looking for flavor '#{detected_flavor}' in build.gradle")
+
+  # Look for the specific flavor block and extract its applicationId
+  # Pattern: create("flavorname") { ... applicationId = "package.name" ... }
+  flavor_block_regex = /create\("#{detected_flavor}"\)\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}/m
+
+  match = build_gradle_content.match(flavor_block_regex)
+  if match
+    flavor_content = match.captures.first
+    UI.message("📦 Found flavor block for '#{detected_flavor}'")
+
+    # Extract applicationId from the flavor block
+    app_id_patterns = [
+      /applicationId\s*=\s*"([^"]+)"/,
+      /applicationId\s*=\s*'([^']+)'/,
+      /applicationId\s+"([^"]+)"/,
+      /applicationId\s+'([^']+)'/
+    ]
+
+    app_id_patterns.each do |pattern|
+      app_id_match = flavor_content.match(pattern)
+      if app_id_match
+        return app_id_match.captures.first.strip
+      end
+    end
+  end
+
+  UI.message("⚠️ No applicationId found for flavor '#{detected_flavor}'")
   return nil
 end
 
