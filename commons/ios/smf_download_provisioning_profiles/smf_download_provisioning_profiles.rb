@@ -74,7 +74,9 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
   template_name = options[:template_name]
 
   force = options[:force]
-  force = force.nil? ? !template_name.nil? : force
+  # Note: template_name parameter removed due to Apple API deprecation (May 2025)
+  # See: https://github.com/fastlane/fastlane/issues/29498
+  force = force.nil? ? false : force
 
   platform = options[:platform]
 
@@ -94,7 +96,40 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
   # Create App Store Connect API key if environment variables are available
   api_key = nil
   
-  # Debug: Check environment variables
+  # Debug: Comprehensive environment variable analysis
+  UI.important("=== API KEY ENVIRONMENT VARIABLES DEBUG ===")
+
+  # Our expected variables
+  UI.message("APP_STORE_CONNECT_API_KEY_ID: #{ENV['APP_STORE_CONNECT_API_KEY_ID'] ? 'SET' : 'NOT SET'}")
+  UI.message("APP_STORE_CONNECT_API_KEY_ISSUER_ID: #{ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'] ? 'SET' : 'NOT SET'}")
+  UI.message("APP_STORE_CONNECT_API_KEY_PATH: #{ENV['APP_STORE_CONNECT_API_KEY_PATH'] ? 'SET' : 'NOT SET'}")
+
+  # Potential conflicting Fastlane variables
+  UI.message("FASTLANE_API_KEY_PATH: #{ENV['FASTLANE_API_KEY_PATH'] ? 'SET' : 'NOT SET'}")
+  UI.message("APP_STORE_CONNECT_API_KEY_KEY_FILEPATH: #{ENV['APP_STORE_CONNECT_API_KEY_KEY_FILEPATH'] ? 'SET' : 'NOT SET'}")
+  UI.message("FASTLANE_API_KEY: #{ENV['FASTLANE_API_KEY'] ? 'SET' : 'NOT SET'}")
+  UI.message("APP_STORE_CONNECT_API_KEY: #{ENV['APP_STORE_CONNECT_API_KEY'] ? 'SET' : 'NOT SET'}")
+
+  # Search for any environment variable containing 'API_KEY'
+  api_key_vars = ENV.select { |key, value| key.upcase.include?('API_KEY') && !value.nil? && !value.empty? }
+  if api_key_vars.any?
+    UI.important("All API_KEY related environment variables found:")
+    api_key_vars.each do |key, value|
+      # Show first 20 chars of value for security, but indicate if it's set
+      safe_value = value.length > 20 ? "#{value[0..19]}... (#{value.length} chars)" : value
+      UI.message("  #{key}: #{safe_value}")
+    end
+  else
+    UI.message("No API_KEY environment variables found")
+  end
+
+  # Jenkins specific variables that might interfere
+  jenkins_vars = %w[BUILD_ID BUILD_NUMBER JOB_NAME JENKINS_URL WORKSPACE]
+  UI.message("Jenkins context: #{jenkins_vars.map { |var| "#{var}=#{ENV[var]}" }.select { |s| !s.end_with?('=') }.join(', ')}")
+
+  UI.important("=== END DEBUG ===")
+
+  # Original debug messages for backward compatibility
   UI.message("API Key ID set: #{ENV['APP_STORE_CONNECT_API_KEY_ID'] ? 'YES' : 'NO'}")
   UI.message("API Key Issuer ID set: #{ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'] ? 'YES' : 'NO'}")
   UI.message("API Key Path set: #{ENV['APP_STORE_CONNECT_API_KEY_PATH'] ? 'YES' : 'NO'}")
@@ -112,6 +147,19 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
     UI.message('Using username/password authentication for provisioning profiles (fallback)')
   end
 
+  # Debug: Log exact match parameters
+  UI.important("=== MATCH CALL DEBUG ===")
+  UI.message("Match parameters being passed:")
+  UI.message("  type: #{type}")
+  UI.message("  readonly: #{read_only}")
+  UI.message("  app_identifier: #{[app_identifier]}")
+  UI.message("  api_key: #{api_key ? 'API_KEY_OBJECT_SET' : 'nil'}")
+  UI.message("  username: #{api_key ? 'nil (using api_key)' : apple_id}")
+  UI.message("  team_id: #{team_id}")
+  UI.message("  api_key_path: NOT_EXPLICITLY_SET")
+  UI.message("  platform: #{platform}")
+  UI.important("=== END MATCH DEBUG ===")
+
   match(
     type: type,
     readonly: read_only,
@@ -123,7 +171,6 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
     git_branch: team_id,
     keychain_name: "jenkins.keychain",
     keychain_password: ENV[$KEYCHAIN_JENKINS_ENV_KEY],
-    template_name: template_name,
     force: force,
     platform: platform
   )

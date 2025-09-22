@@ -70,7 +70,7 @@ private_lane :smf_super_build do |options|
       use_default_match_config: smf_config_get(build_variant, :match).nil?,
       match_read_only: smf_config_get(build_variant, :match, :read_only),
       match_type: smf_config_get(build_variant, :match, :type),
-      template_name: smf_config_get(build_variant, :match, :template_name),
+      # template_name: smf_config_get(build_variant, :match, :template_name), # Removed due to Apple API deprecation
       extensions_suffixes: extension_suffixes,
       build_variant: build_variant,
       force: force_match,
