@@ -160,6 +160,15 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
   UI.message("  platform: #{platform}")
   UI.important("=== END MATCH DEBUG ===")
 
+  # WORKAROUND: Prevent Fastlane from automatically setting api_key_path
+  # when APP_STORE_CONNECT_API_KEY_PATH env variable is present
+  # This avoids conflict between api_key (object) and api_key_path (string)
+  if api_key
+    UI.message("Temporarily clearing APP_STORE_CONNECT_API_KEY_PATH to prevent auto api_key_path setting")
+    api_key_path_backup = ENV['APP_STORE_CONNECT_API_KEY_PATH']
+    ENV['APP_STORE_CONNECT_API_KEY_PATH'] = nil
+  end
+
   match(
     type: type,
     readonly: read_only,
@@ -175,18 +184,38 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
     platform: platform
   )
 
-  match(
-    type: type,
-    readonly: read_only,
-    app_identifier: extension_identifiers,
-    api_key: api_key,
-    username: api_key ? nil : apple_id,
-    team_id: team_id,
-    git_url: git_url,
-    git_branch: team_id,
-    keychain_name: "jenkins.keychain",
-    keychain_password: ENV[$KEYCHAIN_JENKINS_ENV_KEY],
-    force: force,
-    platform: platform
-  ) unless extension_identifiers.empty?
+  # Restore environment variable after match call
+  if api_key && api_key_path_backup
+    UI.message("Restoring APP_STORE_CONNECT_API_KEY_PATH environment variable")
+    ENV['APP_STORE_CONNECT_API_KEY_PATH'] = api_key_path_backup
+  end
+
+  # Apply same workaround for extension profiles
+  unless extension_identifiers.empty?
+    if api_key
+      UI.message("Temporarily clearing APP_STORE_CONNECT_API_KEY_PATH for extension profiles")
+      api_key_path_backup = ENV['APP_STORE_CONNECT_API_KEY_PATH']
+      ENV['APP_STORE_CONNECT_API_KEY_PATH'] = nil
+    end
+
+    match(
+      type: type,
+      readonly: read_only,
+      app_identifier: extension_identifiers,
+      api_key: api_key,
+      username: api_key ? nil : apple_id,
+      team_id: team_id,
+      git_url: git_url,
+      git_branch: team_id,
+      keychain_name: "jenkins.keychain",
+      keychain_password: ENV[$KEYCHAIN_JENKINS_ENV_KEY],
+      force: force,
+      platform: platform
+    )
+
+    if api_key && api_key_path_backup
+      UI.message("Restoring APP_STORE_CONNECT_API_KEY_PATH after extension profiles")
+      ENV['APP_STORE_CONNECT_API_KEY_PATH'] = api_key_path_backup
+    end
+  end
 end
