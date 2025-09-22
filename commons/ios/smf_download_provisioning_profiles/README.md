@@ -34,7 +34,7 @@ smf_download_provisioning_profiles(
   match_type: "appstore",                                                           # The type can be one of the following values: "appstore", "adhoc", "development", "enterprise"
   extensions_suffixes: ["PushNotificationServiceExtension"],                          # See special parameters below
   build_variant: "alpha",                                                           # the build variant of the current build
-  template_name: "Contact Note Field Access beta",                                  # Entitlement that can be choosen while creating a Provisioning Profile
+  # template_name: "Contact Note Field Access beta",                               # DEPRECATED: Removed due to Apple API changes (May 2025)
   force: false,                                                                     # Optional: Renew the provisioning profiles every time you run match
   platform: 'ios'                                                                   # Optional: the platform, either 'ios' or 'macos', defaults to :ios  
 )
@@ -43,5 +43,5 @@ smf_download_provisioning_profiles(
 
 | Parameter | Optional | Default | Info |
 | :----: | :----: | :----: | :--- |
-| force | `true`| `false` | Renew the provisioning profiles every time you run match, if this is nil/not set and the `template_name` parameter **is** set, force will be set to **true**. |
+| force | `true`| `false` | Renew the provisioning profiles every time you run match. |
 | extensions_suffixes | `true`| `[]` | If the project contains extensions, a list of extension suffixes (when appended to the apps bundle identifier produce the extensions bundle identifier) can be provided for which match will be executed, too.  |
