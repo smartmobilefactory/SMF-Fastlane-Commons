@@ -11,7 +11,7 @@ private_lane :smf_download_provisioning_profiles do |options|
   match_type = options[:match_type]
   extensions_suffixes = options[:extensions_suffixes]
   build_variant = options[:build_variant]
-  template_name = options[:template_name]
+  # template_name = options[:template_name] # Removed due to Apple API deprecation
   force = options[:force]
   platform = options[:platform].nil? ? 'ios' : options[:platform]
 
@@ -37,7 +37,7 @@ private_lane :smf_download_provisioning_profiles do |options|
       extensions_suffixes: extensions_suffixes,
       apple_id: apple_id,
       team_id: team_id,
-      template_name: template_name,
+      # template_name: template_name, # Removed due to Apple API deprecation
       force: force,
       platform: platform
     )
@@ -55,7 +55,7 @@ private_lane :smf_download_provisioning_profiles do |options|
               extensions_suffixes: extensions_suffixes,
               apple_id: apple_id,
               team_id: team_id,
-              template_name: template_name,
+              # template_name: template_name, # Removed due to Apple API deprecation
               force: force,
               platform: 'ios'
             )
@@ -71,7 +71,7 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
   extensions_suffixes = options[:extensions_suffixes]
   apple_id = options[:apple_id]
   team_id = options[:team_id]
-  template_name = options[:template_name]
+  # template_name = options[:template_name] # Removed due to Apple API deprecation
 
   force = options[:force]
   # Note: template_name parameter removed due to Apple API deprecation (May 2025)
