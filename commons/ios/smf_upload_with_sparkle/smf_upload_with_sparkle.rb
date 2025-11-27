@@ -39,7 +39,7 @@ private_lane :smf_upload_with_sparkle do |options|
   release_notes_path = "#{update_dir}#{release_notes_name}"
   File.write(release_notes_path, release_notes)
 
-  if !File.exists?(dmg_path)
+  if !File.exist?(dmg_path)
     raise("DMG file #{dmg_path} does not exit. Nothing to upload.")
   end
 

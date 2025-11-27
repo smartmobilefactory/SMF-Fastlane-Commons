@@ -68,7 +68,7 @@ private_lane :smf_create_github_release do |options|
 end
 
 def zipped_path(path)
-  if File.exists?(path)
+  if File.exist?(path)
     if File.extname(path) != '.zip'
       zipped_file_path = "#{path}.zip"
       sh "cd \"#{File.dirname(path)}\"; zip -r -q \"#{zipped_file_path}\" \"./#{File.basename(path)}\""

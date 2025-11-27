@@ -211,13 +211,13 @@ def clone_phraseapp_ci
   url = $SMF_PHRASE_APP_SCRIPTS_REPO_URL
   branch = 'master'
   src_root = File.join(smf_workspace_dir, File.basename(url, File.extname(url)))
-  if File.exists?(src_root)
+  if File.exist?(src_root)
     UI.error("Can't clone into #{src_root}, directory already exists. Can't download Phraseapp-CI scripts..")
     return nil
   end
   UI.message("Cloning #{url} branch: #{branch} into #{src_root}")
   `git clone #{url} #{src_root} -b #{branch} -q > /dev/null`
-  if File.exists?(src_root) == false
+  if File.exist?(src_root) == false
     UI.error("Error while cloning into #{src_root}. Couldn't download Phraseapp-CI scripts..")
     return nil
   end
