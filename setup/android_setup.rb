@@ -309,7 +309,19 @@ private_lane :smf_super_push_git_tag_release do |options|
   smf_push_to_git_remote(local_branch: local_branch)
 
   # Create the GitHub release
-  build_number = smf_get_build_number_of_app
+  # CI: Extract build number from git tag (not Config.json)
+  # Local: Use Config.json (backward compatible)
+  if smf_is_ci?
+    UI.message("🏗️  CI Build - extracting build number from latest git tag")
+    # Get the latest tag for this build variant
+    latest_tag = sh("git describe --tags --match '*#{build_variant}*' --abbrev=0 HEAD", log: false).strip
+    build_number = latest_tag.split('/').last.to_i
+    UI.message("📊 Extracted build number from tag: #{build_number}")
+  else
+    UI.message("🖥️  Local Build - using Config.json for build number")
+    build_number = smf_get_build_number_of_app
+  end
+
   smf_create_github_release(
     build_number: build_number,
     tag: smf_get_tag_of_app(build_variant, build_number),
