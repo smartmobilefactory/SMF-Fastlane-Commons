@@ -88,6 +88,111 @@ end
 - Platform-specific error channels defined in constants
 - Exception handling via `smf_handle_exception` lane
 
+## Version Code Management (Android)
+
+### Overview (CBENEFIOS-1881)
+
+Since November 2025, Android builds use **Git tags as the source of truth** for version codes instead of committing Config.json on every build. This eliminates 18-54 commits per week across all client projects.
+
+### New Module: `smf_version_management`
+
+**Location:** `commons/smf_version_management/smf_get_next_version_code.rb`
+
+**Functions:**
+
+1. **`smf_get_next_version_code_from_tags(platform)`**
+   - Queries all Git tags matching `build/*/*` pattern
+   - Extracts highest version code
+   - Returns `highest + 1`
+   - Fallback to Config.json if no tags exist
+
+2. **`smf_is_ci?()`**
+   - Detects CI environment (Jenkins, GitHub Actions, etc.)
+   - Checks for `BUILD_NUMBER`, `CI`, `JENKINS_HOME` environment variables
+
+3. **`smf_get_current_version_code_from_apk(apk_path)`**
+   - Extracts version code from built APK using `aapt`
+   - Used for Git tag creation after build
+
+### Modified Lanes
+
+**`smf_super_build` (setup/android_setup.rb):**
+```ruby
+# CI: Use Git tags for version code
+if smf_is_ci?
+  version_code = smf_get_next_version_code_from_tags('android')
+else
+  version_code = @smf_fastlane_config[:app_version_code]
+end
+
+smf_build_android_app(
+  build_variant: variant,
+  keystore_folder: keystore_folder,
+  version_code: version_code  # NEW parameter
+)
+```
+
+**`smf_build_android_app` (commons/smf_build_app/smf_build_android_app.rb):**
+- Now accepts optional `version_code` parameter
+- Passes version code to Gradle as property
+- Project must support `project.hasProperty("versionCode")` in build.gradle.kts
+
+**`smf_super_pipeline_increment_build_number` (setup/android_setup.rb):**
+- Now skips Config.json increment for CI builds (no-op)
+- Only increments for local builds
+- Marked as deprecated for CI use
+
+**`smf_super_pipeline_create_git_tag` (setup/android_setup.rb):**
+- CI: Extracts version code from built APK (not Config.json)
+- Fallback to Git tags if extraction fails
+- Local: Uses Config.json (backward compatible)
+
+### Usage in Client Projects
+
+**build.gradle.kts:**
+```kotlin
+versionCode = if (project.hasProperty("versionCode")) {
+    project.property("versionCode").toString().toInt()  // From Fastlane
+} else {
+    (configJson?.get("app_version_code") as? Int) ?: 1  // Fallback
+}
+```
+
+**Jenkins Jobs:**
+- Can stop calling `smf_pipeline_increment_build_number` lane
+- Version code is automatically managed via Git tags
+- No Config.json commits needed
+
+### Benefits
+
+- **Before:** 18-54 Config.json commits per week (9 countries × 2-6 builds each)
+- **After:** 0 Config.json commits, only lightweight Git tags
+- **Backward Compatible:** Local builds still use Config.json
+- **Sequential:** Version codes remain sequential and unique
+
+### Git Tag Format
+
+```
+build/android/{variant}/{versionCode}
+
+Examples:
+build/android/de_alpha/3549
+build/android/tr_beta/3550
+build/android/it_live/3551
+```
+
+### Troubleshooting
+
+**Version code not incrementing:**
+- Check Git tags: `git tag -l 'build/*/*' | sort -V | tail -10`
+- Ensure tags are pushed to remote
+- Verify `smf_is_ci?` returns true in CI environment
+
+**Config.json still being committed:**
+- Verify SMF-Fastlane-Commons is updated to latest version
+- Check that `smf_pipeline_increment_build_number` is not called by Jenkins
+- CI environment detection should work automatically
+
 ## Working with This Codebase
 
 - Each lane/tool has its own directory with a README.md explaining usage
