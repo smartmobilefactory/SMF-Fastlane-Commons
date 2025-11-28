@@ -2,6 +2,7 @@ private_lane :smf_build_android_app do |options|
 
   build_variant = !options[:build_variant].nil? ? options[:build_variant] : ''
   keystore_folder = options[:keystore_folder]
+  version_code = options[:version_code]  # NEW: Optional version code parameter
 
   letters = build_variant.split('')
   letters[0] = letters[0].upcase if letters.length >= 1
@@ -39,6 +40,13 @@ private_lane :smf_build_android_app do |options|
       }
 
     end
+  end
+
+  # Add versionCode to properties if provided (for CI builds)
+  if version_code
+    properties ||= {}
+    properties["versionCode"] = version_code
+    UI.message("📦 Building with versionCode: #{version_code}")
   end
 
   gradle(

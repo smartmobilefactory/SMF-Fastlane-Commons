@@ -38,9 +38,22 @@ private_lane :smf_super_build do |options|
 
   UI.message("Keystore: #{keystore_folder}")
 
+  # Version Code Management (CBENEFIOS-1881)
+  # CI: Use Git tags (no Config.json commit)
+  # Local: Use Config.json (backward compatible)
+  version_code = nil
+  if smf_is_ci?
+    UI.message("🏗️  CI Build detected - using Git tags for version code")
+    version_code = smf_get_next_version_code_from_tags('android')
+  else
+    UI.message("🖥️  Local Build detected - using Config.json for version code")
+    version_code = @smf_fastlane_config[:app_version_code]
+  end
+
   smf_build_android_app(
       build_variant: variant,
-      keystore_folder: keystore_folder
+      keystore_folder: keystore_folder,
+      version_code: version_code
   )
 end
 
@@ -135,9 +148,22 @@ end
 
 
 # Increment Build Number
+# NOTE (CBENEFIOS-1881): This lane is deprecated for CI builds
+# CI builds now use Git tags for version code management (no Config.json commits)
+# This lane is kept for backward compatibility and local builds only
 
 private_lane :smf_super_pipeline_increment_build_number do |options|
 
+  if smf_is_ci?
+    UI.important("⚠️  CI Build detected - skipping Config.json increment")
+    UI.important("💡 Version code is now managed via Git tags (CBENEFIOS-1881)")
+    UI.important("💡 Jenkins jobs should stop calling this lane for CI builds")
+    # No-op for CI builds - version code comes from Git tags
+    return
+  end
+
+  # Local builds: Keep original behavior
+  UI.message("🖥️  Local Build - incrementing Config.json")
   smf_increment_build_number(
       current_build_number: smf_get_build_number_of_app
   )
@@ -152,7 +178,40 @@ end
 private_lane :smf_super_pipeline_create_git_tag do |options|
 
   build_variant = options[:build_variant]
-  build_number = smf_get_build_number_of_app
+
+  # Version Code Management (CBENEFIOS-1881)
+  # CI: Extract version code from built APK (not Config.json)
+  # Local: Use Config.json (backward compatible)
+  if smf_is_ci?
+    UI.message("🏗️  CI Build - extracting version code from APK")
+
+    # Try to get version code from built APK
+    apk_file_regex = smf_get_apk_file_regex(build_variant)
+    aab_file_regex = smf_get_aab_file_regex(build_variant)
+
+    apk_path = smf_get_file_path(apk_file_regex)
+    aab_path = smf_get_file_path(aab_file_regex)
+
+    build_number = nil
+
+    if apk_path && File.exist?(apk_path)
+      build_number = smf_get_current_version_code_from_apk(apk_path)
+    elsif aab_path && File.exist?(aab_path)
+      # For AAB, use aapt2 or fall back to Git tags
+      UI.message("📦 AAB found, using version code from Git tags + 1")
+      build_number = smf_get_next_version_code_from_tags('android')
+    end
+
+    if build_number.nil?
+      UI.important("⚠️  Could not extract version code from APK/AAB")
+      UI.important("💡 Falling back to Git tags")
+      build_number = smf_get_next_version_code_from_tags('android')
+    end
+  else
+    UI.message("🖥️  Local Build - using Config.json for version code")
+    build_number = smf_get_build_number_of_app
+  end
+
   smf_create_git_tag(build_variant: build_variant, build_number: build_number)
 end
 
