@@ -159,7 +159,7 @@ private_lane :smf_super_pipeline_increment_build_number do |options|
     UI.important("💡 Version code is now managed via Git tags (CBENEFIOS-1881)")
     UI.important("💡 Jenkins jobs should stop calling this lane for CI builds")
     # No-op for CI builds - version code comes from Git tags
-    return
+    next
   end
 
   # Local builds: Keep original behavior
