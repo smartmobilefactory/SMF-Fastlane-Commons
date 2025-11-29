@@ -28,29 +28,6 @@ def smf_import_commons
   if !Dir.exist?(@fastlane_commons_dir_path)
     UI.message('The fastlane commons directory does not exist yet.')
     smf_clone_fastlane_commons_repo
-  else
-    # Auto-update in CI environment to always use latest version
-    # This prevents stale cached versions from causing build issues
-    is_ci = !ENV['BUILD_NUMBER'].nil? || !ENV['CI'].nil? || !ENV['JENKINS_HOME'].nil? || !ENV['JENKINS_URL'].nil?
-    force_update = ENV['SMF_UPDATE_COMMONS'] == 'true'
-
-    if is_ci || force_update
-      if is_ci
-        UI.message('🏗️  CI environment detected - updating Fastlane Commons to latest version...')
-      else
-        UI.message('🔄 SMF_UPDATE_COMMONS=true - forcing update to latest version...')
-      end
-
-      begin
-        sh("cd #{@fastlane_commons_dir_path} && git fetch origin #{@fastlane_commons_branch} --quiet && git reset --hard origin/#{@fastlane_commons_branch} --quiet")
-        UI.success('✅ Updated Fastlane Commons to latest version')
-      rescue => e
-        UI.important("⚠️  Could not update Fastlane Commons: #{e.message}")
-        UI.important("💡 Continuing with cached version...")
-      end
-    else
-      UI.message('🖥️  Local build - using cached Fastlane Commons (set SMF_UPDATE_COMMONS=true to update)')
-    end
   end
 
   UI.message('Import files from fastlane commons directory.')
