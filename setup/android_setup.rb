@@ -46,8 +46,29 @@ private_lane :smf_super_build do |options|
     is_group_build = ENV['IS_GROUP_BUILD'] == 'true'
 
     if is_group_build
-      UI.message("🔗 Group Build detected - reusing current version code")
-      version_code = smf_get_current_version_code_from_tags('android')
+      UI.message("🔗 Group Build detected - smart version code selection")
+
+      # Get current highest and next version code
+      current_highest = smf_get_current_version_code_from_tags('android')
+      next_version = current_highest + 1
+
+      # Check if next version code is already used by another variant in this group
+      # This happens when we're NOT the first build in the group
+      next_version_tags = sh(
+        "git tag -l 'build/*/#{next_version}' 2>/dev/null",
+        log: false
+      ).strip
+
+      if next_version_tags.empty?
+        # No other variant has used next version yet → We are FIRST in group
+        version_code = next_version
+        UI.message("🔗 First build in group - incrementing: #{current_highest} → #{version_code}")
+      else
+        # Another variant already used next version → REUSE it
+        version_code = next_version
+        UI.message("🔗 Subsequent build in group - reusing: #{version_code}")
+        UI.message("📋 Other variants using #{version_code}: #{next_version_tags.split("\n").join(", ")}")
+      end
     else
       UI.message("🏗️  Single CI Build - incrementing version code")
       version_code = smf_get_next_version_code_from_tags('android')
