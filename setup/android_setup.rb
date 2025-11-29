@@ -197,32 +197,43 @@ private_lane :smf_super_pipeline_create_git_tag do |options|
   build_variant = options[:build_variant]
 
   # Version Code Management (CBENEFIOS-1881)
-  # CI: Extract version code from built APK (not Config.json)
+  # Group builds: Use Jenkins-provided version code
+  # Single builds: Extract from APK or use Git tags
   # Local: Use Config.json (backward compatible)
+
+  build_number = nil
+
   if smf_is_ci?
-    UI.message("🏗️  CI Build - extracting version code from APK")
+    is_group_build = ENV['IS_GROUP_BUILD'] == 'true'
 
-    # Try to get version code from built APK
-    apk_file_regex = smf_get_apk_file_regex(build_variant)
-    aab_file_regex = smf_get_aab_file_regex(build_variant)
+    if is_group_build && ENV['GROUP_BUILD_VERSION_CODE']
+      # Group build: Use version code provided by Jenkins
+      build_number = ENV['GROUP_BUILD_VERSION_CODE'].to_i
+      UI.message("🔗 Group Build - using version code from Jenkins: #{build_number}")
+    else
+      # Single build: Extract from APK or use Git tags
+      UI.message("🏗️  CI Build - extracting version code from APK")
 
-    apk_path = smf_get_file_path(apk_file_regex)
-    aab_path = smf_get_file_path(aab_file_regex)
+      # Try to get version code from built APK
+      apk_file_regex = smf_get_apk_file_regex(build_variant)
+      aab_file_regex = smf_get_aab_file_regex(build_variant)
 
-    build_number = nil
+      apk_path = smf_get_file_path(apk_file_regex)
+      aab_path = smf_get_file_path(aab_file_regex)
 
-    if apk_path && File.exist?(apk_path)
-      build_number = smf_get_current_version_code_from_apk(apk_path)
-    elsif aab_path && File.exist?(aab_path)
-      # For AAB, use aapt2 or fall back to Git tags
-      UI.message("📦 AAB found, using version code from Git tags + 1")
-      build_number = smf_get_next_version_code_from_tags('android')
-    end
+      if apk_path && File.exist?(apk_path)
+        build_number = smf_get_current_version_code_from_apk(apk_path)
+      elsif aab_path && File.exist?(aab_path)
+        # For AAB, use aapt2 or fall back to Git tags
+        UI.message("📦 AAB found, using version code from Git tags + 1")
+        build_number = smf_get_next_version_code_from_tags('android')
+      end
 
-    if build_number.nil?
-      UI.important("⚠️  Could not extract version code from APK/AAB")
-      UI.important("💡 Falling back to Git tags")
-      build_number = smf_get_next_version_code_from_tags('android')
+      if build_number.nil?
+        UI.important("⚠️  Could not extract version code from APK/AAB")
+        UI.important("💡 Falling back to Git tags")
+        build_number = smf_get_next_version_code_from_tags('android')
+      end
     end
   else
     UI.message("🖥️  Local Build - using Config.json for version code")
