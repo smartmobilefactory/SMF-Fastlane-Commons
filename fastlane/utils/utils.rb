@@ -80,29 +80,35 @@ def smf_get_build_number_of_app
     project_name = @smf_fastlane_config[:project][:project_name]
     build_number = get_build_number(xcodeproj: smf_get_xcodeproj_file_name)
   when :android
-    # CI: Use Git tags (CBENEFIOS-1881)
+    # CI: Use BUILD_VERSION_CODE from Jenkins (CBENEFIOS-1881)
     # Local: Use Config.json
     if smf_is_ci?
-      # In CI, git tag was already created - read from latest tag
-      begin
-        all_version_codes = sh(
-          "git tag -l 'build/*/*' 2>/dev/null | grep -oE '[0-9]+$' | sort -n",
-          log: false
-        ).strip
+      # Jenkins provides BUILD_VERSION_CODE for all CI builds
+      if ENV['BUILD_VERSION_CODE']
+        build_number = ENV['BUILD_VERSION_CODE']
+        UI.message("📊 Using version code from Jenkins: #{build_number}")
+      else
+        # Fallback: Read from latest git tag (after tag was created)
+        begin
+          all_version_codes = sh(
+            "git tag -l 'build/*/*' 2>/dev/null | grep -oE '[0-9]+$' | sort -n",
+            log: false
+          ).strip
 
-        if !all_version_codes.empty?
-          build_number = all_version_codes.split("\n").last
-          UI.message("📊 Using version code from Git tags: #{build_number}")
-        else
-          # Fallback to Config.json if no tags
+          if !all_version_codes.empty?
+            build_number = all_version_codes.split("\n").last
+            UI.message("📊 Using version code from Git tags: #{build_number}")
+          else
+            # Fallback to Config.json if no tags
+            build_number = @smf_fastlane_config[:app_version_code].to_s
+            UI.important("⚠️  No Git tags found, using Config.json: #{build_number}")
+          end
+        rescue => e
+          # Error reading tags - fallback to Config.json
+          UI.error("❌ Error reading Git tags: #{e.message}")
           build_number = @smf_fastlane_config[:app_version_code].to_s
-          UI.important("⚠️  No Git tags found, using Config.json: #{build_number}")
+          UI.important("⚠️  Falling back to Config.json: #{build_number}")
         end
-      rescue => e
-        # Error reading tags - fallback to Config.json
-        UI.error("❌ Error reading Git tags: #{e.message}")
-        build_number = @smf_fastlane_config[:app_version_code].to_s
-        UI.important("⚠️  Falling back to Config.json: #{build_number}")
       end
     else
       # Local: Use Config.json

@@ -39,27 +39,23 @@ private_lane :smf_super_build do |options|
   UI.message("Keystore: #{keystore_folder}")
 
   # Version Code Management (CBENEFIOS-1881)
-  # CI: Use Git tags (no Config.json commit)
+  # CI: Jenkins calculates version code once and provides via ENV variable
   # Local: Use Config.json (backward compatible)
   version_code = nil
   if smf_is_ci?
-    is_group_build = ENV['IS_GROUP_BUILD'] == 'true'
+    # Jenkins provides BUILD_VERSION_CODE for all CI builds (single + group)
+    if ENV['BUILD_VERSION_CODE']
+      version_code = ENV['BUILD_VERSION_CODE'].to_i
+      UI.message("🔢 Using version code from Jenkins: #{version_code}")
 
-    if is_group_build
-      UI.message("🔗 Group Build detected - using shared version code")
-
-      # Jenkins calculates version once and sets it as ENV variable (CBENEFIOS-1881)
-      # All builds in the group reuse this same version code
-      if ENV['GROUP_BUILD_VERSION_CODE']
-        version_code = ENV['GROUP_BUILD_VERSION_CODE'].to_i
-        UI.message("🔢 Using version code from Jenkins: #{version_code}")
+      if ENV['IS_GROUP_BUILD'] == 'true'
+        UI.message("🔗 Group Build - all variants share this version code")
       else
-        # Fallback if ENV variable not set (shouldn't happen in CI)
-        UI.important("⚠️  GROUP_BUILD_VERSION_CODE not set, falling back to tag-based calculation")
-        version_code = smf_get_next_version_code_from_tags('android')
+        UI.message("🏗️  Single Build")
       end
     else
-      UI.message("🏗️  Single CI Build - incrementing version code")
+      # Fallback if ENV variable not set (shouldn't happen in CI)
+      UI.important("⚠️  BUILD_VERSION_CODE not set, falling back to tag-based calculation")
       version_code = smf_get_next_version_code_from_tags('android')
     end
   else
@@ -197,24 +193,20 @@ private_lane :smf_super_pipeline_create_git_tag do |options|
   build_variant = options[:build_variant]
 
   # Version Code Management (CBENEFIOS-1881)
-  # Group builds: Use Jenkins-provided version code
-  # Single builds: Extract from APK or use Git tags
+  # CI: Jenkins provides BUILD_VERSION_CODE for all builds
   # Local: Use Config.json (backward compatible)
 
   build_number = nil
 
   if smf_is_ci?
-    is_group_build = ENV['IS_GROUP_BUILD'] == 'true'
-
-    if is_group_build && ENV['GROUP_BUILD_VERSION_CODE']
-      # Group build: Use version code provided by Jenkins
-      build_number = ENV['GROUP_BUILD_VERSION_CODE'].to_i
-      UI.message("🔗 Group Build - using version code from Jenkins: #{build_number}")
+    # Jenkins provides BUILD_VERSION_CODE for all CI builds
+    if ENV['BUILD_VERSION_CODE']
+      build_number = ENV['BUILD_VERSION_CODE'].to_i
+      UI.message("🔢 Using version code from Jenkins for git tag: #{build_number}")
     else
-      # Single build: Extract from APK or use Git tags
-      UI.message("🏗️  CI Build - extracting version code from APK")
+      # Fallback: Try to extract from APK or use Git tags
+      UI.important("⚠️  BUILD_VERSION_CODE not set, trying APK extraction")
 
-      # Try to get version code from built APK
       apk_file_regex = smf_get_apk_file_regex(build_variant)
       aab_file_regex = smf_get_aab_file_regex(build_variant)
 
@@ -224,8 +216,7 @@ private_lane :smf_super_pipeline_create_git_tag do |options|
       if apk_path && File.exist?(apk_path)
         build_number = smf_get_current_version_code_from_apk(apk_path)
       elsif aab_path && File.exist?(aab_path)
-        # For AAB, use aapt2 or fall back to Git tags
-        UI.message("📦 AAB found, using version code from Git tags + 1")
+        UI.message("📦 AAB found, using version code from Git tags")
         build_number = smf_get_next_version_code_from_tags('android')
       end
 
