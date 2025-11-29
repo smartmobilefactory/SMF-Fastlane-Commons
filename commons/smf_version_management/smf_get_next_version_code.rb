@@ -16,8 +16,8 @@ def smf_get_next_version_code_from_tags(platform = nil)
   UI.message("🔍 Querying Git tags for version code...")
 
   begin
-    # Fetch all tags to ensure we have the latest
-    sh("git fetch --tags --quiet 2>&1 || true")
+    # Fetch build tags (optimized: only once per build, only build/* tags)
+    _smf_fetch_build_tags_once
 
     # Query all build tags and extract version codes
     # Format: build/android/de_alpha/3548 or build/de_alpha/3548
@@ -85,5 +85,65 @@ def smf_get_current_version_code_from_apk(apk_path)
   rescue => e
     UI.error("❌ Error extracting versionCode from APK: #{e.message}")
     return nil
+  end
+end
+
+# Get CURRENT highest version code from Git tags (for group builds - reuse same version)
+# This is used when IS_GROUP_BUILD=true to ensure all builds in a group use the same version code
+def smf_get_current_version_code_from_tags(platform = nil)
+  UI.message("🔍 Querying Git tags for current version code (group build)...")
+
+  begin
+    # Fetch build tags (optimized: only once per build, only build/* tags)
+    _smf_fetch_build_tags_once
+
+    # Query all build tags and extract version codes
+    all_version_codes = sh(
+      "git tag -l 'build/*/*' 2>/dev/null | grep -oE '[0-9]+$' | sort -n",
+      log: false
+    ).strip
+
+    if all_version_codes.empty?
+      # No tags found - fallback to Config.json
+      base_version = @smf_fastlane_config[:app_version_code] || 1
+      UI.important("⚠️  No Git tags found, using Config.json: #{base_version}")
+      return base_version
+    end
+
+    # Get highest version code from all tags (reuse for group build)
+    current_version = all_version_codes.split("\n").last.to_i
+
+    UI.message("📊 Current highest versionCode from Git tags: #{current_version}")
+    UI.message("🔗 Reusing versionCode for group build: #{current_version}")
+
+    return current_version
+
+  rescue => e
+    # Error reading tags - fallback to Config.json
+    UI.error("❌ Error reading Git tags: #{e.message}")
+    base_version = @smf_fastlane_config[:app_version_code] || 1
+    UI.important("⚠️  Falling back to Config.json: #{base_version}")
+    return base_version
+  end
+end
+
+# Private: Fetch build tags from remote (optimized - only once per build)
+# Uses caching to avoid multiple fetches in the same pipeline
+def _smf_fetch_build_tags_once
+  # Use instance variable to cache across function calls
+  if @smf_build_tags_fetched.nil?
+    UI.message("🔄 Fetching build tags from remote (optimized: only build/* tags)...")
+    begin
+      # Option 1 + 3: Fetch only build/* tags, only once per build
+      sh("git fetch origin 'refs/tags/build/*:refs/tags/build/*' --quiet --force 2>&1 || true")
+      @smf_build_tags_fetched = true
+      UI.success("✅ Fetched build tags successfully")
+    rescue => e
+      UI.important("⚠️  Could not fetch tags: #{e.message}")
+      UI.important("💡 Continuing with local tags...")
+      @smf_build_tags_fetched = true  # Don't retry on error
+    end
+  else
+    UI.message("📦 Using cached build tags (already fetched in this pipeline)")
   end
 end

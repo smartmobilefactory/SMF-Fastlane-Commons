@@ -43,8 +43,15 @@ private_lane :smf_super_build do |options|
   # Local: Use Config.json (backward compatible)
   version_code = nil
   if smf_is_ci?
-    UI.message("🏗️  CI Build detected - using Git tags for version code")
-    version_code = smf_get_next_version_code_from_tags('android')
+    is_group_build = ENV['IS_GROUP_BUILD'] == 'true'
+
+    if is_group_build
+      UI.message("🔗 Group Build detected - reusing current version code")
+      version_code = smf_get_current_version_code_from_tags('android')
+    else
+      UI.message("🏗️  Single CI Build - incrementing version code")
+      version_code = smf_get_next_version_code_from_tags('android')
+    end
   else
     UI.message("🖥️  Local Build detected - using Config.json for version code")
     version_code = @smf_fastlane_config[:app_version_code]
