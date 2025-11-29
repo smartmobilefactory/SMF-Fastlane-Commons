@@ -3,7 +3,7 @@ private_lane :smf_upload_to_testflight do |options|
   slack_channel = options[:slack_channel]
 
   if options[:upload_itc] != true
-    UI.message("Upload to iTunes Connect is not enabled for this build variant.")
+    UI.message("Upload to TestFlight is not enabled for this build variant.")
     next
   end
 
@@ -37,10 +37,11 @@ private_lane :smf_upload_to_testflight do |options|
       options[:build_variant],
       slack_channel,
       options[:bundle_identifier],
-      username
+      username,
+      options[:precheck_include_in_app_purchases]
   )
 
-  UI.important("Uploading the build to Testflight.")
+  UI.important("Uploading the build to TestFlight.")
   upload_to_testflight(
       apple_id: itc_apple_id,
       team_id: itc_team_id,
@@ -52,7 +53,7 @@ private_lane :smf_upload_to_testflight do |options|
   )
 end
 
-def _smf_itunes_precheck(build_variant, slack_channel, bundle_identifier, username)
+def _smf_itunes_precheck(build_variant, slack_channel, bundle_identifier, username, include_in_app_purchases = true)
 
   begin
 
@@ -71,13 +72,14 @@ def _smf_itunes_precheck(build_variant, slack_channel, bundle_identifier, userna
     precheck(
         api_key: api_key_for_precheck,
         username: api_key_for_precheck ? nil : username,
-        app_identifier: bundle_identifier
+        app_identifier: bundle_identifier,
+        include_in_app_purchases: include_in_app_purchases
     )
 
   rescue => exception
 
-    title = "Fastlane Precheck found Metadata issues in iTunes Connect for #{smf_get_default_name_and_version(build_variant)} 😢"
-    message = "The build will continue to upload to iTunes Connect, but you may need to fix the Metadata issues before releasing the app."
+    title = "Fastlane Precheck found Metadata issues in App Store Connect for #{smf_get_default_name_and_version(build_variant)} 😢"
+    message = "The build will continue to upload to App Store Connect, but you may need to fix the Metadata issues before releasing the app."
 
     smf_send_message(
         title: title,
