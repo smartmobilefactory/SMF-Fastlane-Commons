@@ -56,11 +56,20 @@ def _smf_update_build_number_in_project(build_number, skip_update_in_plists)
       skip_info_plist: skip_update_in_plists
     )
 
-    commit_version_bump(
-      xcodeproj: smf_get_xcodeproj_file_name,
-      message: "Increment build number to #{build_number}",
-      force: true
-    )
+    # Skip commit in CI (CBENEFIOS-1899)
+    # CI: Plist files are updated for the build but not committed (similar to Xcode Cloud)
+    # Local: Commit changes for local development workflow
+    unless smf_is_ci?
+      UI.message("🖥️  Local Build - committing plist changes")
+      commit_version_bump(
+        xcodeproj: smf_get_xcodeproj_file_name,
+        message: "Increment build number to #{build_number}",
+        force: true
+      )
+    else
+      UI.message("🔢 CI Build - skipping plist commit (changes applied to build only)")
+      UI.message("   Build will use number #{build_number}, but plists won't be committed")
+    end
   when :android
     new_config = @smf_fastlane_config
     new_config[:app_version_code] = build_number.to_i
