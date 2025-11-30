@@ -422,3 +422,143 @@ end
 lane :smf_send_slack_notification do |options|
   smf_super_send_slack_notification(options)
 end
+
+
+# Prepare App Store Release (Job 2)
+# Creates a new App Store version with metadata (localized release notes) without uploading a binary
+
+private_lane :smf_super_prepare_app_store_release do |options|
+
+  build_variant = smf_build_variant(options)
+  version_name = options[:version_name]
+  metadata_path = options[:metadata_path] || "#{smf_workspace_dir}/iosApp/fastlane/metadata"
+  dry_run = options[:dry_run] || false
+
+  # Get config for this variant
+  bundle_id = smf_config_get(build_variant, :bundle_identifier)
+  itc_team_id = smf_config_get(build_variant, :itc_team_id)
+  username = smf_config_get(build_variant, :apple_id)
+
+  UI.header "📝 Preparing App Store release for #{build_variant}"
+  UI.message "   Version: #{version_name}"
+  UI.message "   Bundle ID: #{bundle_id}"
+  UI.message "   Metadata Path: #{metadata_path}"
+
+  if dry_run
+    UI.important "🔍 DRY RUN - No changes will be made to App Store Connect"
+    return
+  end
+
+  # Create App Store Connect API key if environment variables are available
+  api_key = nil
+  if ENV['APP_STORE_CONNECT_API_KEY_ID'] && ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'] && ENV['APP_STORE_CONNECT_API_KEY_PATH']
+    UI.message 'Using App Store Connect API key for authentication'
+    api_key = app_store_connect_api_key(
+      key_id: ENV['APP_STORE_CONNECT_API_KEY_ID'],
+      issuer_id: ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'],
+      key_filepath: ENV['APP_STORE_CONNECT_API_KEY_PATH'],
+      duration: 1200,
+      in_house: false
+    )
+  else
+    UI.message 'Using username/password authentication (fallback)'
+  end
+
+  ENV["FASTLANE_ITC_TEAM_ID"] = itc_team_id
+
+  # Prepare metadata (create version, upload release notes)
+  deliver(
+    app_identifier: bundle_id,
+    skip_binary_upload: true,
+    metadata_path: metadata_path,
+    app_version: version_name,
+    skip_screenshots: true,
+    skip_metadata: false,
+    force: true,  # Create version if doesn't exist
+    run_precheck_before_submit: false,
+    api_key: api_key,
+    username: api_key ? nil : username,
+    team_id: itc_team_id
+  )
+
+  UI.success "✅ App Store release prepared for #{build_variant} (Version: #{version_name})"
+end
+
+lane :smf_prepare_app_store_release do |options|
+  smf_super_prepare_app_store_release(options)
+end
+
+
+# Submit TestFlight Build to App Store (Job 3)
+# Takes an existing TestFlight build and submits it for App Store review
+
+private_lane :smf_super_submit_testflight_to_app_store do |options|
+
+  build_variant = smf_build_variant(options)
+  version_name = options[:version_name]
+  build_number = options[:build_number]
+  submit_for_review = options[:submit_for_review] != false
+  automatic_release = options[:automatic_release] || false
+  dry_run = options[:dry_run] || false
+
+  # Get config for this variant
+  bundle_id = smf_config_get(build_variant, :bundle_identifier)
+  itc_team_id = smf_config_get(build_variant, :itc_team_id)
+  username = smf_config_get(build_variant, :apple_id)
+
+  UI.header "🚀 Submitting to App Store for #{build_variant}"
+  UI.message "   Version: #{version_name}"
+  UI.message "   Build: #{build_number}"
+  UI.message "   Bundle ID: #{bundle_id}"
+  UI.message "   Submit for review: #{submit_for_review}"
+  UI.message "   Automatic release: #{automatic_release}"
+
+  if dry_run
+    UI.important "🔍 DRY RUN - No changes will be made to App Store Connect"
+    return
+  end
+
+  # Create App Store Connect API key if environment variables are available
+  api_key = nil
+  if ENV['APP_STORE_CONNECT_API_KEY_ID'] && ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'] && ENV['APP_STORE_CONNECT_API_KEY_PATH']
+    UI.message 'Using App Store Connect API key for authentication'
+    api_key = app_store_connect_api_key(
+      key_id: ENV['APP_STORE_CONNECT_API_KEY_ID'],
+      issuer_id: ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'],
+      key_filepath: ENV['APP_STORE_CONNECT_API_KEY_PATH'],
+      duration: 1200,
+      in_house: false
+    )
+  else
+    UI.message 'Using username/password authentication (fallback)'
+  end
+
+  ENV["FASTLANE_ITC_TEAM_ID"] = itc_team_id
+
+  # Submit existing TestFlight build to App Store
+  deliver(
+    app_identifier: bundle_id,
+    build_number: build_number,
+    app_version: version_name,
+    skip_binary_upload: true,
+    submit_for_review: submit_for_review,
+    automatic_release: automatic_release,
+    skip_screenshots: true,
+    skip_metadata: true,  # Metadata already uploaded in Job 2
+    run_precheck_before_submit: true,
+    precheck_include_in_app_purchases: false,
+    submission_information: {
+      export_compliance_uses_encryption: false,
+      add_id_info_uses_idfa: false
+    },
+    api_key: api_key,
+    username: api_key ? nil : username,
+    team_id: itc_team_id
+  )
+
+  UI.success "✅ #{build_variant} submitted to App Store (Version: #{version_name}, Build: #{build_number})"
+end
+
+lane :smf_submit_testflight_to_app_store do |options|
+  smf_super_submit_testflight_to_app_store(options)
+end
