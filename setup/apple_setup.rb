@@ -562,3 +562,73 @@ end
 lane :smf_submit_testflight_to_app_store do |options|
   smf_super_submit_testflight_to_app_store(options)
 end
+
+
+# Get Latest Draft Version from App Store Connect
+# Returns the latest version in PREPARE_FOR_SUBMISSION state
+
+private_lane :smf_super_get_latest_draft_version do |options|
+
+  build_variant = smf_build_variant(options)
+
+  # Get config for this variant
+  bundle_id = smf_config_get(build_variant, :bundle_identifier)
+  itc_team_id = smf_config_get(build_variant, :itc_team_id)
+  username = smf_config_get(build_variant, :apple_id)
+
+  # Create App Store Connect API key if environment variables are available
+  api_key = nil
+  if ENV['APP_STORE_CONNECT_API_KEY_ID'] && ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'] && ENV['APP_STORE_CONNECT_API_KEY_PATH']
+    api_key = app_store_connect_api_key(
+      key_id: ENV['APP_STORE_CONNECT_API_KEY_ID'],
+      issuer_id: ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'],
+      key_filepath: ENV['APP_STORE_CONNECT_API_KEY_PATH'],
+      duration: 1200,
+      in_house: false
+    )
+  end
+
+  require 'spaceship'
+
+  # Initialize Spaceship with API key or username/password
+  if api_key
+    Spaceship::ConnectAPI.token = api_key
+  else
+    Spaceship::ConnectAPI.login(username)
+  end
+
+  # Find the app
+  app = Spaceship::ConnectAPI::App.find(bundle_id)
+
+  if app.nil?
+    UI.error "❌ App not found with bundle ID: #{bundle_id}"
+    return nil
+  end
+
+  # Get all App Store versions
+  versions = app.get_app_store_versions
+
+  # Filter for PREPARE_FOR_SUBMISSION (draft, not submitted)
+  draft_versions = versions.select do |v|
+    v.app_store_state == Spaceship::ConnectAPI::AppStoreVersion::AppStoreState::PREPARE_FOR_SUBMISSION
+  end
+
+  if draft_versions.any?
+    # Sort by version string (semantic versioning)
+    sorted_versions = draft_versions.sort_by { |v| Gem::Version.new(v.version_string) }.reverse
+    latest = sorted_versions.first
+
+    UI.message "📦 Latest draft version for #{build_variant}: #{latest.version_string}"
+    return latest.version_string
+  else
+    UI.message "ℹ️  No draft version found for #{build_variant}"
+    return nil
+  end
+rescue => ex
+  UI.error "❌ Error getting draft version: #{ex.message}"
+  return nil
+end
+
+lane :smf_get_latest_draft_version do |options|
+  smf_super_get_latest_draft_version(options)
+end
