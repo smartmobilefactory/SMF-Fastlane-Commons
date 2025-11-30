@@ -598,7 +598,7 @@ private_lane :smf_super_get_latest_draft_version do |options|
 
   if app.nil?
     UI.error "❌ App not found with bundle ID: #{bundle_id}"
-    return nil
+    next nil
   end
 
   # Get all App Store versions
@@ -615,14 +615,14 @@ private_lane :smf_super_get_latest_draft_version do |options|
     latest = sorted_versions.first
 
     UI.message "📦 Latest draft version for #{build_variant}: #{latest.version_string}"
-    return latest.version_string
+    next latest.version_string
   else
     UI.message "ℹ️  No draft version found for #{build_variant}"
-    return nil
+    next nil
   end
 rescue => ex
   UI.error "❌ Error getting draft version: #{ex.message}"
-  return nil
+  next nil
 end
 
 lane :smf_get_latest_draft_version do |options|
