@@ -583,8 +583,7 @@ private_lane :smf_super_get_latest_draft_version do |options|
       key_id: ENV['APP_STORE_CONNECT_API_KEY_ID'],
       issuer_id: ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'],
       key_filepath: ENV['APP_STORE_CONNECT_API_KEY_PATH'],
-      duration: 1200,
-      in_house: false
+      duration: 1200
     )
   end
 
