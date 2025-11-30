@@ -587,10 +587,9 @@ private_lane :smf_super_get_latest_draft_version do |options|
 
   require 'spaceship'
 
-  # Initialize Spaceship with API key or username/password
-  if api_key
-    Spaceship::ConnectAPI.token = api_key
-  else
+  # Initialize Spaceship with username/password if API key is not used
+  # (API key authentication is handled automatically by app_store_connect_api_key with set_spaceship_token: true)
+  if !api_key
     Spaceship::ConnectAPI.login(username)
   end
 
