@@ -71,11 +71,8 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
   extensions_suffixes = options[:extensions_suffixes]
   apple_id = options[:apple_id]
   team_id = options[:team_id]
-  # template_name = options[:template_name] # Removed due to Apple API deprecation
 
   force = options[:force]
-  # Note: template_name parameter removed due to Apple API deprecation (May 2025)
-  # See: https://github.com/fastlane/fastlane/issues/29498
   force = force.nil? ? false : force
 
   platform = options[:platform]
@@ -105,10 +102,10 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
   UI.message("APP_STORE_CONNECT_API_KEY_PATH: #{ENV['APP_STORE_CONNECT_API_KEY_PATH'] ? 'SET' : 'NOT SET'}")
 
   # Potential conflicting Fastlane variables
-  UI.message("FASTLANE_API_KEY_PATH: #{ENV['FASTLANE_API_KEY_PATH'] ? 'SET' : 'NOT SET'}")
-  UI.message("APP_STORE_CONNECT_API_KEY_KEY_FILEPATH: #{ENV['APP_STORE_CONNECT_API_KEY_KEY_FILEPATH'] ? 'SET' : 'NOT SET'}")
   UI.message("FASTLANE_API_KEY: #{ENV['FASTLANE_API_KEY'] ? 'SET' : 'NOT SET'}")
+  UI.message("FASTLANE_API_KEY_PATH: #{ENV['FASTLANE_API_KEY_PATH'] ? 'SET' : 'NOT SET'}")
   UI.message("APP_STORE_CONNECT_API_KEY: #{ENV['APP_STORE_CONNECT_API_KEY'] ? 'SET' : 'NOT SET'}")
+  UI.message("APP_STORE_CONNECT_API_KEY_KEY_FILEPATH: #{ENV['APP_STORE_CONNECT_API_KEY_KEY_FILEPATH'] ? 'SET' : 'NOT SET'}")
 
   # Search for any environment variable containing 'API_KEY'
   api_key_vars = ENV.select { |key, value| key.upcase.include?('API_KEY') && !value.nil? && !value.empty? }
@@ -129,10 +126,6 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
 
   UI.important("=== END DEBUG ===")
 
-  # Original debug messages for backward compatibility
-  UI.message("API Key ID set: #{ENV['APP_STORE_CONNECT_API_KEY_ID'] ? 'YES' : 'NO'}")
-  UI.message("API Key Issuer ID set: #{ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'] ? 'YES' : 'NO'}")
-  UI.message("API Key Path set: #{ENV['APP_STORE_CONNECT_API_KEY_PATH'] ? 'YES' : 'NO'}")
   
   if ENV['APP_STORE_CONNECT_API_KEY_ID'] && ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'] && ENV['APP_STORE_CONNECT_API_KEY_PATH']
     UI.message('Using App Store Connect API key for provisioning profiles')
@@ -140,8 +133,7 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
       key_id: ENV['APP_STORE_CONNECT_API_KEY_ID'],
       issuer_id: ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'],
       key_filepath: ENV['APP_STORE_CONNECT_API_KEY_PATH'],
-      duration: 1200,
-      in_house: false
+      duration: 1200
     )
   else
     UI.message('Using username/password authentication for provisioning profiles (fallback)')

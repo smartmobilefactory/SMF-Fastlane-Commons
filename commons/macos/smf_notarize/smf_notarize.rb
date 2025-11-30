@@ -21,8 +21,7 @@ private_lane :smf_notarize do |options|
       key_id: ENV['APP_STORE_CONNECT_API_KEY_ID'],
       issuer_id: ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'],
       key_filepath: ENV['APP_STORE_CONNECT_API_KEY_PATH'],
-      duration: 1200,
-      in_house: false
+      duration: 1200
     )
   else
     UI.message('Using username/password authentication for notarization (fallback)')
