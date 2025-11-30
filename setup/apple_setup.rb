@@ -457,8 +457,7 @@ private_lane :smf_super_prepare_app_store_release do |options|
       key_id: ENV['APP_STORE_CONNECT_API_KEY_ID'],
       issuer_id: ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'],
       key_filepath: ENV['APP_STORE_CONNECT_API_KEY_PATH'],
-      duration: 1200,
-      in_house: false
+      duration: 1200
     )
   else
     UI.message 'Using username/password authentication (fallback)'
@@ -526,8 +525,7 @@ private_lane :smf_super_submit_testflight_to_app_store do |options|
       key_id: ENV['APP_STORE_CONNECT_API_KEY_ID'],
       issuer_id: ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'],
       key_filepath: ENV['APP_STORE_CONNECT_API_KEY_PATH'],
-      duration: 1200,
-      in_house: false
+      duration: 1200
     )
   else
     UI.message 'Using username/password authentication (fallback)'
