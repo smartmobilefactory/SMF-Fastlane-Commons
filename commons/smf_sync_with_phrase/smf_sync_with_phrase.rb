@@ -4,7 +4,6 @@ require 'phrase'
 # APPLE
 APPLE_LOCALE_DIR_POSTFIX = '.lproj'.freeze
 APPLE_API_TOKEN_KEY = 'PHRASEAPP_API_ACCESS_TOKEN'.freeze
-APPLE_CUSTOM_API_TOKEN_KEY = 'CUSTOM_PHRASE_APP_TOKEN'.freeze
 APPLE_LOCALIZABLE_FORMAT = 'strings'.freeze
 
 # ANDROID
@@ -27,9 +26,7 @@ private_lane :smf_sync_with_phrase do |options|
   project_id = options[:project_id]
   raise 'Unable to sync with phrase, missing project id' unless project_id
 
-  # Optional, set to true if apple project contains custom api token
-  use_custom_api_token = options[:use_custom_api_token]
-  api_token = _smf_api_token(use_custom_api_token)
+  api_token = _smf_api_token
   upload_api_client = _smf_api_client(:upload, api_token)
   download_api_client = _smf_api_client(:download, api_token)
 
@@ -385,13 +382,11 @@ end
 
 ############################### HELPERS #######################
 
-# returns the correct api token based on platform and possible custom token
-def _smf_api_token(use_custom_api_token)
+# returns the correct api token based on platform
+def _smf_api_token
   case @platform
   when :ios, :macos, :apple
     api_token_key = APPLE_API_TOKEN_KEY
-    api_token_key = APPLE_CUSTOM_API_TOKEN_KEY if use_custom_api_token
-
   when :android
     api_token_key = ANDROID_API_TOKEN_KEY
   end

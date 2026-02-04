@@ -1,99 +1,5 @@
 require 'json'
 
-########## DEPRECATED CODE START #########
-# This code is deprecated and should be removed as soon as most
-# of the projects are migrated.
-# TICKET: https://sosimple.atlassian.net/browse/SMFIT-1867 (19.04.2021)
-# !!! Also search for "deprecated" in this file and remove the marked lines !!!
-
-FALLBACK_TEMPLATE_CREDENTIAL_KEY = 'PIPELINE_TEMPLATE_CREDENTIAL'
-CUSTOM_IOS_CREDENTIALS = [
-  '__CUSTOM_PHRASE_APP_TOKEN__'
-]
-
-CUSTOM_CREDENTIALS_SECTION_KEY = '__CUSTOM_CREDENTIALS__'
-CUSTOM_CREDENTIALS_SECTION = """
-// This way of using custom credentials is deprecated and will be removed
-// as soon as most of the projects are migrated
-// TICKET: https://sosimple.atlassian.net/browse/SMFIT-1867 (19.04.2021)
-
-_custom_credentials = [
-  'CUSTOM_PHRASE_APP_TOKEN': '__CUSTOM_PHRASE_APP_TOKEN__',
-]
-
-_build_parameters['custom_credentials'] = _custom_credentials
-"""
-
-def _smf_custom_credential_deprecation_warning
-  case @platform
-  when :ios, :macos, :apple
-
-    custom_credential_keys = smf_config_get(nil, :project, :custom_credentials)
-
-    if custom_credential_keys.nil? == false && custom_credential_keys.empty? == false
-      _, credential_key = custom_credential_keys.first
-
-      if credential_key.is_a?(Hash) == false
-        migration_guide_url = 'https://sosimple.atlassian.net/l/c/QZebJa0M'
-        message = "This project uses a deprecated way to setup custom credentials, please update using this migration guide: #{migration_guide_url}"
-        estimated_time = '10m'
-        requirements = ['Access to the project on Github']
-
-        smf_send_deprecation_warning(
-          title: 'Custom Credential Passing',
-          message: message,
-          estimated_time: estimated_time,
-          requirements: requirements
-        )
-
-        return false
-      end
-    end
-  end
-
-  true
-end
-
-def _smf_insert_custom_credentials(jenkinsFile)
-  jenkinsFileData = jenkinsFile
-  case @platform
-  when :ios, :macos, :apple
-    should_skip = _smf_custom_credential_deprecation_warning
-
-    return jenkinsFileData.gsub(CUSTOM_CREDENTIALS_SECTION_KEY, '') if should_skip
-
-    custom_credentials_section = CUSTOM_CREDENTIALS_SECTION
-
-    CUSTOM_IOS_CREDENTIALS.each do |custom_credential_placeholder|
-      custom_credential_key = smf_config_get(
-        nil,
-        :project, :custom_credentials, custom_credential_placeholder.to_sym
-      )
-
-      if custom_credential_key
-        custom_credentials_section.gsub!(custom_credential_placeholder, custom_credential_key)
-      else
-        custom_credentials_section.gsub!(custom_credential_placeholder, FALLBACK_TEMPLATE_CREDENTIAL_KEY)
-      end
-    end
-
-    jenkinsFileData.gsub!(CUSTOM_CREDENTIALS_SECTION_KEY, custom_credentials_section)
-
-  when :android
-  when :flutter
-    UI.message('Inserting custom credentials for flutter is not implemented yet')
-  when :ios_framework
-  else
-    UI.message("There is no platform \"#{@platform}\", exiting...")
-    raise 'Unknown platform'
-  end
-
-  jenkinsFileData
-end
-
-############################ DEPRECATION END ################
-
-
 # Local Constants
 BUILD_VARIANTS_PATTERN = '__BUILD_VARIANTS__'
 POD_EXAMPLE_VARIANTS_PATTERN = '__EXAMPLE_VARIANTS__'
@@ -138,9 +44,6 @@ private_lane :smf_generate_jenkins_file do |options|
   end
 
   jenkinsFileData = jenkinsFileData.gsub("#{BUILD_VARIANTS_PATTERN}", JSON.dump(possible_build_variants))
-
-  # Deprecated, remove after migration,
-  jenkinsFileData = _smf_insert_custom_credentials(jenkinsFileData)
 
   jenkinsFileData = _smf_insert_build_nodes(jenkinsFileData, ios_build_nodes)
 

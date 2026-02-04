@@ -234,11 +234,7 @@ end
 def transform_value_if_necessary(key, value)
   case key
   when :access_token_key
-    if value != $SMF_PHRASE_APP_ACCESS_TOKEN_KEY
-      return ENV[$SMF_PHRASE_APP_CUSTOM_TOKEN_KEY]
-    else
-      return ENV[$SMF_PHRASE_APP_ACCESS_TOKEN_KEY]
-    end
+    return ENV[$SMF_PHRASE_APP_ACCESS_TOKEN_KEY]
   when :locales, :files
     return value.join(" ")
   when :forbid_comments_in_source

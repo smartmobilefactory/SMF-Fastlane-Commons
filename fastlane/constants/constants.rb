@@ -27,7 +27,6 @@ $SMF_CI_DIAGNOSTIC_CHANNEL = 'ci-diagnostic-messages'
 
 # PhraseApp
 $SMF_PHRASE_APP_ACCESS_TOKEN_KEY = 'PHRASEAPP_API_ACCESS_TOKEN'
-$SMF_PHRASE_APP_CUSTOM_TOKEN_KEY = 'CUSTOM_PHRASE_APP_TOKEN'
 $SMF_PHRASE_APP_SCRIPTS_REPO_URL = 'git@github.com:smartmobilefactory/Phraseapp-CI.git'
 
 # Changelog

@@ -45,7 +45,6 @@ The `default` language is the one who's key-value pairs will be uploaded to phra
 
 | Parameter     | Type          | Required  | Description |
 |:------------- |:------------- |:--------- |:----------- |
-|use_custom_api_token|Bool|false|If there is a custom api token set in the config.json for phraseapp, set this to true to use it.|
 |base|String|true|The base locale which is uploaded to phrase. This can either be 'base' or any other commonly known locale (e.g. 'de', 'fr', 'en', ..)|
 |extensions|Array|false|An array with a maps of extensions, see 'Extensions' section below for more details.|
 
