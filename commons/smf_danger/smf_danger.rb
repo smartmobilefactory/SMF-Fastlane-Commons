@@ -163,16 +163,21 @@ def _smf_check_valid_xcode_config(options)
     return
   end
 
+  # Clear target settings cache before analysis (CBENEFIOS-2076)
+  # This ensures fresh data while still benefiting from caching within this analysis run
+  smf_clear_target_settings_cache if defined?(smf_clear_target_settings_cache)
+
   xcode_settings = smf_xcodeproj_settings(options)
-  # If invalid, set warning under env 'DANGER_ENABLE_BITCODE'
-  smf_analyse_bitcode(xcode_settings, options)
+
+  # Bitcode analysis skipped - deprecated since Xcode 14 (CBENEFIOS-2076)
+  # smf_analyse_bitcode(xcode_settings, options)
+
   # If invalid, set warning under env 'DANGER_SWIFT_VERSION'
   smf_analyse_swift_version(xcode_settings, options)
-  # If invalid, set warning(s) for the invalid deployment target(s):
+
+  # If invalid, set warning for iOS deployment target
+  # Only iOS is checked by default - most apps don't target macOS/tvOS/watchOS (CBENEFIOS-2076)
   # env: 'DANGER_IPHONEOS_DEPLOYMENT_TARGET'
-  # env: 'DANGER_MACOSX_DEPLOYMENT_TARGET'
-  # env: 'DANGER_TVOS_DEPLOYMENT_TARGET'
-  # env: 'DANGER_WATCHOS_DEPLOYMENT_TARGET'
   smf_analyse_deployment_targets(xcode_settings, options)
 end
 
