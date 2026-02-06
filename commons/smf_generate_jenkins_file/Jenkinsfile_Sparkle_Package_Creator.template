@@ -4,9 +4,9 @@
 
 @Library('jenkins-pipeline-commons@master') _
 
-_build_variants = __BUILD_VARIANTS__
+def _build_variants = __BUILD_VARIANTS__
 
-_build_parameters = [
+def _build_parameters = [
 	'build_variants': _build_variants
 ]
 
