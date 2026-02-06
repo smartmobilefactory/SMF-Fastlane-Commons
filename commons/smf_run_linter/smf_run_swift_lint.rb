@@ -31,3 +31,18 @@ def smf_swift_lint_number_of_warnings
   UI.important("Violations appear directly in Xcode and PR comments via danger-swiftlint")
   return 0
 end
+
+# Deprecated: Returns path that won't exist (SwiftLint runs via SPM Build Tool Plugin)
+def smf_swift_lint_output_xml_path
+  return File.join(smf_workspace_dir, "build", "swiftlint_output.xml")
+end
+
+# Deprecated: Returns path that won't exist (SwiftLint runs via SPM Build Tool Plugin)
+def smf_swift_lint_analyze_xml_path
+  return File.join(smf_workspace_dir, "build", "swiftlint_analyze.xml")
+end
+
+# Deprecated: Returns path that won't exist (SwiftLint runs via SPM Build Tool Plugin)
+def smf_swift_lint_rules_report_path
+  return File.join(smf_workspace_dir, "build", "swiftlint_rules_report.txt")
+end
