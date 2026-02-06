@@ -32,6 +32,9 @@ def _should_send_ios_report_data(options)
 end
 
 def _smf_analyse_ios_project(options)
+  # Clear target settings cache before analysis (CBENEFIOS-2076)
+  smf_clear_target_settings_cache if defined?(smf_clear_target_settings_cache)
+
   analysis_json = {}
   analysis_json[:date] = Date.today.to_s
   analysis_json[:repo] = @smf_fastlane_config[:project][:project_name]
@@ -48,7 +51,8 @@ def _smf_analyse_ios_project(options)
   analysis_json[:qakit] = smf_analyse_qakit_usage
   analysis_json[:debug_menu] = smf_analyse_debug_menu_usage
 
-  # Analysers that are also used by Danger to add warnings to the PR checks
+  # Analysers that are also used by Danger to add warnings to the PR checks (CBENEFIOS-2076)
+  # Optimized: Target settings are now cached, reducing xcodebuild calls significantly
   xcode_settings = smf_xcodeproj_settings(options)
   analysis_json[:bitcode] = smf_analyse_bitcode(xcode_settings, options)
   analysis_json[:swift_version] = smf_analyse_swift_version(xcode_settings, options)
