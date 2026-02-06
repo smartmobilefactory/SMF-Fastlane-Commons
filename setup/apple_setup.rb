@@ -81,6 +81,11 @@ private_lane :smf_super_build do |options|
   # CI: Jenkins provides BUILD_VERSION_CODE for all CI builds (CBENEFIOS-2077)
   # Local: Don't override - use project.pbxproj value (backward compatible)
   build_number = nil
+
+  # Debug output for CI detection
+  UI.message("🔍 DEBUG: BUILD_NUMBER=#{ENV['BUILD_NUMBER']}, CI=#{ENV['CI']}, JENKINS_HOME=#{ENV['JENKINS_HOME']}")
+  UI.message("🔍 DEBUG: smf_is_ci? = #{smf_is_ci?}")
+
   if smf_is_ci?
     if ENV['BUILD_VERSION_CODE']
       build_number = ENV['BUILD_VERSION_CODE'].to_i
@@ -94,6 +99,8 @@ private_lane :smf_super_build do |options|
   else
     UI.message("🖥️  Local Build - using project.pbxproj for version code")
   end
+
+  UI.message("🔍 DEBUG: Final build_number = #{build_number.inspect}")
 
   smf_build_apple_app(
     build_variant: build_variant,
