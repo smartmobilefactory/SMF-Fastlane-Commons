@@ -66,14 +66,32 @@ JSON.parse(ENV['DANGER_REPO_MISSING_REQUIRED_PROJECT_CONFIG_KEYS']).each do |key
   failure("[ERROR] - Config.json: Missing required key in 'project' hash, please add: '#{key}'")
 end
 
+puts "Danger: SwiftLint (modern approach)"
+## SWIFTLINT - Direct execution via danger-swiftlint (CBENEFIOS-2070)
+# Projects using SPM Build Tool Plugin have .swiftlint.yml committed
+# danger-swiftlint runs SwiftLint directly and provides inline PR comments
+if File.exist?('.swiftlint.yml')
+  begin
+    swiftlint.config_file = '.swiftlint.yml'
+    swiftlint.lint_files(inline_mode: true)
+    UI.message("✅ SwiftLint executed via danger-swiftlint")
+  rescue => e
+    UI.important("⚠️  danger-swiftlint failed: #{e.message}")
+    UI.important("Falling back to checkstyle format if available")
+  end
+else
+  UI.important("ℹ️  No .swiftlint.yml found - skipping SwiftLint in Danger")
+  UI.important("Projects should commit .swiftlint.yml for PR checks")
+end
+
 puts "Danger: Generate Swiftlint rules report"
-## SWIFTLINT RULES REPORT
+## SWIFTLINT RULES REPORT (deprecated - kept for backward compatibility)
 unless ENV['DANGER_SWIFT_LINT_RULES_REPORT'].nil?
   message(ENV['DANGER_SWIFT_LINT_RULES_REPORT'])
 end
 
 puts "Danger: Checkstyle"
-## CHECKSTYLE:
+## CHECKSTYLE (includes legacy SwiftLint XML if provided):
 JSON.parse(ENV["DANGER_CHECKSTYLE_PATHS"]).each do |checkstyle_path|
   if !checkstyle_path.nil?
     if File.exist?(checkstyle_path)
