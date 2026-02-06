@@ -78,6 +78,9 @@ def _is_apple_platform
 end
 
 def _swift_lint_count_unused_rules
+  # Only applicable to Apple platforms
+  return unless _is_apple_platform
+
   # Deprecated (CBENEFIOS-2070): SwiftLint runs via SPM Build Tool Plugin
   # Rules report is no longer generated
   # Projects manage their own .swiftlint.yml configuration
