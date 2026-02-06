@@ -4,14 +4,17 @@ private_lane :smf_danger do |options|
   podspec_path = options[:podspec_path]
   bump_type = options[:bump_type]
 
-  if File.exist?(smf_swift_lint_output_xml_path)
-    checkstyle_paths.push(smf_swift_lint_output_xml_path)
-  elsif _is_apple_platform
-    UI.important("There is no SwiftLint output file at #{smf_swift_lint_output_xml_path}. Is SwiftLint enabled?")
-  end
+  # SwiftLint paths only exist on Apple platforms
+  if _is_apple_platform
+    if File.exist?(smf_swift_lint_output_xml_path)
+      checkstyle_paths.push(smf_swift_lint_output_xml_path)
+    else
+      UI.important("There is no SwiftLint output file at #{smf_swift_lint_output_xml_path}. Is SwiftLint enabled?")
+    end
 
-  if File.exist?(smf_swift_lint_analyze_xml_path)
-    checkstyle_paths.push(smf_swift_lint_analyze_xml_path)
+    if File.exist?(smf_swift_lint_analyze_xml_path)
+      checkstyle_paths.push(smf_swift_lint_analyze_xml_path)
+    end
   end
 
   if @platform == :android
