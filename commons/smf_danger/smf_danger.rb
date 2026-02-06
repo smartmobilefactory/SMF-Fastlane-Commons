@@ -75,6 +75,9 @@ def _is_apple_platform
 end
 
 def _swift_lint_count_unused_rules
+  # Deprecated (CBENEFIOS-2070): SwiftLint runs via SPM Build Tool Plugin
+  # Rules report is no longer generated
+  # Projects manage their own .swiftlint.yml configuration
   if File.exist?(smf_swift_lint_rules_report_path)
     line_count = `wc -l "#{smf_swift_lint_rules_report_path}"`.strip.split(' ')[0].to_i
     # In the report, there is a total of 4 lines used as format for the document (header/footer)
@@ -87,8 +90,9 @@ def _swift_lint_count_unused_rules
       message = "There is a total of <b>#{line_count}</b> unused Swiftlint rules!<br>Please check the generated report directly on Jenkins: #{href}"
       ENV['DANGER_SWIFT_LINT_RULES_REPORT'] = message
     end
-  elsif _is_apple_platform
-    UI.important("There is no SwiftLint rules report at #{smf_swift_lint_rules_report_path}. Is SwiftLint enabled?")
+  else
+    # No warning - rules report is not generated anymore with modern SwiftLint approach
+    UI.message("ℹ️  SwiftLint rules report not generated (projects use SPM Build Tool Plugin)")
   end
 end
 

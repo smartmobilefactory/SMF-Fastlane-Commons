@@ -47,15 +47,41 @@ smf_danger_module_config(
 
 ## smf_run_swift_lint
 
-This lane runs SiwftLint and stores the output in the `<project>/build` folder.
-SwiftLint is configured with the swiftlint.yml in this directory.
+**Status:** Deprecated/Simplified (as of CBENEFIOS-2070)
 
-It also generates a report of the default opt-in rules that have not been integrated or reviewed.
+This lane is now a no-op. Projects should use SwiftLint via **SPM Build Tool Plugin** instead.
 
-Example:
+### Modern SwiftLint Setup (Required for new projects):
 
-```
-smf_run_swift_lint
+1. **Add SwiftLintPlugins as SPM dependency:**
+   - In Xcode: File → Add Package Dependencies
+   - URL: `https://github.com/SimplyDanny/SwiftLintPlugins`
+   - Version: Latest (e.g., 0.63.x)
+
+2. **Enable Build Tool Plugin:**
+   - Select target → Build Phases
+   - Add "Run Build Tool Plug-ins"
+   - Select "SwiftLintBuildToolPlugin"
+
+3. **Commit `.swiftlint.yml` configuration:**
+   - Create project-specific SwiftLint rules
+   - Remove `.swiftlint.yml` from `.gitignore`
+   - Commit the configuration file
+
+### Benefits:
+- ✅ No external SwiftLint installation required
+- ✅ Version fixed in project (reproducible builds)
+- ✅ Works automatically for all developers and CI
+- ✅ Warnings visible directly in Xcode
+- ✅ PR comments via danger-swiftlint
+
+### For PR checks:
+SwiftLint is run directly by danger-swiftlint (no XML files needed).
+See `commons/smf_danger/Dangerfile` for implementation.
+
+Example (legacy compatibility):
+```ruby
+smf_run_swift_lint  # Shows informational message
 ```
 
 ## smf_run_flutter_analyzer
