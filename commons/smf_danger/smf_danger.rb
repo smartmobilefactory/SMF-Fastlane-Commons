@@ -5,11 +5,13 @@ private_lane :smf_danger do |options|
   bump_type = options[:bump_type]
 
   # SwiftLint paths only exist on Apple platforms
+  # Note: Modern projects use SwiftLint via SPM Build Tool Plugin (CBENEFIOS-2070)
+  # which doesn't generate XML output files. This is expected behavior.
   if _is_apple_platform
     if File.exist?(smf_swift_lint_output_xml_path)
       checkstyle_paths.push(smf_swift_lint_output_xml_path)
     else
-      UI.important("There is no SwiftLint output file at #{smf_swift_lint_output_xml_path}. Is SwiftLint enabled?")
+      UI.message("ℹ️  No SwiftLint XML output (projects use SPM Build Tool Plugin)")
     end
 
     if File.exist?(smf_swift_lint_analyze_xml_path)
