@@ -184,13 +184,38 @@ end
 
 
 # Increment Build Number
+# NOTE (CBENEFIOS-2074): CI builds now use Git tags as source of truth for version code
+# The plist is updated for the build, but changes are NOT committed (handled in smf_increment_build_number)
 
 private_lane :smf_super_pipeline_increment_build_number do |options|
 
-  smf_increment_build_number(
-    current_build_number: smf_get_build_number_of_app,
-    skip_build_nr_update_in_plists: smf_config_get(nil, :project, :skip_build_nr_update_in_plists)
-  )
+  if smf_is_ci?
+    UI.message("🏗️  CI Build - using Git tags for version code (CBENEFIOS-2074)")
+
+    # Get version code from ENV (if Jenkins provides it) or calculate from Git tags
+    if ENV['BUILD_VERSION_CODE']
+      next_build_number = ENV['BUILD_VERSION_CODE'].to_i
+      UI.message("🔢 Using version code from Jenkins ENV: #{next_build_number}")
+    else
+      next_build_number = smf_get_next_version_code_from_tags('ios')
+      UI.message("🔢 Calculated version code from Git tags: #{next_build_number}")
+    end
+
+    # Update plist with the version code (commit is skipped for CI in smf_increment_build_number)
+    skip_update_in_plists = smf_config_get(nil, :project, :skip_build_nr_update_in_plists)
+    increment_build_number(
+      build_number: next_build_number.to_s,
+      skip_info_plist: skip_update_in_plists
+    )
+    UI.success("✅ Updated plist with build number: #{next_build_number} (not committed)")
+  else
+    # Local builds: Keep original behavior (increment based on tags + commit)
+    UI.message("🖥️  Local Build - using original increment logic")
+    smf_increment_build_number(
+      current_build_number: smf_get_build_number_of_app,
+      skip_build_nr_update_in_plists: smf_config_get(nil, :project, :skip_build_nr_update_in_plists)
+    )
+  end
 end
 
 lane :smf_pipeline_increment_build_number do |options|
@@ -199,11 +224,36 @@ end
 
 
 # Create Git Tag
+# NOTE (CBENEFIOS-2074): CI builds now use Git tags as source of truth for version code
 
 private_lane :smf_super_pipeline_create_git_tag do |options|
 
   build_variant = smf_build_variant(options)
-  build_number = smf_get_build_number_of_app
+
+  # Version Code Management (CBENEFIOS-2074)
+  # CI: Use Git tags as source of truth (like Android)
+  # Local: Use Xcode project build number (backward compatible)
+
+  build_number = nil
+
+  if smf_is_ci?
+    # CI builds: Use Git tags for version code
+    if ENV['BUILD_VERSION_CODE']
+      # Jenkins provides BUILD_VERSION_CODE (calculated once at start of pipeline)
+      build_number = ENV['BUILD_VERSION_CODE'].to_i
+      UI.message("🔢 Using version code from Jenkins ENV: #{build_number}")
+    else
+      # Fallback: Calculate from Git tags
+      UI.message("🔍 BUILD_VERSION_CODE not set, calculating from Git tags...")
+      build_number = smf_get_next_version_code_from_tags('ios')
+      UI.message("🔢 Calculated version code from Git tags: #{build_number}")
+    end
+  else
+    # Local builds: Use Xcode project build number
+    UI.message("🖥️  Local Build - using Xcode project build number")
+    build_number = smf_get_build_number_of_app
+  end
+
   smf_create_git_tag(
     build_variant: build_variant,
     build_number: build_number
@@ -387,7 +437,24 @@ private_lane :smf_super_push_git_tag_release do |options|
   smf_push_to_git_remote(local_branch: local_branch)
 
   # Create the GitHub release
-  build_number = get_build_number(xcodeproj: smf_get_xcodeproj_file_name)
+  # CI: Extract build number from git tag (not Xcode project) - CBENEFIOS-2074
+  # Local: Use Xcode project (backward compatible)
+  if smf_is_ci?
+    UI.message("🏗️  CI Build - extracting build number from latest git tag")
+    # Get the latest tag for this build variant
+    begin
+      latest_tag = sh("git describe --tags --match '*#{build_variant}*' --abbrev=0 HEAD", log: false).strip
+      build_number = latest_tag.split('/').last.to_i
+      UI.message("📊 Extracted build number from tag: #{build_number}")
+    rescue
+      UI.important("⚠️  Could not extract build number from git tag, falling back to Xcode project")
+      build_number = get_build_number(xcodeproj: smf_get_xcodeproj_file_name)
+    end
+  else
+    UI.message("🖥️  Local Build - using Xcode project build number")
+    build_number = get_build_number(xcodeproj: smf_get_xcodeproj_file_name)
+  end
+
   smf_create_github_release(
     build_number: build_number,
     tag: smf_get_tag_of_app(build_variant, build_number),
