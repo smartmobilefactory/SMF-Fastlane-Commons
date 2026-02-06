@@ -74,14 +74,14 @@ if File.exist?('.swiftlint.yml')
   begin
     swiftlint.config_file = '.swiftlint.yml'
     swiftlint.lint_files(inline_mode: true)
-    UI.message("✅ SwiftLint executed via danger-swiftlint")
+    puts "✅ SwiftLint executed via danger-swiftlint"
   rescue => e
-    UI.important("⚠️  danger-swiftlint failed: #{e.message}")
-    UI.important("Falling back to checkstyle format if available")
+    puts "⚠️  danger-swiftlint failed: #{e.message}"
+    puts "Falling back to checkstyle format if available"
   end
 else
-  UI.important("ℹ️  No .swiftlint.yml found - skipping SwiftLint in Danger")
-  UI.important("Projects should commit .swiftlint.yml for PR checks")
+  puts "ℹ️  No .swiftlint.yml found - skipping SwiftLint in Danger"
+  puts "Projects should commit .swiftlint.yml for PR checks"
 end
 
 puts "Danger: Generate Swiftlint rules report"
