@@ -22,6 +22,7 @@ private_lane :smf_build_apple_app do |options|
   icloud_environment = options[:icloud_environment]
   workspace = options[:workspace]
   build_variant = options[:build_variant]
+  build_number = options[:build_number]
 
   catalyst_platform = nil
   if @platform == :apple
@@ -40,6 +41,13 @@ private_lane :smf_build_apple_app do |options|
 
   smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
 
+  # Build xcargs string with optional build number override (CBENEFIOS-2077)
+  xcargs_string = "#{smf_xcargs_for_build_system} CODE_SIGN_STYLE=Manual -skipPackagePluginValidation"
+  if build_number
+    UI.message("🔢 Overriding CURRENT_PROJECT_VERSION with: #{build_number}")
+    xcargs_string += " CURRENT_PROJECT_VERSION=#{build_number}"
+  end
+
   gym_parameters = {
     clean: clean_project,
     workspace: !workspace.nil? ? workspace : "#{project_name}.xcworkspace",
@@ -47,7 +55,7 @@ private_lane :smf_build_apple_app do |options|
     configuration: xcconfig_name,
     codesigning_identity: code_signing_identity,
     output_directory: $IOS_BUILD_OUTPUT_DIR,
-    xcargs: "#{smf_xcargs_for_build_system} CODE_SIGN_STYLE=Manual -skipPackagePluginValidation",
+    xcargs: xcargs_string,
     archive_path: $IOS_ARCHIVE_PATH,
     derived_data_path: $IOS_DERIVED_DATA_PATH,
     result_bundle: true,

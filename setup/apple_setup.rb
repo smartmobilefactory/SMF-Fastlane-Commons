@@ -78,6 +78,23 @@ private_lane :smf_super_build do |options|
     )
   end
 
+  # CI: Jenkins provides BUILD_VERSION_CODE for all CI builds (CBENEFIOS-2077)
+  # Local: Don't override - use project.pbxproj value (backward compatible)
+  build_number = nil
+  if smf_is_ci?
+    if ENV['BUILD_VERSION_CODE']
+      build_number = ENV['BUILD_VERSION_CODE'].to_i
+      UI.message("🔢 Using version code from Jenkins: #{build_number}")
+    else
+      # Fallback: Calculate from Git tags
+      UI.message("⚠️  BUILD_VERSION_CODE not set, calculating from Git tags")
+      build_number = smf_get_next_version_code_from_tags('ios')
+      UI.message("🔢 Calculated version code from tags: #{build_number}")
+    end
+  else
+    UI.message("🖥️  Local Build - using project.pbxproj for version code")
+  end
+
   smf_build_apple_app(
     build_variant: build_variant,
     skip_export: options[:skip_export],
@@ -92,7 +109,8 @@ private_lane :smf_super_build do |options|
     upload_itc: smf_config_get(build_variant, :upload_itc),
     upload_bitcode: smf_config_get(build_variant, :upload_bitcode),
     export_method: smf_config_get(build_variant, :export_method),
-    icloud_environment: smf_get_icloud_environment(build_variant.to_sym)
+    icloud_environment: smf_get_icloud_environment(build_variant.to_sym),
+    build_number: build_number
   )
 end
 
