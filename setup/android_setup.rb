@@ -462,7 +462,22 @@ private_lane :smf_super_upload_to_play_store do |options|
       UI.message("📋 Will also create draft in alpha track")
     end
 
+    # Get version code from APK/AAB for subsequent uploads
+    version_code = nil
+    if file_type == "APK"
+      version_code = smf_get_current_version_code_from_apk(upload_file)
+    else
+      # For AAB, try to get version code from Jenkins or Git tags
+      if ENV['BUILD_VERSION_CODE']
+        version_code = ENV['BUILD_VERSION_CODE'].to_i
+      else
+        version_code = smf_get_next_version_code_from_tags('android') - 1
+      end
+    end
+    UI.message("🔢 Version code for releases: #{version_code}")
+
     # Upload to each track
+    is_first_upload = true
     tracks_to_upload.each do |track_config|
       current_track = track_config[:track]
       current_status = track_config[:status]
@@ -487,11 +502,20 @@ private_lane :smf_super_upload_to_play_store do |options|
         upload_params[:metadata_path] = metadata_path
       end
 
-      # Add the appropriate file parameter
-      if file_type == "AAB"
-        upload_params[:aab] = upload_file
+      if is_first_upload
+        # First upload: include the binary
+        if file_type == "AAB"
+          upload_params[:aab] = upload_file
+        else
+          upload_params[:apk] = upload_file
+        end
+        is_first_upload = false
       else
-        upload_params[:apk] = upload_file
+        # Subsequent uploads: skip binary and reference already-uploaded version
+        upload_params[:skip_upload_apk] = true
+        upload_params[:skip_upload_aab] = true
+        upload_params[:version_codes] = [version_code.to_s]
+        UI.message("📦 Skipping binary upload - referencing version code #{version_code}")
       end
 
       # Upload to Google Play Store
