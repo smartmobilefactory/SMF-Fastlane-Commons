@@ -50,9 +50,12 @@ private_lane :smf_build_apple_app do |options|
     xcargs_string += " CURRENT_PROJECT_VERSION=#{build_number}"
   end
 
-  # CBENEFIOS-2059: Explicitly set PROVISIONING_PROFILE_SPECIFIER from match ENV variable
+  # CBENEFIOS-2059: Explicitly set provisioning profile for the app target only
   # This prevents Xcode from auto-selecting the wrong profile when multiple profiles are installed
   # (common issue in group builds where profiles for all countries/variants are present)
+  # NOTE: We use update_code_signing_settings instead of xcargs PROVISIONING_PROFILE_SPECIFIER
+  # because xcargs applies to ALL targets including SPM packages, which don't support provisioning profiles
+  profile_name = nil
   if bundle_identifier && match_type
     # Match sets ENV variables in format: sigh_<bundle_id>_<type>_profile-name
     # Example: sigh_com.corporatebenefits.de.alpha_adhoc_profile-name
@@ -60,10 +63,45 @@ private_lane :smf_build_apple_app do |options|
     profile_name = ENV[profile_env_key]
 
     if profile_name && !profile_name.empty?
-      UI.message("🔐 Using provisioning profile from match: #{profile_name}")
-      xcargs_string += " PROVISIONING_PROFILE_SPECIFIER='#{profile_name}'"
+      UI.message("🔐 Using provisioning profile from match ENV: #{profile_name}")
     else
-      UI.important("⚠️  No provisioning profile found in ENV[#{profile_env_key}] - Xcode will auto-select")
+      # Fallback: Construct profile name for skip_match scenarios where ENV is not set
+      # Match naming convention: "match <Type> <bundle_identifier>"
+      type_name = case match_type.to_s.downcase
+                  when 'adhoc' then 'AdHoc'
+                  when 'appstore' then 'AppStore'
+                  when 'development' then 'Development'
+                  when 'enterprise' then 'InHouse'
+                  when 'developer_id' then 'Direct'
+                  else match_type.to_s.split('_').map(&:capitalize).join('')
+                  end
+      profile_name = "match #{type_name} #{bundle_identifier}"
+      UI.message("🔐 Using constructed provisioning profile name: #{profile_name}")
+    end
+
+    # Determine project path (handle workspace vs project scenarios)
+    project_path = nil
+    if workspace.nil?
+      project_path = "#{project_name}.xcodeproj"
+    else
+      # Extract project path from workspace path
+      workspace_dir = File.dirname(workspace)
+      project_path = "#{workspace_dir}/#{project_name}.xcodeproj"
+      # If workspace is in a subdirectory (e.g., ios/Runner.xcworkspace for Flutter)
+      project_path = "#{project_name}.xcodeproj" unless File.exist?(project_path)
+    end
+
+    if File.exist?(project_path)
+      UI.message("🔧 Updating code signing settings in Xcode project: #{project_path}")
+      update_code_signing_settings(
+        path: project_path,
+        use_automatic_signing: false,
+        bundle_identifier: bundle_identifier,
+        profile_name: profile_name,
+        code_sign_identity: code_signing_identity
+      )
+    else
+      UI.important("⚠️  Project not found at #{project_path} - skipping update_code_signing_settings")
     end
   else
     UI.message("ℹ️  bundle_identifier or match_type not provided - Xcode will auto-select provisioning profile")
@@ -85,7 +123,7 @@ private_lane :smf_build_apple_app do |options|
     output_name: output_name,
     include_symbols: true,
     include_bitcode: (upload_itc && upload_bitcode),
-    export_options: { iCloudContainerEnvironment: icloud_environment },
+    export_options: smf_build_export_options(icloud_environment, bundle_identifier, profile_name),
     export_method: export_method,
     skip_package_ipa: skip_package_ipa,
     skip_package_pkg: skip_package_pkg,
@@ -96,6 +134,20 @@ private_lane :smf_build_apple_app do |options|
 
   gym(gym_parameters)
 
+end
+
+# CBENEFIOS-2059: Build export options with optional provisioning profile mapping
+def smf_build_export_options(icloud_environment, bundle_identifier, profile_name)
+  export_opts = {}
+  export_opts[:iCloudContainerEnvironment] = icloud_environment if icloud_environment
+
+  # Add provisioning profile mapping for explicit profile selection during IPA export
+  if bundle_identifier && profile_name
+    export_opts[:provisioningProfiles] = { bundle_identifier => profile_name }
+    UI.message("📦 Export options include provisioningProfiles: #{bundle_identifier} => #{profile_name}")
+  end
+
+  export_opts
 end
 
 def smf_xcargs_for_build_system
