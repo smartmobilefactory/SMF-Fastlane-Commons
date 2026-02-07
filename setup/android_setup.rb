@@ -435,13 +435,16 @@ private_lane :smf_super_upload_to_play_store do |options|
     
     # Check for metadata directory with changelogs
     # Note: fastlane runs from the 'fastlane/' directory, so path is relative to that
-    metadata_path = "./metadata/android"
+    # Convert to absolute path to avoid issues with supply changing directories
+    metadata_path_relative = "./metadata/android"
+    metadata_path = File.expand_path(metadata_path_relative)
     has_metadata = File.directory?(metadata_path)
 
     if has_metadata
       UI.message("📝 Found metadata directory - will upload changelogs")
+      UI.message("📂 Absolute path: #{metadata_path}")
     else
-      UI.message("📝 No metadata directory found at #{metadata_path} - skipping changelogs")
+      UI.message("📝 No metadata directory found at #{metadata_path_relative} - skipping changelogs")
     end
 
     # Determine release status (default: draft, configurable via google_play_release_status)
@@ -463,19 +466,20 @@ private_lane :smf_super_upload_to_play_store do |options|
       UI.message("📋 Will also create draft in alpha track")
     end
 
-    # Get version code from APK/AAB for subsequent uploads
+    # Get version code for subsequent uploads (needed when referencing already-uploaded binary)
+    # Priority: 1. Jenkins BUILD_VERSION_CODE, 2. Extract from APK, 3. Git tags
     version_code = nil
-    if file_type == "APK"
+    if ENV['BUILD_VERSION_CODE'] && !ENV['BUILD_VERSION_CODE'].empty?
+      version_code = ENV['BUILD_VERSION_CODE'].to_i
+      UI.message("🔢 Using version code from Jenkins: #{version_code}")
+    elsif file_type == "APK"
       version_code = smf_get_current_version_code_from_apk(upload_file)
+      UI.message("🔢 Extracted version code from APK: #{version_code}")
     else
-      # For AAB, try to get version code from Jenkins or Git tags
-      if ENV['BUILD_VERSION_CODE']
-        version_code = ENV['BUILD_VERSION_CODE'].to_i
-      else
-        version_code = smf_get_next_version_code_from_tags('android') - 1
-      end
+      # Fallback to Git tags (current tag, not next)
+      version_code = smf_get_next_version_code_from_tags('android') - 1
+      UI.message("🔢 Using version code from Git tags: #{version_code}")
     end
-    UI.message("🔢 Version code for releases: #{version_code}")
 
     # Upload to each track
     is_first_upload = true
