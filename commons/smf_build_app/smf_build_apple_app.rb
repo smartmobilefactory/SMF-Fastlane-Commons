@@ -50,10 +50,8 @@ private_lane :smf_build_apple_app do |options|
     xcargs_string += " CURRENT_PROJECT_VERSION=#{build_number}"
   end
 
-  # CBENEFIOS-2059: Explicitly set provisioning profile for the app target only
-  # This prevents Xcode from auto-selecting the wrong profile when multiple profiles are installed
-  # (common issue in group builds where profiles for all countries/variants are present)
-  # NOTE: We use update_code_signing_settings instead of xcargs PROVISIONING_PROFILE_SPECIFIER
+  # CBENEFIOS-2059: Determine provisioning profile name and update Xcode project
+  # We use update_code_signing_settings instead of xcargs PROVISIONING_PROFILE_SPECIFIER
   # because xcargs applies to ALL targets including SPM packages, which don't support provisioning profiles
   profile_name = nil
   if bundle_identifier && match_type
@@ -66,7 +64,7 @@ private_lane :smf_build_apple_app do |options|
       UI.message("🔐 Using provisioning profile from match ENV: #{profile_name}")
     else
       # Fallback: Construct profile name for skip_match scenarios where ENV is not set
-      # Match naming convention: "match <Type> <bundle_identifier>"
+      # Match always uses naming convention: "match <Type> <bundle_identifier>"
       type_name = case match_type.to_s.downcase
                   when 'adhoc' then 'AdHoc'
                   when 'appstore' then 'AppStore'
@@ -80,15 +78,12 @@ private_lane :smf_build_apple_app do |options|
     end
 
     # Determine project path (handle workspace vs project scenarios)
-    project_path = nil
-    if workspace.nil?
-      project_path = "#{project_name}.xcodeproj"
-    else
-      # Extract project path from workspace path
+    project_path = "#{project_name}.xcodeproj"
+    if workspace && !workspace.empty?
+      # Extract project path from workspace path for Flutter/workspace scenarios
       workspace_dir = File.dirname(workspace)
-      project_path = "#{workspace_dir}/#{project_name}.xcodeproj"
-      # If workspace is in a subdirectory (e.g., ios/Runner.xcworkspace for Flutter)
-      project_path = "#{project_name}.xcodeproj" unless File.exist?(project_path)
+      potential_path = "#{workspace_dir}/#{project_name}.xcodeproj"
+      project_path = potential_path if File.exist?(potential_path)
     end
 
     if File.exist?(project_path)
@@ -104,7 +99,13 @@ private_lane :smf_build_apple_app do |options|
       UI.important("⚠️  Project not found at #{project_path} - skipping update_code_signing_settings")
     end
   else
-    UI.message("ℹ️  bundle_identifier or match_type not provided - Xcode will auto-select provisioning profile")
+    UI.message("ℹ️  bundle_identifier or match_type not provided - using Xcode project defaults")
+  end
+
+  # Build export_options with provisioning profile mapping (for IPA export)
+  export_opts = { iCloudContainerEnvironment: icloud_environment }
+  if bundle_identifier && profile_name
+    export_opts[:provisioningProfiles] = { bundle_identifier => profile_name }
   end
 
   gym_parameters = {
@@ -123,7 +124,7 @@ private_lane :smf_build_apple_app do |options|
     output_name: output_name,
     include_symbols: true,
     include_bitcode: (upload_itc && upload_bitcode),
-    export_options: smf_build_export_options(icloud_environment, bundle_identifier, profile_name),
+    export_options: export_opts,
     export_method: export_method,
     skip_package_ipa: skip_package_ipa,
     skip_package_pkg: skip_package_pkg,
@@ -134,20 +135,6 @@ private_lane :smf_build_apple_app do |options|
 
   gym(gym_parameters)
 
-end
-
-# CBENEFIOS-2059: Build export options with optional provisioning profile mapping
-def smf_build_export_options(icloud_environment, bundle_identifier, profile_name)
-  export_opts = {}
-  export_opts[:iCloudContainerEnvironment] = icloud_environment if icloud_environment
-
-  # Add provisioning profile mapping for explicit profile selection during IPA export
-  if bundle_identifier && profile_name
-    export_opts[:provisioningProfiles] = { bundle_identifier => profile_name }
-    UI.message("📦 Export options include provisioningProfiles: #{bundle_identifier} => #{profile_name}")
-  end
-
-  export_opts
 end
 
 def smf_xcargs_for_build_system
