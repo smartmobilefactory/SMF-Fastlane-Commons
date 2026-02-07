@@ -425,9 +425,9 @@ lane :smf_upload_to_firebase do |options|
   smf_super_upload_to_firebase(options)
 end
 
-# Upload to iTunes
+# Upload to Apple (App Store Connect / TestFlight)
 
-private_lane :smf_super_upload_to_itunes do |options|
+private_lane :smf_super_upload_to_apple do |options|
   build_variant = smf_build_variant(options)
 
   slack_channel = smf_config_get(nil, :project, :slack_channel)
@@ -447,8 +447,8 @@ private_lane :smf_super_upload_to_itunes do |options|
   )
 end
 
-lane :smf_upload_to_itunes do |options|
-  smf_super_upload_to_itunes(options)
+lane :smf_upload_to_apple do |options|
+  smf_super_upload_to_apple(options)
 end
 
 

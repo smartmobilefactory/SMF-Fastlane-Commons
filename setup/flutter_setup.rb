@@ -173,9 +173,9 @@ end
 # Upload to AppCenter (Deprecated - AppCenter service discontinued)
 # This functionality has been removed as AppCenter is no longer available
 
-# Upload to iTunes
+# Upload to Apple (App Store Connect / TestFlight)
 
-private_lane :smf_super_upload_to_itunes do |options|
+private_lane :smf_super_upload_to_apple do |options|
 
   build_variant = options[:build_variant]
   build_variant_ios_config = @smf_fastlane_config[:build_variants][build_variant.to_sym][:ios]
@@ -194,8 +194,8 @@ private_lane :smf_super_upload_to_itunes do |options|
   )
 end
 
-lane :smf_upload_to_itunes do |options|
-  smf_super_upload_to_itunes(options)
+lane :smf_upload_to_apple do |options|
+  smf_super_upload_to_apple(options)
 end
 
 
