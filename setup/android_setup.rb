@@ -485,75 +485,46 @@ private_lane :smf_super_upload_to_play_store do |options|
       UI.message("📝 Changelogs will be uploaded from #{metadata_path}")
     end
 
-    # Build list of tracks to upload
-    tracks_to_upload = [{ track: google_play_track, status: release_status }]
+    # Prepare upload parameters
+    upload_params = {
+      package_name: package_name,
+      track: google_play_track,
+      json_key: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON'],
+      release_status: release_status,
+      version_name: marketing_version,
+      skip_upload_metadata: true,
+      skip_upload_changelogs: !has_metadata,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    }
 
-    if also_draft_to_alpha && google_play_track != 'alpha'
-      tracks_to_upload << { track: 'alpha', status: 'draft' }
-      UI.message("📋 Will also create draft in alpha track")
+    # Add metadata path if directory exists
+    if has_metadata
+      upload_params[:metadata_path] = metadata_path
     end
 
-    # Get version code for subsequent uploads (needed when referencing already-uploaded binary)
-    # Priority: 1. Jenkins BUILD_VERSION_CODE, 2. Extract from APK, 3. Git tags
-    version_code = nil
-    if ENV['BUILD_VERSION_CODE'] && !ENV['BUILD_VERSION_CODE'].empty?
-      version_code = ENV['BUILD_VERSION_CODE'].to_i
-      UI.message("🔢 Using version code from Jenkins: #{version_code}")
-    elsif file_type == "APK"
-      version_code = smf_get_current_version_code_from_apk(upload_file)
-      UI.message("🔢 Extracted version code from APK: #{version_code}")
+    # Add the binary file
+    if file_type == "AAB"
+      upload_params[:aab] = upload_file
     else
-      # Fallback to Git tags (current tag, not next)
-      version_code = smf_get_next_version_code_from_tags('android') - 1
-      UI.message("🔢 Using version code from Git tags: #{version_code}")
+      upload_params[:apk] = upload_file
     end
 
-    # Upload to each track
-    is_first_upload = true
-    tracks_to_upload.each do |track_config|
-      current_track = track_config[:track]
-      current_status = track_config[:status]
+    # If also_draft_to_alpha is enabled, use track promotion
+    if also_draft_to_alpha && google_play_track != 'alpha'
+      upload_params[:track_promote_to] = 'alpha'
+      upload_params[:track_promote_release_status] = 'draft'
+      UI.message("📋 Will also promote to alpha track as draft")
+    end
 
-      UI.message("🚀 Uploading to #{current_track} track (status: #{current_status})...")
+    UI.message("🚀 Uploading to #{google_play_track} track (status: #{release_status})...")
 
-      # Prepare upload parameters
-      upload_params = {
-        package_name: package_name,
-        track: current_track,
-        json_key: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON'],
-        release_status: current_status,
-        version_name: marketing_version,
-        skip_upload_metadata: true,
-        skip_upload_changelogs: !has_metadata,
-        skip_upload_images: true,
-        skip_upload_screenshots: true
-      }
+    # Upload to Google Play Store
+    upload_to_play_store(upload_params)
 
-      # Add metadata path if directory exists
-      if has_metadata
-        upload_params[:metadata_path] = metadata_path
-      end
-
-      if is_first_upload
-        # First upload: include the binary
-        if file_type == "AAB"
-          upload_params[:aab] = upload_file
-        else
-          upload_params[:apk] = upload_file
-        end
-        is_first_upload = false
-      else
-        # Subsequent uploads: skip binary and reference already-uploaded version
-        upload_params[:skip_upload_apk] = true
-        upload_params[:skip_upload_aab] = true
-        upload_params[:version_code] = version_code
-        UI.message("📦 Skipping binary upload - referencing version code #{version_code}")
-      end
-
-      # Upload to Google Play Store
-      upload_to_play_store(upload_params)
-
-      UI.success("✅ Uploaded to #{current_track} track (#{current_status})")
+    UI.success("✅ Uploaded to #{google_play_track} track (#{release_status})")
+    if also_draft_to_alpha && google_play_track != 'alpha'
+      UI.success("✅ Promoted to alpha track (draft)")
     end
 
     UI.success("✅ All Google Play uploads completed for #{build_variant}")
