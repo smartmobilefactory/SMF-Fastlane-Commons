@@ -510,20 +510,32 @@ private_lane :smf_super_upload_to_play_store do |options|
       upload_params[:apk] = upload_file
     end
 
-    # If also_draft_to_alpha is enabled, use track promotion
-    if also_draft_to_alpha && google_play_track != 'alpha'
-      upload_params[:track_promote_to] = 'alpha'
-      upload_params[:track_promote_release_status] = 'draft'
-      UI.message("📋 Will also promote to alpha track as draft")
-    end
-
     UI.message("🚀 Uploading to #{google_play_track} track (status: #{release_status})...")
 
     # Upload to Google Play Store
     upload_to_play_store(upload_params)
 
     UI.success("✅ Uploaded to #{google_play_track} track (#{release_status})")
+
+    # If also_draft_to_alpha is enabled, promote as a separate step
     if also_draft_to_alpha && google_play_track != 'alpha'
+      UI.message("📋 Promoting to alpha track as draft...")
+
+      promote_params = {
+        package_name: package_name,
+        track: google_play_track,
+        track_promote_to: 'alpha',
+        track_promote_release_status: 'draft',
+        json_key: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON'],
+        skip_upload_apk: true,
+        skip_upload_aab: true,
+        skip_upload_metadata: true,
+        skip_upload_changelogs: true,
+        skip_upload_images: true,
+        skip_upload_screenshots: true
+      }
+
+      upload_to_play_store(promote_params)
       UI.success("✅ Promoted to alpha track (draft)")
     end
 
