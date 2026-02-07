@@ -437,12 +437,39 @@ private_lane :smf_super_upload_to_play_store do |options|
     # Note: fastlane runs from the 'fastlane/' directory, so path is relative to that
     # Convert to absolute path to avoid issues with supply changing directories
     metadata_path_relative = "./metadata/android"
-    metadata_path = File.expand_path(metadata_path_relative)
-    has_metadata = File.directory?(metadata_path)
+    metadata_path_source = File.expand_path(metadata_path_relative)
+    has_metadata = File.directory?(metadata_path_source)
+
+    # Get configured locales for this variant (optional, defaults to all available)
+    configured_locales = smf_config_get(build_variant, :google_play_locales)
+
+    # Prepare the metadata path (may be filtered or original)
+    metadata_path = metadata_path_source
+    temp_metadata_dir = nil
 
     if has_metadata
-      UI.message("📝 Found metadata directory - will upload changelogs")
-      UI.message("📂 Absolute path: #{metadata_path}")
+      if configured_locales && configured_locales.is_a?(Array) && !configured_locales.empty?
+        # Create a temporary directory with only the configured locales
+        temp_metadata_dir = File.join(Dir.tmpdir, "fastlane_metadata_#{build_variant}_#{Time.now.to_i}")
+        FileUtils.mkdir_p(temp_metadata_dir)
+
+        configured_locales.each do |locale|
+          source_locale_dir = File.join(metadata_path_source, locale)
+          if File.directory?(source_locale_dir)
+            FileUtils.cp_r(source_locale_dir, temp_metadata_dir)
+          else
+            UI.important("⚠️ Configured locale '#{locale}' not found in metadata directory")
+          end
+        end
+
+        metadata_path = temp_metadata_dir
+        UI.message("📝 Found metadata directory - will upload changelogs")
+        UI.message("🌍 Filtered locales: #{configured_locales.join(', ')}")
+        UI.message("📂 Temp metadata path: #{metadata_path}")
+      else
+        UI.message("📝 Found metadata directory - will upload changelogs (all locales)")
+        UI.message("📂 Absolute path: #{metadata_path}")
+      end
     else
       UI.message("📝 No metadata directory found at #{metadata_path_relative} - skipping changelogs")
     end
@@ -530,10 +557,16 @@ private_lane :smf_super_upload_to_play_store do |options|
     end
 
     UI.success("✅ All Google Play uploads completed for #{build_variant}")
-    
+
   rescue => ex
     UI.error("❌ Google Play Store upload failed: #{ex.message}")
     raise ex
+  ensure
+    # Clean up temporary metadata directory if created
+    if temp_metadata_dir && File.directory?(temp_metadata_dir)
+      FileUtils.rm_rf(temp_metadata_dir)
+      UI.message("🧹 Cleaned up temporary metadata directory")
+    end
   end
 end
 
