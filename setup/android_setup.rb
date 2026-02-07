@@ -433,50 +433,74 @@ private_lane :smf_super_upload_to_play_store do |options|
     UI.message("📋 Using marketing version as release name: #{marketing_version}")
     release_notes_xml = get_release_notes_for_version(marketing_version)
     
-    # Skip automated release notes upload - add manually in Google Play Console if needed
-    UI.message("📝 Skipping automated release notes upload")
-    UI.message("💡 Add release notes manually in Google Play Console for better control")
-    
-    # Prepare upload parameters
-    upload_params = {
-      package_name: package_name,
-      track: google_play_track,
-      json_key: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON'],
-      release_status: 'draft',
-      version_name: marketing_version,  # Use versionName (e.g., "3.3.2") for release name
-      skip_upload_metadata: true,
-      skip_upload_changelogs: true,  # Always skip to avoid Fastlane structure conflicts
-      skip_upload_images: true,
-      skip_upload_screenshots: true
-    }
-    
-    # Add rollout percentage only for tracks that support it and when not draft
-    if should_include_rollout(google_play_track, 'draft')
-      rollout_percentage = get_rollout_percentage(google_play_track).to_s
-      upload_params[:rollout] = rollout_percentage
-      UI.message("🎯 Rollout: #{rollout_percentage}")
+    # Check for metadata directory with changelogs
+    metadata_path = "./fastlane/metadata/android"
+    has_metadata = File.directory?(metadata_path)
+
+    if has_metadata
+      UI.message("📝 Found metadata directory - will upload changelogs")
     else
-      UI.message("🎯 Rollout: Not applicable for #{google_play_track} track with draft status")
+      UI.message("📝 No metadata directory found at #{metadata_path} - skipping changelogs")
     end
-    
-    # Log release notes status
-    if release_notes_xml
-      UI.message("📝 Release notes found for version #{marketing_version} but skipping automated upload")
-    else
-      UI.message("📝 No release notes found for version #{marketing_version}")
+
+    # Determine release status (default: draft, configurable via google_play_release_status)
+    release_status = smf_config_get(build_variant, :google_play_release_status) || 'draft'
+
+    # Check if we should also create a draft in alpha track
+    also_draft_to_alpha = smf_config_get(build_variant, :google_play_also_draft_to_alpha) || false
+
+    # Log changelog status
+    if has_metadata
+      UI.message("📝 Changelogs will be uploaded from #{metadata_path}")
     end
-    
-    # Add the appropriate file parameter
-    if file_type == "AAB"
-      upload_params[:aab] = upload_file
-    else
-      upload_params[:apk] = upload_file
+
+    # Build list of tracks to upload
+    tracks_to_upload = [{ track: google_play_track, status: release_status }]
+
+    if also_draft_to_alpha && google_play_track != 'alpha'
+      tracks_to_upload << { track: 'alpha', status: 'draft' }
+      UI.message("📋 Will also create draft in alpha track")
     end
-    
-    # Upload to Google Play Store
-    upload_to_play_store(upload_params)
-    
-    UI.success("✅ Successfully uploaded #{build_variant} to Google Play Store (#{google_play_track} track)")
+
+    # Upload to each track
+    tracks_to_upload.each do |track_config|
+      current_track = track_config[:track]
+      current_status = track_config[:status]
+
+      UI.message("🚀 Uploading to #{current_track} track (status: #{current_status})...")
+
+      # Prepare upload parameters
+      upload_params = {
+        package_name: package_name,
+        track: current_track,
+        json_key: ENV['GOOGLE_PLAY_SERVICE_ACCOUNT_JSON'],
+        release_status: current_status,
+        version_name: marketing_version,
+        skip_upload_metadata: true,
+        skip_upload_changelogs: !has_metadata,
+        skip_upload_images: true,
+        skip_upload_screenshots: true
+      }
+
+      # Add metadata path if directory exists
+      if has_metadata
+        upload_params[:metadata_path] = metadata_path
+      end
+
+      # Add the appropriate file parameter
+      if file_type == "AAB"
+        upload_params[:aab] = upload_file
+      else
+        upload_params[:apk] = upload_file
+      end
+
+      # Upload to Google Play Store
+      upload_to_play_store(upload_params)
+
+      UI.success("✅ Uploaded to #{current_track} track (#{current_status})")
+    end
+
+    UI.success("✅ All Google Play uploads completed for #{build_variant}")
     
   rescue => ex
     UI.error("❌ Google Play Store upload failed: #{ex.message}")
