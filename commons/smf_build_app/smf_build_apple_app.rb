@@ -50,9 +50,10 @@ private_lane :smf_build_apple_app do |options|
     xcargs_string += " CURRENT_PROJECT_VERSION=#{build_number}"
   end
 
-  # CBENEFIOS-2059: Explicitly set PROVISIONING_PROFILE_SPECIFIER from match ENV variable
-  # This prevents Xcode from auto-selecting the wrong profile when multiple profiles are installed
-  # (common issue in group builds where profiles for all countries/variants are present)
+  # CBENEFIOS-2059: Determine provisioning profile name
+  # We need to set this in the Xcode project (not xcargs) to avoid affecting SPM packages
+  # (SPM packages don't support provisioning profiles and would fail with global xcargs)
+  profile_name = nil
   if bundle_identifier && match_type
     # Match sets ENV variables in format: sigh_<bundle_id>_<type>_profile-name
     # Example: sigh_com.corporatebenefits.de.alpha_adhoc_profile-name
@@ -60,13 +61,41 @@ private_lane :smf_build_apple_app do |options|
     profile_name = ENV[profile_env_key]
 
     if profile_name && !profile_name.empty?
-      UI.message("🔐 Using provisioning profile from match: #{profile_name}")
-      xcargs_string += " PROVISIONING_PROFILE_SPECIFIER='#{profile_name}'"
+      UI.message("🔐 Using provisioning profile from match ENV: #{profile_name}")
     else
-      UI.important("⚠️  No provisioning profile found in ENV[#{profile_env_key}] - Xcode will auto-select")
+      # Fallback: Construct profile name from bundle_identifier and match_type
+      # This supports skip_match scenarios where profiles are already installed
+      # Match always uses naming convention: "match <Type> <bundle_identifier>"
+      type_name = case match_type.downcase
+                  when 'adhoc' then 'AdHoc'
+                  when 'appstore' then 'AppStore'
+                  when 'development' then 'Development'
+                  when 'enterprise' then 'InHouse'
+                  when 'developer_id' then 'Direct'
+                  else match_type.capitalize
+                  end
+      profile_name = "match #{type_name} #{bundle_identifier}"
+      UI.message("🔐 Using constructed provisioning profile name: #{profile_name}")
     end
+
+    # Update Xcode project to use the correct provisioning profile for this target only
+    # This is safer than xcargs because it doesn't affect SPM packages
+    UI.message("🔐 Updating Xcode project code signing settings for #{bundle_identifier}")
+    update_code_signing_settings(
+      path: "#{project_name}.xcodeproj",
+      use_automatic_signing: false,
+      bundle_identifier: bundle_identifier,
+      profile_name: profile_name,
+      code_sign_identity: code_signing_identity
+    )
   else
-    UI.message("ℹ️  bundle_identifier or match_type not provided - Xcode will auto-select provisioning profile")
+    UI.message("ℹ️  bundle_identifier or match_type not provided - using Xcode project defaults")
+  end
+
+  # Build export_options with provisioning profile mapping (for IPA export)
+  export_opts = { iCloudContainerEnvironment: icloud_environment }
+  if bundle_identifier && profile_name
+    export_opts[:provisioningProfiles] = { bundle_identifier => profile_name }
   end
 
   gym_parameters = {
@@ -85,7 +114,7 @@ private_lane :smf_build_apple_app do |options|
     output_name: output_name,
     include_symbols: true,
     include_bitcode: (upload_itc && upload_bitcode),
-    export_options: { iCloudContainerEnvironment: icloud_environment },
+    export_options: export_opts,
     export_method: export_method,
     skip_package_ipa: skip_package_ipa,
     skip_package_pkg: skip_package_pkg,
