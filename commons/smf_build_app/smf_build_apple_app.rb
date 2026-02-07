@@ -23,6 +23,8 @@ private_lane :smf_build_apple_app do |options|
   workspace = options[:workspace]
   build_variant = options[:build_variant]
   build_number = options[:build_number]
+  bundle_identifier = options[:bundle_identifier]
+  match_type = options[:match_type]
 
   catalyst_platform = nil
   if @platform == :apple
@@ -46,6 +48,25 @@ private_lane :smf_build_apple_app do |options|
   if build_number
     UI.message("🔢 Overriding CURRENT_PROJECT_VERSION with: #{build_number}")
     xcargs_string += " CURRENT_PROJECT_VERSION=#{build_number}"
+  end
+
+  # CBENEFIOS-2059: Explicitly set PROVISIONING_PROFILE_SPECIFIER from match ENV variable
+  # This prevents Xcode from auto-selecting the wrong profile when multiple profiles are installed
+  # (common issue in group builds where profiles for all countries/variants are present)
+  if bundle_identifier && match_type
+    # Match sets ENV variables in format: sigh_<bundle_id>_<type>_profile-name
+    # Example: sigh_com.corporatebenefits.de.alpha_adhoc_profile-name
+    profile_env_key = "sigh_#{bundle_identifier}_#{match_type}_profile-name"
+    profile_name = ENV[profile_env_key]
+
+    if profile_name && !profile_name.empty?
+      UI.message("🔐 Using provisioning profile from match: #{profile_name}")
+      xcargs_string += " PROVISIONING_PROFILE_SPECIFIER='#{profile_name}'"
+    else
+      UI.important("⚠️  No provisioning profile found in ENV[#{profile_env_key}] - Xcode will auto-select")
+    end
+  else
+    UI.message("ℹ️  bundle_identifier or match_type not provided - Xcode will auto-select provisioning profile")
   end
 
   gym_parameters = {
