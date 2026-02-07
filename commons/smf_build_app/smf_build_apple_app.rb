@@ -50,9 +50,9 @@ private_lane :smf_build_apple_app do |options|
     xcargs_string += " CURRENT_PROJECT_VERSION=#{build_number}"
   end
 
-  # CBENEFIOS-2059: Determine provisioning profile name
-  # We need to set this in the Xcode project (not xcargs) to avoid affecting SPM packages
-  # (SPM packages don't support provisioning profiles and would fail with global xcargs)
+  # CBENEFIOS-2059: Determine provisioning profile name and update Xcode project
+  # We use update_code_signing_settings instead of xcargs PROVISIONING_PROFILE_SPECIFIER
+  # because xcargs applies to ALL targets including SPM packages, which don't support provisioning profiles
   profile_name = nil
   if bundle_identifier && match_type
     # Match sets ENV variables in format: sigh_<bundle_id>_<type>_profile-name
@@ -63,31 +63,41 @@ private_lane :smf_build_apple_app do |options|
     if profile_name && !profile_name.empty?
       UI.message("🔐 Using provisioning profile from match ENV: #{profile_name}")
     else
-      # Fallback: Construct profile name from bundle_identifier and match_type
-      # This supports skip_match scenarios where profiles are already installed
+      # Fallback: Construct profile name for skip_match scenarios where ENV is not set
       # Match always uses naming convention: "match <Type> <bundle_identifier>"
-      type_name = case match_type.downcase
+      type_name = case match_type.to_s.downcase
                   when 'adhoc' then 'AdHoc'
                   when 'appstore' then 'AppStore'
                   when 'development' then 'Development'
                   when 'enterprise' then 'InHouse'
                   when 'developer_id' then 'Direct'
-                  else match_type.capitalize
+                  else match_type.to_s.split('_').map(&:capitalize).join('')
                   end
       profile_name = "match #{type_name} #{bundle_identifier}"
       UI.message("🔐 Using constructed provisioning profile name: #{profile_name}")
     end
 
-    # Update Xcode project to use the correct provisioning profile for this target only
-    # This is safer than xcargs because it doesn't affect SPM packages
-    UI.message("🔐 Updating Xcode project code signing settings for #{bundle_identifier}")
-    update_code_signing_settings(
-      path: "#{project_name}.xcodeproj",
-      use_automatic_signing: false,
-      bundle_identifier: bundle_identifier,
-      profile_name: profile_name,
-      code_sign_identity: code_signing_identity
-    )
+    # Determine project path (handle workspace vs project scenarios)
+    project_path = "#{project_name}.xcodeproj"
+    if workspace && !workspace.empty?
+      # Extract project path from workspace path for Flutter/workspace scenarios
+      workspace_dir = File.dirname(workspace)
+      potential_path = "#{workspace_dir}/#{project_name}.xcodeproj"
+      project_path = potential_path if File.exist?(potential_path)
+    end
+
+    if File.exist?(project_path)
+      UI.message("🔧 Updating code signing settings in Xcode project: #{project_path}")
+      update_code_signing_settings(
+        path: project_path,
+        use_automatic_signing: false,
+        bundle_identifier: bundle_identifier,
+        profile_name: profile_name,
+        code_sign_identity: code_signing_identity
+      )
+    else
+      UI.important("⚠️  Project not found at #{project_path} - skipping update_code_signing_settings")
+    end
   else
     UI.message("ℹ️  bundle_identifier or match_type not provided - using Xcode project defaults")
   end
