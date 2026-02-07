@@ -434,7 +434,8 @@ private_lane :smf_super_upload_to_play_store do |options|
     release_notes_xml = get_release_notes_for_version(marketing_version)
     
     # Check for metadata directory with changelogs
-    metadata_path = "./fastlane/metadata/android"
+    # Note: fastlane runs from the 'fastlane/' directory, so path is relative to that
+    metadata_path = "./metadata/android"
     has_metadata = File.directory?(metadata_path)
 
     if has_metadata
