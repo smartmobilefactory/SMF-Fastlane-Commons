@@ -519,7 +519,7 @@ private_lane :smf_super_upload_to_play_store do |options|
         # Subsequent uploads: skip binary and reference already-uploaded version
         upload_params[:skip_upload_apk] = true
         upload_params[:skip_upload_aab] = true
-        upload_params[:version_codes] = [version_code.to_s]
+        upload_params[:version_code] = version_code
         UI.message("📦 Skipping binary upload - referencing version code #{version_code}")
       end
 
