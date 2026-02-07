@@ -14,6 +14,24 @@ private_lane :smf_upload_to_testflight do |options|
   skip_waiting_for_build_processing = options[:skip_waiting_for_build_processing] == true
   itc_platform = options[:itc_platform]
 
+  # TestFlight changelog / "What to Test" (CBENEFIOS-1900)
+  # Priority: 1. options[:changelog], 2. ENV['TESTFLIGHT_CHANGELOG'], 3. file, 4. default
+  changelog = options[:changelog]
+  if changelog.nil? && ENV['TESTFLIGHT_CHANGELOG']
+    changelog = ENV['TESTFLIGHT_CHANGELOG']
+    UI.message("📝 Using changelog from TESTFLIGHT_CHANGELOG environment variable")
+  end
+  if changelog.nil?
+    changelog_file = "fastlane/testflight_changelog.txt"
+    if File.exist?(changelog_file)
+      changelog = File.read(changelog_file).strip
+      UI.message("📝 Using changelog from #{changelog_file}")
+    end
+  end
+  if changelog
+    UI.message("📋 TestFlight changelog: #{changelog[0..100]}#{changelog.length > 100 ? '...' : ''}")
+  end
+
   # Create App Store Connect API key if environment variables are available
   api_key = nil
   if ENV['APP_STORE_CONNECT_API_KEY_ID'] && ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID'] && ENV['APP_STORE_CONNECT_API_KEY_PATH']
@@ -41,15 +59,24 @@ private_lane :smf_upload_to_testflight do |options|
   )
 
   UI.important("Uploading the build to TestFlight.")
-  upload_to_testflight(
-      apple_id: itc_apple_id,
-      team_id: itc_team_id,
-      api_key: api_key,
-      username: api_key ? nil : username,
-      skip_waiting_for_build_processing: skip_waiting_for_build_processing,
-      ipa: smf_path_to_ipa_or_app.gsub('.zip', ''),
-      app_platform: itc_platform
-  )
+
+  upload_params = {
+    apple_id: itc_apple_id,
+    team_id: itc_team_id,
+    api_key: api_key,
+    username: api_key ? nil : username,
+    skip_waiting_for_build_processing: skip_waiting_for_build_processing,
+    ipa: smf_path_to_ipa_or_app.gsub('.zip', ''),
+    app_platform: itc_platform
+  }
+
+  # Add changelog if available (CBENEFIOS-1900)
+  if changelog && !changelog.empty?
+    upload_params[:changelog] = changelog
+    UI.message("✅ Including 'What to Test' notes in TestFlight upload")
+  end
+
+  upload_to_testflight(upload_params)
 end
 
 def _smf_itunes_precheck(build_variant, slack_channel, bundle_identifier, username, include_in_app_purchases = true)
