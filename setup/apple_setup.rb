@@ -117,7 +117,10 @@ private_lane :smf_super_build do |options|
     upload_bitcode: smf_config_get(build_variant, :upload_bitcode),
     export_method: smf_config_get(build_variant, :export_method),
     icloud_environment: smf_get_icloud_environment(build_variant.to_sym),
-    build_number: build_number
+    build_number: build_number,
+    # CBENEFIOS-2059: Pass bundle_identifier and match_type for explicit provisioning profile selection
+    bundle_identifier: smf_config_get(build_variant, :bundle_identifier),
+    match_type: smf_config_get(build_variant, :match, :type)
   )
 end
 

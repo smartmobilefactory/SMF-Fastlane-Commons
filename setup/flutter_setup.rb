@@ -92,7 +92,10 @@ private_lane :smf_super_ios_build do |options|
       upload_bitcode: build_variant_ios_config[:upload_bitcode].nil? ? true : build_variant_ios_config[:upload_bitcode],
       export_method: build_variant_ios_config[:export_method],
       icloud_environment: smf_get_icloud_environment(build_variant.to_sym),
-      workspace: "#{smf_workspace_dir}/ios/Runner.xcworkspace"
+      workspace: "#{smf_workspace_dir}/ios/Runner.xcworkspace",
+      # CBENEFIOS-2059: Pass bundle_identifier and match_type for explicit provisioning profile selection
+      bundle_identifier: build_variant_ios_config[:bundle_identifier],
+      match_type: build_variant_ios_config.dig(:match, :type)
   )
 end
 
