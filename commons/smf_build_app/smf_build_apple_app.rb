@@ -26,6 +26,19 @@ private_lane :smf_build_apple_app do |options|
   bundle_identifier = options[:bundle_identifier]
   match_type = options[:match_type]
 
+  # CBENEFIOS-1900: Derive export_method from match_type if not explicitly set
+  if export_method.nil? && match_type
+    export_method = case match_type.to_s.downcase
+                    when 'adhoc' then 'ad-hoc'
+                    when 'appstore' then 'app-store'
+                    when 'development' then 'development'
+                    when 'enterprise' then 'enterprise'
+                    when 'developer_id' then 'developer-id'
+                    else nil
+                    end
+    UI.message("📦 Derived export_method '#{export_method}' from match_type '#{match_type}'") if export_method
+  end
+
   catalyst_platform = nil
   if @platform == :apple
     catalyst_platform = 'ios'
