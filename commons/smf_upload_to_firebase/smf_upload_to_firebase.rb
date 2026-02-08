@@ -101,19 +101,25 @@ def _smf_get_release_notes_for_firebase(build_variant)
   if smf_ai_release_notes_enabled?
     UI.message("AI release notes enabled, attempting generation...")
 
-    # Read ticket tags from changelog
-    ticket_tags_string = smf_read_changelog(type: :ticket_tags)
-    ticket_tags = ticket_tags_string.is_a?(Array) ? ticket_tags_string : ticket_tags_string.to_s.split(' ')
+    # Read the standard changelog as array (contains commit messages)
+    changelog_text = smf_read_changelog.to_s
+    changelog_array = changelog_text.split("\n").map(&:strip).reject(&:empty?)
+
+    # Get ticket tags WITH their commit messages (from the central utility)
+    ticket_data = smf_get_ticket_tags_with_commits_from_changelog(changelog_array)
+    ticket_tags = ticket_data[:tags]
+    ticket_commits = ticket_data[:commits_by_tag]
 
     if ticket_tags.any?
-      # Generate tickets data from tags
+      # Generate tickets data from tags (fetches Jira titles, links, etc.)
       tickets = smf_generate_tickets_from_tags(ticket_tags)
 
       # Generate AI release notes
       ai_notes = smf_generate_ai_release_notes(tickets, {
         build_variant: build_variant,
         language: 'en',
-        max_length: 500
+        max_length: 500,
+        ticket_commits: ticket_commits
       })
 
       if ai_notes && !ai_notes.empty?

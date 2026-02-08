@@ -76,6 +76,43 @@ def smf_get_ticket_tags_from_changelog(changelog)
   ticket_tags.uniq
 end
 
+# Get ticket tags with their associated commit messages
+# @param changelog [Array<String>] Array of commit messages
+# @return [Hash] { tags: [String], commits_by_tag: { tag => [messages] } }
+def smf_get_ticket_tags_with_commits_from_changelog(changelog)
+  return { tags: [], commits_by_tag: {} } if changelog.nil?
+
+  ticket_tags = []
+  commits_by_tag = {}
+
+  changelog.each do |commit_message|
+    # Find ticket tags in this commit
+    tags_in_commit = _smf_find_ticket_tags_in(commit_message)
+    tags_in_commit += _smf_find_ticket_tags_in_related_pr(commit_message)
+
+    tags_in_commit.uniq.each do |tag|
+      ticket_tags << tag
+
+      # Store the commit message for this tag
+      commits_by_tag[tag] ||= []
+
+      # Clean up the commit message (remove tag, leading dash, etc.)
+      clean_message = commit_message
+        .sub(/^-\s*/, '')              # Remove leading dash
+        .sub(/#{tag}[:\s]*/i, '')      # Remove ticket tag
+        .sub(/^\s*[:\-]\s*/, '')       # Remove leading colon or dash
+        .strip
+
+      commits_by_tag[tag] << clean_message unless clean_message.empty?
+    end
+  end
+
+  {
+    tags: ticket_tags.uniq,
+    commits_by_tag: commits_by_tag
+  }
+end
+
 def _smf_make_pr_reference(ticket_tag)
 
   pr_number_matches = ticket_tag.scan(/^PR-([0-9]+)$/)

@@ -76,12 +76,14 @@ end
 #   - build_variant [String] e.g., 'germany_alpha', 'austria_beta'
 #   - language [String] Target language code (default: 'en')
 #   - max_length [Integer] Maximum character length (default: 500 for Firebase)
+#   - ticket_commits [Hash] Map of ticket tag to commit messages (optional)
 # @return [String, nil] Generated release notes or nil if disabled/failed
 def smf_generate_ai_release_notes(tickets, options = {})
   return nil unless smf_ai_release_notes_enabled?
 
   config = smf_get_ai_release_notes_config
   build_variant = options[:build_variant] || ''
+  ticket_commits = options[:ticket_commits] || {}
 
   # Determine mode based on build variant
   mode = if build_variant.downcase.include?('alpha')
@@ -106,9 +108,19 @@ def smf_generate_ai_release_notes(tickets, options = {})
 
   UI.message("Processing #{unique_tickets.length} unique tickets for AI generation")
 
-  # Prepare ticket summaries for AI
+  # Prepare ticket summaries for AI (including commit messages if available)
   ticket_summaries = unique_tickets.map do |ticket|
-    "#{ticket[:tag]}: #{ticket[:title]}"
+    tag = ticket[:tag]
+    title = ticket[:title]
+    commits = ticket_commits[tag] || []
+
+    if commits.any?
+      # Include commit messages for better context
+      commit_info = commits.take(3).join('; ')  # Limit to 3 commits per ticket
+      "#{tag}: #{title}\n  Commits: #{commit_info}"
+    else
+      "#{tag}: #{title}"
+    end
   end
 
   # Generate AI release notes using configured provider
