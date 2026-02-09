@@ -278,7 +278,8 @@ private_lane :smf_super_upload_to_firebase do |options|
         app_id: firebase_app_id,
         destinations: destinations,
         android_artifact_path: aab_path,
-        android_artifact_type: "AAB"
+        android_artifact_type: "AAB",
+        build_variant: build_variant
       )
     else
       UI.user_error!("use_aab=true but no AAB file found for variant: #{build_variant}")
@@ -297,7 +298,8 @@ private_lane :smf_super_upload_to_firebase do |options|
       app_id: firebase_app_id,
       destinations: destinations,
       android_artifact_path: aab_path,
-      android_artifact_type: "AAB"
+      android_artifact_type: "AAB",
+      build_variant: build_variant
     ) if aab_path != ''
 
     apk_path = smf_get_file_path(apk_file_regex)
@@ -306,7 +308,8 @@ private_lane :smf_super_upload_to_firebase do |options|
       app_id: firebase_app_id,
       destinations: destinations,
       android_artifact_path: apk_path,
-      android_artifact_type: "APK"
+      android_artifact_type: "APK",
+      build_variant: build_variant
     ) if apk_path != ''
   end
 end

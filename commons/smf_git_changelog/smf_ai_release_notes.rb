@@ -367,7 +367,8 @@ def _smf_build_release_notes_prompt(ticket_summaries, language, max_length)
     - Focus on benefits and improvements for end users
     - Use simple, non-technical language
     - Group into categories if appropriate (New Features, Improvements, Bug Fixes)
-    - Use emoji sparingly for visual appeal
+    - Do NOT use emoji icons at the beginning of lines
+    - Use simple dashes (-) for bullet points
     - Maximum length: #{max_length} characters
     - Language: #{language_name}
     - Tone: Professional but friendly, encourage feedback
