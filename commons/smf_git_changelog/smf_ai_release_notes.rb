@@ -129,14 +129,23 @@ def smf_generate_ai_release_notes(tickets, options = {})
   return nil if ai_notes.nil?
 
   # Format based on mode
-  case mode
+  UI.message("🔧 Formatting mode: #{mode.inspect} (class: #{mode.class})")
+  UI.message("   Unique tickets for list: #{unique_tickets.length}")
+
+  result = case mode
   when :comparison
+    UI.message("   → Using comparison mode (with ticket list)")
     _smf_format_comparison_notes(unique_tickets, ai_notes, include_jira_links)
   when :ai_only
+    UI.message("   → Using ai_only mode (no ticket list)")
     ai_notes
   else
+    UI.message("   → Using fallback mode: #{mode}")
     ai_notes
   end
+
+  UI.message("📋 Final result length: #{result&.length || 0} chars")
+  result
 end
 
 # Generate localized release notes for TestFlight
