@@ -363,10 +363,14 @@ def _smf_build_release_notes_prompt(ticket_summaries, language, max_length)
     - Language: #{language_name}
     - Tone: Professional but friendly, encourage feedback
 
+    Output format:
+    - Output ONLY the release notes content, nothing else
+    - Do NOT include any intro text like "Here are the release notes..."
+    - Do NOT include character counts or meta-information
+    - Start directly with the first category or bullet point
+
     Tickets:
     #{ticket_summaries.join("\n")}
-
-    Generate concise, user-friendly release notes:
   PROMPT
 end
 
