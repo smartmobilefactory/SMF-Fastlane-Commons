@@ -97,24 +97,50 @@ private_lane :smf_ios_upload_to_firebase do |options|
 # @param build_variant [String] Build variant (e.g., 'germany_alpha', 'austria_beta')
 # @return [String] Release notes for Firebase
 def _smf_get_release_notes_for_firebase(build_variant)
+  UI.header("🤖 AI Release Notes Generation")
+  UI.message("Build variant: #{build_variant}")
+
   # Try AI-generated release notes if enabled
   if smf_ai_release_notes_enabled?
-    UI.message("AI release notes enabled, attempting generation...")
+    config = smf_get_ai_release_notes_config
+    UI.message("✅ AI release notes ENABLED")
+    UI.message("   Provider: #{config[:provider]}")
+    UI.message("   Model: #{config[:model]}")
+    UI.message("   API Key Env: #{config[:api_key_env]}")
+    UI.message("   Alpha Mode: #{config[:alpha_mode]}")
+    UI.message("   Beta Mode: #{config[:beta_mode]}")
 
     # Read the standard changelog as array (contains commit messages)
     changelog_text = smf_read_changelog.to_s
     changelog_array = changelog_text.split("\n").map(&:strip).reject(&:empty?)
+    UI.message("📝 Changelog entries: #{changelog_array.length}")
 
     # Get ticket tags WITH their commit messages (from the central utility)
     ticket_data = smf_get_ticket_tags_with_commits_from_changelog(changelog_array)
     ticket_tags = ticket_data[:tags]
     ticket_commits = ticket_data[:commits_by_tag]
 
+    UI.message("🎫 Ticket tags found: #{ticket_tags.length}")
+    ticket_tags.each do |tag|
+      commits = ticket_commits[tag] || []
+      UI.message("   #{tag}: #{commits.length} commit(s)")
+      commits.each { |c| UI.message("      - #{c[0..80]}#{'...' if c.length > 80}") }
+    end
+
     if ticket_tags.any?
       # Generate tickets data from tags (fetches Jira titles, links, etc.)
+      UI.message("🔍 Fetching Jira ticket details...")
       tickets = smf_generate_tickets_from_tags(ticket_tags)
+      UI.message("   Normal tickets: #{tickets[:normal]&.length || 0}")
+      UI.message("   Linked tickets: #{tickets[:linked]&.length || 0}")
+      UI.message("   Unknown tickets: #{tickets[:unknown]&.length || 0}")
+
+      tickets[:normal]&.each do |t|
+        UI.message("   📋 #{t[:tag]}: #{t[:title]}")
+      end
 
       # Generate AI release notes
+      UI.message("🚀 Calling AI API...")
       ai_notes = smf_generate_ai_release_notes(tickets, {
         build_variant: build_variant,
         language: 'en',
@@ -123,18 +149,25 @@ def _smf_get_release_notes_for_firebase(build_variant)
       })
 
       if ai_notes && !ai_notes.empty?
-        UI.success("Using AI-generated release notes")
+        UI.success("✅ AI release notes generated successfully!")
+        UI.message("📄 Generated notes (#{ai_notes.length} chars):")
+        UI.message("─" * 60)
+        UI.message(ai_notes)
+        UI.message("─" * 60)
         return ai_notes
       else
-        UI.important("AI generation failed, falling back to standard changelog")
+        UI.important("⚠️ AI generation failed, falling back to standard changelog")
       end
     else
-      UI.message("No ticket tags found, using standard changelog")
+      UI.message("ℹ️ No ticket tags found, using standard changelog")
     end
+  else
+    UI.message("❌ AI release notes DISABLED")
+    UI.message("   Check Config.json 'ai_release_notes.enabled' and API key environment variable")
   end
 
   # Fallback to standard changelog
-  UI.message("Using standard changelog for release notes")
+  UI.message("📝 Using standard changelog for release notes")
   smf_read_changelog
 end
 

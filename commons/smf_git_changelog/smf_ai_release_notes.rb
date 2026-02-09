@@ -237,7 +237,13 @@ def _smf_call_openai_api(ticket_summaries, language, max_length, config)
   api_key = ENV[config[:api_key_env]]
   model = config[:model]
 
+  UI.message("🔌 OpenAI API Call")
+  UI.message("   Model: #{model}")
+  UI.message("   API Key present: #{api_key.nil? ? '❌ NO' : '✅ YES (length: ' + api_key.length.to_s + ')'}")
+  UI.message("   Ticket summaries: #{ticket_summaries.length}")
+
   prompt = _smf_build_release_notes_prompt(ticket_summaries, language, max_length)
+  UI.message("   Prompt length: #{prompt.length} chars")
 
   begin
     uri = URI.parse('https://api.openai.com/v1/chat/completions')
@@ -258,19 +264,23 @@ def _smf_call_openai_api(ticket_summaries, language, max_length, config)
       temperature: 0.7
     }.to_json
 
+    UI.message("   Sending request to OpenAI...")
     response = http.request(request)
+    UI.message("   Response code: #{response.code}")
 
     if response.code == '200'
       result = JSON.parse(response.body)
       notes = result.dig('choices', 0, 'message', 'content')
-      UI.success("AI release notes generated successfully (OpenAI #{model})")
+      UI.success("✅ OpenAI API success (#{model})")
       notes&.strip
     else
-      UI.error("OpenAI API error: #{response.code} - #{response.body}")
+      UI.error("❌ OpenAI API error: #{response.code}")
+      UI.error("   Response: #{response.body[0..500]}")
       nil
     end
   rescue StandardError => e
-    UI.error("Failed to call OpenAI API: #{e.message}")
+    UI.error("❌ Failed to call OpenAI API: #{e.message}")
+    UI.error("   #{e.backtrace.first(3).join("\n   ")}")
     nil
   end
 end
@@ -285,7 +295,13 @@ def _smf_call_anthropic_api(ticket_summaries, language, max_length, config)
   api_key = ENV[config[:api_key_env]]
   model = config[:model]
 
+  UI.message("🔌 Anthropic API Call")
+  UI.message("   Model: #{model}")
+  UI.message("   API Key present: #{api_key.nil? ? '❌ NO' : '✅ YES (length: ' + api_key.length.to_s + ')'}")
+  UI.message("   Ticket summaries: #{ticket_summaries.length}")
+
   prompt = _smf_build_release_notes_prompt(ticket_summaries, language, max_length)
+  UI.message("   Prompt length: #{prompt.length} chars")
 
   begin
     uri = URI.parse('https://api.anthropic.com/v1/messages')
@@ -306,19 +322,23 @@ def _smf_call_anthropic_api(ticket_summaries, language, max_length, config)
       ]
     }.to_json
 
+    UI.message("   Sending request to Anthropic...")
     response = http.request(request)
+    UI.message("   Response code: #{response.code}")
 
     if response.code == '200'
       result = JSON.parse(response.body)
       notes = result.dig('content', 0, 'text')
-      UI.success("AI release notes generated successfully (Anthropic #{model})")
+      UI.success("✅ Anthropic API success (#{model})")
       notes&.strip
     else
-      UI.error("Anthropic API error: #{response.code} - #{response.body}")
+      UI.error("❌ Anthropic API error: #{response.code}")
+      UI.error("   Response: #{response.body[0..500]}")
       nil
     end
   rescue StandardError => e
-    UI.error("Failed to call Anthropic API: #{e.message}")
+    UI.error("❌ Failed to call Anthropic API: #{e.message}")
+    UI.error("   #{e.backtrace.first(3).join("\n   ")}")
     nil
   end
 end
