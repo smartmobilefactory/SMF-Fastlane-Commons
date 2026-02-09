@@ -394,9 +394,10 @@ def _smf_build_release_notes_prompt(ticket_summaries, language, max_length)
 
     Output format:
     - Output ONLY the release notes content, nothing else
-    - Do NOT include any intro text like "Here are the release notes..."
+    - Do NOT include any intro text like "Here are the release notes...", "This build includes...", "What's new:", etc.
     - Do NOT include character counts or meta-information
-    - Start directly with the first category or bullet point
+    - Do NOT include a header or title for the release notes
+    - Start directly with the first category heading (e.g., "New Features:") or bullet point
 
     Tickets:
     #{ticket_summaries.join("\n")}
