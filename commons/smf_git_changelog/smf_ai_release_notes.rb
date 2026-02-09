@@ -75,7 +75,7 @@ end
 # @param options [Hash] Options hash
 #   - build_variant [String] e.g., 'germany_alpha', 'austria_beta'
 #   - language [String] Target language code (default: 'en')
-#   - max_length [Integer] Maximum character length (default: 500 for Firebase)
+#   - max_length [Integer] Maximum character length (default: 700 for Firebase)
 #   - ticket_commits [Hash] Map of ticket tag to commit messages (optional)
 # @return [String, nil] Generated release notes or nil if disabled/failed
 def smf_generate_ai_release_notes(tickets, options = {})
@@ -86,7 +86,8 @@ def smf_generate_ai_release_notes(tickets, options = {})
   ticket_commits = options[:ticket_commits] || {}
 
   # Determine mode based on build variant
-  mode = if build_variant.downcase.include?('alpha')
+  is_alpha = build_variant.downcase.include?('alpha')
+  mode = if is_alpha
            config[:alpha_mode]
          else
            config[:beta_mode]
@@ -94,21 +95,33 @@ def smf_generate_ai_release_notes(tickets, options = {})
 
   include_jira_links = (mode == :comparison)
   language = options[:language] || 'en'
-  max_length = options[:max_length] || 500
+  max_length = options[:max_length] || 700
 
   UI.message("Generating AI release notes (provider: #{config[:provider]}, mode: #{mode}, links: #{include_jira_links})")
 
   # Deduplicate tickets
   unique_tickets = _smf_deduplicate_tickets(tickets)
 
-  if unique_tickets.empty?
+  # Get DevOps tickets (CBENEFIOS-2079) - only for alpha builds in comparison mode
+  devops_tickets = []
+  if is_alpha && mode == :comparison
+    devops_tickets = tickets[:devops] || []
+    # Also try to read from temp file if not in tickets hash
+    if devops_tickets.empty? && defined?(smf_read_devops_tickets)
+      devops_tickets = smf_read_devops_tickets
+    end
+    UI.message("DevOps tickets found: #{devops_tickets.length}")
+  end
+
+  if unique_tickets.empty? && devops_tickets.empty?
     UI.message("No tickets found for AI release notes generation")
     return nil
   end
 
-  UI.message("Processing #{unique_tickets.length} unique tickets for AI generation")
+  UI.message("Processing #{unique_tickets.length} app tickets + #{devops_tickets.length} devops tickets")
 
   # Prepare ticket summaries for AI (including commit messages if available)
+  # Only include app tickets in AI summary, not DevOps tickets
   ticket_summaries = unique_tickets.map do |ticket|
     tag = ticket[:tag]
     title = ticket[:title]
@@ -124,18 +137,24 @@ def smf_generate_ai_release_notes(tickets, options = {})
   end
 
   # Generate AI release notes using configured provider
-  ai_notes = _smf_call_ai_api(ticket_summaries, language, max_length, config)
+  ai_notes = nil
+  if ticket_summaries.any?
+    ai_notes = _smf_call_ai_api(ticket_summaries, language, max_length, config)
+  else
+    ai_notes = "Infrastructure and DevOps updates."
+  end
 
   return nil if ai_notes.nil?
 
   # Format based on mode
   UI.message("🔧 Formatting mode: #{mode.inspect} (class: #{mode.class})")
   UI.message("   Unique tickets for list: #{unique_tickets.length}")
+  UI.message("   DevOps tickets for list: #{devops_tickets.length}")
 
   result = case mode
   when :comparison
     UI.message("   → Using comparison mode (with ticket list)")
-    _smf_format_comparison_notes(unique_tickets, ai_notes, include_jira_links)
+    _smf_format_comparison_notes(unique_tickets, ai_notes, include_jira_links, devops_tickets)
   when :ai_only
     UI.message("   → Using ai_only mode (no ticket list)")
     ai_notes
@@ -522,20 +541,41 @@ def _smf_language_name(lang_code)
   }[lang_code] || 'English'
 end
 
-# Format comparison notes (technical list + AI notes)
+# Format comparison notes (technical list + AI notes + DevOps section for alpha)
 # @param tickets [Array<Hash>] Unique tickets
 # @param ai_notes [String] AI-generated notes
 # @param include_links [Boolean] Whether to include Jira links
+# @param devops_tickets [Array<Hash>] DevOps tickets (optional, for alpha builds)
 # @return [String] Formatted comparison notes
-def _smf_format_comparison_notes(tickets, ai_notes, include_links)
-  technical_section = "Tickets:\n"
+def _smf_format_comparison_notes(tickets, ai_notes, include_links, devops_tickets = nil)
+  technical_section = ""
 
-  tickets.each do |ticket|
-    if include_links && ticket[:link]
-      technical_section += "- #{ticket[:tag]}: #{ticket[:title]}\n  #{ticket[:link]}\n"
-    else
-      technical_section += "- #{ticket[:tag]}: #{ticket[:title]}\n"
+  # App tickets section
+  if tickets && !tickets.empty?
+    technical_section += "Tickets:\n"
+    tickets.each do |ticket|
+      if include_links && ticket[:link]
+        technical_section += "- #{ticket[:tag]}: #{ticket[:title]}\n  #{ticket[:link]}\n"
+      else
+        technical_section += "- #{ticket[:tag]}: #{ticket[:title]}\n"
+      end
     end
+  end
+
+  # DevOps tickets section (CBENEFIOS-2079)
+  if devops_tickets && !devops_tickets.empty?
+    technical_section += "\nDevOps/Config:\n"
+    devops_tickets.each do |ticket|
+      if include_links && ticket[:link]
+        technical_section += "- #{ticket[:tag]}: #{ticket[:title]}\n  #{ticket[:link]}\n"
+      else
+        technical_section += "- #{ticket[:tag]}: #{ticket[:title]}\n"
+      end
+    end
+  end
+
+  if technical_section.empty?
+    return ai_notes
   end
 
   <<~NOTES

@@ -3,13 +3,15 @@ TICKET_BLACKLIST = [
   /UNICODE*/,
 ]
 
-def smf_generate_tickets_from_tags(ticket_tags)
+def smf_generate_tickets_from_tags(ticket_tags, options = {})
+  target_platform = options[:target_platform]
 
   tickets = {
     normal: [],
     linked: [],
     pr: [],
-    unknown: []
+    unknown: [],
+    devops: []  # New category for DevOps tickets (CBENEFIOS-2079)
   }
 
   return tickets if ticket_tags.nil?
@@ -27,6 +29,7 @@ def smf_generate_tickets_from_tags(ticket_tags)
     title = fetched_data[:title]
     base_url = fetched_data[:base_url]
     linked_issues = fetched_data[:linked_tickets]
+    components = fetched_data[:components] || []
 
     if base_url.nil?
       unknown_ticket = { tag: ticket_tag }
@@ -40,23 +43,53 @@ def smf_generate_tickets_from_tags(ticket_tags)
     # get remote links and check them for tickets
     linked_tickets += smf_jira_fetch_related_tickets_for(ticket_tag, base_url)
 
+    # Detect platform from Jira components (CBENEFIOS-2079)
+    ticket_platform = nil
+    if defined?(smf_detect_platform_from_components)
+      ticket_platform = smf_detect_platform_from_components(components)
+    end
+
     new_ticket = {
       tag: ticket_tag,
       link: link,
       title: title,
-      linked_tickets: linked_tickets.uniq
+      linked_tickets: linked_tickets.uniq,
+      components: components,
+      platform: ticket_platform
     }
 
-    tickets[:normal].push(new_ticket)
-    tickets[:linked].concat(linked_tickets)
+    # Categorize ticket based on platform (CBENEFIOS-2079)
+    if ticket_platform == :devops
+      tickets[:devops].push(new_ticket)
+    elsif target_platform.nil? || _smf_ticket_relevant_for_platform?(ticket_platform, target_platform)
+      tickets[:normal].push(new_ticket)
+      tickets[:linked].concat(linked_tickets)
+    end
+    # Tickets not relevant for target platform are silently excluded
   end
 
   tickets[:normal].uniq!
   tickets[:linked].uniq!
   tickets[:pr].uniq!
   tickets[:unknown].uniq!
+  tickets[:devops].uniq!
 
   tickets
+end
+
+# Check if a ticket is relevant for the target platform
+# @param ticket_platform [Symbol] Platform detected from Jira components
+# @param target_platform [Symbol] Target build platform (:ios or :android)
+# @return [Boolean] True if relevant
+def _smf_ticket_relevant_for_platform?(ticket_platform, target_platform)
+  return true if ticket_platform.nil?
+  return true if ticket_platform == :both
+  return true if ticket_platform == target_platform
+  return false if ticket_platform == :devops
+  return false if ticket_platform == :excluded
+
+  # Default: include if uncertain
+  true
 end
 
 def smf_get_ticket_tags_from_changelog(changelog)

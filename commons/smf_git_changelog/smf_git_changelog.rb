@@ -7,6 +7,20 @@ private_lane :smf_git_changelog do |options|
 
   build_variant = options[:build_variant].downcase if !options[:build_variant].nil?
   is_library = !options[:is_library].nil? ? options[:is_library] : false
+
+  # Platform filtering (CBENEFIOS-2079)
+  # Detect target platform from @platform variable or build_variant
+  target_platform = nil
+  if defined?(@platform)
+    case @platform
+    when :ios, :apple
+      target_platform = :ios
+    when :android
+      target_platform = :android
+    end
+  end
+  UI.message("Platform filtering: #{target_platform || 'disabled'}")
+
   UI.important('Collecting commits back to the last tag')
 
   # Constants
@@ -31,17 +45,43 @@ private_lane :smf_git_changelog do |options|
 
   UI.important("Using tag: #{last_tag} to compare with HEAD")
 
-  changelog_messages = changelog_from_git_commits(
-    between: [last_tag, 'HEAD'],
-    merge_commit_filtering: 'include_merges',
-    pretty: '- (%an) %s'
-  )
+  # Get commits with SHA for platform filtering (CBENEFIOS-2079)
+  commit_data = _smf_get_commits_with_sha(last_tag, 'HEAD')
 
-  changelog_messages = '' if changelog_messages.nil?
+  # Filter commits by platform if platform filtering is enabled
+  app_commits = []
+  devops_commits = []
 
+  if target_platform && defined?(smf_detect_platform_from_commit)
+    UI.message("Filtering commits for platform: #{target_platform}")
+
+    commit_data.each do |commit|
+      platform = smf_detect_platform_from_commit(commit[:sha])
+
+      if platform == :devops
+        devops_commits << commit
+      elsif platform == :excluded
+        UI.message("Excluding commit (docs/config): #{commit[:message][0..50]}...")
+      elsif platform == :both || platform == target_platform
+        app_commits << commit
+      else
+        UI.message("Excluding commit (#{platform} only): #{commit[:message][0..50]}...")
+      end
+    end
+
+    UI.message("Commits after filtering: #{app_commits.length} app, #{devops_commits.length} devops")
+  else
+    # No platform filtering - all commits are app commits
+    app_commits = commit_data
+  end
+
+  # Process app commits for changelog
   cleaned_changelog_messages = []
   ignored_commits = [/Release Pod.*/, /Increment build number.*/, /Updating i18n/, /Updated strings from Phrase/]
-  changelog_messages.split(/\n+/).each do |commit_message|
+
+  app_commits.each do |commit|
+    commit_message = "- #{commit[:message]}"
+
     if _smf_should_commit_be_ignored_in_changelog(commit_message, ignored_commits)
       next
     end
@@ -52,13 +92,33 @@ private_lane :smf_git_changelog do |options|
     letters[2] = letters[2].upcase if letters.length >= 2
     commit_message = letters.join('')
     cleaned_changelog_messages.push(commit_message)
-
   end
 
-  # Extract related Jira issues info
+  # Process devops commits separately (CBENEFIOS-2079)
+  devops_changelog_messages = []
+  devops_commits.each do |commit|
+    commit_message = "- #{commit[:message]}"
+    next if _smf_should_commit_be_ignored_in_changelog(commit_message, ignored_commits)
+
+    commit_message = commit_message.sub(/^- \([^\)]*\) /, '- ')
+    letters = commit_message.split('')
+    letters[2] = letters[2].upcase if letters.length >= 2
+    commit_message = letters.join('')
+    devops_changelog_messages.push(commit_message)
+  end
+
+  # Extract related Jira issues info (with platform filtering)
   ticket_tags = smf_get_ticket_tags_from_changelog(cleaned_changelog_messages.uniq)
-  UI.message("Jira tickets found: #{ticket_tags}")
-  tickets = smf_generate_tickets_from_tags(ticket_tags)
+  devops_ticket_tags = smf_get_ticket_tags_from_changelog(devops_changelog_messages.uniq)
+
+  UI.message("Jira tickets found: #{ticket_tags.length} app, #{devops_ticket_tags.length} devops")
+
+  tickets = smf_generate_tickets_from_tags(ticket_tags, target_platform: target_platform)
+  devops_tickets = smf_generate_tickets_from_tags(devops_ticket_tags, target_platform: nil)
+
+  # Merge devops tickets into main tickets structure
+  tickets[:devops] = (tickets[:devops] || []) + (devops_tickets[:normal] || []) + (devops_tickets[:devops] || [])
+  tickets[:devops].uniq! { |t| t[:tag] }
 
   # Limit the size of changelog as it's crashes if it's too long
   changelog = cleaned_changelog_messages.uniq.join("\n")
@@ -69,14 +129,40 @@ private_lane :smf_git_changelog do |options|
   html_changelog = _smf_generate_changelog(changelog, tickets, :html)
   markdown_changelog = _smf_generate_changelog(changelog, tickets, :markdown)
   slack_changelog = _smf_generate_changelog(changelog, tickets, :slack_markdown)
-  ticket_tags = ticket_tags.join(' ') # convert array to string list
+  all_ticket_tags = (ticket_tags + devops_ticket_tags).uniq.join(' ')
 
   smf_write_changelog(
     changelog: markdown_changelog,
     html_changelog: html_changelog,
     slack_changelog: slack_changelog,
-    ticket_tags: ticket_tags
+    ticket_tags: all_ticket_tags,
+    devops_tickets: tickets[:devops]  # Store devops tickets separately
   )
+end
+
+# Get commits with SHA between two refs
+# @param from_ref [String] Starting ref (tag or commit)
+# @param to_ref [String] Ending ref (usually 'HEAD')
+# @return [Array<Hash>] Array of { sha: String, message: String }
+def _smf_get_commits_with_sha(from_ref, to_ref)
+  commits = []
+
+  # Get commit SHAs and messages
+  log_output = `git log #{from_ref}..#{to_ref} --pretty=format:"%H|||%s" 2>/dev/null`.strip
+
+  return commits if log_output.empty?
+
+  log_output.split("\n").each do |line|
+    parts = line.split('|||', 2)
+    next if parts.length < 2
+
+    commits << {
+      sha: parts[0].strip,
+      message: parts[1].strip
+    }
+  end
+
+  commits
 end
 
 ############################## HELPER ##############################

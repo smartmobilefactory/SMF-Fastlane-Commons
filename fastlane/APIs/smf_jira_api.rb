@@ -27,8 +27,21 @@ def smf_jira_fetch_ticket_data_for(ticket_tag)
 
   result[:title] = res.dig(:fields, :summary) unless res.nil?
   result[:linked_tickets] = _smf_extract_linked_issues(res, base_url)
+  result[:components] = _smf_extract_components(res) unless res.nil?
 
   result
+end
+
+# Extract component names from Jira ticket
+# @param ticket_data [Hash] Jira API response
+# @return [Array<String>] List of component names
+def _smf_extract_components(ticket_data)
+  return [] if ticket_data.nil?
+
+  components = ticket_data.dig(:fields, :components)
+  return [] if components.nil?
+
+  components.map { |c| c[:name] }.compact
 end
 
 def smf_jira_fetch_related_tickets_for(ticket_tag, base_url)

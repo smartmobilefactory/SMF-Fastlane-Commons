@@ -34,6 +34,7 @@ $CHANGELOG_TEMP_FILE = 'temp_changelog.txt'
 $CHANGELOG_TEMP_FILE_HTML = 'temp_changelog.html'
 $CHANGELOG_TEMP_FILE_SLACK_MARKDOWN = 'temp_changelog_slack_markdown.text'
 $TICKET_TAGS_TEMP_FILE = 'temp_ticket_tags.text'
+$DEVOPS_TICKETS_TEMP_FILE = 'temp_devops_tickets.json'  # CBENEFIOS-2079
 
 # Build Options
 $POD_DEFAULT_VARIANTS = ['patch', 'minor', 'major', 'current', 'breaking', 'internal']
