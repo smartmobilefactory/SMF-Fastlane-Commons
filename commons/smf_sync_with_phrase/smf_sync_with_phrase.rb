@@ -83,7 +83,9 @@ end
 
 # uploads and downloads the translation files for given resource directories and a project id
 def _smf_upload_and_download_translations(upload_api_client, download_api_client, project_id, upload_resource_dir, download_resource_dir, languages, is_kmpp, base, commit_message = nil)
+  sync_start_time = Time.now
 
+  upload_start_time = Time.now
   used_tags = _smf_upload_translations(
     upload_api_client,
     project_id,
@@ -91,10 +93,14 @@ def _smf_upload_and_download_translations(upload_api_client, download_api_client
     languages,
     base
   )
+  upload_duration = Time.now - upload_start_time
 
   # sleep for a small amount of time to make uploaded strings available to download again
-  sleep(15)
+  sleep_duration = 15
+  UI.message("Waiting #{sleep_duration} seconds for Phrase to process upload...")
+  sleep(sleep_duration)
 
+  download_start_time = Time.now
   _smf_download_translations(
     download_api_client,
     project_id,
@@ -103,8 +109,19 @@ def _smf_upload_and_download_translations(upload_api_client, download_api_client
     used_tags,
     is_kmpp
   )
+  download_duration = Time.now - download_start_time
 
   _smf_commit_changes_if_needed(download_resource_dir, commit_message)
+
+  # Print timing summary
+  total_duration = Time.now - sync_start_time
+  UI.message("-" * 60)
+  UI.message("Timing Summary:")
+  UI.message("  Upload:   #{upload_duration.round(2)}s (#{used_tags.count} files)")
+  UI.message("  Sleep:    #{sleep_duration}s")
+  UI.message("  Download: #{download_duration.round(2)}s (#{languages.count} locales)")
+  UI.message("  Total:    #{total_duration.round(2)}s")
+  UI.message("-" * 60)
 end
 
 def _smf_handle_apple_extensions(upload_api_client, download_api_client, base, extensions)
@@ -183,6 +200,7 @@ def _smf_upload_translations(api_client, project_id, upload_resource_dir, langua
 end
 
 def _smf_upload_translation_file(api_client, project_id, locale_id, file, tags, format)
+  start_time = Time.now
 
   options = {
     tags: tags,
@@ -193,7 +211,8 @@ def _smf_upload_translation_file(api_client, project_id, locale_id, file, tags, 
   begin
     UI.message("Uploading translation file: #{File.basename(file)}")
     result = api_client.upload_create(project_id, File.new(file), format, locale_id, options)
-    UI.message("Updated #{File.basename(file)} at #{result.updated_at} UTC")
+    duration = Time.now - start_time
+    UI.message("Uploaded #{File.basename(file)} in #{duration.round(2)}s (server time: #{result.updated_at} UTC)")
   rescue Phrase::ApiError => e
     puts "Exception while uploading translation file #{file}: #{e}"
   end
@@ -343,19 +362,21 @@ def _smf_download_files_android(api_client, project_id, dir, locale_id, is_kmpp)
 end
 
 def _smf_download_file(api_client, project_id, locale_id, output_file, tags, file_format, remove_quote_escape, include_empty_translations = false)
+  start_time = Time.now
+
   options = {
     return_type: 'String', # This is a workaround as there is currently no other way to get the downloaded content see https://github.com/phrase/phrase-ruby/issues/7
     file_format: file_format,
     tags: tags,
     encoding: FILE_ENCODING,
     include_empty_translations: include_empty_translations,
-    format_options: { 
-	    convert_placeholder: true 
+    format_options: {
+	    convert_placeholder: true
     }
   }
 
   begin
-    UI.message("Dowloading translation file #{File.basename(output_file)} with ID: #{locale_id}")
+    UI.message("Downloading translation file #{File.basename(output_file)} with ID: #{locale_id}")
     result = api_client.locale_download(project_id, locale_id, options)
     data = result.data
     if remove_quote_escape
@@ -363,6 +384,8 @@ def _smf_download_file(api_client, project_id, locale_id, output_file, tags, fil
       data = data.gsub('\"', '"')
     end
     File.write(output_file, data) unless result.data.nil? || result.data.empty?
+    duration = Time.now - start_time
+    UI.message("Downloaded #{File.basename(output_file)} in #{duration.round(2)}s")
   rescue Phrase::ApiError => e
     puts "Exception while downloading locale with ID #{locale_id}: #{e}"
   end
