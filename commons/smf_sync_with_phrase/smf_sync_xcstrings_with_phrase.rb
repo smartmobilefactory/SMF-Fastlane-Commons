@@ -79,7 +79,7 @@ def _smf_sync_single_xcstrings_project(upload_api_client, download_api_client, p
   )
 
   # Sleep to allow Phrase to process the upload
-  sleep_duration = 15
+  sleep_duration = 5
   UI.message("Waiting #{sleep_duration} seconds for Phrase to process upload...")
   sleep(sleep_duration)
 
