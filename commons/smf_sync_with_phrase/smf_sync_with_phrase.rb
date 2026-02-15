@@ -96,7 +96,7 @@ def _smf_upload_and_download_translations(upload_api_client, download_api_client
   upload_duration = Time.now - upload_start_time
 
   # sleep for a small amount of time to make uploaded strings available to download again
-  sleep_duration = 15
+  sleep_duration = 10
   UI.message("Waiting #{sleep_duration} seconds for Phrase to process upload...")
   sleep(sleep_duration)
 
