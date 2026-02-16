@@ -128,6 +128,42 @@ lane :smf_build do |options|
   smf_super_build(options)
 end
 
+# Download Provisioning Profiles (public wrapper for parallel builds)
+# This lane can be called from Jenkins to pre-download all profiles before parallel builds start
+# This prevents race conditions where parallel match calls interfere with each other's ENV variables
+
+lane :smf_pipeline_download_provisioning_profiles do |options|
+  build_variant = smf_build_variant(options)
+
+  extension_suffixes = smf_config_get(build_variant, :extensions_suffixes)
+  extension_suffixes = smf_config_get(nil, :extensions_suffixes) if extension_suffixes.nil?
+
+  default_platform = smf_is_mac_build(build_variant) ? 'macos' : 'ios'
+  match_platform = smf_config_get(build_variant, :match, :platform)
+  platform = match_platform.nil? ? default_platform : match_platform
+
+  force_match = options[:force_match]
+  force_match ||= smf_config_get(build_variant, :match, :force)
+
+  UI.message("📱 Downloading provisioning profiles for: #{build_variant}")
+
+  smf_download_provisioning_profiles(
+    team_id: smf_config_get(build_variant, :team_id),
+    apple_id: smf_config_get(build_variant, :apple_id),
+    use_wildcard_signing: smf_config_get(build_variant, :use_wildcard_signing),
+    bundle_identifier: smf_config_get(build_variant, :bundle_identifier),
+    use_default_match_config: smf_config_get(build_variant, :match).nil?,
+    match_read_only: smf_config_get(build_variant, :match, :read_only),
+    match_type: smf_config_get(build_variant, :match, :type),
+    extensions_suffixes: extension_suffixes,
+    build_variant: build_variant,
+    force: force_match,
+    platform: platform
+  )
+
+  UI.success("✅ Provisioning profiles downloaded for: #{build_variant}")
+end
+
 # Unit-Tests
 
 private_lane :smf_super_unit_tests do |options|
