@@ -6,6 +6,11 @@ private_lane :smf_build_apple_app do |options|
   UI.message('Cleaning build directory')
   `rm -rf #{smf_workspace_dir}/build`
 
+  # Clean global DerivedData for this project to prevent stale artifacts
+  # This fixes sporadic ibtool/CompileStoryboard failures after deployment target changes
+  UI.message('Cleaning global DerivedData for CorporateBenefits')
+  `rm -rf ~/Library/Developer/Xcode/DerivedData/CorporateBenefits*`
+
   # Parameter
   skip_package_ipa = (options[:skip_export].nil? ? false : options[:skip_export])
   skip_package_pkg = (options[:skip_package_pkg].nil? ? true : options[:skip_package_pkg])
