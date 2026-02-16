@@ -113,7 +113,7 @@ def _smf_upload_xcstrings(api_client, project_id, file_path, source_locale_id)
   start_time = Time.now
 
   options = {
-    update_translations: true,
+    update_translations: false, # IMPORTANT: Keep false to avoid overwriting existing translations in Phrase
     file_encoding: 'UTF-8'
   }
 
