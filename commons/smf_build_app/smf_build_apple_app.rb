@@ -62,8 +62,8 @@ private_lane :smf_build_apple_app do |options|
   smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
 
   # Build xcargs string with optional build number override (CBENEFIOS-2077)
-  # TEMP: -parallelizeTargets NO to debug sporadic CI build failures (race conditions)
-  xcargs_string = "#{smf_xcargs_for_build_system} CODE_SIGN_STYLE=Manual -skipPackagePluginValidation -parallelizeTargets NO"
+  # TEMP: -jobs 1 to debug sporadic CI build failures (race conditions in parallel builds)
+  xcargs_string = "#{smf_xcargs_for_build_system} CODE_SIGN_STYLE=Manual -skipPackagePluginValidation -jobs 1"
   if build_number
     UI.message("🔢 Overriding CURRENT_PROJECT_VERSION with: #{build_number}")
     xcargs_string += " CURRENT_PROJECT_VERSION=#{build_number}"
