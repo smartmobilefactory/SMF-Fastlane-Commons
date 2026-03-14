@@ -281,7 +281,8 @@ private_lane :smf_super_pipeline_create_git_tag do |options|
 
   smf_create_git_tag(
     build_variant: build_variant,
-    build_number: build_number
+    build_number: build_number,
+    platform: 'ios'
   )
 end
 

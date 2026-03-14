@@ -245,8 +245,12 @@ def smf_get_tag_of_pod(podspec_path)
   "releases/#{version_number}"
 end
 
-def smf_get_tag_of_app(build_variant, build_number)
-  "build/#{build_variant.downcase}/#{build_number}"
+def smf_get_tag_of_app(build_variant, build_number, platform = nil)
+  if platform
+    "build/#{platform.downcase}/#{build_variant.downcase}/#{build_number}"
+  else
+    "build/#{build_variant.downcase}/#{build_number}"
+  end
 end
 
 def smf_get_version_number(build_variant = nil, podspec_path = nil)

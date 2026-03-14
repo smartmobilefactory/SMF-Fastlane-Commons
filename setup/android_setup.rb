@@ -231,7 +231,11 @@ private_lane :smf_super_pipeline_create_git_tag do |options|
     build_number = smf_get_build_number_of_app
   end
 
-  smf_create_git_tag(build_variant: build_variant, build_number: build_number)
+  smf_create_git_tag(
+    build_variant: build_variant,
+    build_number: build_number,
+    platform: 'android'
+  )
 end
 
 lane :smf_pipeline_create_git_tag do |options|

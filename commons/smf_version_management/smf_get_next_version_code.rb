@@ -20,10 +20,11 @@ def smf_get_next_version_code_from_tags(platform = nil)
     _smf_fetch_build_tags_once
 
     # Query all build tags and extract version codes
-    # Format: build/android/de_alpha/3548 or build/de_alpha/3548
-    # Extract: 3548
+    # New format: build/ios/de_alpha/3548 or build/android/de_alpha/3548
+    # Legacy format: build/de_alpha/3548
+    # Extract: 3548 (last number segment, works for both formats)
     all_version_codes = sh(
-      "git tag -l 'build/*/*' 2>/dev/null | grep -oE '[0-9]+$' | sort -n",
+      "{ git tag -l 'build/*/*/*' 2>/dev/null; git tag -l 'build/*/*' 2>/dev/null; } | grep -oE '[0-9]+$' | sort -n | uniq",
       log: false
     ).strip
 
@@ -97,9 +98,9 @@ def smf_get_current_version_code_from_tags(platform = nil)
     # Fetch build tags (optimized: only once per build, only build/* tags)
     _smf_fetch_build_tags_once
 
-    # Query all build tags and extract version codes
+    # Query all build tags and extract version codes (new + legacy format)
     all_version_codes = sh(
-      "git tag -l 'build/*/*' 2>/dev/null | grep -oE '[0-9]+$' | sort -n",
+      "{ git tag -l 'build/*/*/*' 2>/dev/null; git tag -l 'build/*/*' 2>/dev/null; } | grep -oE '[0-9]+$' | sort -n | uniq",
       log: false
     ).strip
 
