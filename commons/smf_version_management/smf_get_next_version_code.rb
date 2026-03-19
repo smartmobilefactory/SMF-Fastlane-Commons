@@ -133,10 +133,11 @@ end
 def _smf_fetch_build_tags_once
   # Use instance variable to cache across function calls
   if @smf_build_tags_fetched.nil?
-    UI.message("🔄 Fetching build tags from remote (optimized: only build/* tags)...")
+    UI.message("🔄 Fetching build tags from remote...")
     begin
-      # Option 1 + 3: Fetch only build/* tags, only once per build
-      sh("git fetch origin 'refs/tags/build/*:refs/tags/build/*' --quiet --force 2>&1 || true")
+      # Fetch both old format (build/<variant>/<number>) and new format (build/<platform>/<variant>/<number>)
+      # Git refspec '*' only matches one path level, so we need separate refspecs for each depth
+      sh("git fetch origin 'refs/tags/build/*:refs/tags/build/*' 'refs/tags/build/*/*:refs/tags/build/*/*' 'refs/tags/build/*/*/*:refs/tags/build/*/*/*' --quiet --force 2>&1 || true")
       @smf_build_tags_fetched = true
       UI.success("✅ Fetched build tags successfully")
     rescue => e
