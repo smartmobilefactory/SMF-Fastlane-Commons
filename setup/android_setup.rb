@@ -339,6 +339,8 @@ private_lane :smf_super_push_git_tag_release do |options|
   # Local: Use Config.json (backward compatible)
   if smf_is_ci?
     UI.message("🏗️  CI Build - extracting build number from latest git tag")
+    # Fetch remote tags so we see tags created earlier in this pipeline
+    _smf_fetch_build_tags_once
     # Use git tag -l instead of git describe to avoid HEAD ancestry issues after git pull
     # New format first (build/android/<variant>/*), then legacy (build/<variant>/*)
     latest_version = sh(
