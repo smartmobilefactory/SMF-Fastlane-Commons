@@ -339,8 +339,13 @@ private_lane :smf_super_push_git_tag_release do |options|
   # Local: Use Config.json (backward compatible)
   if smf_is_ci?
     UI.message("🏗️  CI Build - extracting build number from latest git tag")
-    # Get the latest tag for this build variant
-    latest_tag = sh("git describe --tags --match '*#{build_variant}*' --abbrev=0 HEAD", log: false).strip
+    # Get the latest tag for this build variant (platform-specific first, then legacy)
+    begin
+      latest_tag = sh("git describe --tags --match 'build/android/#{build_variant}/*' --abbrev=0 HEAD", log: false).strip
+    rescue
+      UI.message("No platform-specific tag found, trying legacy format...")
+      latest_tag = sh("git describe --tags --match 'build/#{build_variant}/*' --abbrev=0 HEAD", log: false).strip
+    end
     build_number = latest_tag.split('/').last.to_i
     UI.message("📊 Extracted build number from tag: #{build_number}")
   else
@@ -350,7 +355,7 @@ private_lane :smf_super_push_git_tag_release do |options|
 
   smf_create_github_release(
     build_number: build_number,
-    tag: smf_get_tag_of_app(build_variant, build_number),
+    tag: smf_get_tag_of_app(build_variant, build_number, 'android'),
     branch: local_branch,
     build_variant: build_variant,
     changelog: changelog

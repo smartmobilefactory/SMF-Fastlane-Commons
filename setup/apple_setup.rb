@@ -506,14 +506,21 @@ private_lane :smf_super_push_git_tag_release do |options|
   # Local: Use Xcode project (backward compatible)
   if smf_is_ci?
     UI.message("🏗️  CI Build - extracting build number from latest git tag")
-    # Get the latest tag for this build variant
+    # Get the latest tag for this build variant (platform-specific first, then legacy)
     begin
-      latest_tag = sh("git describe --tags --match '*#{build_variant}*' --abbrev=0 HEAD", log: false).strip
+      latest_tag = sh("git describe --tags --match 'build/ios/#{build_variant}/*' --abbrev=0 HEAD", log: false).strip
       build_number = latest_tag.split('/').last.to_i
       UI.message("📊 Extracted build number from tag: #{build_number}")
     rescue
-      UI.important("⚠️  Could not extract build number from git tag, falling back to Xcode project")
-      build_number = get_build_number(xcodeproj: smf_get_xcodeproj_file_name)
+      begin
+        UI.message("No platform-specific tag found, trying legacy format...")
+        latest_tag = sh("git describe --tags --match 'build/#{build_variant}/*' --abbrev=0 HEAD", log: false).strip
+        build_number = latest_tag.split('/').last.to_i
+        UI.message("📊 Extracted build number from legacy tag: #{build_number}")
+      rescue
+        UI.important("⚠️  Could not extract build number from git tag, falling back to Xcode project")
+        build_number = get_build_number(xcodeproj: smf_get_xcodeproj_file_name)
+      end
     end
   else
     UI.message("🖥️  Local Build - using Xcode project build number")
@@ -522,7 +529,7 @@ private_lane :smf_super_push_git_tag_release do |options|
 
   smf_create_github_release(
     build_number: build_number,
-    tag: smf_get_tag_of_app(build_variant, build_number),
+    tag: smf_get_tag_of_app(build_variant, build_number, 'ios'),
     branch: local_branch,
     build_variant: build_variant,
     changelog: changelog
