@@ -33,7 +33,22 @@ private_lane :smf_git_changelog do |options|
   if is_library
     last_tag = sh("git describe --tags --match \"releases/*\" --abbrev=0 HEAD --first-parent || echo #{NO_GIT_TAG_FAILURE}").to_s
   else
-    last_tag = sh("git describe --tags --match \"*#{build_variant}*\" --abbrev=0 HEAD --first-parent || echo #{NO_GIT_TAG_FAILURE}").to_s
+    # Try platform-specific tag first (build/<platform>/<variant>/*), then fall back to old format (build/<variant>/*)
+    platform_prefix = case target_platform
+                      when :ios then 'ios/'
+                      when :android then 'android/'
+                      else ''
+                      end
+    if !platform_prefix.empty?
+      last_tag = sh("git describe --tags --match \"build/#{platform_prefix}#{build_variant}/*\" --abbrev=0 HEAD --first-parent || echo #{NO_GIT_TAG_FAILURE}").to_s
+      if last_tag.include?(NO_GIT_TAG_FAILURE)
+        # Fall back to old format without platform prefix
+        UI.message("No platform-specific tag found, trying old format...")
+        last_tag = sh("git describe --tags --match \"build/#{build_variant}/*\" --abbrev=0 HEAD --first-parent || echo #{NO_GIT_TAG_FAILURE}").to_s
+      end
+    else
+      last_tag = sh("git describe --tags --match \"*#{build_variant}*\" --abbrev=0 HEAD --first-parent || echo #{NO_GIT_TAG_FAILURE}").to_s
+    end
   end
 
   # Use the initial commit if there is no matching tag yet

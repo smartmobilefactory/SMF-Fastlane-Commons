@@ -11,7 +11,7 @@ private_lane :smf_create_git_tag do |options|
   if _smf_git_tag_exists_locally?(tag)
     UI.important("⚠️  Git tag '#{tag}' already exists locally - skipping tag creation")
     UI.important("💡 This can happen if a previous build with the same version already created this tag")
-    return tag
+    next tag
   end
   UI.message("✅ Tag not found locally")
 
@@ -20,7 +20,7 @@ private_lane :smf_create_git_tag do |options|
   if _smf_git_tag_exists_on_remote?(tag)
     UI.important("⚠️  Git tag '#{tag}' already exists on remote - skipping tag creation")
     UI.important("💡 This can happen if a previous build with the same version already created this tag")
-    return tag
+    next tag
   end
   UI.message("✅ Tag not found on remote")
 
