@@ -41,30 +41,38 @@ private_lane :smf_create_github_release do |options|
     release_name = "#{smf_get_version_number(nil, podspec_path)}"
   end
 
+  begin
     # Create the GitHub release as draft
-  release = set_github_release(
-      is_draft: true,
-      repository_name: repository_path,
-      api_token: ENV[$SMF_GITHUB_TOKEN_ENV_KEY],
-      name: release_name,
-      tag_name: tag,
-      description: changelog,
-      commitish: branch,
-      upload_assets: paths
-  )
+    release = set_github_release(
+        is_draft: true,
+        repository_name: repository_path,
+        api_token: ENV[$SMF_GITHUB_TOKEN_ENV_KEY],
+        name: release_name,
+        tag_name: tag,
+        description: changelog,
+        commitish: branch,
+        upload_assets: paths
+    )
 
-  release_id = release['id']
-  UI.message("Found id \"#{release_id}\" for release \"#{tag}\"")
+    release_id = release['id']
+    UI.message("Found id \"#{release_id}\" for release \"#{tag}\"")
 
-  github_api(
-      server_url: 'https://api.github.com',
-      api_token: ENV[$SMF_GITHUB_TOKEN_ENV_KEY],
-      http_method: 'PATCH',
-      path: "/repos/#{repository_path}/releases/#{release_id}",
-      body: {
-          "draft": false
-      }
-  )
+    github_api(
+        server_url: 'https://api.github.com',
+        api_token: ENV[$SMF_GITHUB_TOKEN_ENV_KEY],
+        http_method: 'PATCH',
+        path: "/repos/#{repository_path}/releases/#{release_id}",
+        body: {
+            "draft": false
+        }
+    )
+  rescue => e
+    if e.message.include?('already_exists') || e.message.include?('422')
+      UI.important("⚠️  GitHub release for tag '#{tag}' already exists — skipping")
+    else
+      raise e
+    end
+  end
 end
 
 def zipped_path(path)
