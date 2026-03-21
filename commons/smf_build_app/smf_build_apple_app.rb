@@ -157,7 +157,17 @@ private_lane :smf_build_apple_app do |options|
 end
 
 def smf_xcargs_for_build_system
-  smf_is_using_old_build_system ? "" : "-UseNewBuildSystem=YES CODE_SIGN_STYLE=Manual"
+  base = smf_is_using_old_build_system ? "" : "-UseNewBuildSystem=YES CODE_SIGN_STYLE=Manual"
+  spm_cache = smf_spm_cache_dir
+  spm_cache ? "#{base} -clonedSourcePackagesDirPath #{spm_cache}" : base
+end
+
+# CBENEFIOS-2156: Persistent SPM cache directory, works regardless of CI username (ci/smf)
+def smf_spm_cache_dir
+  return nil unless smf_is_ci?
+  cache_dir = File.join(Dir.home, "spm-cache-persistent")
+  FileUtils.mkdir_p(cache_dir)
+  cache_dir
 end
 
 def smf_is_using_old_build_system
