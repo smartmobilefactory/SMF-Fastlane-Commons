@@ -64,6 +64,18 @@ private_lane :smf_build_apple_app do |options|
   # Build xcargs string with optional build number override (CBENEFIOS-2077)
   # Limit parallel jobs to prevent race conditions in actool/ibtool (CI stability fix)
   xcargs_string = "#{smf_xcargs_for_build_system} CODE_SIGN_STYLE=Manual -skipPackagePluginValidation -jobs 4"
+
+  # CBENEFIOS-2157: CI Build Flags optimization
+  if smf_is_ci?
+    # Disable Index Store on CI (not needed without IDE, saves ~30-60s)
+    xcargs_string += " COMPILER_INDEX_STORE_ENABLE=NO"
+
+    # Alpha/Beta: use incremental compilation without optimization (saves ~30-60s)
+    is_release = build_variant && (build_variant.include?('release') || build_variant.include?('live'))
+    unless is_release
+      xcargs_string += " SWIFT_COMPILATION_MODE=incremental"
+    end
+  end
   if build_number
     UI.message("🔢 Overriding CURRENT_PROJECT_VERSION with: #{build_number}")
     xcargs_string += " CURRENT_PROJECT_VERSION=#{build_number}"
