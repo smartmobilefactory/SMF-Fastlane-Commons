@@ -78,7 +78,12 @@ def smf_get_build_number_of_app
   case @platform
   when :ios, :macos, :apple
     project_name = @smf_fastlane_config[:project][:project_name]
-    build_number = get_build_number(xcodeproj: smf_get_xcodeproj_file_name)
+    if smf_is_ci? && ENV['BUILD_VERSION_CODE']
+      build_number = ENV['BUILD_VERSION_CODE']
+      UI.message("📊 Using version code from Jenkins: #{build_number}")
+    else
+      build_number = get_build_number(xcodeproj: smf_get_xcodeproj_file_name)
+    end
   when :android
     # CI: Use BUILD_VERSION_CODE from Jenkins (CBENEFIOS-1881)
     # Local: Use Config.json
