@@ -65,6 +65,11 @@ private_lane :smf_build_apple_app do |options|
   # Limit parallel jobs to prevent race conditions in actool/ibtool (CI stability fix)
   xcargs_string = "#{smf_xcargs_for_build_system} CODE_SIGN_STYLE=Manual -skipPackagePluginValidation -jobs 4"
 
+  # CBENEFIOS-2193: Use shared compilation cache across all workspaces on the same node
+  # Default path lands inside build/derivedData/ which gets deleted before each build.
+  # Redirecting to a global path enables cache hits across parallel builds and slots.
+  xcargs_string += " COMPILATION_CACHE_CAS_PATH=#{File.expand_path('~/Library/Developer/Xcode/CompilationCache')}"
+
   # CBENEFIOS-2157: CI Build Flags optimization
   if smf_is_ci?
     # Disable Index Store on CI (not needed without IDE, saves ~30-60s)
