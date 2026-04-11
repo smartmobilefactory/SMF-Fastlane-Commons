@@ -66,7 +66,11 @@ private_lane :smf_danger do |options|
   _smf_check_valid_xcode_config(options)
   _smf_extract_thread_sanitizer_warnings
 
-  _smf_patch_multi_json_utf8_encoding
+  # CBENEFIOS-2241: inject MultiJson UTF-8 patch into the danger subprocess
+  # via RUBYOPT so it loads before any Ruby code runs — covers Danger's own
+  # GitHub#fetch_details call, which runs before the Dangerfile is evaluated.
+  patch_file = File.expand_path('multi_json_utf8_patch.rb', File.dirname(__FILE__))
+  ENV['RUBYOPT'] = "#{ENV['RUBYOPT']} -r#{patch_file}".strip
 
   dangerfile = "#{File.expand_path(File.dirname(__FILE__))}/Dangerfile"
   puts "Loading Dangerfile: #{dangerfile}"
@@ -75,32 +79,6 @@ private_lane :smf_danger do |options|
       dangerfile: dangerfile,
       verbose: true
   )
-end
-
-# CBENEFIOS-2241: octokit 10.0 / sawyer 0.9.3 hand GitHub response bodies to
-# MultiJson tagged as ASCII-8BIT. Under Ruby 3.3 + json stdlib this raises
-# MultiJson::ParseError on any non-ASCII byte (e.g. 0xE2 em-dash). An earlier
-# attempt patched Sawyer::Serializer#decode, but Sawyer 0.9.3 routes through
-# #call internally so the decode override is never hit. Patch MultiJson.load
-# directly — it's the common endpoint for every JSON decode path regardless
-# of which HTTP client sits above it.
-# Must run before danger() so it covers Danger's own GitHub#fetch_details call.
-def _smf_patch_multi_json_utf8_encoding
-  require 'multi_json'
-  return if MultiJson.singleton_class.method_defined?(:_smf_orig_load)
-
-  MultiJson.singleton_class.class_eval do
-    alias_method :_smf_orig_load, :load
-    def load(string, options = {})
-      if string.is_a?(String) && string.encoding == Encoding::ASCII_8BIT
-        string = string.dup.force_encoding('UTF-8')
-      end
-      _smf_orig_load(string, options)
-    end
-  end
-  UI.message('🩹 Applied MultiJson UTF-8 load patch (CBENEFIOS-2241)')
-rescue LoadError => e
-  UI.important("Could not load multi_json for UTF-8 patch: #{e.message}")
 end
 
 def _is_apple_platform
