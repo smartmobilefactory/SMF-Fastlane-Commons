@@ -122,6 +122,15 @@ private_lane :smf_build_apple_app do |options|
       project_path = potential_path if File.exist?(potential_path)
     end
 
+    # Fall back to parent directory: when fastlane is invoked from the
+    # `fastlane/` sub-directory rather than the project root, relative paths
+    # resolve against `iosApp/fastlane/` and miss the .xcodeproj that lives
+    # one level up. Try the parent before giving up.
+    unless File.exist?(project_path)
+      parent_path = "../#{project_path}"
+      project_path = parent_path if File.exist?(parent_path)
+    end
+
     if File.exist?(project_path)
       UI.message("🔧 Updating code signing settings in Xcode project: #{project_path}")
       update_code_signing_settings(
