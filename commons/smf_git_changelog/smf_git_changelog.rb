@@ -140,10 +140,17 @@ private_lane :smf_git_changelog do |options|
   changelog = "#{changelog[0..20_000]}#{'\\n...'}" if changelog.length > 20_000
   changelog = changelog.split("\n")
 
+  # CBENEFIOS-2510: compute the canonical commits_by_tag once (this is the
+  # path that does the GitHub PR-body lookup for commits whose CBENEFIOS-XXXX
+  # is only in the PR body, not the title). Pass it to all three format
+  # calls so we don't pay the network cost three times.
+  commits_attribution = smf_get_ticket_tags_with_commits_from_changelog(changelog)
+  commits_by_tag = commits_attribution[:commits_by_tag] || {}
+
   # Convert changelog to different output formats
-  html_changelog = _smf_generate_changelog(changelog, tickets, :html)
-  markdown_changelog = _smf_generate_changelog(changelog, tickets, :markdown)
-  slack_changelog = _smf_generate_changelog(changelog, tickets, :slack_markdown)
+  html_changelog = _smf_generate_changelog(changelog, tickets, :html, commits_by_tag: commits_by_tag)
+  markdown_changelog = _smf_generate_changelog(changelog, tickets, :markdown, commits_by_tag: commits_by_tag)
+  slack_changelog = _smf_generate_changelog(changelog, tickets, :slack_markdown, commits_by_tag: commits_by_tag)
   all_ticket_tags = (ticket_tags + devops_ticket_tags).uniq.join(' ')
 
   smf_write_changelog(
