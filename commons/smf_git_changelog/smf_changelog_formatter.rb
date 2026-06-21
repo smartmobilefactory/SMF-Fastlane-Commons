@@ -84,6 +84,20 @@ def _smf_generate_changelog(changelog, tickets, changelog_format, commits_by_tag
   # line. This is a worse but no-network attribution that still works for
   # commits where the tag is explicitly in the title.
   commits_by_tag ||= _smf_build_commits_by_tag(changelog_lines)
+
+  # CBENEFIOS-2511: defensive normalization of attribution map values.
+  # The yet-unidentified re-feed mechanism contaminates the changelog
+  # input with leading bullet chars from our own previous output ("- · X").
+  # The canonical attribution helper (smf_get_ticket_tags_with_commits_from_changelog)
+  # strips the leading "- " but not "· ", so commits_by_tag values may carry
+  # "· " prefixes that contaminate:
+  #   - sub-bullet rendering: shows "- · · {body}" double-dot
+  #   - orphan dedup: comparison key mismatch → same commit appears both
+  #     as sub-bullet AND as orphan
+  # Strip them at the boundary here, once for all downstream uses.
+  commits_by_tag = commits_by_tag.transform_values do |msgs|
+    (msgs || []).map { |m| _smf_strip_bullet_prefixes(m) }.reject(&:empty?)
+  end
   attributed_lines = Set.new(commits_by_tag.values.flatten.map(&:to_s))
 
   # Sort tickets by tag for deterministic output.
