@@ -11,7 +11,6 @@
 # — this file no longer participates in translation.
 #
 # Install on each Mac agent:
-#   brew tap rudivice/tools git@github.com:rudivice/homebrew-tools.git
 #   brew install rudivice/tools/afmcli
 #
 # Config.json example:
@@ -44,8 +43,21 @@ end
 
 def smf_get_ai_release_notes_config
   config = @smf_fastlane_config[:ai_release_notes] || {}
+  # Compatibility note (CBENEFIOS-2504):
+  #   provider / api_key_env / model are no longer used by this gem after the
+  #   afmcli migration, but a few external callers still read them (informational
+  #   logs in smf_upload_to_firebase.rb, and the to-be-removed
+  #   ai_filter_testflight_relevant in CorporateBenefits-MP/Fastfile, which is
+  #   migrated in PR 2). We keep the keys with safe defaults so:
+  #     - ENV[config[:api_key_env]] returns nil (NOT a TypeError)
+  #     - the caller's existing 'if api_key.nil? — fail-open' branch triggers
+  #     - logging shows meaningful strings instead of empty interpolations
+  #   These keys can be dropped after PR 2 + bake-out are merged.
   {
     enabled: config[:enabled] || config['enabled'] || false,
+    provider: 'apple-on-device',
+    api_key_env: 'AFMCLI_NO_KEY_NEEDED',
+    model: 'on-device',
     alpha_mode: (config[:alpha_mode] || config['alpha_mode'] || 'comparison').to_sym,
     beta_mode: (config[:beta_mode] || config['beta_mode'] || 'ai_only').to_sym
   }
