@@ -1,73 +1,92 @@
 # AI-generated release notes for Firebase App Distribution and TestFlight
 # CBENEFIOS-1886, CBENEFIOS-1887
 #
-# Supported providers: OpenAI, Anthropic
+# Provider: afmcli (Apple Foundation Models, on-device, macOS 26+).
+# The previous Anthropic/OpenAI HTTP paths are gone — afmcli wraps
+# Apple's FoundationModels framework and runs on the Mac agent itself,
+# so no API key or network round-trip is required.
+#
+# Translation continues to live in Groovy/DeepL inside the Jenkins
+# pipelines (set-testflight-notes.groovy, prepare-app-store-release.groovy)
+# — this file no longer participates in translation.
+#
+# Install on each Mac agent:
+#   brew install rudivice/tools/afmcli
 #
 # Config.json example:
 # {
 #   "ai_release_notes": {
 #     "enabled": true,
-#     "provider": "openai",           # or "anthropic"
-#     "api_key_env": "OPENAI_API_KEY", # or "ANTHROPIC_API_KEY"
-#     "model": "gpt-4o-mini",          # or "claude-3-haiku-20240307"
 #     "alpha_mode": "comparison",
 #     "beta_mode": "ai_only"
 #   }
 # }
 
-require 'net/http'
-require 'uri'
+require 'open3'
 require 'json'
 require 'set'
 
-# Default models per provider
-AI_DEFAULT_MODELS = {
-  'openai' => 'gpt-4o-mini',
-  'anthropic' => 'claude-3-haiku-20240307'
-}.freeze
-
-# Default API key environment variable names per provider
-# Note: Jenkins credentials use hyphens (ANTHROPIC-API-KEY), but env vars use underscores
-AI_DEFAULT_API_KEY_ENV = {
-  'openai' => 'OPENAI_API_KEY',
-  'anthropic' => 'ANTHROPIC_API_KEY'
-}.freeze
+# Build-safety contract:
+#   AI release notes are a pure convenience feature. None of the public methods
+#   in this file may raise. Each catches StandardError at the top level and
+#   returns a safe default (false / safe-default-config / nil) so callers can
+#   degrade to their own non-AI fallback (standard changelog, pass-through
+#   filter, etc.) and the build keeps moving.
 
 def smf_ai_release_notes_enabled?
-  config = @smf_fastlane_config[:ai_release_notes]
+  config = (defined?(@smf_fastlane_config) && @smf_fastlane_config) ? @smf_fastlane_config[:ai_release_notes] : nil
   return false if config.nil?
 
   enabled = config[:enabled] || config['enabled']
   return false unless enabled
 
-  provider = (config[:provider] || config['provider'] || 'openai').to_s.downcase
-  default_env = AI_DEFAULT_API_KEY_ENV[provider] || 'OPENAI_API_KEY'
-  api_key_env = config[:api_key_env] || config['api_key_env'] || default_env
-  api_key = ENV[api_key_env]
-
-  if api_key.nil? || api_key.empty?
-    UI.message("AI release notes disabled: #{api_key_env} not set")
+  unless system('command -v afmcli > /dev/null 2>&1')
+    UI.message('AI release notes disabled: afmcli not installed on this agent (brew install rudivice/tools/afmcli)')
     return false
   end
 
   true
+rescue StandardError => e
+  # Belt-and-suspenders: never let a config-shape change or env oddity crash the build.
+  UI.message("AI release notes disabled (probe failed): #{e.class}: #{e.message}") if defined?(UI)
+  false
 end
 
+# Safe default returned when the config block is missing or unreadable.
+# Holds the same keys as a successful read so callers can interpolate without nil-guards.
+AI_RELEASE_NOTES_SAFE_DEFAULT_CONFIG = {
+  enabled: false,
+  provider: 'apple-on-device',
+  api_key_env: 'AFMCLI_NO_KEY_NEEDED',
+  model: 'on-device',
+  alpha_mode: :comparison,
+  beta_mode: :ai_only
+}.freeze
+
 def smf_get_ai_release_notes_config
-  config = @smf_fastlane_config[:ai_release_notes] || {}
-  provider = (config[:provider] || config['provider'] || 'openai').to_s.downcase
-
-  default_model = AI_DEFAULT_MODELS[provider] || 'gpt-4o-mini'
-  default_env = AI_DEFAULT_API_KEY_ENV[provider] || 'OPENAI_API_KEY'
-
+  raw = (defined?(@smf_fastlane_config) && @smf_fastlane_config) ? @smf_fastlane_config[:ai_release_notes] : nil
+  config = raw || {}
+  # Compatibility note (CBENEFIOS-2504):
+  #   provider / api_key_env / model are no longer used by this gem after the
+  #   afmcli migration, but a few external callers still read them (informational
+  #   logs in smf_upload_to_firebase.rb, and the to-be-removed
+  #   ai_filter_testflight_relevant in CorporateBenefits-MP/Fastfile, which is
+  #   migrated in PR 2). We keep the keys with safe defaults so:
+  #     - ENV[config[:api_key_env]] returns nil (NOT a TypeError)
+  #     - the caller's existing 'if api_key.nil? — fail-open' branch triggers
+  #     - logging shows meaningful strings instead of empty interpolations
+  #   These keys can be dropped after PR 2 + bake-out are merged.
   {
     enabled: config[:enabled] || config['enabled'] || false,
-    provider: provider,
-    api_key_env: config[:api_key_env] || config['api_key_env'] || default_env,
-    model: config[:model] || config['model'] || default_model,
+    provider: 'apple-on-device',
+    api_key_env: 'AFMCLI_NO_KEY_NEEDED',
+    model: 'on-device',
     alpha_mode: (config[:alpha_mode] || config['alpha_mode'] || 'comparison').to_sym,
     beta_mode: (config[:beta_mode] || config['beta_mode'] || 'ai_only').to_sym
   }
+rescue StandardError => e
+  UI.message("AI release notes config unreadable (#{e.class}: #{e.message}) — using safe defaults") if defined?(UI)
+  AI_RELEASE_NOTES_SAFE_DEFAULT_CONFIG.dup
 end
 
 # Main entry point for generating AI release notes
@@ -97,16 +116,15 @@ def smf_generate_ai_release_notes(tickets, options = {})
   language = options[:language] || 'en'
   max_length = options[:max_length] || 700
 
-  UI.message("Generating AI release notes (provider: #{config[:provider]}, mode: #{mode}, links: #{include_jira_links})")
+  UI.message("Generating AI release notes (afmcli, mode: #{mode}, links: #{include_jira_links})")
 
   # Deduplicate tickets
   unique_tickets = _smf_deduplicate_tickets(tickets)
 
-  # Get DevOps tickets (CBENEFIOS-2079) - only for alpha builds in comparison mode
+  # Get DevOps tickets (CBENEFIOS-2079) — only for alpha builds in comparison mode
   devops_tickets = []
   if is_alpha && mode == :comparison
     devops_tickets = tickets[:devops] || []
-    # Also try to read from temp file if not in tickets hash
     if devops_tickets.empty? && defined?(smf_read_devops_tickets)
       devops_tickets = smf_read_devops_tickets
     end
@@ -114,7 +132,7 @@ def smf_generate_ai_release_notes(tickets, options = {})
   end
 
   if unique_tickets.empty? && devops_tickets.empty?
-    UI.message("No tickets found for AI release notes generation")
+    UI.message('No tickets found for AI release notes generation')
     return nil
   end
 
@@ -128,21 +146,19 @@ def smf_generate_ai_release_notes(tickets, options = {})
     commits = ticket_commits[tag] || []
 
     if commits.any?
-      # Include commit messages for better context
-      commit_info = commits.take(3).join('; ')  # Limit to 3 commits per ticket
+      commit_info = commits.take(3).join('; ') # Limit to 3 commits per ticket
       "#{tag}: #{title}\n  Commits: #{commit_info}"
     else
       "#{tag}: #{title}"
     end
   end
 
-  # Generate AI release notes using configured provider
-  ai_notes = nil
-  if ticket_summaries.any?
-    ai_notes = _smf_call_ai_api(ticket_summaries, language, max_length, config)
-  else
-    ai_notes = "Infrastructure and DevOps updates."
-  end
+  # Generate AI release notes via afmcli
+  ai_notes = if ticket_summaries.any?
+               _smf_call_afmcli_shorten(ticket_summaries, language, max_length, mode)
+             else
+               'Infrastructure and DevOps updates.'
+             end
 
   return nil if ai_notes.nil?
 
@@ -152,63 +168,29 @@ def smf_generate_ai_release_notes(tickets, options = {})
   UI.message("   DevOps tickets for list: #{devops_tickets.length}")
 
   result = case mode
-  when :comparison
-    UI.message("   → Using comparison mode (with ticket list)")
-    _smf_format_comparison_notes(unique_tickets, ai_notes, include_jira_links, devops_tickets)
-  when :ai_only
-    UI.message("   → Using ai_only mode (no ticket list)")
-    ai_notes
-  else
-    UI.message("   → Using fallback mode: #{mode}")
-    ai_notes
-  end
+           when :comparison
+             UI.message('   → Using comparison mode (with ticket list)')
+             _smf_format_comparison_notes(unique_tickets, ai_notes, include_jira_links, devops_tickets)
+           when :ai_only
+             UI.message('   → Using ai_only mode (no ticket list)')
+             ai_notes
+           else
+             UI.message("   → Using fallback mode: #{mode}")
+             ai_notes
+           end
 
   UI.message("📋 Final result length: #{result&.length || 0} chars")
   result
-end
-
-# Generate localized release notes for TestFlight
-# @param tickets [Hash] Ticket data from smf_generate_tickets_from_tags
-# @param options [Hash] Options hash
-#   - base_language [String] Base language for generation (default: 'en')
-#   - target_languages [Array<String>] Languages to translate to
-#   - max_length [Integer] Maximum character length per language
-# @return [Hash<String, String>] Hash of language code to release notes
-def smf_generate_localized_release_notes(tickets, options = {})
-  return {} unless smf_ai_release_notes_enabled?
-
-  config = smf_get_ai_release_notes_config
-  base_language = options[:base_language] || 'en'
-  target_languages = options[:target_languages] || ['de', 'es', 'fr', 'it', 'nl', 'pl', 'pt', 'tr']
-  max_length = options[:max_length] || 4000 # TestFlight allows longer notes
-
-  # Generate base English notes first
-  base_notes = smf_generate_ai_release_notes(tickets, {
-    build_variant: 'release', # Use ai_only mode for TestFlight
-    language: base_language,
-    max_length: max_length
-  })
-
-  return {} if base_notes.nil?
-
-  localized_notes = { base_language => base_notes }
-
-  # Translate to each target language
-  target_languages.each do |lang|
-    next if lang == base_language
-
-    UI.message("Translating release notes to #{lang}...")
-    translated = _smf_translate_with_ai(base_notes, base_language, lang, config)
-
-    if translated
-      localized_notes[lang] = translated
-    else
-      UI.important("Failed to translate to #{lang}, using base language")
-      localized_notes[lang] = base_notes
-    end
+rescue StandardError => e
+  # Top-level convenience-feature guard (CBENEFIOS-2504): never let an
+  # AI-release-notes failure crash the build. Caller falls back to its
+  # own non-AI changelog when this returns nil.
+  if defined?(UI)
+    UI.error("❌ AI release notes generation failed unexpectedly — falling back to standard changelog")
+    UI.error("   #{e.class}: #{e.message}")
+    UI.error("   #{e.backtrace.first(3).join("\n   ")}") if e.backtrace
   end
-
-  localized_notes
+  nil
 end
 
 # Deduplicate tickets by merging normal and linked tickets
@@ -223,6 +205,7 @@ def _smf_deduplicate_tickets(tickets)
   # Process normal tickets first (they have more info)
   (tickets[:normal] || []).each do |ticket|
     next if seen_tags.include?(ticket[:tag])
+
     seen_tags.add(ticket[:tag])
     unique_tickets << ticket
   end
@@ -230,6 +213,7 @@ def _smf_deduplicate_tickets(tickets)
   # Add linked tickets that weren't in normal
   (tickets[:linked] || []).each do |ticket|
     next if seen_tags.include?(ticket[:tag])
+
     seen_tags.add(ticket[:tag])
     unique_tickets << ticket
   end
@@ -237,309 +221,67 @@ def _smf_deduplicate_tickets(tickets)
   unique_tickets
 end
 
-# Route AI API call to the appropriate provider
-# @param ticket_summaries [Array<String>] List of ticket summaries
-# @param language [String] Target language
-# @param max_length [Integer] Maximum output length
-# @param config [Hash] AI configuration
-# @return [String, nil] Generated notes or nil on failure
-def _smf_call_ai_api(ticket_summaries, language, max_length, config)
-  case config[:provider]
-  when 'anthropic'
-    _smf_call_anthropic_api(ticket_summaries, language, max_length, config)
-  when 'openai'
-    _smf_call_openai_api(ticket_summaries, language, max_length, config)
+# Shell out to `afmcli shorten` to produce user-facing release notes.
+# The tool is installed on every Mac agent via `brew install rudivice/tools/afmcli`
+# and uses the on-device Apple Foundation Model on macOS 26+.
+#
+# If the model is unavailable on the agent (Apple Intelligence off, older OS),
+# afmcli still exits 0 with `ok: false` and a `fallback-truncate` engine — we
+# treat that as a soft failure: we log it and pass the (truncated) output back
+# so the pipeline keeps moving.
+#
+# @param ticket_summaries [Array<String>] Pre-built ticket-summary lines
+# @param language [String] ISO 639-1 code, e.g. 'en' or 'de'
+# @param max_length [Integer] Hard character budget for the output
+# @param mode [Symbol] :comparison or :ai_only — passed through to afmcli's prompt selection
+# @return [String, nil] The generated notes, or nil on hard failure
+def _smf_call_afmcli_shorten(ticket_summaries, language, max_length, mode)
+  body = ticket_summaries.join("\n")
+  afmcli_mode = mode == :comparison ? 'comparison' : 'ai-only'
+  cmd = [
+    'afmcli', 'shorten',
+    '--max-chars', max_length.to_s,
+    '--language', language,
+    '--mode', afmcli_mode,
+    '--style', 'release-notes'
+  ]
+
+  UI.message("🔌 afmcli shorten (--mode #{afmcli_mode} --max-chars #{max_length} --language #{language})")
+  UI.message("   Input length: #{body.length} chars (#{ticket_summaries.length} tickets)")
+
+  stdout, stderr, status = Open3.capture3(*cmd, stdin_data: body)
+
+  unless status.success?
+    UI.error("❌ afmcli exited #{status.exitstatus}")
+    UI.error("   stderr: #{stderr[0..500]}")
+    return nil
+  end
+
+  begin
+    result = JSON.parse(stdout)
+  rescue JSON::ParserError => e
+    UI.error("❌ afmcli returned non-JSON output: #{e.message}")
+    UI.error("   stdout: #{stdout[0..500]}")
+    return nil
+  end
+
+  engine = result['engine'] || 'unknown'
+  ok = result['ok']
+  truncated = result['truncated']
+  output = result['output']
+
+  if ok
+    UI.success("✅ afmcli success (engine: #{engine}, truncated: #{truncated}, chars: #{result['char_count']})")
   else
-    UI.error("Unknown AI provider: #{config[:provider]}")
-    nil
+    reason = result.dig('error', 'reason') || 'unknown'
+    UI.important("⚠️ afmcli fallback path engaged (engine: #{engine}, reason: #{reason}) — release notes are not LLM-polished")
   end
-end
 
-# Call OpenAI API to generate release notes
-# @param ticket_summaries [Array<String>] List of ticket summaries
-# @param language [String] Target language
-# @param max_length [Integer] Maximum output length
-# @param config [Hash] AI configuration
-# @return [String, nil] Generated notes or nil on failure
-def _smf_call_openai_api(ticket_summaries, language, max_length, config)
-  api_key = ENV[config[:api_key_env]]
-  model = config[:model]
-
-  UI.message("🔌 OpenAI API Call")
-  UI.message("   Model: #{model}")
-  UI.message("   API Key present: #{api_key.nil? ? '❌ NO' : '✅ YES (length: ' + api_key.length.to_s + ')'}")
-  UI.message("   Ticket summaries: #{ticket_summaries.length}")
-
-  prompt = _smf_build_release_notes_prompt(ticket_summaries, language, max_length)
-  UI.message("   Prompt length: #{prompt.length} chars")
-
-  begin
-    uri = URI.parse('https://api.openai.com/v1/chat/completions')
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
-    http.read_timeout = 30
-
-    request = Net::HTTP::Post.new(uri.path)
-    request['Content-Type'] = 'application/json'
-    request['Authorization'] = "Bearer #{api_key}"
-
-    request.body = {
-      model: model,
-      messages: [
-        { role: 'user', content: prompt }
-      ],
-      max_tokens: 500,
-      temperature: 0.7
-    }.to_json
-
-    UI.message("   Sending request to OpenAI...")
-    response = http.request(request)
-    UI.message("   Response code: #{response.code}")
-
-    if response.code == '200'
-      result = JSON.parse(response.body)
-      notes = result.dig('choices', 0, 'message', 'content')
-      UI.success("✅ OpenAI API success (#{model})")
-      notes&.strip
-    else
-      UI.error("❌ OpenAI API error: #{response.code}")
-      UI.error("   Response: #{response.body[0..500]}")
-      nil
-    end
-  rescue StandardError => e
-    UI.error("❌ Failed to call OpenAI API: #{e.message}")
-    UI.error("   #{e.backtrace.first(3).join("\n   ")}")
-    nil
-  end
-end
-
-# Call Anthropic API to generate release notes
-# @param ticket_summaries [Array<String>] List of ticket summaries
-# @param language [String] Target language
-# @param max_length [Integer] Maximum output length
-# @param config [Hash] AI configuration
-# @return [String, nil] Generated notes or nil on failure
-def _smf_call_anthropic_api(ticket_summaries, language, max_length, config)
-  api_key = ENV[config[:api_key_env]]
-  model = config[:model]
-
-  UI.message("🔌 Anthropic API Call")
-  UI.message("   Model: #{model}")
-  UI.message("   API Key present: #{api_key.nil? ? '❌ NO' : '✅ YES (length: ' + api_key.length.to_s + ')'}")
-  UI.message("   Ticket summaries: #{ticket_summaries.length}")
-
-  prompt = _smf_build_release_notes_prompt(ticket_summaries, language, max_length)
-  UI.message("   Prompt length: #{prompt.length} chars")
-
-  begin
-    uri = URI.parse('https://api.anthropic.com/v1/messages')
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
-    http.read_timeout = 30
-
-    request = Net::HTTP::Post.new(uri.path)
-    request['Content-Type'] = 'application/json'
-    request['x-api-key'] = api_key
-    request['anthropic-version'] = '2023-06-01'
-
-    request.body = {
-      model: model,
-      max_tokens: 500,
-      messages: [
-        { role: 'user', content: prompt }
-      ]
-    }.to_json
-
-    UI.message("   Sending request to Anthropic...")
-    response = http.request(request)
-    UI.message("   Response code: #{response.code}")
-
-    if response.code == '200'
-      result = JSON.parse(response.body)
-      notes = result.dig('content', 0, 'text')
-      UI.success("✅ Anthropic API success (#{model})")
-      notes&.strip
-    else
-      UI.error("❌ Anthropic API error: #{response.code}")
-      UI.error("   Response: #{response.body[0..500]}")
-      nil
-    end
-  rescue StandardError => e
-    UI.error("❌ Failed to call Anthropic API: #{e.message}")
-    UI.error("   #{e.backtrace.first(3).join("\n   ")}")
-    nil
-  end
-end
-
-# Build the prompt for release notes generation
-# @param ticket_summaries [Array<String>] List of ticket summaries
-# @param language [String] Target language
-# @param max_length [Integer] Maximum output length
-# @return [String] The prompt
-def _smf_build_release_notes_prompt(ticket_summaries, language, max_length)
-  language_name = _smf_language_name(language)
-
-  <<~PROMPT
-    You are a mobile app release notes writer. Transform these technical Jira ticket titles into user-friendly release notes.
-
-    Guidelines:
-    - Focus on benefits and improvements for end users
-    - Use simple, non-technical language
-    - Group into categories if appropriate (New Features, Improvements, Bug Fixes)
-    - Do NOT use emoji icons at the beginning of lines
-    - Use simple dashes (-) for bullet points
-    - Maximum length: #{max_length} characters
-    - Language: #{language_name}
-    - Tone: Professional but friendly, encourage feedback
-
-    Output format:
-    - Output ONLY the release notes content, nothing else
-    - Do NOT include any intro text like "Here are the release notes...", "This build includes...", "What's new:", etc.
-    - Do NOT include character counts or meta-information
-    - Do NOT include a header or title for the release notes
-    - Start directly with the first category heading (e.g., "New Features:") or bullet point
-
-    Tickets:
-    #{ticket_summaries.join("\n")}
-  PROMPT
-end
-
-# Translate text using the configured AI provider
-# @param text [String] Text to translate
-# @param from_lang [String] Source language code
-# @param to_lang [String] Target language code
-# @param config [Hash] AI configuration
-# @return [String, nil] Translated text or nil on failure
-def _smf_translate_with_ai(text, from_lang, to_lang, config)
-  case config[:provider]
-  when 'anthropic'
-    _smf_translate_with_anthropic(text, from_lang, to_lang, config)
-  when 'openai'
-    _smf_translate_with_openai(text, from_lang, to_lang, config)
-  else
-    UI.error("Unknown AI provider for translation: #{config[:provider]}")
-    nil
-  end
-end
-
-# Translate using OpenAI
-def _smf_translate_with_openai(text, from_lang, to_lang, config)
-  api_key = ENV[config[:api_key_env]]
-  model = config[:model]
-  prompt = _smf_build_translation_prompt(text, from_lang, to_lang)
-
-  begin
-    uri = URI.parse('https://api.openai.com/v1/chat/completions')
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
-    http.read_timeout = 30
-
-    request = Net::HTTP::Post.new(uri.path)
-    request['Content-Type'] = 'application/json'
-    request['Authorization'] = "Bearer #{api_key}"
-
-    request.body = {
-      model: model,
-      messages: [
-        { role: 'user', content: prompt }
-      ],
-      max_tokens: 600,
-      temperature: 0.3
-    }.to_json
-
-    response = http.request(request)
-
-    if response.code == '200'
-      result = JSON.parse(response.body)
-      translation = result.dig('choices', 0, 'message', 'content')
-      UI.success("Translated to #{_smf_language_name(to_lang)} successfully (OpenAI)")
-      translation&.strip
-    else
-      UI.error("Translation API error: #{response.code}")
-      nil
-    end
-  rescue StandardError => e
-    UI.error("Failed to translate with OpenAI: #{e.message}")
-    nil
-  end
-end
-
-# Translate using Anthropic
-def _smf_translate_with_anthropic(text, from_lang, to_lang, config)
-  api_key = ENV[config[:api_key_env]]
-  model = config[:model]
-  prompt = _smf_build_translation_prompt(text, from_lang, to_lang)
-
-  begin
-    uri = URI.parse('https://api.anthropic.com/v1/messages')
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true
-    http.read_timeout = 30
-
-    request = Net::HTTP::Post.new(uri.path)
-    request['Content-Type'] = 'application/json'
-    request['x-api-key'] = api_key
-    request['anthropic-version'] = '2023-06-01'
-
-    request.body = {
-      model: model,
-      max_tokens: 600,
-      messages: [
-        { role: 'user', content: prompt }
-      ]
-    }.to_json
-
-    response = http.request(request)
-
-    if response.code == '200'
-      result = JSON.parse(response.body)
-      translation = result.dig('content', 0, 'text')
-      UI.success("Translated to #{_smf_language_name(to_lang)} successfully (Anthropic)")
-      translation&.strip
-    else
-      UI.error("Translation API error: #{response.code}")
-      nil
-    end
-  rescue StandardError => e
-    UI.error("Failed to translate with Anthropic: #{e.message}")
-    nil
-  end
-end
-
-# Build the prompt for translation
-def _smf_build_translation_prompt(text, from_lang, to_lang)
-  from_name = _smf_language_name(from_lang)
-  to_name = _smf_language_name(to_lang)
-
-  <<~PROMPT
-    Translate the following mobile app release notes from #{from_name} to #{to_name}.
-
-    Guidelines:
-    - Maintain the same tone and style
-    - Keep emoji and formatting
-    - Preserve technical terms that shouldn't be translated (app names, etc.)
-    - Natural, native-sounding translation
-
-    Text to translate:
-    #{text}
-
-    #{to_name} translation:
-  PROMPT
-end
-
-# Get human-readable language name
-def _smf_language_name(lang_code)
-  {
-    'en' => 'English',
-    'de' => 'German',
-    'es' => 'Spanish',
-    'fr' => 'French',
-    'it' => 'Italian',
-    'nl' => 'Dutch',
-    'pl' => 'Polish',
-    'pt' => 'Portuguese',
-    'tr' => 'Turkish'
-  }[lang_code] || 'English'
+  output&.strip
+rescue StandardError => e
+  UI.error("❌ Failed to invoke afmcli: #{e.message}")
+  UI.error("   #{e.backtrace.first(3).join("\n   ")}")
+  nil
 end
 
 # Format comparison notes (technical list + AI notes + DevOps section for alpha)
@@ -549,17 +291,17 @@ end
 # @param devops_tickets [Array<Hash>] DevOps tickets (optional, for alpha builds)
 # @return [String] Formatted comparison notes
 def _smf_format_comparison_notes(tickets, ai_notes, include_links, devops_tickets = nil)
-  technical_section = ""
+  technical_section = ''
 
   # App tickets section
   if tickets && !tickets.empty?
     technical_section += "Tickets:\n"
     tickets.each do |ticket|
-      if include_links && ticket[:link]
-        technical_section += "- #{ticket[:tag]}: #{ticket[:title]}\n  #{ticket[:link]}\n"
-      else
-        technical_section += "- #{ticket[:tag]}: #{ticket[:title]}\n"
-      end
+      technical_section += if include_links && ticket[:link]
+                             "- #{ticket[:tag]}: #{ticket[:title]}\n  #{ticket[:link]}\n"
+                           else
+                             "- #{ticket[:tag]}: #{ticket[:title]}\n"
+                           end
     end
   end
 
@@ -567,17 +309,15 @@ def _smf_format_comparison_notes(tickets, ai_notes, include_links, devops_ticket
   if devops_tickets && !devops_tickets.empty?
     technical_section += "\nDevOps/Config:\n"
     devops_tickets.each do |ticket|
-      if include_links && ticket[:link]
-        technical_section += "- #{ticket[:tag]}: #{ticket[:title]}\n  #{ticket[:link]}\n"
-      else
-        technical_section += "- #{ticket[:tag]}: #{ticket[:title]}\n"
-      end
+      technical_section += if include_links && ticket[:link]
+                             "- #{ticket[:tag]}: #{ticket[:title]}\n  #{ticket[:link]}\n"
+                           else
+                             "- #{ticket[:tag]}: #{ticket[:title]}\n"
+                           end
     end
   end
 
-  if technical_section.empty?
-    return ai_notes
-  end
+  return ai_notes if technical_section.empty?
 
   <<~NOTES
     #{ai_notes}
