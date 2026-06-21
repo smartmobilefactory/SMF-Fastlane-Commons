@@ -26,8 +26,15 @@ require 'open3'
 require 'json'
 require 'set'
 
+# Build-safety contract:
+#   AI release notes are a pure convenience feature. None of the public methods
+#   in this file may raise. Each catches StandardError at the top level and
+#   returns a safe default (false / safe-default-config / nil) so callers can
+#   degrade to their own non-AI fallback (standard changelog, pass-through
+#   filter, etc.) and the build keeps moving.
+
 def smf_ai_release_notes_enabled?
-  config = @smf_fastlane_config[:ai_release_notes]
+  config = (defined?(@smf_fastlane_config) && @smf_fastlane_config) ? @smf_fastlane_config[:ai_release_notes] : nil
   return false if config.nil?
 
   enabled = config[:enabled] || config['enabled']
@@ -39,10 +46,26 @@ def smf_ai_release_notes_enabled?
   end
 
   true
+rescue StandardError => e
+  # Belt-and-suspenders: never let a config-shape change or env oddity crash the build.
+  UI.message("AI release notes disabled (probe failed): #{e.class}: #{e.message}") if defined?(UI)
+  false
 end
 
+# Safe default returned when the config block is missing or unreadable.
+# Holds the same keys as a successful read so callers can interpolate without nil-guards.
+AI_RELEASE_NOTES_SAFE_DEFAULT_CONFIG = {
+  enabled: false,
+  provider: 'apple-on-device',
+  api_key_env: 'AFMCLI_NO_KEY_NEEDED',
+  model: 'on-device',
+  alpha_mode: :comparison,
+  beta_mode: :ai_only
+}.freeze
+
 def smf_get_ai_release_notes_config
-  config = @smf_fastlane_config[:ai_release_notes] || {}
+  raw = (defined?(@smf_fastlane_config) && @smf_fastlane_config) ? @smf_fastlane_config[:ai_release_notes] : nil
+  config = raw || {}
   # Compatibility note (CBENEFIOS-2504):
   #   provider / api_key_env / model are no longer used by this gem after the
   #   afmcli migration, but a few external callers still read them (informational
@@ -61,6 +84,9 @@ def smf_get_ai_release_notes_config
     alpha_mode: (config[:alpha_mode] || config['alpha_mode'] || 'comparison').to_sym,
     beta_mode: (config[:beta_mode] || config['beta_mode'] || 'ai_only').to_sym
   }
+rescue StandardError => e
+  UI.message("AI release notes config unreadable (#{e.class}: #{e.message}) — using safe defaults") if defined?(UI)
+  AI_RELEASE_NOTES_SAFE_DEFAULT_CONFIG.dup
 end
 
 # Main entry point for generating AI release notes
@@ -155,6 +181,16 @@ def smf_generate_ai_release_notes(tickets, options = {})
 
   UI.message("📋 Final result length: #{result&.length || 0} chars")
   result
+rescue StandardError => e
+  # Top-level convenience-feature guard (CBENEFIOS-2504): never let an
+  # AI-release-notes failure crash the build. Caller falls back to its
+  # own non-AI changelog when this returns nil.
+  if defined?(UI)
+    UI.error("❌ AI release notes generation failed unexpectedly — falling back to standard changelog")
+    UI.error("   #{e.class}: #{e.message}")
+    UI.error("   #{e.backtrace.first(3).join("\n   ")}") if e.backtrace
+  end
+  nil
 end
 
 # Deduplicate tickets by merging normal and linked tickets
