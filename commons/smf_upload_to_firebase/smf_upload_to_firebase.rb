@@ -139,12 +139,20 @@ def _smf_get_release_notes_for_firebase(build_variant)
         UI.message("   📋 #{t[:tag]}: #{t[:title]}")
       end
 
-      # Generate AI release notes
+      # Generate AI release notes (CBENEFIOS-2507).
+      # max_length is a HARD character cap that afmcli enforces via a post-truncate
+      # backstop — if the LLM overshoots, the tail is chopped grapheme-cluster-safe.
+      # 500 (the old value) was a regression vs. the original Anthropic flow, which
+      # had max_tokens=500 (~1500-2000 chars output). Real builds confirmed the
+      # truncation cut the "Bug Fixes:" section off mid-word. Firebase App
+      # Distribution accepts up to 16384 chars, so 1500 is conservative AND
+      # leaves room for the full New Features / Improvements / Bug Fixes block
+      # without grapheme drift.
       UI.message("🚀 Calling AI API...")
       ai_notes = smf_generate_ai_release_notes(tickets, {
         build_variant: build_variant,
         language: 'en',
-        max_length: 500,
+        max_length: 1500,
         ticket_commits: ticket_commits
       })
 
