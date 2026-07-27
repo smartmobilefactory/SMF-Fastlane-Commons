@@ -261,12 +261,12 @@ private_lane :smf_super_upload_to_firebase do |options|
 
   if service_credentials_file.nil?
     UI.message("Skipping upload to Firebase because Firebase credentials are missing.")
-    return
+    next
   end
 
   if firebase_app_id.nil?
     UI.message("Skipping upload to Firebase because Firebase app id is missing.")
-    return
+    next
   end
 
   if use_aab
@@ -415,7 +415,7 @@ private_lane :smf_super_upload_to_play_store do |options|
   # Skip if Google Play upload is disabled for this variant
   unless google_play_upload
     UI.message("Google Play Store upload disabled for variant: #{build_variant}")
-    return
+    next
   end
   
   # Validate required configuration
