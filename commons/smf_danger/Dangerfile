@@ -1,4 +1,8 @@
 require 'json'
+require 'cgi'  # CBENEFIOS-2694: danger-xcode_summary calls CGI.parse but does not
+# require 'cgi'. Since cgi 0.5.x split the library, only cgi/escape is ambiently
+# loaded and CGI.parse (in cgi/core) is missing -> NoMethodError. Requiring cgi
+# fully loads core in every cgi version. (A version pin does NOT fix this.)
 
 puts "Danger: Bump Type"
 if ENV['MULTIPLE_BUMP_TYPES_ERROR'] == 'true'
