@@ -74,7 +74,20 @@ private_lane :smf_danger do |options|
 
   dangerfile = "#{File.expand_path(File.dirname(__FILE__))}/Dangerfile"
   puts "Loading Dangerfile: #{dangerfile}"
+  # EPRES-212: one danger_id per platform, because a KMP repository runs this
+  # lane twice for the same pull request — once from the iOS pipeline, once from
+  # Android. Without an id both runs share Danger's default identity, so they
+  # write the same comment and the same "danger/danger" status: whichever
+  # finishes last silently replaces the other's findings. Observed on
+  # ePrescription-MP PR-76, where nine iOS warnings were overwritten two minutes
+  # later by the Android run.
+  #
+  # With an id, Danger keeps one comment and one status context per platform.
+  # Single-platform projects are unaffected apart from the context gaining a
+  # suffix; no repository in the organisation requires "danger/danger" as a
+  # status check, so nothing starts blocking.
   danger(
+      danger_id: @platform.to_s,
       github_api_token: ENV[$DANGER_GITHUB_TOKEN_KEY],
       dangerfile: dangerfile,
       verbose: true

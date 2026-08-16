@@ -138,6 +138,17 @@ if File.exist?(ENV['DANGER_RESULT_BUNDLE_PATH'])
   xcode_summary.inline_mode = true
   xcode_summary.ignored_files = 'Pods/**'
 
+  # EPRES-212: project_root defaults to Dir.pwd, which is the fastlane directory
+  # — for an Apple project inside a larger repository that is a subdirectory. Any
+  # warning about a file outside it then fails the prefix match and keeps its
+  # absolute path, which Danger appends to the blob URL verbatim:
+  #   blob/<sha>/Volumes/miniExtHD/workspace/.../composeApp/src/...
+  # Every such link is dead. Anchoring on the repository root makes the paths
+  # relative and the links work. Harmless where fastlane already sits at the
+  # root, since the value is then the same.
+  repository_root = `git rev-parse --show-toplevel`.strip
+  xcode_summary.project_root = repository_root unless repository_root.empty?
+
   xcode_summary.ignored_results { |result|
 
       if result.location.nil?
