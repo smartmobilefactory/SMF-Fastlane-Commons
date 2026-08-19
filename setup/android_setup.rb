@@ -912,21 +912,26 @@ def extract_package_from_output_metadata(build_variant)
     return nil
   end
 
-  Dir.glob("**/build/outputs/**/output-metadata.json").each do |path|
-    metadata = begin
-      JSON.parse(File.read(path))
-    rescue StandardError => e
-      UI.message("⚠️ Could not read #{path}: #{e.message}")
-      next
+  # fastlane runs from the `fastlane/` sub directory, so the project root — and with
+  # it every `build/outputs` tree — sits one level up. Search both, the same way the
+  # build.gradle lookup below already carries `../` variants of its paths.
+  ['.', '..'].each do |root|
+    Dir.glob("#{root}/**/build/outputs/**/output-metadata.json").each do |path|
+      metadata = begin
+        JSON.parse(File.read(path))
+      rescue StandardError => e
+        UI.message("⚠️ Could not read #{path}: #{e.message}")
+        next
+      end
+
+      next unless metadata['variantName'].to_s.casecmp(gradle_variant).zero?
+
+      application_id = metadata['applicationId'].to_s
+      next if application_id.empty?
+
+      UI.message("📄 Found applicationId for '#{gradle_variant}' in #{path}")
+      return application_id
     end
-
-    next unless metadata['variantName'].to_s.casecmp(gradle_variant).zero?
-
-    application_id = metadata['applicationId'].to_s
-    next if application_id.empty?
-
-    UI.message("📄 Found applicationId for '#{gradle_variant}' in #{path}")
-    return application_id
   end
 
   UI.message("⚠️ No output-metadata.json with variantName '#{gradle_variant}' found")
