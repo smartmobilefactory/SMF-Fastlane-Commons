@@ -1,3 +1,5 @@
+require 'json'
+
 
 
 ########## PULLREQUEST CHECK LANES ##########
@@ -833,25 +835,50 @@ def copy_xml_to_default_changelog(xml_content)
 end
 
 # Helper function to get package name from build variant
+#
+# Resolution order, first source that yields a value wins:
+#   1. An explicit `package_name` in the variant's Config.json entry.
+#   2. AGP's `output-metadata.json`, matched on the Gradle variant name.
+#   3. The legacy source scraping (manifest, build.gradle, gradle.properties).
+#
+# Sources 1 and 2 return the final, fully resolved application ID *including* any
+# build-type suffix, so the `.alpha` / `.beta` suffix is appended only for the
+# legacy sources, which read pre-suffix values.
 def smf_get_package_name_from_variant(build_variant)
   UI.message("🔍 Getting package name for build variant: #{build_variant}")
-  
+
+  # 1. Explicit override — no inference at all, always wins.
+  explicit_package = smf_config_get(build_variant, :package_name)
+  unless explicit_package.nil? || explicit_package.to_s.empty?
+    UI.message("✅ Using explicit package_name from Config.json: #{explicit_package}")
+    return explicit_package.to_s
+  end
+
+  # 2. The resolved value the Android Gradle plugin itself wrote out.
+  resolved_package = extract_package_from_output_metadata(build_variant)
+  unless resolved_package.nil? || resolved_package.empty?
+    UI.message("✅ Package name for #{build_variant}: #{resolved_package}")
+    return resolved_package
+  end
+
+  # 3. Legacy source scraping. These read pre-suffix values, hence the suffix
+  # handling below.
   base_package = nil
-  
+
   # Try to extract package name from AndroidManifest.xml (most reliable for built variants)
   base_package = extract_package_from_manifest(build_variant) if base_package.nil?
-  
+
   # Fallback: try to read from build.gradle (primary source)
   base_package = extract_package_from_build_gradle(build_variant) if base_package.nil?
-  
+
   # Fallback: try to read from gradle.properties
   base_package = extract_package_from_gradle_properties if base_package.nil?
-  
+
   # If still no package found, raise error
   if base_package.nil? || base_package.empty?
-    UI.user_error!("❌ Could not extract package name from AndroidManifest.xml, build.gradle, or gradle.properties for variant: #{build_variant}")
+    UI.user_error!("❌ Could not determine the package name for variant: #{build_variant}. Build the variant first so AGP writes output-metadata.json, or set an explicit \"package_name\" in that variant's Config.json entry.")
   end
-  
+
   # Apply variant-specific suffix if needed
   case build_variant
   when /alpha/i
@@ -861,9 +888,49 @@ def smf_get_package_name_from_variant(build_variant)
   else
     package_name = base_package
   end
-  
+
   UI.message("✅ Package name for #{build_variant}: #{package_name}")
   return package_name
+end
+
+# Reads the application ID from AGP's `output-metadata.json`.
+#
+# This is the stable source: the file is written by the Android Gradle plugin
+# next to the build outputs and carries the *resolved* application ID — including
+# the build-type suffix — instead of something scraped out of source text. It is
+# located by glob and matched on `variantName`, so it survives both Gradle
+# refactors (flavors declared in a loop rather than as literal `create("x")`
+# blocks) and AGP changing its intermediates layout.
+#
+# Note: AGP writes this file for APK outputs only, not for bundles. A project that
+# exclusively builds AABs therefore falls through to the legacy sources, or should
+# set `package_name` explicitly in Config.json.
+def extract_package_from_output_metadata(build_variant)
+  gradle_variant = smf_config_get(build_variant, :variant).to_s
+  if gradle_variant.empty?
+    UI.message("⚠️ No `variant` configured for #{build_variant}; skipping output-metadata.json lookup")
+    return nil
+  end
+
+  Dir.glob("**/build/outputs/**/output-metadata.json").each do |path|
+    metadata = begin
+      JSON.parse(File.read(path))
+    rescue StandardError => e
+      UI.message("⚠️ Could not read #{path}: #{e.message}")
+      next
+    end
+
+    next unless metadata['variantName'].to_s.casecmp(gradle_variant).zero?
+
+    application_id = metadata['applicationId'].to_s
+    next if application_id.empty?
+
+    UI.message("📄 Found applicationId for '#{gradle_variant}' in #{path}")
+    return application_id
+  end
+
+  UI.message("⚠️ No output-metadata.json with variantName '#{gradle_variant}' found")
+  return nil
 end
 
 # Helper function to extract package name from AndroidManifest.xml
