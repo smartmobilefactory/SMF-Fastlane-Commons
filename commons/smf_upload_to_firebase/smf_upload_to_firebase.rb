@@ -106,7 +106,9 @@ def _smf_get_release_notes_for_firebase(build_variant)
     UI.message("✅ AI release notes ENABLED")
     UI.message("   Provider: #{config[:provider]}")
     UI.message("   Model: #{config[:model]}")
-    UI.message("   API Key Env: #{config[:api_key_env]}")
+    # No API-key line: since the migration to afmcli (CBENEFIOS-2504) generation runs
+    # on-device and api_key_env is a placeholder. Printing it invites the reader to
+    # hunt for a credential that no longer exists in this path.
     UI.message("   Alpha Mode: #{config[:alpha_mode]}")
     UI.message("   Beta Mode: #{config[:beta_mode]}")
 
@@ -170,8 +172,10 @@ def _smf_get_release_notes_for_firebase(build_variant)
       UI.message("ℹ️ No ticket tags found, using standard changelog")
     end
   else
-    UI.message("❌ AI release notes DISABLED")
-    UI.message("   Check Config.json 'ai_release_notes.enabled' and API key environment variable")
+    # Informational, not an error: the standard changelog is a supported configuration,
+    # not a degraded fallback. A ❌ here made green builds look like they had failed a
+    # step, and the old API-key hint was stale after the afmcli migration.
+    UI.message("ℹ️ AI release notes disabled by configuration (ai_release_notes.enabled = false)")
   end
 
   # Fallback to standard changelog
