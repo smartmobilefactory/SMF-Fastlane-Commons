@@ -90,7 +90,20 @@ private_lane :smf_build_apple_app do |options|
   # We use update_code_signing_settings instead of xcargs PROVISIONING_PROFILE_SPECIFIER
   # because xcargs applies to ALL targets including SPM packages, which don't support provisioning profiles
   profile_name = nil
+  # Collected below and merged into the export options: without them the IPA
+  # export fails the same way the build did, only later.
+  extension_profiles = {}
   if bundle_identifier && match_type
+    # Hoisted out of the fallback branch below: extensions need the same naming
+    # rule, and computing it twice is how the two drift apart.
+    type_name_for_match = case match_type.to_s.downcase
+                          when 'adhoc' then 'AdHoc'
+                          when 'appstore' then 'AppStore'
+                          when 'development' then 'Development'
+                          when 'enterprise' then 'InHouse'
+                          when 'developer_id' then 'Direct'
+                          else match_type.to_s.split('_').map(&:capitalize).join('')
+                          end
     # Match sets ENV variables in format: sigh_<bundle_id>_<type>_profile-name
     # Example: sigh_com.corporatebenefits.de.alpha_adhoc_profile-name
     profile_env_key = "sigh_#{bundle_identifier}_#{match_type}_profile-name"
@@ -101,15 +114,7 @@ private_lane :smf_build_apple_app do |options|
     else
       # Fallback: Construct profile name for skip_match scenarios where ENV is not set
       # Match always uses naming convention: "match <Type> <bundle_identifier>"
-      type_name = case match_type.to_s.downcase
-                  when 'adhoc' then 'AdHoc'
-                  when 'appstore' then 'AppStore'
-                  when 'development' then 'Development'
-                  when 'enterprise' then 'InHouse'
-                  when 'developer_id' then 'Direct'
-                  else match_type.to_s.split('_').map(&:capitalize).join('')
-                  end
-      profile_name = "match #{type_name} #{bundle_identifier}"
+      profile_name = "match #{type_name_for_match} #{bundle_identifier}"
       UI.message("🔐 Using constructed provisioning profile name: #{profile_name}")
     end
 
@@ -135,13 +140,92 @@ private_lane :smf_build_apple_app do |options|
 
     if File.exist?(project_path)
       UI.message("🔧 Updating code signing settings in Xcode project: #{project_path}")
-      update_code_signing_settings(
-        path: project_path,
-        use_automatic_signing: false,
-        bundle_identifier: bundle_identifier,
-        profile_name: profile_name,
-        code_sign_identity: code_signing_identity
-      )
+
+      # Which targets carry which identifier, read from the project rather than
+      # guessed from the scheme.
+      #
+      # This matters because update_code_signing_settings *sets*
+      # PRODUCT_BUNDLE_IDENTIFIER rather than filtering on it: a call without
+      # `targets` rewrites the identifier and the profile of every target in the
+      # project. With an App Clip or any other extension present, the extension is
+      # then signed with the app's profile and the build stops at
+      #
+      #   Provisioning profile "match AdHoc <app>" doesn't include the App Clip
+      #   capability. (in target '<app>Clip')
+      #
+      # Resolving by identifier keeps this working for projects that name their
+      # targets freely. If nothing resolves, the original unfiltered call is used,
+      # so no existing build changes behaviour.
+      targets_carrying = lambda do |identifier|
+        begin
+          require 'xcodeproj'
+          Xcodeproj::Project.open(project_path).targets.select { |target|
+            target.build_configurations.any? { |config|
+              config.build_settings['PRODUCT_BUNDLE_IDENTIFIER'] == identifier
+            }
+          }.map(&:name)
+        rescue StandardError => e
+          UI.important("⚠️  Could not read targets from #{project_path}: #{e.message}")
+          []
+        end
+      end
+
+      app_targets = targets_carrying.call(bundle_identifier)
+
+      if app_targets.empty?
+        UI.important("⚠️  No target carries #{bundle_identifier} — updating all targets, as before")
+        update_code_signing_settings(
+          path: project_path,
+          use_automatic_signing: false,
+          bundle_identifier: bundle_identifier,
+          profile_name: profile_name,
+          code_sign_identity: code_signing_identity
+        )
+      else
+        update_code_signing_settings(
+          path: project_path,
+          use_automatic_signing: false,
+          targets: app_targets,
+          bundle_identifier: bundle_identifier,
+          profile_name: profile_name,
+          code_sign_identity: code_signing_identity
+        )
+
+        # Extensions carry their own identifier and their own profile. match has
+        # already fetched them — smf_download_provisioning_profiles builds the same
+        # identifiers from extensions_suffixes — but until here nothing applied
+        # them to a target.
+        extension_suffixes = smf_config_get(build_variant, :extensions_suffixes)
+        extension_suffixes = smf_config_get(nil, :extensions_suffixes) if extension_suffixes.nil?
+
+        (extension_suffixes || []).each do |suffix|
+          extension_identifier = "#{bundle_identifier}.#{suffix}"
+          extension_targets = targets_carrying.call(extension_identifier)
+
+          if extension_targets.empty?
+            UI.important("⚠️  No target carries #{extension_identifier} — skipping")
+            next
+          end
+
+          extension_profile = ENV["sigh_#{extension_identifier}_#{match_type}_profile-name"]
+          if extension_profile.nil? || extension_profile.empty?
+            extension_profile = "match #{type_name_for_match} #{extension_identifier}"
+          end
+
+          UI.message("🔐 #{extension_identifier} → #{extension_profile}")
+
+          update_code_signing_settings(
+            path: project_path,
+            use_automatic_signing: false,
+            targets: extension_targets,
+            bundle_identifier: extension_identifier,
+            profile_name: extension_profile,
+            code_sign_identity: code_signing_identity
+          )
+
+          extension_profiles[extension_identifier] = extension_profile
+        end
+      end
     else
       UI.important("⚠️  Project not found at #{project_path} - skipping update_code_signing_settings")
     end
@@ -152,7 +236,7 @@ private_lane :smf_build_apple_app do |options|
   # Build export_options with provisioning profile mapping (for IPA export)
   export_opts = { iCloudContainerEnvironment: icloud_environment }
   if bundle_identifier && profile_name
-    export_opts[:provisioningProfiles] = { bundle_identifier => profile_name }
+    export_opts[:provisioningProfiles] = { bundle_identifier => profile_name }.merge(extension_profiles)
   end
 
   gym_parameters = {
