@@ -27,6 +27,25 @@ private_lane :smf_create_git_tag do |options|
   add_git_tag(tag: tag)
   UI.success("✅ Created git tag: #{tag}")
 
+  # Pushed here rather than with the rest of the run.
+  #
+  # The tag reserves a build number and the number goes into the plist, but it is
+  # *spent* only when the binary reaches App Store Connect — which happens later.
+  # Anything failing in between takes the local tag down with the workspace while
+  # the number stays taken at Apple, so the next build computes the same one and
+  # is rejected as a duplicate. Pushing on creation closes that window and, since
+  # add_git_tag tags the checked-out commit, records which code the number belongs
+  # to even for a run that later fails.
+  begin
+    sh("git push origin 'refs/tags/#{tag}'")
+    UI.success("✅ Pushed git tag: #{tag}")
+  rescue StandardError => e
+    # Not fatal: the build itself is fine and the tag exists locally. Said loudly
+    # because the consequence surfaces one build later, somewhere else entirely.
+    UI.important("⚠️  Could not push tag '#{tag}': #{e.message}")
+    UI.important("💡 The number is reserved locally only — if this run fails after the upload, the next build will reuse it and be rejected")
+  end
+
   tag
 end
 
