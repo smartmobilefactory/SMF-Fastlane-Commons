@@ -520,12 +520,12 @@ private_lane :smf_super_push_git_tag_release do |options|
     # capitals — eRezept-Alpha — wrote build/ios/erezept-alpha/237 and then
     # searched for build/ios/eRezept-Alpha/*, which matches nothing.
     #
-    # The fallback below made that look harmless. It is not: the release is cut
-    # at the Xcode number, which for this project had been 164 since 1.1.x, so
-    # every build addressed a tag that already existed. Creating the draft
-    # succeeds — drafts carry no tag — and publishing it fails with 422, leaving
-    # the draft behind. Thirty of them had collected on ePrescription-MP before
-    # anyone looked.
+    # A fallback to the Xcode number used to make that look harmless. It was
+    # not: the release was cut at 164, so every build addressed a tag that
+    # already existed. Creating the draft succeeds — drafts carry no tag — and
+    # publishing it fails with 422, leaving the draft behind. Thirty of them had
+    # collected on ePrescription-MP before anyone looked. The fallback is gone;
+    # see below.
     latest_version = _smf_latest_tagged_build_number(smf_get_tag_of_app(build_variant, '*', 'ios'))
     if latest_version.empty?
       UI.message("No platform-specific tag found, trying legacy format...")
@@ -533,11 +533,20 @@ private_lane :smf_super_push_git_tag_release do |options|
     end
 
     if latest_version.empty?
-      UI.important("⚠️  No git tag found, falling back to Xcode project build number")
-      build_number = get_build_number(xcodeproj: smf_get_xcodeproj_file_name)
-    else
-      build_number = latest_version.to_i
+      # No fallback, matching android_setup. The tag for this very build is
+      # pushed earlier in the same pipeline, so an empty result no longer means
+      # "this project has no tags yet" — it means the push, the fetch or the
+      # pattern is broken, and there is nothing here that could stand in.
+      #
+      # The Xcode number used to. It is not maintained once a project takes its
+      # build numbers from tags, so it holds whatever it held on the day that
+      # changed: on ePrescription-MP, 164 for four months while the builds ran
+      # past 238. Every release was cut at 164, and the warning above was the
+      # only sign — in a log nobody reads when the build goes green.
+      UI.user_error!("❌ No git tag found for build variant '#{build_variant}' — cannot determine build number")
     end
+
+    build_number = latest_version.to_i
     UI.message("📊 Extracted build number: #{build_number}")
   else
     UI.message("🖥️  Local Build - using Xcode project build number")
