@@ -41,6 +41,10 @@ private_lane :smf_create_github_release do |options|
     release_name = "#{smf_get_version_number(nil, podspec_path)}"
   end
 
+  # Set inside the begin block and read by the rescue, so the draft can be taken
+  # back if publishing it fails.
+  release_id = nil
+
   begin
     # Create the GitHub release as draft
     release = set_github_release(
@@ -67,12 +71,30 @@ private_lane :smf_create_github_release do |options|
         }
     )
   rescue => e
-    if e.message.include?('already_exists') || e.message.include?('422')
-      UI.important("⚠️  GitHub release for tag '#{tag}' already exists — skipping")
-    else
-      raise e
-    end
+    raise e unless e.message.include?('already_exists') || e.message.include?('422')
+
+    UI.important("⚠️  GitHub release for tag '#{tag}' already exists — skipping")
+
+    # A draft carries no git tag, so creating one never collides and this only
+    # ever fails on the publish. Without the cleanup the draft stays: thirty
+    # identical drafts had collected on one repository, one per build, each
+    # reported as "skipping" — which reads as "nothing was done".
+    _smf_delete_github_release(repository_path, release_id) unless release_id.nil?
   end
+end
+
+def _smf_delete_github_release(repository_path, release_id)
+  github_api(
+      server_url: 'https://api.github.com',
+      api_token: ENV[$SMF_GITHUB_TOKEN_ENV_KEY],
+      http_method: 'DELETE',
+      path: "/repos/#{repository_path}/releases/#{release_id}"
+  )
+  UI.message("Removed the draft that could not be published (id #{release_id}).")
+rescue => e
+  # Worth saying, not worth failing the build over: the release itself is
+  # already lost at this point and a leftover draft is litter, not damage.
+  UI.important("⚠️  Could not remove draft #{release_id}: #{e.message}")
 end
 
 def zipped_path(path)

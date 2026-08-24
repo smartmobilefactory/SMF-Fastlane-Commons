@@ -513,17 +513,23 @@ private_lane :smf_super_push_git_tag_release do |options|
     _smf_fetch_build_tags_once
     # Use git tag -l instead of git describe to avoid HEAD ancestry issues after git pull
     # New format first (build/ios/<variant>/*), then legacy (build/<variant>/*)
-    latest_version = sh(
-      "git tag -l 'build/ios/#{build_variant}/*' | grep -oE '[0-9]+$' | sort -n | tail -1",
-      log: false
-    ).strip
-
+    #
+    # The pattern comes from smf_get_tag_of_app rather than being spelled out
+    # here. It downcases the variant when it writes a tag, git tag -l matches
+    # case-sensitively, and the two had drifted: a project whose variant carries
+    # capitals — eRezept-Alpha — wrote build/ios/erezept-alpha/237 and then
+    # searched for build/ios/eRezept-Alpha/*, which matches nothing.
+    #
+    # The fallback below made that look harmless. It is not: the release is cut
+    # at the Xcode number, which for this project had been 164 since 1.1.x, so
+    # every build addressed a tag that already existed. Creating the draft
+    # succeeds — drafts carry no tag — and publishing it fails with 422, leaving
+    # the draft behind. Thirty of them had collected on ePrescription-MP before
+    # anyone looked.
+    latest_version = _smf_latest_tagged_build_number(smf_get_tag_of_app(build_variant, '*', 'ios'))
     if latest_version.empty?
       UI.message("No platform-specific tag found, trying legacy format...")
-      latest_version = sh(
-        "git tag -l 'build/#{build_variant}/*' | grep -oE '[0-9]+$' | sort -n | tail -1",
-        log: false
-      ).strip
+      latest_version = _smf_latest_tagged_build_number(smf_get_tag_of_app(build_variant, '*'))
     end
 
     if latest_version.empty?

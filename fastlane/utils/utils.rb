@@ -258,6 +258,16 @@ def smf_get_tag_of_app(build_variant, build_number, platform = nil)
   end
 end
 
+# The highest build number among the tags matching a pattern, or "".
+#
+# Takes the pattern from smf_get_tag_of_app with '*' as the build number, so the
+# shape of a build tag is written down once. Spelling it out at the call site is
+# what caused this to exist: the tag is written with the variant downcased and
+# was searched for with the variant as given, and git tag -l is case-sensitive.
+def _smf_latest_tagged_build_number(tag_pattern)
+  sh("git tag -l '#{tag_pattern}' | grep -oE '[0-9]+$' | sort -n | tail -1", log: false).strip
+end
+
 def smf_get_version_number(build_variant = nil, podspec_path = nil)
 
   case @platform
