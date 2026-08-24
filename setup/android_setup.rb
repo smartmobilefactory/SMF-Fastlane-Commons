@@ -345,17 +345,15 @@ private_lane :smf_super_push_git_tag_release do |options|
     _smf_fetch_build_tags_once
     # Use git tag -l instead of git describe to avoid HEAD ancestry issues after git pull
     # New format first (build/android/<variant>/*), then legacy (build/<variant>/*)
-    latest_version = sh(
-      "git tag -l 'build/android/#{build_variant}/*' | grep -oE '[0-9]+$' | sort -n | tail -1",
-      log: false
-    ).strip
-
+    #
+    # The pattern comes from smf_get_tag_of_app, which is what writes the tag and
+    # which downcases the variant. Spelled out here it matched only as long as
+    # every Android variant happened to be lowercase already — the iOS side had
+    # the same line and a variant named eRezept-Alpha, and found nothing.
+    latest_version = _smf_latest_tagged_build_number(smf_get_tag_of_app(build_variant, '*', 'android'))
     if latest_version.empty?
       UI.message("No platform-specific tag found, trying legacy format...")
-      latest_version = sh(
-        "git tag -l 'build/#{build_variant}/*' | grep -oE '[0-9]+$' | sort -n | tail -1",
-        log: false
-      ).strip
+      latest_version = _smf_latest_tagged_build_number(smf_get_tag_of_app(build_variant, '*'))
     end
 
     if latest_version.empty?
