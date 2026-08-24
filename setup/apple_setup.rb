@@ -480,7 +480,10 @@ private_lane :smf_super_upload_to_apple do |options|
     bundle_identifier: smf_config_get(build_variant, :bundle_identifier),
     upload_itc: smf_config_get(build_variant, :upload_itc),
     required_xcode_version: xcode_version,
-    itc_platform: smf_config_get(build_variant, :itc_platform)
+    itc_platform: smf_config_get(build_variant, :itc_platform),
+    testflight_groups: smf_config_get(build_variant, :testflight_groups),
+    testflight_distribute_external: smf_config_get(build_variant, :testflight_distribute_external),
+    testflight_submit_beta_review: smf_config_get(build_variant, :testflight_submit_beta_review)
   )
 end
 

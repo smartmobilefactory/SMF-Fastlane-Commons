@@ -76,6 +76,39 @@ private_lane :smf_upload_to_testflight do |options|
     UI.message("✅ Including 'What to Test' notes in TestFlight upload")
   end
 
+  # Hand the build to the beta groups the project names, instead of someone
+  # opening App Store Connect after every upload and doing it by hand.
+  #
+  # Internal groups are reached the same way as external ones — App Store Connect
+  # keeps both under betaGroups and pilot matches on the name — so this needs no
+  # separate setting for the two kinds.
+  #
+  # The two flags are read from the project rather than decided here. pilot
+  # defaults submit_beta_review to true and submits whenever groups are given:
+  #
+  #   if options[:submit_beta_review] && (options[:groups] || options[:distribute_external])
+  #
+  # so naming a group would otherwise also send the build to Apple's beta review.
+  # Both default to false because that is the answer that cannot surprise anyone:
+  # a project wanting external distribution or a review submission says so, and a
+  # project that only wants its testers to get the build says nothing.
+  testflight_groups = options[:testflight_groups]
+  if testflight_groups && !testflight_groups.empty?
+    distribute_external = options[:testflight_distribute_external] == true
+    submit_beta_review = options[:testflight_submit_beta_review] == true
+
+    upload_params[:groups] = testflight_groups
+    upload_params[:distribute_external] = distribute_external
+    upload_params[:submit_beta_review] = submit_beta_review
+
+    # Named in full because a mismatch is silent: pilot looks the groups up by
+    # name and, finding none, simply assigns nothing. Printing what was asked for
+    # is what lets a typo be seen in the log rather than as a build that quietly
+    # reaches no tester.
+    UI.message("👥 Assigning the build to TestFlight group(s): #{testflight_groups.join(', ')}")
+    UI.message("   distribute_external: #{distribute_external} · submit_beta_review: #{submit_beta_review}")
+  end
+
   upload_to_testflight(upload_params)
 end
 
