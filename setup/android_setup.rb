@@ -339,9 +339,21 @@ private_lane :smf_super_push_git_tag_release do |options|
   # Create the GitHub release
   # CI: Extract build number from git tag (not Config.json)
   # Local: Use Config.json (backward compatible)
-  if smf_is_ci?
+  if smf_is_ci? && ENV['BUILD_VERSION_CODE']
+    # The number Jenkins reserved before anything was built, and the one already
+    # inside the artifact that was just uploaded — smf_super_build read it from
+    # this same variable, as did the tag. Asking git again can only disagree.
+    #
+    # Same change as apple_setup, for the same reason: this lane was the odd one
+    # out among the places that need the number, and being the odd one out is
+    # what let a mismatched search pattern go unnoticed on the iOS side until it
+    # had produced 45 unpublishable drafts.
+    build_number = ENV['BUILD_VERSION_CODE'].to_i
+    UI.message("📊 Using the build number reserved by Jenkins: #{build_number}")
+  elsif smf_is_ci?
     UI.message("🏗️  CI Build - extracting build number from latest git tag")
-    # Fetch remote tags so we see tags created earlier in this pipeline
+    # Reached when BUILD_VERSION_CODE is absent — an older pipeline, or a lane
+    # driven by hand on a CI machine.
     _smf_fetch_build_tags_once
     # Use git tag -l instead of git describe to avoid HEAD ancestry issues after git pull
     # New format first (build/android/<variant>/*), then legacy (build/<variant>/*)
