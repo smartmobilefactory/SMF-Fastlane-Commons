@@ -51,30 +51,54 @@ private_lane :smf_ios_unit_tests do |options|
 
 end
 
-def _smf_can_unit_tests_be_preformed(project_name, scheme, unit_test_xcconfig_name, testing_for_mac = nil)
+# Whether the scheme has anything to test.
+#
+# This used to run `scan` with `xcargs: "-dry-run …"`. Xcode removed support for
+# `-dry-run`, so that call could only ever raise — the rescue then reported
+# "Maybe the project does not have any unit tests?" and returned false, and the
+# real test run was skipped. Builds stayed green while no test was executed.
+#
+# The replacement reads the scheme's TestAction instead of starting Xcode: it is
+# instant, and it cannot fail for reasons unrelated to the question.
+#
+# It deliberately defaults to TRUE whenever the scheme cannot be located or
+# parsed. Running the tests and failing loudly is recoverable; skipping them
+# silently is what caused this bug in the first place.
+def _smf_can_unit_tests_be_preformed(project_name, scheme, unit_test_xcconfig_name = nil, testing_for_mac = nil)
 
-  UI.important("Checking whether the unit tests with the scheme \"#{scheme}\" can be performed.")
+  UI.important("Checking whether the scheme \"#{scheme}\" has a test target.")
 
-  destination = testing_for_mac ? "platform=macOS,arch=x86_64" : nil
+  scheme_files = Dir.glob([
+    "**/#{project_name}.xcodeproj/xcshareddata/xcschemes/#{scheme}.xcscheme",
+    "**/#{project_name}.xcworkspace/xcshareddata/xcschemes/#{scheme}.xcscheme",
+    "**/xcshareddata/xcschemes/#{scheme}.xcscheme"
+  ])
 
-  begin
-    scan(
-        workspace: "#{project_name}.xcworkspace",
-        scheme: scheme,
-        configuration: unit_test_xcconfig_name,
-        destination: destination,
-        clean: false,
-        skip_build: true,
-        xcargs: "-dry-run #{smf_xcargs_for_build_system}"
-    )
-
-    UI.important("Unit tests can be performed")
-
+  if scheme_files.empty?
+    UI.important("Scheme file for \"#{scheme}\" not found — assuming it has tests and running them.")
     return true
-  rescue => exception
+  end
 
-    UI.important("Unit tests can't be performed: #{exception}. Maybe the project does not have any unit tests?")
+  content = File.read(scheme_files.first)
+  test_action = content[/<TestAction.*?<\/TestAction>/m]
 
+  if test_action.nil?
+    UI.important("Scheme \"#{scheme}\" has no TestAction — skipping the unit tests.")
     return false
   end
+
+  # A testable counts only when it is not skipped.
+  testables = test_action.scan(/<TestableReference(.*?)<\/TestableReference>/m).flatten
+  active = testables.reject { |t| t =~ /skipped\s*=\s*"YES"/i }
+
+  if active.empty?
+    UI.important("Scheme \"#{scheme}\" has no active test target — skipping the unit tests.")
+    return false
+  end
+
+  UI.important("Scheme \"#{scheme}\" has #{active.count} test target(s) — running the unit tests.")
+  true
+rescue => exception
+  UI.important("Could not inspect the scheme (#{exception}). Assuming it has tests and running them.")
+  true
 end
