@@ -321,7 +321,29 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
     end
 
   when :android
-    version_number = nil
+    # Was `nil`, unconditionally — a placeholder that was never filled in. The
+    # only caller that shows it is smf_create_github_release, whose title reads
+    # "#{variant.upcase} #{version} (#{build_number})", so every Android release
+    # has been named "LIVE  (260)" with a gap where the version belongs, while
+    # iOS got "EREZEPT-LIVE 1.2.0 (256)".
+    #
+    # The value was never missing. smf_get_version_name — defined in
+    # setup/android_setup.rb, which the Fastfile imports for exactly this
+    # platform — already finds it for the Play release name: build.gradle in its
+    # usual places, then gradle.properties, then Config.json.
+    #
+    # Asked, not obeyed. That function ends in UI.user_error! when it finds
+    # nothing, which is correct where a Play release name is being set and wrong
+    # here: a project that has managed without a discoverable version so far
+    # would start failing its release stage instead of getting the same slightly
+    # worse title it has had all along. Falling back to nil keeps that promise.
+    version_number =
+      begin
+        smf_get_version_name
+      rescue StandardError => e
+        UI.important("Could not determine the Android version name (#{e.message}). Continuing without it, as before.")
+        nil
+      end
   when :flutter
     version_number = YAML.load(File.read("#{smf_workspace_dir}/pubspec.yaml"))['version'].split('+').first
   else
