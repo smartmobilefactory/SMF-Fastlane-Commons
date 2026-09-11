@@ -50,6 +50,37 @@ end
 
 The array returned by `smf_atlassian_base_urls` is then used during the 'ticket lookup process'. For each found ticket tag, an API call is triggered using the provided base urls until a request is successful. This url is then used to create the ticket link and to get more detailed information about the ticket itself. If all API calls fail, the ticket is presented in the changelog's 'Unknown Tickets' section.
 
+## Platform filtering by Jira component
+
+For cross-platform projects, a ticket can be kept out of the notes of a platform
+it does not concern. `smf_platform_filter.rb` maps each Jira component name to a
+platform:
+
+| Component | Treated as |
+|---|---|
+| `iOS App`, `App Clip` | iOS only |
+| `Android App` | Android only |
+| `KMM Core`, `QA` | both platforms |
+| `DevOps`, `Infrastruktur` / `Infrastructure`, `Backend` | DevOps, listed separately — not app work, so not in customer-facing notes, but still visible internally |
+| `Dokumentation` / `Documentation`, `Design & Konzept` / `Design & Concept`, `Projektmanagement` / `Projectmanagement` | excluded — not code, and whatever they produce reaches users through some other ticket |
+
+Both spellings are listed on purpose. Projects name their components in German
+or in English, and the two must not behave differently.
+
+**An unknown component is not an error.** It falls through to "relevant for every
+platform", which is the safe direction — better to mention a ticket twice than to
+drop it. It is, however, easy to miss: a miss looks exactly like a component that
+genuinely spans both. The build therefore prints
+
+```
+Jira component 'Marketing' is not in COMPONENT_PLATFORM_MAPPING — treating it as
+relevant for every platform. Add it to smf_platform_filter.rb if that is wrong.
+```
+
+once per unknown name per run. `App Clip` sat unmapped and turned up in Android
+release notes for months before anyone noticed, which is what the warning exists
+to prevent.
+
 ## Collect commit messages
 The commit messages will be collected by fetching the git commits between the last tag and *HEAD*. If an app is built the last tag is the tag which contains the *build_variant*. If a library is built, the parameter *is_library* must be set to true. In this case the last tag is the last one which starts with *releases/*. Merges are excluded.
 
