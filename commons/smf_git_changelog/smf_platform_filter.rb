@@ -53,15 +53,39 @@ PLATFORM_PATH_PATTERNS = {
 }.freeze
 
 # Jira component to platform mapping
+#
+# Both the German and the English spelling of each component, because projects
+# name them either way and an unmatched name is not an error here — it falls
+# through to PLATFORM_BOTH and the ticket silently appears in every platform's
+# notes. That is why the list is longer than it looks like it needs to be.
 COMPONENT_PLATFORM_MAPPING = {
   'iOS App' => PLATFORM_IOS,
+  # An App Clip is an Apple feature; there is no Android counterpart to confuse
+  # it with. Left unmapped it turned up in Android release notes.
+  'App Clip' => PLATFORM_IOS,
   'Android App' => PLATFORM_ANDROID,
   'KMM Core' => PLATFORM_BOTH,
   'DevOps' => PLATFORM_DEVOPS,
   'Dokumentation' => PLATFORM_EXCLUDED,
+  'Documentation' => PLATFORM_EXCLUDED,
+  # Design and project management are not code. Whatever they produce reaches
+  # users through some other ticket, so naming them in release notes describes
+  # work nobody outside can observe.
   'Design & Konzept' => PLATFORM_EXCLUDED,
+  'Design & Concept' => PLATFORM_EXCLUDED,
   'Infrastruktur' => PLATFORM_DEVOPS,
+  'Infrastructure' => PLATFORM_DEVOPS,
+  # Backend work is not app work, so it does not belong in notes a customer
+  # reads. Listed rather than excluded, because "these backend changes rode
+  # along with this app release" is worth seeing internally — DEVOPS keeps it in
+  # its own section instead of dropping it.
+  #
+  # A ticket carrying both Backend and an app component is unaffected: the app
+  # component wins, so an end-to-end feature still reads as app work.
+  'Backend' => PLATFORM_DEVOPS,
   'Projektmanagement' => PLATFORM_EXCLUDED,
+  'Projectmanagement' => PLATFORM_EXCLUDED,
+  'Project Management' => PLATFORM_EXCLUDED,
   'QA' => PLATFORM_BOTH  # QA affects both platforms
 }.freeze
 
@@ -142,6 +166,7 @@ def smf_detect_platform_from_components(components)
 
   components.each do |component|
     platform = COMPONENT_PLATFORM_MAPPING[component]
+    _smf_report_unmapped_component(component) if platform.nil?
     platforms_found.add(platform) if platform
   end
 
@@ -166,6 +191,26 @@ def smf_detect_platform_from_components(components)
   return PLATFORM_ANDROID if app_platforms.include?(PLATFORM_ANDROID)
 
   PLATFORM_BOTH
+end
+
+# Names already reported in this run, so a project with fifty tickets on one
+# unmapped component says so once instead of fifty times.
+UNMAPPED_COMPONENTS_SEEN = Set.new
+
+# Say out loud when a component is not in the mapping.
+#
+# The fallback for an unknown name is PLATFORM_BOTH, which is the safe choice —
+# better to mention a ticket on both platforms than to drop it. But it is also
+# invisible: 'App Clip' was iOS-only and appeared in Android notes for months
+# without anything saying so, because a miss looks exactly like a component that
+# genuinely spans both.
+#
+# @param component [String] The component name that was not found
+def _smf_report_unmapped_component(component)
+  return if UNMAPPED_COMPONENTS_SEEN.include?(component)
+
+  UNMAPPED_COMPONENTS_SEEN.add(component)
+  UI.important("Jira component '#{component}' is not in COMPONENT_PLATFORM_MAPPING — treating it as relevant for every platform. Add it to smf_platform_filter.rb if that is wrong.")
 end
 
 # Check if a platform is relevant for a target build platform
