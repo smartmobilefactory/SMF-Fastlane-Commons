@@ -17,6 +17,8 @@ $KEYCHAIN_JENKINS_ENV_KEY = 'JENKINS'
 # Path to xcode versions, used for xcode_select and ensure_xcode_version in combination with the projects xcode version
 $XCODE_EXECUTABLE_PATH_PREFIX = '/Applications/Xcode-'
 $XCODE_EXECUTABLE_PATH_POSTFIX = '.app'
+# Used when a project does not pin an xcode_version: build with the node's default Xcode bundle
+$XCODE_DEFAULT_EXECUTABLE_PATH = '/Applications/Xcode.app'
 $DEVELOPMENT_DIRECTORY_KEY = 'DEVELOPMENT_DIR'
 
 # Default Slack channel to send logs to
@@ -66,15 +68,16 @@ $CONFIG_DEPRECATED_FILES_FOLDERS_FLUTTER = []
 
 # Required Config.json/project keys
 $CONFIG_REQUIRED_PROJECT_KEYS_COMMONS = ['slack_channel', 'project_name']
-$CONFIG_REQUIRED_PROJECT_KEYS_IOS = ['xcode_version']
+$CONFIG_REQUIRED_PROJECT_KEYS_IOS = []
 $CONFIG_REQUIRED_PROJECT_KEYS_ANDROID = []
-$CONFIG_REQUIRED_PROJECT_KEYS_FLUTTER = ['xcode_version']
+$CONFIG_REQUIRED_PROJECT_KEYS_FLUTTER = []
 
 # Optional Config.json/project keys
+# xcode_version is optional: without it the build uses /Applications/Xcode.app
 $CONFIG_OPTIONAL_PROJECT_KEYS_COMMONS = ['sentry_org_slug', 'sentry_project_slug']
-$CONFIG_OPTIONAL_PROJECT_KEYS_IOS = ['custom_credentials', 'dmg_template_path', 'skip_build_nr_update_in_plists', 'skip_thread_sanitizer_for_unit_tests', 'use_custom_jenkinsfile']
+$CONFIG_OPTIONAL_PROJECT_KEYS_IOS = ['xcode_version', 'custom_credentials', 'dmg_template_path', 'skip_build_nr_update_in_plists', 'skip_thread_sanitizer_for_unit_tests', 'use_custom_jenkinsfile']
 $CONFIG_OPTIONAL_PROJECT_KEYS_ANDROID = []
-$CONFIG_OPTIONAL_PROJECT_KEYS_FLUTTER = []
+$CONFIG_OPTIONAL_PROJECT_KEYS_FLUTTER = ['xcode_version']
 
 # Deprecated Config.json/build_variants
 $CONFIG_DEPRECATED_BUILD_VARIANT_KEYS_IOS = ['pr.archive_ipa']
