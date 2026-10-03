@@ -17,6 +17,8 @@ $KEYCHAIN_JENKINS_ENV_KEY = 'JENKINS'
 # Path to xcode versions, used for xcode_select and ensure_xcode_version in combination with the projects xcode version
 $XCODE_EXECUTABLE_PATH_PREFIX = '/Applications/Xcode-'
 $XCODE_EXECUTABLE_PATH_POSTFIX = '.app'
+# Used when a project does not pin an xcode_version: build with the node's default Xcode bundle
+$XCODE_DEFAULT_EXECUTABLE_PATH = '/Applications/Xcode.app'
 $DEVELOPMENT_DIRECTORY_KEY = 'DEVELOPMENT_DIR'
 
 # Default Slack channel to send logs to
