@@ -45,3 +45,5 @@ smf_download_provisioning_profiles(
 | :----: | :----: | :----: | :--- |
 | force | `true`| `false` | Renew the provisioning profiles every time you run match. |
 | extensions_suffixes | `true`| `[]` | If the project contains extensions, a list of extension suffixes (when appended to the apps bundle identifier produce the extensions bundle identifier) can be provided for which match will be executed, too.  |
+| match_git_url | `true` | `$FASTLANE_MATCH_REPO_URL` | Match repository to use instead of the shared one. Set via `match.git_url` in the Config.json build variant. The repository's passphrase must be provided as `MATCH_PASSWORD`, e.g. as a folder credential of the same ID that shadows the global one. |
+| match_git_branch | `true` | team ID | Branch of the match repository. Set via `match.git_branch`; needed when the repository keeps everything on one branch instead of one per team. |

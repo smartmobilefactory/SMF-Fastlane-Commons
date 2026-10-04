@@ -74,7 +74,9 @@ private_lane :smf_super_build do |options|
       extensions_suffixes: extension_suffixes,
       build_variant: build_variant,
       force: force_match,
-      platform: platform
+      platform: platform,
+      match_git_url: smf_config_get(build_variant, :match, :git_url),
+      match_git_branch: smf_config_get(build_variant, :match, :git_branch)
     )
   end
 
@@ -158,7 +160,9 @@ lane :smf_pipeline_download_provisioning_profiles do |options|
     extensions_suffixes: extension_suffixes,
     build_variant: build_variant,
     force: force_match,
-    platform: platform
+    platform: platform,
+    match_git_url: smf_config_get(build_variant, :match, :git_url),
+    match_git_branch: smf_config_get(build_variant, :match, :git_branch)
   )
 
   UI.success("✅ Provisioning profiles downloaded for: #{build_variant}")

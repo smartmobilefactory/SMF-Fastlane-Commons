@@ -14,6 +14,8 @@ private_lane :smf_download_provisioning_profiles do |options|
   # template_name = options[:template_name] # Removed due to Apple API deprecation
   force = options[:force]
   platform = options[:platform].nil? ? 'ios' : options[:platform]
+  match_git_url = options[:match_git_url]
+  match_git_branch = options[:match_git_branch]
 
   team_id(team_id)
 
@@ -41,7 +43,9 @@ private_lane :smf_download_provisioning_profiles do |options|
       team_id: team_id,
       # template_name: template_name, # Removed due to Apple API deprecation
       force: force,
-      platform: platform
+      platform: platform,
+      git_url: match_git_url,
+      git_branch: match_git_branch
     )
 
   elsif (!build_variant.match(/alpha/).nil? ||
@@ -59,7 +63,9 @@ private_lane :smf_download_provisioning_profiles do |options|
               team_id: team_id,
               # template_name: template_name, # Removed due to Apple API deprecation
               force: force,
-              platform: 'ios'
+              platform: 'ios',
+              git_url: match_git_url,
+              git_branch: match_git_branch
             )
           end
   end
@@ -79,7 +85,12 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
 
   platform = options[:platform]
 
-  git_url = $FASTLANE_MATCH_REPO_URL
+  # A project may keep its certificates in its own match repository (Config.json
+  # `match.git_url`, optionally `match.git_branch`), e.g. when it signs with a team
+  # whose distribution certificate already lives elsewhere. The repository's
+  # passphrase then has to come from the job's MATCH_PASSWORD credential.
+  git_url = options[:git_url] || $FASTLANE_MATCH_REPO_URL
+  git_branch = options[:git_branch] || team_id
 
   # Skip match if signing identity is already valid in keychain (CBENEFIOS-2162)
   # Only checks certificates — provisioning profiles are cached by the system
@@ -191,7 +202,7 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
     username: api_key ? nil : apple_id,
     team_id: team_id,
     git_url: git_url,
-    git_branch: team_id,
+    git_branch: git_branch,
     keychain_name: "jenkins.keychain",
     keychain_password: ENV[$KEYCHAIN_JENKINS_ENV_KEY],
     force: force,
@@ -220,7 +231,7 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
       username: api_key ? nil : apple_id,
       team_id: team_id,
       git_url: git_url,
-      git_branch: team_id,
+      git_branch: git_branch,
       keychain_name: "jenkins.keychain",
       keychain_password: ENV[$KEYCHAIN_JENKINS_ENV_KEY],
       force: force,
