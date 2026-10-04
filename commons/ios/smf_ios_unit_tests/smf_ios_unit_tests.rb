@@ -68,11 +68,22 @@ def _smf_can_unit_tests_be_preformed(project_name, scheme, unit_test_xcconfig_na
 
   UI.important("Checking whether the scheme \"#{scheme}\" has a test target.")
 
-  scheme_files = Dir.glob([
+  patterns = [
     "**/#{project_name}.xcodeproj/xcshareddata/xcschemes/#{scheme}.xcscheme",
     "**/#{project_name}.xcworkspace/xcshareddata/xcschemes/#{scheme}.xcscheme",
     "**/xcshareddata/xcschemes/#{scheme}.xcscheme"
-  ])
+  ]
+
+  # Lane code runs with the fastlane folder as working directory, while the
+  # project sits next to it. Search from the project root first, so the scheme
+  # is found when the fastlane folder lives inside the iOS project directory.
+  search_roots = [Dir.pwd]
+  fastlane_folder = FastlaneCore::FastlaneFolder.path
+  search_roots.unshift(File.expand_path('..', fastlane_folder)) unless fastlane_folder.nil?
+
+  scheme_files = search_roots.uniq.flat_map do |root|
+    Dir.glob(patterns, base: root).map { |path| File.join(root, path) }
+  end
 
   if scheme_files.empty?
     UI.important("Scheme file for \"#{scheme}\" not found — assuming it has tests and running them.")
