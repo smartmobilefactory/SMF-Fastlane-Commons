@@ -26,8 +26,6 @@ private_lane :smf_super_setup_dependencies do |options|
     upload_itc: smf_config_get(build_variant, :upload_itc),
     itc_apple_id: smf_config_get(build_variant, :itc_apple_id)
   )
-
-  smf_pod_install
 end
 
 lane :smf_setup_dependencies_pr_check do |options|
