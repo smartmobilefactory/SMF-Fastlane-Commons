@@ -188,9 +188,6 @@ def _smf_check_valid_xcode_config(options)
 
   xcode_settings = smf_xcodeproj_settings(options)
 
-  # Bitcode analysis skipped - deprecated since Xcode 14 (CBENEFIOS-2076)
-  # smf_analyse_bitcode(xcode_settings, options)
-
   # If invalid, set warning under env 'DANGER_SWIFT_VERSION'
   smf_analyse_swift_version(xcode_settings, options)
 

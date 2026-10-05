@@ -159,25 +159,6 @@ lane :smf_pod_danger do |options|
   smf_pod_super_danger(options)
 end
 
-############ AUTOMATIC REPORTING LANES ############
-###########  For Unit-Tests Reporting  ############
-
-override_lane :smf_automatic_reporting do |options|
-  smf_ios_monitor_unit_tests(options)
-end
-
-############ META REPORTING LANES ############
-
-private_lane :smf_super_pod_meta_reporting do |options|
-  build_variant = smf_build_variant(options)
-  smf_pod_linter
-  smf_report_metrics(build_variant: build_variant)
-end
-
-lane :smf_pod_meta_reporting do |options|
-  smf_super_pod_meta_reporting(options)
-end
-
 ############ POD PUBLISH LANES ############
 
 # Setup Workspace

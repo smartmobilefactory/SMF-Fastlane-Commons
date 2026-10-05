@@ -115,37 +115,6 @@ lane :smf_pipeline_danger do |options|
   smf_super_pipeline_danger(options)
 end
 
-# Report project data
-
-private_lane :smf_super_report do |options|
-  build_variant = options[:build_variant]
-  smf_linter(options)
-  smf_report_metrics(build_variant: build_variant)
-end
-
-lane :smf_report do |options|
-  # smf_super_report(options)
-end
-
-############ AUTOMATIC REPORTING LANES ############
-###########  For Unit-Tests Reporting  ############
-
-private_lane :smf_super_android_automatic_reporting do |options|
-
-  project_name = @smf_fastlane_config.dig(:project, :project_name)
-  branch_name = !options[:branch_name].nil? ? options[:branch_name] : smf_workspace_dir_git_branch
-
-  smf_android_monitor_unit_tests(
-    project_name: project_name,
-    branch: branch_name,
-    platform: smf_meta_report_platform_friendly_name
-  )
-end
-
-lane :smf_android_automatic_reporting do |options|
-  smf_super_android_automatic_reporting(options)
-end
-
 ########## ADDITIONAL LANES USED FOR BUILDING ##########
 
 # Generate Changelog
