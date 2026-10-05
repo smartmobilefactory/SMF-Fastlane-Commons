@@ -27,10 +27,19 @@ private_lane :smf_ios_unit_tests do |options|
 
     destination = testing_for_mac ? "platform=macOS,arch=x86_64" : nil
 
+    # RWCIT-2098: a sanitizer report makes xcodebuild treat the test process as hung, so it
+    # starts `simctl diagnose --timeout=600` and the build stands still for ten minutes before
+    # the request gives up and the run continues green. Measured on CorporateBenefits-MP: 611 s
+    # with the sanitizer, 35 s without it, 27 s with it and this flag. The step only gathers a
+    # sysdiagnose for post-mortem use — the sanitizer's own findings stay in the test log, where
+    # smf_danger reads them. Left at the default without a sanitizer, so a genuine test failure
+    # still produces diagnostics.
+    diagnostics_xcarg = use_thread_sanitizer ? " -collect-test-diagnostics never" : ""
+
     scan(
         workspace: "#{project_name}.xcworkspace",
         scheme: scheme_to_use,
-        xcargs: smf_xcargs_for_build_system,
+        xcargs: "#{smf_xcargs_for_build_system}#{diagnostics_xcarg}",
         clean: false,
         device: device,
         destination: destination,
