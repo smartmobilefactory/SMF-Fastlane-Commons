@@ -26,8 +26,6 @@ private_lane :smf_super_setup_dependencies do |options|
     upload_itc: smf_config_get(build_variant, :upload_itc),
     itc_apple_id: smf_config_get(build_variant, :itc_apple_id)
   )
-
-  smf_pod_install
 end
 
 lane :smf_setup_dependencies_pr_check do |options|
@@ -197,12 +195,6 @@ lane :smf_unit_tests_reporting do |options|
   smf_super_unit_tests(options)
 end
 
-# Reporting
-
-lane :smf_automatic_reporting do |options|
-  smf_ios_monitor_unit_tests(options)
-end
-
 # Linter
 
 private_lane :smf_super_linter do |options|
@@ -223,18 +215,6 @@ end
 
 lane :smf_pipeline_danger do |options|
   smf_super_pipeline_danger(options)
-end
-
-# Report project data
-
-private_lane :smf_super_report do |options|
-  build_variant = smf_build_variant(options)
-  smf_linter(options)
-  smf_report_metrics(build_variant: build_variant)
-end
-
-lane :smf_report do |options|
-  # smf_super_report(options)
 end
 
 ########## ADDITIONAL LANES USED FOR BUILDING ##########
