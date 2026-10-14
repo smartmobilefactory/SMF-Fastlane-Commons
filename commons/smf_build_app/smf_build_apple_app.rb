@@ -249,6 +249,7 @@ private_lane :smf_build_apple_app do |options|
     xcargs: xcargs_string,
     archive_path: $IOS_ARCHIVE_PATH,
     derived_data_path: $IOS_DERIVED_DATA_PATH,
+    cloned_source_packages_path: $IOS_SOURCE_PACKAGES_PATH,
     result_bundle: true,
     result_bundle_path: $IOS_RESULT_BUNDLE_PATH,
     buildlog_path: $IOS_ARCHIVE_BUILD_LOGS_DIRECTORY,
