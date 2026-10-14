@@ -249,9 +249,7 @@ private_lane :smf_build_apple_app do |options|
     xcargs: xcargs_string,
     archive_path: $IOS_ARCHIVE_PATH,
     derived_data_path: $IOS_DERIVED_DATA_PATH,
-    # Projects using smf_xcargs_for_build_system already pass the node-wide cache
-    # (CBENEFIOS-2156); xcodebuild rejects the option twice (RWCIT-2101).
-    cloned_source_packages_path: xcargs_string.to_s.include?('-clonedSourcePackagesDirPath') ? nil : $IOS_SOURCE_PACKAGES_PATH,
+    cloned_source_packages_path: smf_source_packages_path(xcargs_string),
     result_bundle: true,
     result_bundle_path: $IOS_RESULT_BUNDLE_PATH,
     buildlog_path: $IOS_ARCHIVE_BUILD_LOGS_DIRECTORY,
@@ -271,18 +269,18 @@ private_lane :smf_build_apple_app do |options|
 
 end
 
+# RWCIT-2102: the node-wide package cache (~/spm-cache-persistent, CBENEFIOS-2156) is gone.
+# Builds running at the same time on one node overwrote each other's packages in it.
+# Packages now live per workspace in $IOS_SOURCE_PACKAGES_PATH, see smf_source_packages_path.
 def smf_xcargs_for_build_system
-  base = smf_is_using_old_build_system ? "" : "-UseNewBuildSystem=YES CODE_SIGN_STYLE=Manual"
-  spm_cache = smf_spm_cache_dir
-  spm_cache ? "#{base} -clonedSourcePackagesDirPath #{spm_cache}" : base
+  smf_is_using_old_build_system ? "" : "-UseNewBuildSystem=YES CODE_SIGN_STYLE=Manual"
 end
 
-# CBENEFIOS-2156: Persistent SPM cache directory, works regardless of CI username (ci/smf)
-def smf_spm_cache_dir
-  return nil unless smf_is_ci?
-  cache_dir = File.join(Dir.home, "spm-cache-persistent")
-  FileUtils.mkdir_p(cache_dir)
-  cache_dir
+# Returns the directory xcodebuild clones Swift packages into, or nil when the given
+# xcargs already pass one (a project overriding smf_xcargs_for_build_system);
+# xcodebuild rejects -clonedSourcePackagesDirPath twice.
+def smf_source_packages_path(xcargs)
+  xcargs.to_s.include?('-clonedSourcePackagesDirPath') ? nil : $IOS_SOURCE_PACKAGES_PATH
 end
 
 def smf_is_using_old_build_system

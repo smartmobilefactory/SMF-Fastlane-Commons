@@ -36,10 +36,12 @@ private_lane :smf_ios_unit_tests do |options|
     # still produces diagnostics.
     diagnostics_xcarg = use_thread_sanitizer ? " -collect-test-diagnostics never" : ""
 
+    test_xcargs = "#{smf_xcargs_for_build_system}#{diagnostics_xcarg}"
     scan(
         workspace: "#{project_name}.xcworkspace",
         scheme: scheme_to_use,
-        xcargs: "#{smf_xcargs_for_build_system}#{diagnostics_xcarg}",
+        xcargs: test_xcargs,
+        cloned_source_packages_path: smf_source_packages_path(test_xcargs),
         clean: false,
         device: device,
         destination: destination,
