@@ -217,10 +217,39 @@ def smf_ci_flutter_error_log
   $SMF_CI_FLUTTER_ERROR_LOG.to_s
 end
 
+# Merges the remote branch into the local one, e.g. before pushing commits the
+# build made itself (Phrase string updates).
+#
+# RWCIT-2101: this used to pass `--depth=5 -X theirs`. The depth made the
+# repository shallow, which hides older build tags from `git describe`, and
+# `-X theirs` silently resolved conflicts in favour of the remote, dropping the
+# build's own changes. A conflict now aborts the merge and fails the step.
+#
+# A merge is used rather than a rebase on purpose: the build tag already points
+# at the local commit, and rebasing would leave that commit off the branch.
 def smf_git_pull(branch)
-  branch_name = "#{branch}"
-  branch_name.sub!('origin/', '')
-  sh "git pull origin #{branch_name} --depth=5 --quiet --allow-unrelated-histories -X theirs"
+  branch_name = "#{branch}".sub('origin/', '')
+  begin
+    sh "git pull --no-rebase --no-edit --quiet --allow-unrelated-histories origin #{branch_name}"
+  rescue StandardError => e
+    sh("git merge --abort", error_callback: ->(_) {})
+    UI.user_error!("Could not merge origin/#{branch_name} into the build: #{e.message.strip}")
+  end
+end
+
+# Pulls the remote branch and pushes the local one, retrying when the push is
+# rejected because someone pushed in between (RWCIT-2101).
+def smf_git_pull_and_push(local_branch, attempts: 3)
+  attempts.times do |attempt|
+    smf_git_pull(local_branch)
+    begin
+      smf_push_to_git_remote(local_branch: local_branch)
+      return
+    rescue StandardError => e
+      raise if attempt == attempts - 1
+      UI.important("Push to #{local_branch} failed (attempt #{attempt + 1}/#{attempts}), pulling again: #{e.message.lines.first.to_s.strip}")
+    end
+  end
 end
 
 def smf_danger_module_config(options)
