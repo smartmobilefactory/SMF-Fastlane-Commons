@@ -302,8 +302,7 @@ private_lane :smf_super_push_git_tag_release do |options|
 
   changelog = smf_read_changelog
 
-  smf_git_pull(local_branch)
-  smf_push_to_git_remote(local_branch: local_branch)
+  smf_git_pull_and_push(local_branch)
 
   # Create the GitHub release
   # CI: Extract build number from git tag (not Config.json)
