@@ -130,9 +130,15 @@ error do |lane, exception, options|
   )
 end
 
-# sets the commons dir path and clones the fastlane repo
+# Sets the commons dir path and clones the fastlane repo. Both happen while this
+# Fastfile is imported, so the lane itself has nothing left to do.
+#
+# It used to run `git pull --depth=5` on top of the Jenkins checkout (RWCIT-2101).
+# That pull merged commits newer than the revision the job was started for and
+# made the repository shallow, which hides older build tags from `git describe`
+# and breaks the changelog of builds whose last tag is more than five commits back.
 lane :smf_setup_workspace do
-  smf_git_pull("")
+  UI.message("Workspace ready at #{smf_workspace_dir} (#{`git rev-parse --short HEAD`.strip})")
 end
 
 
