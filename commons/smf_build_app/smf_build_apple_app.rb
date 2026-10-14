@@ -249,7 +249,9 @@ private_lane :smf_build_apple_app do |options|
     xcargs: xcargs_string,
     archive_path: $IOS_ARCHIVE_PATH,
     derived_data_path: $IOS_DERIVED_DATA_PATH,
-    cloned_source_packages_path: $IOS_SOURCE_PACKAGES_PATH,
+    # Projects using smf_xcargs_for_build_system already pass the node-wide cache
+    # (CBENEFIOS-2156); xcodebuild rejects the option twice (RWCIT-2101).
+    cloned_source_packages_path: xcargs_string.to_s.include?('-clonedSourcePackagesDirPath') ? nil : $IOS_SOURCE_PACKAGES_PATH,
     result_bundle: true,
     result_bundle_path: $IOS_RESULT_BUNDLE_PATH,
     buildlog_path: $IOS_ARCHIVE_BUILD_LOGS_DIRECTORY,
