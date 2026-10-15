@@ -203,6 +203,10 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
     team_id: team_id,
     git_url: git_url,
     git_branch: git_branch,
+    # RWCIT-2102: only the team branch, without history. A full clone of the
+    # certificates repository (all branches, ~130 MB) took ~5 s per call, ~1 s this way.
+    shallow_clone: true,
+    clone_branch_directly: true,
     keychain_name: "jenkins.keychain",
     keychain_password: ENV[$KEYCHAIN_JENKINS_ENV_KEY],
     force: force,
@@ -232,6 +236,8 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
       team_id: team_id,
       git_url: git_url,
       git_branch: git_branch,
+      shallow_clone: true,
+      clone_branch_directly: true,
       keychain_name: "jenkins.keychain",
       keychain_password: ENV[$KEYCHAIN_JENKINS_ENV_KEY],
       force: force,
