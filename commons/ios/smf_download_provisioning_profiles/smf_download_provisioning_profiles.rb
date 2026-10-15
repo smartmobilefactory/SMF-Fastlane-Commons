@@ -92,26 +92,6 @@ private_lane :smf_download_provisioning_profile_using_match do |options|
   git_url = options[:git_url] || $FASTLANE_MATCH_REPO_URL
   git_branch = options[:git_branch] || team_id
 
-  # Skip match if signing identity is already valid in keychain (CBENEFIOS-2162)
-  # Only checks certificates — provisioning profiles are cached by the system
-  # and don't require re-download if certs haven't changed.
-  unless force
-    keychain_name = "jenkins.keychain"
-    identity_type = type == 'development' ? 'iPhone Developer' : 'iPhone Distribution'
-
-    cert_count = sh(
-      command: "security find-identity -v -p codesigning #{keychain_name} 2>/dev/null | grep -c '#{identity_type}' || true",
-      log: false
-    ).strip.to_i
-
-    if cert_count > 0
-      UI.success("✅ Signing identity '#{identity_type}' already valid in #{keychain_name} (#{cert_count} found) — skipping match")
-      next
-    else
-      UI.message("No valid '#{identity_type}' identity in #{keychain_name} — running match")
-    end
-  end
-
   extension_identifiers = []
   if extensions_suffixes
     extensions_suffixes.each do |extension_suffix|
