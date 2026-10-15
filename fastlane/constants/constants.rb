@@ -2,7 +2,6 @@
 $SMF_GITHUB_TOKEN_ENV_KEY = 'GITHUB_TOKEN'
 $SMF_SLACK_URL = 'SMF_SLACK_URL_IDENTIFIER'
 $JIRA_DEV_ACCESS_CREDENTIALS = 'JIRA_TOKEN_FASTLANE_ACCESS'
-$SENTRY_AUTH_TOKEN = 'SENTRY_API_ACCESS_TOKEN'
 $DANGER_GITHUB_TOKEN_KEY = 'DANGER_GITHUB_API_TOKEN'
 
 # External URLs
@@ -79,7 +78,7 @@ $CONFIG_REQUIRED_PROJECT_KEYS_FLUTTER = []
 # xcode_version is optional: without it the build uses /Applications/Xcode.app
 # custom_credentials is read by Jenkins-Pipeline-Commons (customCredentials.groovy) for
 # Apple, Android and Sparkle pipelines, so it is valid on every platform.
-$CONFIG_OPTIONAL_PROJECT_KEYS_COMMONS = ['sentry_org_slug', 'sentry_project_slug', 'custom_credentials']
+$CONFIG_OPTIONAL_PROJECT_KEYS_COMMONS = ['custom_credentials']
 $CONFIG_OPTIONAL_PROJECT_KEYS_IOS = ['xcode_version', 'dmg_template_path', 'skip_build_nr_update_in_plists', 'skip_thread_sanitizer_for_unit_tests', 'use_custom_jenkinsfile']
 $CONFIG_OPTIONAL_PROJECT_KEYS_ANDROID = []
 $CONFIG_OPTIONAL_PROJECT_KEYS_FLUTTER = ['xcode_version']
