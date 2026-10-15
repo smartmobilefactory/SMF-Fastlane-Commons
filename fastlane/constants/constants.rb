@@ -45,10 +45,8 @@ $CATALYST_MAC_BUILD_VARIANT_PREFIX = 'macOS_'
 $IOS_BUILD_OUTPUT_DIR = 'build'
 $IOS_ARCHIVE_PATH = File.join($IOS_BUILD_OUTPUT_DIR, '/')
 $IOS_DERIVED_DATA_PATH = File.join($IOS_BUILD_OUTPUT_DIR, 'derivedData/')
-# Swift packages live outside the build directory, which smf_build_apple_app deletes
-# on every run. Jenkins keeps this directory between builds of the same workspace and
-# seeds new workspaces from the last successful default-branch build, so xcodebuild
-# only verifies the packages instead of unpacking ~1 GB each time (RWCIT-2101, RWCIT-2102).
+# Swift packages for local runs. On Jenkins they live in <workspace>@spm-cache instead,
+# see smf_source_packages_path (RWCIT-2101, RWCIT-2102).
 $IOS_SOURCE_PACKAGES_PATH = '.spm-cache/SourcePackages'
 $IOS_ARCHIVE_BUILD_LOGS_DIRECTORY =  File.join($IOS_BUILD_OUTPUT_DIR, 'ArchiveBuildLogs/')
 $IOS_UNIT_TESTS_BUILD_LOGS_DIRECTORY =  File.join($IOS_BUILD_OUTPUT_DIR, 'UnitTestsBuildLogs/')

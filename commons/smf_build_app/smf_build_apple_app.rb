@@ -279,8 +279,16 @@ end
 # Returns the directory xcodebuild clones Swift packages into, or nil when the given
 # xcargs already pass one (a project overriding smf_xcargs_for_build_system);
 # xcodebuild rejects -clonedSourcePackagesDirPath twice.
+#
+# On Jenkins the packages live next to the workspace (<workspace>@spm-cache), not inside
+# the project: linters such as a SwiftLint build phase without exclusions would otherwise
+# lint every package (RKI iOS #42), and git clean never has to know about it.
+# Jenkins-Pipeline-Commons (spmSeed.groovy) uses the same path.
 def smf_source_packages_path(xcargs)
-  xcargs.to_s.include?('-clonedSourcePackagesDirPath') ? nil : $IOS_SOURCE_PACKAGES_PATH
+  return nil if xcargs.to_s.include?('-clonedSourcePackagesDirPath')
+
+  workspace = ENV['WORKSPACE'].to_s
+  workspace.empty? ? $IOS_SOURCE_PACKAGES_PATH : File.join("#{workspace}@spm-cache", 'SourcePackages')
 end
 
 def smf_is_using_old_build_system
