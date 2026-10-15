@@ -355,27 +355,6 @@ lane :smf_create_dmg_and_gatekeeper do |options|
 end
 
 
-# Upload Dsyms
-
-private_lane :smf_super_upload_dsyms do |options|
-  build_variant = smf_build_variant(options)
-
-  smf_upload_to_sentry(
-    build_variant: build_variant,
-    org_slug: smf_config_get(nil, :project, :sentry_org_slug),
-    project_slug: smf_config_get(nil, :project, :sentry_project_slug),
-    build_variant_org_slug: smf_config_get(build_variant, :sentry_org_slug),
-    build_variant_project_slug: smf_config_get(build_variant, :sentry_project_slug),
-    escaped_filename: smf_config_get(build_variant, :scheme).gsub(' ', "\ "),
-    slack_channel: smf_config_get(nil, :project, :slack_channel)
-  )
-
-end
-
-lane :smf_upload_dsyms do |options|
-  smf_super_upload_dsyms(options)
-end
-
 # Upload to Sparkle
 
 private_lane :smf_super_pipeline_upload_with_sparkle do |options|

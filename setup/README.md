@@ -40,7 +40,6 @@ Table of Contents
          - [`smf_generate_changelog`](#-smf-generate-changelog--1)
          - [`smf_pipeline_increment_build_number`](#-smf-pipeline-increment-build-number--1)
          - [`smf_pipeline_create_git_tag`](#-smf-pipeline-create-git-tag--1)
-         - [`smf_upload_dsyms`](#-smf-upload-dsyms-)
          - [`smf_upload_to_itunes`](#-smf-upload-to-itunes-)
          - [`smf_push_git_tag_release`](#-smf-push-git-tag-release-)
          - [`smf_send_slack_notification`](#-smf-send-slack-notification--1)
@@ -60,7 +59,6 @@ Table of Contents
          - [`smf_pipeline_increment_build_number`](#-smf-pipeline-increment-build-number--2)
          - [`smf_pipeline_create_git_tag`](#-smf-pipeline-create-git-tag--2)
          - [`smf_create_dmg_and_gatekeeper`](#-smf-create-dmg-and-gatekeeper-)
-         - [`smf_upload_dsyms`](#-smf-upload-dsyms--1)
          - [`smf_pipeline_upload_with_sparkle`](#-smf-pipeline-upload-with-sparkle-)
          - [`smf_upload_to_itunes`](#-smf-upload-to-itunes--1)
          - [`smf_push_git_tag_release`](#-smf-push-git-tag-release--1)
@@ -91,7 +89,6 @@ Table of Contents
          - [`smf_generate_changelog`](#-smf-generate-changelog--4)
          - [`smf_pipeline_increment_build_number`](#-smf-pipeline-increment-build-number--4)
          - [`smf_pipeline_create_git_tag`](#-smf-pipeline-create-git-tag--4)
-         - [`smf_upload_dsyms`](#-smf-upload-dsyms--2)
          - [`smf_upload_to_itunes`](#-smf-upload-to-itunes--2)
          - [`smf_push_git_tag_release`](#-smf-push-git-tag-release--3)
          - [`smf_send_slack_notification`](#-smf-send-slack-notification--4)
@@ -108,7 +105,6 @@ Table of Contents
          - [`smf_pipeline_increment_build_number`](#-smf-pipeline-increment-build-number--5)
          - [`smf_pipeline_create_git_tag`](#-smf-pipeline-create-git-tag--5)
          - [`smf_create_dmg_and_gatekeeper`](#-smf-create-dmg-and-gatekeeper--1)
-         - [`smf_upload_dsyms`](#-smf-upload-dsyms--3)
          - [`smf_pipeline_upload_with_sparkle`](#-smf-pipeline-upload-with-sparkle--1)
          - [`smf_push_git_tag_release`](#-smf-push-git-tag-release--4)
          - [`smf_send_slack_notification`](#-smf-send-slack-notification--5)
@@ -178,9 +174,6 @@ This lane runs lint tasks like swift lint.
 
 #### `smf_pipeline_create_git_tag`
 [See this lane in Common Setup](#smf_pipeline_create_git_tag)
-
-#### `smf_upload_dsyms`
-This lane uploads the symbolication files to sentry. :arrow_up:
 
 #### `smf_upload_to_itunes`
 This lane uploads the app to Testflight. :arrow_up::airplane:
@@ -258,9 +251,6 @@ This lane runs lint tasks like swift lint.
 
 #### `smf_create_dmg_and_gatekeeper`
 This lane creates the dmg from the app and notarizes it if `notarize` is set to true in the build variant config in the Config.json.
-
-#### `smf_upload_dsyms`
-This lane uploads the symbolication files to sentry. :arrow_up:
 
 #### `smf_pipeline_upload_with_sparkle`
 This lane uploads the dmg with sparkle.
@@ -363,10 +353,6 @@ This lane runs flutter unit tests by using flutter command `test`.
 #### `smf_pipeline_create_git_tag`
 [See this lane in Common Setup](#smf_pipeline_create_git_tag)
 
-#### `smf_upload_dsyms`
-This lane uploads the symbolication files to sentry. :arrow_up:
-
-
 #### `smf_upload_to_itunes`
 This lane uploads the app to Testflight. :arrow_up::airplane:
 
@@ -414,9 +400,6 @@ This lane runs lint tasks like swift lint.
 
 #### `smf_create_dmg_and_gatekeeper`
 This lane creates the dmg from the app and notarizes it if `notarize` is set to true in the build variant config in the Config.json.
-
-#### `smf_upload_dsyms`
-This lane uploads the dsyms to sentry.
 
 #### `smf_pipeline_upload_with_sparkle`
 This lane uploads the dmg with sparkle.
