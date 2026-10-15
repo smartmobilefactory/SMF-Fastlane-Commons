@@ -79,8 +79,10 @@ $CONFIG_REQUIRED_PROJECT_KEYS_FLUTTER = []
 
 # Optional Config.json/project keys
 # xcode_version is optional: without it the build uses /Applications/Xcode.app
-$CONFIG_OPTIONAL_PROJECT_KEYS_COMMONS = ['sentry_org_slug', 'sentry_project_slug']
-$CONFIG_OPTIONAL_PROJECT_KEYS_IOS = ['xcode_version', 'custom_credentials', 'dmg_template_path', 'skip_build_nr_update_in_plists', 'skip_thread_sanitizer_for_unit_tests', 'use_custom_jenkinsfile']
+# custom_credentials is read by Jenkins-Pipeline-Commons (customCredentials.groovy) for
+# Apple, Android and Sparkle pipelines, so it is valid on every platform.
+$CONFIG_OPTIONAL_PROJECT_KEYS_COMMONS = ['sentry_org_slug', 'sentry_project_slug', 'custom_credentials']
+$CONFIG_OPTIONAL_PROJECT_KEYS_IOS = ['xcode_version', 'dmg_template_path', 'skip_build_nr_update_in_plists', 'skip_thread_sanitizer_for_unit_tests', 'use_custom_jenkinsfile']
 $CONFIG_OPTIONAL_PROJECT_KEYS_ANDROID = []
 $CONFIG_OPTIONAL_PROJECT_KEYS_FLUTTER = ['xcode_version']
 
