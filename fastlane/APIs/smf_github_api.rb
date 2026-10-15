@@ -1,5 +1,11 @@
 # get PR body, title and commits for a certain pull request
 def smf_github_fetch_pull_request_data(pr_number)
+  smf_api_cached('github-pr', "#{smf_remote_repo_name}-#{pr_number}") do
+    _smf_github_fetch_pull_request_data(pr_number)
+  end
+end
+
+def _smf_github_fetch_pull_request_data(pr_number)
   repo_name = smf_remote_repo_name
 
   repo_owner = smf_remote_repo_owner
