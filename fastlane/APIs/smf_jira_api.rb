@@ -5,6 +5,10 @@ JIRA_API_ISSUE_BASE_URL = '/rest/api/3/issue/'
 
 # Get the ticket title from jira
 def smf_jira_fetch_ticket_data_for(ticket_tag)
+  smf_api_cached('jira-ticket', ticket_tag) { _smf_jira_fetch_ticket_data_for(ticket_tag) }
+end
+
+def _smf_jira_fetch_ticket_data_for(ticket_tag)
   res = nil
   base_url = nil
 
@@ -45,6 +49,12 @@ def _smf_extract_components(ticket_data)
 end
 
 def smf_jira_fetch_related_tickets_for(ticket_tag, base_url)
+  smf_api_cached('jira-remotelinks', "#{ticket_tag}-#{base_url}") do
+    _smf_jira_fetch_related_tickets_for(ticket_tag, base_url)
+  end
+end
+
+def _smf_jira_fetch_related_tickets_for(ticket_tag, base_url)
   res = smf_https_get_request(
     URI.join(base_url, JIRA_API_ISSUE_BASE_URL, ticket_tag + '/', 'remotelink'),
     :basic,
