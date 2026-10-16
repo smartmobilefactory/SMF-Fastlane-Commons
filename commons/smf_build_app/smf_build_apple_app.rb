@@ -94,6 +94,8 @@ private_lane :smf_build_apple_app do |options|
   # export fails the same way the build did, only later.
   extension_profiles = {}
   if bundle_identifier && match_type
+    team_id = smf_config_get(build_variant, :team_id)
+
     # Hoisted out of the fallback branch below: extensions need the same naming
     # rule, and computing it twice is how the two drift apart.
     type_name_for_match = case match_type.to_s.downcase
@@ -112,10 +114,19 @@ private_lane :smf_build_apple_app do |options|
     if profile_name && !profile_name.empty?
       UI.message("🔐 Using provisioning profile from match ENV: #{profile_name}")
     else
-      # Fallback: Construct profile name for skip_match scenarios where ENV is not set
-      # Match always uses naming convention: "match <Type> <bundle_identifier>"
-      profile_name = "match #{type_name_for_match} #{bundle_identifier}"
-      UI.message("🔐 Using constructed provisioning profile name: #{profile_name}")
+      # The ENV is gone whenever match ran in another process — since RWCIT-2102
+      # it has its own pipeline stage — and for skip_match. Look at what is
+      # installed before guessing: the portal appends a timestamp when a name is
+      # taken ("match AdHoc <id> 1787520201"), and the bare name then matches
+      # nothing, so the archive stops at "No profile ... matching".
+      profile_name = _smf_installed_match_profile_name(type_name_for_match, bundle_identifier, team_id)
+      if profile_name
+        UI.message("🔐 Using installed provisioning profile: #{profile_name}")
+      else
+        # Match always uses naming convention: "match <Type> <bundle_identifier>"
+        profile_name = "match #{type_name_for_match} #{bundle_identifier}"
+        UI.message("🔐 Using constructed provisioning profile name: #{profile_name}")
+      end
     end
 
     # Determine project path (handle workspace vs project scenarios)
@@ -209,7 +220,8 @@ private_lane :smf_build_apple_app do |options|
 
           extension_profile = ENV["sigh_#{extension_identifier}_#{match_type}_profile-name"]
           if extension_profile.nil? || extension_profile.empty?
-            extension_profile = "match #{type_name_for_match} #{extension_identifier}"
+            extension_profile = _smf_installed_match_profile_name(type_name_for_match, extension_identifier, team_id) ||
+                                "match #{type_name_for_match} #{extension_identifier}"
           end
 
           UI.message("🔐 #{extension_identifier} → #{extension_profile}")
@@ -320,4 +332,37 @@ def smf_is_using_old_build_system
 
   return true if (contents.match(regex) != nil)
 
+end
+
+# The name of the newest valid match profile installed for this identifier, or nil.
+#
+# Matches "match <Type> <identifier>" exactly or followed by the timestamp the
+# Developer Portal appends when the plain name is already taken. Expired profiles
+# are skipped — an old one under the plain name can still be lying around and
+# would otherwise win. Of the rest, the latest expiry wins and, among profiles
+# tied on it, the latest creation: renewed profiles on one certificate all expire
+# with it, and only the newest is the one match keeps in its repository.
+def _smf_installed_match_profile_name(type_name, identifier, team_id)
+  name_pattern = /\Amatch #{Regexp.escape(type_name)} #{Regexp.escape(identifier)}( \d+)?\z/
+  directories = [
+    File.expand_path('~/Library/Developer/Xcode/UserData/Provisioning Profiles'),
+    File.expand_path('~/Library/MobileDevice/Provisioning Profiles')
+  ]
+
+  candidates = directories.flat_map { |dir| Dir.glob(File.join(dir, '*.mobileprovision')) }.filter_map do |path|
+    xml = `security cms -D -i #{Shellwords.escape(path)} 2>/dev/null`
+    next if xml.empty?
+
+    profile = Plist.parse_xml(xml)
+    next unless profile.is_a?(Hash) && profile['Name'].to_s.match?(name_pattern)
+    next if team_id && !Array(profile['TeamIdentifier']).include?(team_id)
+    next unless profile['ExpirationDate'] && profile['ExpirationDate'] > DateTime.now
+
+    profile
+  rescue StandardError => e
+    UI.verbose("Skipping #{path}: #{e.message}")
+    nil
+  end
+
+  candidates.max_by { |profile| [profile['ExpirationDate'], profile['CreationDate']] }&.fetch('Name')
 end
