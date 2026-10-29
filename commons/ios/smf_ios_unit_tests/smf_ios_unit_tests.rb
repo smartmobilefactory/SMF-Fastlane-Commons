@@ -113,12 +113,21 @@ def _smf_can_unit_tests_be_preformed(project_name, scheme, unit_test_xcconfig_na
   testables = test_action.scan(/<TestableReference(.*?)<\/TestableReference>/m).flatten
   active = testables.reject { |t| t =~ /skipped\s*=\s*"YES"/i }
 
-  if active.empty?
+  # A scheme driven by a test plan lists its tests in the plan and carries no
+  # TestableReference at all, so counting testables alone reads it as empty and
+  # skips the stage — green, with nothing run. A plan reference has no `skipped`
+  # attribute; the plan itself decides what is selected (RWCIT-2117).
+  test_plans = test_action.scan(/<TestPlanReference\b/).count
+
+  if active.empty? && test_plans.zero?
     UI.important("Scheme \"#{scheme}\" has no active test target — skipping the unit tests.")
     return false
   end
 
-  UI.important("Scheme \"#{scheme}\" has #{active.count} test target(s) — running the unit tests.")
+  found = []
+  found << "#{active.count} test target(s)" unless active.empty?
+  found << "#{test_plans} test plan(s)" unless test_plans.zero?
+  UI.important("Scheme \"#{scheme}\" has #{found.join(' and ')} — running the unit tests.")
   true
 rescue => exception
   UI.important("Could not inspect the scheme (#{exception}). Assuming it has tests and running them.")
