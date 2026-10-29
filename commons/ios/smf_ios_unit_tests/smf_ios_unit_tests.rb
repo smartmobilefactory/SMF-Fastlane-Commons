@@ -23,7 +23,14 @@ private_lane :smf_ios_unit_tests do |options|
   if can_preform_unit_tests == true
 
     UI.important("Performing the unit tests with the scheme \"#{scheme_to_use}\"")
-    UI.important("Name of the simulator type to run tests on: \"#{scheme_to_use}\"")
+
+    # The scheme, not the device, used to be printed here — in the one line a reader consults to
+    # find out which simulator a run used (RWCIT-2118).
+    if device.nil?
+      UI.important("No simulator configured — scan falls back to the node's default.")
+    else
+      UI.important("Simulator to run the tests on: \"#{device}\"")
+    end
 
     destination = testing_for_mac ? "platform=macOS,arch=x86_64" : nil
 
