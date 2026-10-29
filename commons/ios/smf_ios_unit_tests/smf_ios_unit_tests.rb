@@ -44,6 +44,11 @@ private_lane :smf_ios_unit_tests do |options|
         cloned_source_packages_path: smf_source_packages_path(test_xcargs),
         clean: false,
         device: device,
+        # Without this, scan logs "couldn't find matching simulator", falls back to whatever
+        # the node offers and the run stays green — a pin on a model Apple has since retired
+        # would quietly stop meaning anything. The check only applies when a device is
+        # configured at all, so projects that pin none are unaffected (RWCIT-2118).
+        ensure_devices_found: true,
         destination: destination,
         configuration: unit_test_xcconfig_name,
         disable_concurrent_testing: true,
