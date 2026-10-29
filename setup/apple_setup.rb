@@ -526,7 +526,8 @@ private_lane :smf_super_push_git_tag_release do |options|
     tag: smf_get_tag_of_app(build_variant, build_number, 'ios'),
     branch: local_branch,
     build_variant: build_variant,
-    changelog: changelog
+    changelog: changelog,
+    paths: smf_github_release_assets_or_none(build_variant: build_variant, build_number: build_number, platform: 'ios')
   )
 
   smf_make_jira_realease_comment(

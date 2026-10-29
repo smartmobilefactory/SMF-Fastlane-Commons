@@ -108,3 +108,27 @@ def zipped_path(path)
     end
   end
 end
+# Files a project wants attached to the GitHub release of a build, for example an SBOM.
+#
+# The default attaches nothing. A project overrides the lane in its Fastfile
+# (`override_lane :smf_github_release_assets do |options| ... end`) and returns a list of
+# file paths; `options` carries `build_variant`, `build_number` and `platform`
+# (`android` or `ios`). Called through smf_github_release_assets_or_none, so a failing or
+# misbehaving override never fails the build.
+lane :smf_github_release_assets do |options|
+  []
+end
+
+# The release assets of smf_github_release_assets, reduced to files that exist.
+#
+# Release assets are an extra: the build and its release are done by the time this runs,
+# so an exception or a missing file only costs the attachment, with a warning in the log.
+def smf_github_release_assets_or_none(build_variant:, build_number:, platform:)
+  paths = Array(smf_github_release_assets(build_variant: build_variant, build_number: build_number, platform: platform))
+  existing, missing = paths.map(&:to_s).partition { |path| File.exist?(path) }
+  UI.important("⚠️  Release assets not found, not attached: #{missing.join(', ')}") unless missing.empty?
+  existing
+rescue StandardError => e
+  UI.important("⚠️  Release assets skipped: #{e.class}: #{e.message}")
+  []
+end
