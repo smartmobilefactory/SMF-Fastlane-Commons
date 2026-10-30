@@ -98,7 +98,12 @@ end
 # Measured on CorporateBenefits-MP (cibre-mini, macOS 27.2): run with Xcode 27.2 → 335 tests in
 # 18 s; run with Xcode 26.6 → hung, aborted after 937 s.
 def _smf_build_and_run_unit_tests_separately(scan_options, required_xcode_version, runner_xcode_version)
-  UI.important("Building the unit tests with Xcode #{required_xcode_version}, running them with Xcode #{runner_xcode_version}.")
+  use_default_runner = runner_xcode_version.to_s.strip == $UNIT_TEST_RUNNER_DEFAULT_XCODE
+  # An empty version selects /Applications/Xcode.app and skips ensure_xcode_version.
+  runner_setup_version = use_default_runner ? nil : runner_xcode_version
+  runner_label = use_default_runner ? "#{$XCODE_DEFAULT_EXECUTABLE_PATH} (#{_smf_xcode_bundle_version($XCODE_DEFAULT_EXECUTABLE_PATH)})" : "Xcode #{runner_xcode_version}"
+
+  UI.important("Building the unit tests with Xcode #{required_xcode_version}, running them with #{runner_label}.")
 
   # The simulator is reset once, right before the run. The build log goes to a subfolder: Danger
   # reads the first log in the logs folder for thread sanitizer findings, and those come from the run.
@@ -110,13 +115,19 @@ def _smf_build_and_run_unit_tests_separately(scan_options, required_xcode_versio
     buildlog_path: File.join($IOS_UNIT_TESTS_BUILD_LOGS_DIRECTORY, 'build-for-testing')
   ))
 
-  smf_setup_correct_xcode_executable_for_build(required_xcode_version: runner_xcode_version)
+  smf_setup_correct_xcode_executable_for_build(required_xcode_version: runner_setup_version)
   begin
     scan(scan_options.merge(test_without_building: true, skip_build: false))
   ensure
     # Later steps of the same run build or archive again and must use the project's Xcode.
     smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
   end
+end
+
+# The marketing version of an Xcode bundle, for the log only.
+def _smf_xcode_bundle_version(xcode_path)
+  version = `/usr/bin/defaults read "#{xcode_path}/Contents/Info" CFBundleShortVersionString 2>/dev/null`.strip
+  version.empty? ? "unknown version" : version
 end
 
 # Whether the scheme has anything to test.
