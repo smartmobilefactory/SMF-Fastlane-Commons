@@ -6,6 +6,7 @@ private_lane :smf_ios_unit_tests do |options|
   unit_test_xcconfig_name = options[:unit_test_xcconfig_name]
   device = options[:device]
   required_xcode_version = options[:required_xcode_version]
+  runner_xcode_version = options[:unit_test_runner_xcode_version]
   testing_for_mac = options[:testing_for_mac]
   use_thread_sanitizer = !options[:use_thread_sanitizer].nil? ? options[:use_thread_sanitizer] : true
 
@@ -44,7 +45,7 @@ private_lane :smf_ios_unit_tests do |options|
     diagnostics_xcarg = use_thread_sanitizer ? " -collect-test-diagnostics never" : ""
 
     test_xcargs = "#{smf_xcargs_for_build_system}#{diagnostics_xcarg}"
-    scan(
+    scan_options = {
         workspace: "#{project_name}.xcworkspace",
         scheme: scheme_to_use,
         xcargs: test_xcargs,
@@ -69,9 +70,53 @@ private_lane :smf_ios_unit_tests do |options|
         buildlog_path: $IOS_UNIT_TESTS_BUILD_LOGS_DIRECTORY,
         number_of_retries: 1,
         thread_sanitizer: use_thread_sanitizer
-    )
+    }
+
+    if _smf_split_unit_test_run?(required_xcode_version, runner_xcode_version)
+      _smf_build_and_run_unit_tests_separately(scan_options, required_xcode_version, runner_xcode_version)
+    else
+      scan(scan_options)
+    end
   end
 
+end
+
+# Whether the tests are built and run by two different Xcode versions (RWCIT-2119).
+def _smf_split_unit_test_run?(required_xcode_version, runner_xcode_version)
+  runner = runner_xcode_version.to_s.strip
+  !runner.empty? && runner != required_xcode_version.to_s.strip
+end
+
+# Builds the tests with the project's Xcode and runs them with a newer one (RWCIT-2119).
+#
+# On macOS 27.2, AMFI refuses Xcode 26's DTServiceHub: xcodebuild logs "DTServiceHubClient
+# failed to bless service hub" and the test runner hangs until "The test runner hung before
+# establishing connection". Building and archiving are unaffected. A project that must keep
+# building with Xcode 26 therefore builds the app and its tests with it — same SDK, same
+# binaries — and leaves only the run to an Xcode that the host macOS still accepts.
+#
+# Measured on CorporateBenefits-MP (cibre-mini, macOS 27.2): run with Xcode 27.2 → 335 tests in
+# 18 s; run with Xcode 26.6 → hung, aborted after 937 s.
+def _smf_build_and_run_unit_tests_separately(scan_options, required_xcode_version, runner_xcode_version)
+  UI.important("Building the unit tests with Xcode #{required_xcode_version}, running them with Xcode #{runner_xcode_version}.")
+
+  # The simulator is reset once, right before the run. The build log goes to a subfolder: Danger
+  # reads the first log in the logs folder for thread sanitizer findings, and those come from the run.
+  scan(scan_options.merge(
+    build_for_testing: true,
+    skip_build: false,
+    reset_simulator: false,
+    number_of_retries: 0,
+    buildlog_path: File.join($IOS_UNIT_TESTS_BUILD_LOGS_DIRECTORY, 'build-for-testing')
+  ))
+
+  smf_setup_correct_xcode_executable_for_build(required_xcode_version: runner_xcode_version)
+  begin
+    scan(scan_options.merge(test_without_building: true, skip_build: false))
+  ensure
+    # Later steps of the same run build or archive again and must use the project's Xcode.
+    smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
+  end
 end
 
 # Whether the scheme has anything to test.
