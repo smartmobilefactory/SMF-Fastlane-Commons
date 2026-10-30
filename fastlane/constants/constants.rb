@@ -18,6 +18,11 @@ $XCODE_EXECUTABLE_PATH_PREFIX = '/Applications/Xcode-'
 $XCODE_EXECUTABLE_PATH_POSTFIX = '.app'
 # Used when a project does not pin an xcode_version: build with the node's default Xcode bundle
 $XCODE_DEFAULT_EXECUTABLE_PATH = '/Applications/Xcode.app'
+# unit_test_runner_xcode_version value that runs the unit tests with $XCODE_DEFAULT_EXECUTABLE_PATH
+# instead of a pinned version (RWCIT-2119). The runner only has to be an Xcode the host macOS
+# accepts, and the node's default Xcode is kept current with macOS; a pinned runner would have to
+# be raised by hand after every macOS update that rejects it.
+$UNIT_TEST_RUNNER_DEFAULT_XCODE = 'default'
 $DEVELOPMENT_DIRECTORY_KEY = 'DEVELOPMENT_DIR'
 
 # Default Slack channel to send logs to
@@ -77,7 +82,7 @@ $CONFIG_REQUIRED_PROJECT_KEYS_FLUTTER = []
 # Optional Config.json/project keys
 # xcode_version is optional: without it the build uses /Applications/Xcode.app
 # unit_test_runner_xcode_version is optional: when set, the unit tests are built with xcode_version
-# and run with this Xcode (RWCIT-2119)
+# and run with this Xcode; "default" runs them with /Applications/Xcode.app (RWCIT-2119)
 # custom_credentials is read by Jenkins-Pipeline-Commons (customCredentials.groovy) for
 # Apple, Android and Sparkle pipelines, so it is valid on every platform.
 $CONFIG_OPTIONAL_PROJECT_KEYS_COMMONS = ['custom_credentials']
