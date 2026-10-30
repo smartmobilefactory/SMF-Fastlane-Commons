@@ -181,6 +181,7 @@ private_lane :smf_super_unit_tests do |options|
     unit_test_xcconfig_name: smf_config_get(build_variant, :xcconfig_name, :unittests),
     device: smf_config_get(build_variant, 'tests.device_to_test_against'.to_sym),
     required_xcode_version: smf_config_get(nil, :project, :xcode_version),
+    unit_test_runner_xcode_version: smf_config_get(nil, :project, :unit_test_runner_xcode_version),
     testing_for_mac: testing_for_mac,
     use_thread_sanitizer: use_thread_sanitizer
   )

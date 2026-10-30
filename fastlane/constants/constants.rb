@@ -76,10 +76,12 @@ $CONFIG_REQUIRED_PROJECT_KEYS_FLUTTER = []
 
 # Optional Config.json/project keys
 # xcode_version is optional: without it the build uses /Applications/Xcode.app
+# unit_test_runner_xcode_version is optional: when set, the unit tests are built with xcode_version
+# and run with this Xcode (RWCIT-2119)
 # custom_credentials is read by Jenkins-Pipeline-Commons (customCredentials.groovy) for
 # Apple, Android and Sparkle pipelines, so it is valid on every platform.
 $CONFIG_OPTIONAL_PROJECT_KEYS_COMMONS = ['custom_credentials']
-$CONFIG_OPTIONAL_PROJECT_KEYS_IOS = ['xcode_version', 'dmg_template_path', 'skip_build_nr_update_in_plists', 'skip_thread_sanitizer_for_unit_tests', 'use_custom_jenkinsfile']
+$CONFIG_OPTIONAL_PROJECT_KEYS_IOS = ['xcode_version', 'unit_test_runner_xcode_version', 'dmg_template_path', 'skip_build_nr_update_in_plists', 'skip_thread_sanitizer_for_unit_tests', 'use_custom_jenkinsfile']
 $CONFIG_OPTIONAL_PROJECT_KEYS_ANDROID = []
 $CONFIG_OPTIONAL_PROJECT_KEYS_FLUTTER = ['xcode_version']
 
