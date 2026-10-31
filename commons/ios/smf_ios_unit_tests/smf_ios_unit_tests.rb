@@ -76,6 +76,10 @@ private_lane :smf_ios_unit_tests do |options|
         thread_sanitizer: use_thread_sanitizer
     }
 
+    # xcodebuild refuses to write over an existing result bundle ("Existing file at
+    # -resultBundlePath"), so a bundle left in the build folder would fail the run before a test starts.
+    FileUtils.rm_rf($IOS_UNIT_TESTS_RESULT_BUNDLE_PATH)
+
     if _smf_split_unit_test_run?(required_xcode_version, runner_xcode_version)
       _smf_build_and_run_unit_tests_separately(scan_options, required_xcode_version, runner_xcode_version)
     else
@@ -121,11 +125,15 @@ def _smf_build_and_run_unit_tests_separately(scan_options, required_xcode_versio
 
   # The simulator is reset once, right before the run. The build log goes to a subfolder: Danger
   # reads the first log in the logs folder for thread sanitizer findings, and those come from the run.
+  # Only the run writes the result bundle: the build step would create it at the same path, and the
+  # run then stops with "Existing file at -resultBundlePath" (CBENEFIOS-3144).
   scan(scan_options.merge(
     build_for_testing: true,
     skip_build: false,
     reset_simulator: false,
     number_of_retries: 0,
+    result_bundle: false,
+    result_bundle_path: nil,
     buildlog_path: File.join($IOS_UNIT_TESTS_BUILD_LOGS_DIRECTORY, 'build-for-testing')
   ))
 
