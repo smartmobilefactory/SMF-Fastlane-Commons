@@ -12,7 +12,7 @@ smf_ios_unit_tests(
       unit_test_xcconfig_name: <name_of_the_xcconfig_for_unit_tests>,   # Name of the xcconfig to use for the unit tests
       device: <test_device_name_to_test_against>,                       # Name of the device to use for the unit tests
       required_xcode_version: "26.6",                                   # The xcode version used to build this project
-      unit_test_runner_xcode_version: "default",                        # Optional, the xcode that runs the tests: "default" or a version (see below)
+      unit_test_runner_xcode_version: "default",                        # Optional, the xcode that runs the tests: "default" (also when absent) or a version (see below)
       unit_testing_for_mac_os: false                                    # Optional, set to true if running unit tests for platform mac os
       use_thread_sanitizer: <use_thread_sanitizer>                      # Use Thread Sanitizer, true by default
   )
@@ -32,13 +32,15 @@ A project that has to keep building with the older Xcode sets the optional proje
 }
 ```
 
-`"default"` runs the tests with the node's `/Applications/Xcode.app`, whatever version it is. That is
-the recommended value: the runner only has to be accepted by the host macOS, and the default Xcode is
+`"default"` runs the tests with the node's `/Applications/Xcode.app`, whatever version it is, and is
+what the lane uses when the key is absent (RWCIT-2122): every CI Mac runs macOS 27, where the Xcode 26
+simulator no longer starts, so a project that pins `xcode_version` to 26.x would otherwise hang in
+every unit test run. It is the recommended value: the runner only has to be accepted by the host macOS, and the default Xcode is
 kept current with it, whereas a pinned runner version would need raising after every macOS update
 that rejects it. A version such as `"27.2"` still works and pins the runner like `xcode_version` pins
 the build.
 
 The lane then runs `build-for-testing` with `xcode_version` — the app and the tests keep the
 project's SDK — and `test-without-building` with `unit_test_runner_xcode_version`. Afterwards it
-switches back to `xcode_version`. Without the key, or with the same version in both, nothing changes.
+switches back to `xcode_version`. With the same version in both, or without `xcode_version`, nothing changes.
 With a pinned version the node needs `/Applications/Xcode-<unit_test_runner_xcode_version>.app`.
