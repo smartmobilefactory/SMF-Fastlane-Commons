@@ -68,9 +68,12 @@ private_lane :smf_ios_unit_tests do |options|
         output_types: "html,junit,json-compilation-database",
         output_files: "report.html,report.junit,report.json",
         # The xcresult is what Allure 3 reads on Jenkins (CBENEFIOS-3144): it carries every
-        # Swift Testing argument case as its own test, which the junit report flattens.
+        # Swift Testing argument case as its own test, which the junit report flattens. No
+        # `result_bundle_path`: scan only removes a bundle left by an earlier xcodebuild at its own
+        # path, `<output_directory>/<scheme>.xcresult`, and a custom path is handed to xcodebuild
+        # as it is — the build-for-testing step of the split run (RWCIT-2119) then leaves a bundle
+        # behind and the test run aborts with "Existing file at -resultBundlePath".
         result_bundle: true,
-        result_bundle_path: $IOS_UNIT_TESTS_RESULT_BUNDLE_PATH,
         buildlog_path: $IOS_UNIT_TESTS_BUILD_LOGS_DIRECTORY,
         number_of_retries: 1,
         thread_sanitizer: use_thread_sanitizer

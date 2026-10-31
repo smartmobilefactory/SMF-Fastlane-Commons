@@ -56,8 +56,6 @@ $IOS_ARCHIVE_BUILD_LOGS_DIRECTORY =  File.join($IOS_BUILD_OUTPUT_DIR, 'ArchiveBu
 $IOS_UNIT_TESTS_BUILD_LOGS_DIRECTORY =  File.join($IOS_BUILD_OUTPUT_DIR, 'UnitTestsBuildLogs/')
 $XCRESULT_DIR = File.join($IOS_DERIVED_DATA_PATH, 'Logs/Test')
 $IOS_RESULT_BUNDLE_PATH = File.join($IOS_BUILD_OUTPUT_DIR, 'reports/bundleResults.xcresult')
-# The result bundle of the unit test run, read by the Allure step of the PR check (CBENEFIOS-3144).
-$IOS_UNIT_TESTS_RESULT_BUNDLE_PATH = File.join($IOS_BUILD_OUTPUT_DIR, 'reports/unitTests.xcresult')
 
 $PODSPEC_REPO_SOURCES = ['git@github.com:smartmobilefactory/SMF-CocoaPods-Specs', 'https://github.com/CocoaPods/Specs']
 
