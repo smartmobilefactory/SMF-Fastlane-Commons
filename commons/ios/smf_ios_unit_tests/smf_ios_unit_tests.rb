@@ -79,9 +79,9 @@ private_lane :smf_ios_unit_tests do |options|
         thread_sanitizer: use_thread_sanitizer
     }
 
-    # xcodebuild refuses to write over an existing result bundle ("Existing file at
-    # -resultBundlePath"), so a bundle left in the build folder would fail the run before a test starts.
-    FileUtils.rm_rf($IOS_UNIT_TESTS_RESULT_BUNDLE_PATH)
+    # A bundle left at scan's own path (`<output_directory>/<scheme>.xcresult`) is removed by scan
+    # itself before every run, so nothing has to be deleted here. #319 did this with a constant #318
+    # had removed, which made the lane raise before a test started (PR-1315 build 2).
 
     if _smf_split_unit_test_run?(required_xcode_version, runner_xcode_version)
       _smf_build_and_run_unit_tests_separately(scan_options, required_xcode_version, runner_xcode_version)
