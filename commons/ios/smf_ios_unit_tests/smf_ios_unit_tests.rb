@@ -67,6 +67,10 @@ private_lane :smf_ios_unit_tests do |options|
         output_directory: $IOS_BUILD_OUTPUT_DIR,
         output_types: "html,junit,json-compilation-database",
         output_files: "report.html,report.junit,report.json",
+        # The xcresult is what Allure 3 reads on Jenkins (CBENEFIOS-3144): it carries every
+        # Swift Testing argument case as its own test, which the junit report flattens.
+        result_bundle: true,
+        result_bundle_path: $IOS_UNIT_TESTS_RESULT_BUNDLE_PATH,
         buildlog_path: $IOS_UNIT_TESTS_BUILD_LOGS_DIRECTORY,
         number_of_retries: 1,
         thread_sanitizer: use_thread_sanitizer
