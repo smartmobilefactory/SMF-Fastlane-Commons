@@ -83,8 +83,17 @@ end
 
 # Whether the tests are built and run by two different Xcode versions (RWCIT-2119).
 def _smf_split_unit_test_run?(required_xcode_version, runner_xcode_version)
+  required = required_xcode_version.to_s.strip
+  !required.empty? && _smf_unit_test_runner_xcode_version(runner_xcode_version) != required
+end
+
+# The Xcode that runs the tests. Without `unit_test_runner_xcode_version` it is the node's default
+# Xcode (RWCIT-2122): every CI Mac runs macOS 27, where the Xcode 26 simulator no longer starts, so
+# a project that pins its build to Xcode 26 would hang in every unit test run otherwise. A version
+# still pins the runner, and a project without `xcode_version` builds and tests with the default.
+def _smf_unit_test_runner_xcode_version(runner_xcode_version)
   runner = runner_xcode_version.to_s.strip
-  !runner.empty? && runner != required_xcode_version.to_s.strip
+  runner.empty? ? $UNIT_TEST_RUNNER_DEFAULT_XCODE : runner
 end
 
 # Builds the tests with the project's Xcode and runs them with a newer one (RWCIT-2119).
@@ -98,7 +107,8 @@ end
 # Measured on CorporateBenefits-MP (cibre-mini, macOS 27.2): run with Xcode 27.2 → 335 tests in
 # 18 s; run with Xcode 26.6 → hung, aborted after 937 s.
 def _smf_build_and_run_unit_tests_separately(scan_options, required_xcode_version, runner_xcode_version)
-  use_default_runner = runner_xcode_version.to_s.strip == $UNIT_TEST_RUNNER_DEFAULT_XCODE
+  runner_xcode_version = _smf_unit_test_runner_xcode_version(runner_xcode_version)
+  use_default_runner = runner_xcode_version == $UNIT_TEST_RUNNER_DEFAULT_XCODE
   # An empty version selects /Applications/Xcode.app and skips ensure_xcode_version.
   runner_setup_version = use_default_runner ? nil : runner_xcode_version
   runner_label = use_default_runner ? "#{$XCODE_DEFAULT_EXECUTABLE_PATH} (#{_smf_xcode_bundle_version($XCODE_DEFAULT_EXECUTABLE_PATH)})" : "Xcode #{runner_xcode_version}"
