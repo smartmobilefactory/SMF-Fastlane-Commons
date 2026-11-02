@@ -72,6 +72,10 @@ private_lane :smf_danger do |options|
   patch_file = File.expand_path('multi_json_utf8_patch.rb', File.dirname(__FILE__))
   ENV['RUBYOPT'] = "#{ENV['RUBYOPT']} -r#{patch_file}".strip
 
+  # CBENEFIOS-3154: hand Danger the history it diffs against, before it starts
+  # looking for it itself and leaves the workspace shallow.
+  _smf_prepare_git_history_for_danger
+
   dangerfile = "#{File.expand_path(File.dirname(__FILE__))}/Dangerfile"
   puts "Loading Dangerfile: #{dangerfile}"
   # EPRES-212: one danger_id per platform, because a KMP repository runs this
@@ -237,4 +241,47 @@ def _smf_extract_thread_sanitizer_warnings_from_directory(unit_tests_logs_direct
 
     sanitizer_warning
   end
+end
+
+# CBENEFIOS-3154: Danger diffs a pull request against its base branch, but the pull request jobs
+# check out only `+refs/pull/<n>/head`, so neither the base branch nor the history below the pull
+# request's own commits is in the workspace. Danger repairs that itself in
+# `GitRepo#find_merge_base_with_incremental_fetch`, which fetches with `--depth` 20, 74, 168 and
+# 423 — and so leaves the workspace a shallow repository.
+#
+# The next build whose merge base lies below that graft cannot recover: the deepening fetch asks the
+# remote for `refs/heads/danger_base`, a branch Danger created locally itself, and fails with
+# "couldn't find remote ref", after which `git fetch --depth 1000000` only deepens the pull request
+# ref again. The build then dies with "Cannot find a merge base between danger_base and danger_head"
+# although nothing is wrong with the pull request (CorporateBenefits-MP PR-1326, Android and iOS).
+#
+# Completing the history and fetching the base branch up front avoids both the failure and the
+# shallow workspace it grows from.
+def _smf_prepare_git_history_for_danger
+  if `git rev-parse --is-shallow-repository`.strip == 'true'
+    _smf_fetch_for_danger('--unshallow', 'completing the shallow history')
+  end
+
+  base_branch = ENV['CHANGE_TARGET'].to_s
+  if base_branch.empty?
+    UI.important('Danger: CHANGE_TARGET is not set, leaving the base branch to Danger')
+    return
+  end
+
+  _smf_fetch_for_danger(
+      "origin +refs/heads/#{base_branch}:refs/remotes/origin/#{base_branch}",
+      "fetching the base branch #{base_branch}"
+  )
+end
+
+# A failed fetch is reported and survived rather than raised: Danger still has its own deepening
+# fetch, so the worst case is the diff it produced before this step existed. Failing here would turn
+# that into a red pull request.
+def _smf_fetch_for_danger(arguments, description)
+  UI.message("Danger: #{description}")
+
+  sh(
+      "git fetch --no-tags --quiet #{arguments}",
+      error_callback: ->(output) { UI.important("Danger: #{description} failed, continuing: #{output.to_s.strip}") }
+  )
 end
