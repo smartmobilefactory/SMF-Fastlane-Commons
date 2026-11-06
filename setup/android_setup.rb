@@ -637,135 +637,159 @@ def get_rollout_percentage(track)
   end
 end
 
-# Helper function to get marketing version name from build.gradle
+# Where the marketing version of an Android app is written, in the order it is
+# looked for (RWCIT-2128).
+#
+# Across the projects that use these commons it lives in one of two places:
+# androidApp/build.gradle.kts in the Kotlin Multiplatform projects and
+# app/build.gradle in the Groovy ones. fastlane runs with the fastlane directory
+# as its working directory, so each is tried relative to that and to the project
+# root above it.
+BUILD_FILE_VERSION_CANDIDATES = [
+  'app/build.gradle',
+  'androidApp/build.gradle.kts',
+  '../app/build.gradle',
+  '../androidApp/build.gradle.kts'
+].freeze
+
+# Checked when no build file yields a version. This is not only a safety net: a
+# project whose build file delegates the version to a Gradle property reaches it
+# by design. ePrescription-MP does exactly that, so that the value has a single
+# source - its build file and its gradle.properties once drifted apart and a
+# build uploaded a 1.2.0 bundle into a release Play named 1.1.0.
+GRADLE_PROPERTIES_VERSION_CANDIDATES = [
+  'gradle.properties',
+  '../gradle.properties'
+].freeze
+
+# Groovy writes `versionName "1.2.3"`, Kotlin `versionName = "1.2.3"`, either
+# with single or double quotes.
+VERSION_NAME_PATTERNS = [
+  /versionName\s+"([^"]+)"/,
+  /versionName\s+'([^']+)'/,
+  /versionName\s*=\s*"([^"]+)"/,
+  /versionName\s*=\s*'([^']+)'/
+].freeze
+
+# Returns the marketing version name of the Android app.
+#
+# Called twice per build - once for the version number, once to name the Play
+# release - so the result is kept after the first lookup.
+#
+# @return [String] the marketing version
+# @raise [FastlaneCore::Interface::FastlaneError] when no source holds a version
 def smf_get_version_name
-  # Get current working directory for debugging
-  current_dir = Dir.pwd
-  UI.message("🔍 Current directory: #{current_dir}")
-  
-  # List all files in current directory for debugging
-  UI.message("📁 Directory contents: #{Dir.entries(current_dir).join(', ')}")
-  
-  # Try to find build.gradle in comprehensive locations
-  build_gradle_paths = [
-    'app/build.gradle',
-    'app/build.gradle.kts',
-    './app/build.gradle',
-    './app/build.gradle.kts',
-    './androidApp/build.gradle.kts',
-    File.join(current_dir, 'app', 'build.gradle'),
-    File.join(current_dir, 'app', 'build.gradle.kts'),
-    # Additional paths for different Jenkins workspace structures
-    'build.gradle',
-    './build.gradle',
-    File.join(current_dir, 'build.gradle'),
-    # Go up one directory from fastlane folder
-    '../app/build.gradle',
-    '../app/build.gradle.kts',
-    '../androidApp/build.gradle.kts',
-    File.join(current_dir, '..', 'app', 'build.gradle'),
-    File.join(current_dir, '..', 'app', 'build.gradle.kts'),
-    '../build.gradle',
-    '../build.gradle.kts',
-    File.join(current_dir, '..', 'build.gradle')
-  ]
-  
-  # Also search recursively for build.gradle files
-  Dir.glob('**/build.gradle*').each do |file|
-    build_gradle_paths << file unless build_gradle_paths.include?(file)
+  @smf_android_version_name ||= _smf_look_up_version_name
+end
+
+def _smf_look_up_version_name
+  version = _smf_version_name_from_build_files
+  return version unless version.nil?
+
+  version = _smf_version_name_from_gradle_properties
+  return version unless version.nil?
+
+  version = _smf_version_name_from_config_json
+  return version unless version.nil?
+
+  UI.user_error!('❌ Could not find versionName in any build.gradle, gradle.properties, or Config.json file. ' \
+                 'Please ensure your Android project has a valid versionName defined.')
+end
+
+# The known layouts first; only if none of them holds a version are the module
+# directories searched. That search is one level deep on purpose - a recursive
+# one would walk build output and package checkouts - and it replaces an earlier
+# `Dir.glob('**/build.gradle*')` which, running from the fastlane directory,
+# could never reach a build file of the project at all.
+def _smf_version_name_from_build_files
+  BUILD_FILE_VERSION_CANDIDATES.each do |path|
+    version = _smf_version_name_in_build_file(path)
+    return version unless version.nil?
   end
-  
-  build_gradle_paths.each do |path|
+
+  discovered = (Dir.glob('*/build.gradle{,.kts}') + Dir.glob('../*/build.gradle{,.kts}')).sort
+  discovered -= BUILD_FILE_VERSION_CANDIDATES
+  UI.verbose("Searching the module directories for a build file: #{discovered.join(', ')}") unless discovered.empty?
+
+  discovered.each do |path|
+    version = _smf_version_name_in_build_file(path)
+    return version unless version.nil?
+  end
+
+  nil
+end
+
+def _smf_version_name_in_build_file(path)
+  unless File.exist?(path)
+    UI.verbose("No build file at #{path}")
+    return nil
+  end
+
+  content = File.read(path)
+  pattern = VERSION_NAME_PATTERNS.find { |candidate| content.match(candidate) }
+
+  if pattern.nil?
+    # Reached by a build file that reads the version from a Gradle property; the
+    # gradle.properties step below is where such a project is served.
+    UI.verbose("No versionName pattern matched in #{path}")
+    return nil
+  end
+
+  version = content.match(pattern).captures.first
+  UI.message("✅ Version #{version} from #{path}")
+  version
+rescue StandardError => e
+  UI.verbose("Could not read #{path}: #{e.message}")
+  nil
+end
+
+def _smf_version_name_from_gradle_properties
+  GRADLE_PROPERTIES_VERSION_CANDIDATES.each do |path|
+    unless File.exist?(path)
+      UI.verbose("No gradle.properties at #{path}")
+      next
+    end
+
     begin
-      if File.exist?(path)
-        UI.message("📄 Reading version from: #{path}")
-        build_gradle = File.read(path)
-        
-        # Try multiple patterns for Kotlin DSL and Groovy
-        patterns = [
-          /versionName\s+"([^"]+)"/,           # versionName "2.3.2"
-          /versionName\s+'([^']+)'/,           # versionName '2.3.2'
-          /versionName\s*=\s*"([^"]+)"/,       # versionName = "2.3.2"
-          /versionName\s*=\s*'([^']+)'/        # versionName = '2.3.2'
-        ]
-        
-        patterns.each do |pattern|
-          match = build_gradle.match(pattern)
-          if match
-            version_name = match.captures.first
-            UI.message("✅ Found version: #{version_name} in #{path}")
-            return version_name
-          end
-        end
-        
-        UI.message("⚠️ No versionName pattern matched in #{path}")
-      else
-        UI.message("📄 File not found: #{path}")
-      end
-    rescue => e
-      UI.message("❌ Error reading #{path}: #{e.message}")
+      match = File.read(path).match(/^\s*versionName\s*=\s*(.+)$/)
+    rescue StandardError => e
+      UI.verbose("Could not read #{path}: #{e.message}")
+      next
     end
-  end
-  
-  # Fallback to gradle.properties in multiple locations
-  gradle_properties_paths = [
-    'gradle.properties',
-    './gradle.properties',
-    File.join(current_dir, 'gradle.properties'),
-    'app/gradle.properties',
-    './app/gradle.properties',
-    File.join(current_dir, 'app', 'gradle.properties'),
-    # Go up one directory from fastlane folder
-    '../gradle.properties',
-    '../app/gradle.properties',
-    File.join(current_dir, '..', 'gradle.properties'),
-    File.join(current_dir, '..', 'app', 'gradle.properties')
-  ]
-  
-  # Also search recursively for gradle.properties files
-  Dir.glob('**/gradle.properties').each do |file|
-    gradle_properties_paths << file unless gradle_properties_paths.include?(file)
-  end
-  
-  gradle_properties_paths.each do |path|
-    begin
-      if File.exist?(path) && File.read(path).include?('versionName')
-        gradle_properties = File.read(path)
-        version_name = gradle_properties.match(/versionName\s*=\s*(.+)/)&.captures&.first&.strip&.gsub(/["']/, '')
-        UI.message("✅ Found version in gradle.properties: #{version_name}")
-        return version_name
-      end
-    rescue => e
-      UI.message("⚠️ Could not read #{path}: #{e.message}")
+
+    if match.nil?
+      UI.verbose("No versionName in #{path}")
+      next
     end
+
+    version = match.captures.first.strip.gsub(/["']/, '')
+    next if version.empty?
+
+    UI.message("✅ Version #{version} from #{path}")
+    return version
   end
-  
-  # Final fallback: Try to get version from Config.json
-  begin
-    UI.message("🔍 Checking Config.json for app_version_name...")
-    UI.message("🔍 @smf_fastlane_config present: #{!@smf_fastlane_config.nil?}")
-    UI.message("🔍 @smf_fastlane_config type: #{@smf_fastlane_config.class}")
-    
-    if @smf_fastlane_config && @smf_fastlane_config.is_a?(Hash)
-      UI.message("🔍 Config.json keys: #{@smf_fastlane_config.keys}")
-      app_version_name = @smf_fastlane_config[:app_version_name]
-      UI.message("🔍 app_version_name value: #{app_version_name}")
-      
-      if app_version_name && !app_version_name.empty?
-        UI.message("✅ Found version in Config.json: #{app_version_name}")
-        return app_version_name
-      else
-        UI.message("⚠️ app_version_name is empty or nil in Config.json")
-      end
-    else
-      UI.message("⚠️ @smf_fastlane_config is not a valid hash")
-    end
-  rescue => e
-    UI.message("⚠️ Could not read version from Config.json: #{e.message}")
+
+  nil
+end
+
+def _smf_version_name_from_config_json
+  unless @smf_fastlane_config.is_a?(Hash)
+    UI.verbose("No Config.json available to read app_version_name from (#{@smf_fastlane_config.class})")
+    return nil
   end
-  
-  # No version found - raise error instead of fallback
-  UI.user_error!("❌ Could not find versionName in any build.gradle, gradle.properties, or Config.json files. Please ensure your Android project has a valid versionName defined.")
+
+  version = @smf_fastlane_config[:app_version_name]
+
+  if version.nil? || version.to_s.empty?
+    UI.verbose('No app_version_name in Config.json')
+    return nil
+  end
+
+  UI.message("✅ Version #{version} from Config.json (app_version_name)")
+  version
+rescue StandardError => e
+  UI.verbose("Could not read the version from Config.json: #{e.message}")
+  nil
 end
 
 # Helper function to get release notes for marketing version
