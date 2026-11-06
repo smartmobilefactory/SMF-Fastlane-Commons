@@ -3,6 +3,43 @@ TICKET_BLACKLIST = [
   /UNICODE*/,
 ]
 
+# A tag of the form PR-<number> is a pull request reference, not a Jira ticket.
+# It has its own section in the changelog, so it is exempt from the prefix
+# whitelist and never looked up in Jira (RWCIT-2127).
+PR_REFERENCE_TAG_REGEX = /\APR-[0-9]+\z/
+
+# The Jira project prefixes a project accepts in its changelog, read from the
+# consuming project's Config.json:
+#
+#   "jira_ticket_prefixes": ["CBENEFIOS"]
+#
+# The ticket scan matches anything shaped like a key, so without a whitelist a
+# PR body mentioning OpenSpec change ids, a sibling PR or a ticket of another
+# Atlassian instance all end up treated as release tickets (RWCIT-2127).
+#
+# A missing or empty list means no restriction, so a project that does not
+# configure one keeps the previous behaviour.
+#
+# @return [Array<String>] upcased prefixes, empty when unrestricted
+def smf_jira_ticket_prefixes
+  configured = (defined?(@smf_fastlane_config) && @smf_fastlane_config) ? @smf_fastlane_config[:jira_ticket_prefixes] : nil
+  Array(configured).map { |prefix| prefix.to_s.strip.upcase }.reject(&:empty?)
+rescue StandardError
+  # A config shape change must never fail a build; fall back to no restriction.
+  []
+end
+
+# @param tag [String] a detected ticket tag
+# @return [Boolean] true when no whitelist is configured, the tag is a PR
+#   reference, or its prefix is whitelisted
+def _smf_tag_allowed_by_prefix_whitelist?(tag)
+  prefixes = smf_jira_ticket_prefixes
+  return true if prefixes.empty?
+  return true if tag.to_s.match?(PR_REFERENCE_TAG_REGEX)
+
+  prefixes.include?(tag.to_s.split('-').first.to_s.upcase)
+end
+
 def smf_generate_tickets_from_tags(ticket_tags, options = {})
   target_platform = options[:target_platform]
 
@@ -39,9 +76,12 @@ def smf_generate_tickets_from_tags(ticket_tags, options = {})
 
     link = File.join(base_url, 'browse', ticket_tag)
 
-    linked_tickets = linked_issues
+    linked_tickets = Array(linked_issues)
     # get remote links and check them for tickets
     linked_tickets += smf_jira_fetch_related_tickets_for(ticket_tag, base_url)
+    # A linked or remotely linked ticket of another project is as much noise in
+    # the changelog as a wrongly detected one (RWCIT-2127).
+    linked_tickets = linked_tickets.select { |linked| _smf_tag_allowed_by_prefix_whitelist?(linked[:tag]) }
 
     # Detect platform from Jira components (CBENEFIOS-2079)
     ticket_platform = nil
@@ -181,6 +221,7 @@ def _smf_find_ticket_tags_in(string)
   tickets = string.scan(regex)
 
   _smf_filter_blacklisted_tickets(tickets.uniq)
+    .select { |tag| _smf_tag_allowed_by_prefix_whitelist?(tag) }
 end
 
 def smf_find_jira_ticket_tags_in_pr(pr_data)
