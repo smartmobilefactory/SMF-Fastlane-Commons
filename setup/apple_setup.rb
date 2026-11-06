@@ -82,9 +82,8 @@ private_lane :smf_super_build do |options|
   # Local: Don't override - use project.pbxproj value (backward compatible)
   build_number = nil
 
-  # Debug output for CI detection
-  UI.message("🔍 DEBUG: BUILD_NUMBER=#{ENV['BUILD_NUMBER']}, CI=#{ENV['CI']}, JENKINS_HOME=#{ENV['JENKINS_HOME']}")
-  UI.message("🔍 DEBUG: smf_is_ci? = #{smf_is_ci?}")
+  # Only of interest when the CI detection itself is in doubt (RWCIT-2129).
+  UI.verbose("BUILD_NUMBER=#{ENV['BUILD_NUMBER']}, CI=#{ENV['CI']}, JENKINS_HOME=#{ENV['JENKINS_HOME']}, smf_is_ci?=#{smf_is_ci?}")
 
   if smf_is_ci?
     if ENV['BUILD_VERSION_CODE']
@@ -100,7 +99,7 @@ private_lane :smf_super_build do |options|
     UI.message("🖥️  Local Build - using project.pbxproj for version code")
   end
 
-  UI.message("🔍 DEBUG: Final build_number = #{build_number.inspect}")
+  UI.verbose("Final build_number = #{build_number.inspect}")
 
   smf_build_apple_app(
     build_variant: build_variant,
@@ -293,7 +292,7 @@ private_lane :smf_super_pipeline_create_git_tag do |options|
       UI.message("🔢 Using version code from Jenkins ENV: #{build_number}")
     else
       # Fallback: Calculate from Git tags
-      UI.message("🔍 BUILD_VERSION_CODE not set, calculating from Git tags...")
+      UI.message("⚠️  BUILD_VERSION_CODE not set, calculating from Git tags...")
       build_number = smf_get_next_version_code_from_tags('ios')
       UI.message("🔢 Calculated version code from Git tags: #{build_number}")
     end

@@ -303,6 +303,24 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
   when :ios, :macos, :apple
     raise "Cannot find marketing version" if build_variant.nil?
 
+    # An app's marketing version does not change during a fastlane run: the only
+    # lanes that bump a version are the ios_framework ones, and they rewrite a
+    # podspec. Resolving it can be expensive, though - a project whose plist
+    # holds $(MARKETING_VERSION) instead of a literal falls through to
+    # `xcodebuild -showBuildSettings`, which first has to select the right Xcode
+    # - so the answer is kept for the rest of the process (RWCIT-2129).
+    #
+    # The ios_framework branch below must stay uncached: _smf_bump_pod_version
+    # rewrites the podspec mid-run and smf_increment_version_number reads it
+    # again afterwards to name the tag and the release commit. A stale answer
+    # there would release the version the pod had before the bump.
+    @smf_app_version_numbers ||= {}
+    if @smf_app_version_numbers.key?(build_variant)
+      version_number = @smf_app_version_numbers[build_variant]
+      UI.verbose("Marketing version of #{build_variant} already resolved: #{version_number}")
+      return version_number
+    end
+
     target = smf_config_get(build_variant, :target)
     scheme = smf_config_get(build_variant, :scheme)
     configuration = smf_config_get(build_variant, :xcconfig_name, :archive)
@@ -338,6 +356,8 @@ def smf_get_version_number(build_variant = nil, podspec_path = nil)
           raise "Cannot find marketing version"
       end
     end
+
+    @smf_app_version_numbers[build_variant] = version_number
   when :ios_framework
     begin
       # This fails if the version contains anything but digits in the first three components
