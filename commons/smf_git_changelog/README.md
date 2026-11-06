@@ -37,6 +37,19 @@ Which means, it looks for the occurrence of a string like this: `<name>-<number>
 #### Ticket name blacklist
 In the file `smf_ticket_detection_utils.rb`, an array is defined (`TICKET_BLACKLIST`) which contains regex's to match ticket names which should be ignored. For example the regex `UTF-*` prevents strings containing something like `UTF-16` from being counted as a valid ticket tag.
 
+#### Ticket prefix whitelist
+The pattern above matches anything shaped like a ticket key, so a PR body that mentions an OpenSpec change id, a sibling pull request or a ticket of a different Atlassian instance has those picked up as release tickets too. A project can therefore name the Jira project prefixes it accepts in its `Config.json`:
+
+```json
+"jira_ticket_prefixes": ["CBENEFIOS"]
+```
+
+Matching is case-insensitive, and the same whitelist is applied to linked and remotely linked tickets, so a ticket of another project does not enter the changelog through an issue link either. A missing or empty list means no restriction — a project that does not configure one behaves exactly as before (RWCIT-2127).
+
+`PR-<number>` is exempt: it is a pull request reference with its own section, see below.
+
+Note that this filters which **tags** become changelog entries. Ticket titles are used verbatim, so a title that itself carries a foreign key — e.g. a CBENEFIOS ticket titled `APP-1614 iOS: …` — keeps it.
+
 #### The special "ticket"
 Occurrences tags matching `PR-<some number>` are treated at PR references, these tags (with links to the related pull request) are displayed in an extra section in the PR/Changelog
 #### Custom Ticket Links
