@@ -308,6 +308,29 @@ This lane pushes changes to GitHub using the created tag.
 #### `smf_send_slack_notification`
 [See this lane in Common Setup](#smf_send_slack_notification)
 
+### Where the marketing version comes from
+
+`smf_get_version_name` supplies the version that names the Play release and that
+appears in the GitHub release title. It looks in three places, in this order,
+and the first one that yields a value wins:
+
+1. **The build file.** `app/build.gradle` (Groovy projects) or
+   `androidApp/build.gradle.kts` (Kotlin Multiplatform projects), each tried
+   relative to the fastlane directory and to the project root. `versionName`
+   is read in both the Groovy (`versionName "1.2.3"`) and the Kotlin
+   (`versionName = "1.2.3"`) spelling, with single or double quotes. If none of
+   the known paths holds a version, the module directories one level down are
+   searched as well.
+2. **`gradle.properties`** — `versionName=1.2.3`, in the fastlane directory or
+   the project root. A project whose build file reads the version from a Gradle
+   property (`project.findProperty("versionName")`) reaches this step by design,
+   and it is then the single place the version is written.
+3. **`Config.json`** — `app_version_name`.
+
+If no source holds a version the lane fails rather than guessing. Only the
+source that won is logged; the paths that were tried and missed are at
+`--verbose` (RWCIT-2128).
+
 
 
 
