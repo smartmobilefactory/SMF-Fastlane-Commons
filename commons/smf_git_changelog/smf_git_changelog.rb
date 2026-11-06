@@ -197,6 +197,20 @@ lane :smf_atlassian_base_urls do
   smf_super_atlassian_base_urls
 end
 
+# Resolves the Atlassian base URLs once per fastlane run.
+#
+# smf_atlassian_base_urls stays a lane so a project Fastfile can override it to
+# add further Jira instances. The list it returns is constant for the whole run,
+# but every call pays for two lane switches, which fastlane logs as eight lines
+# and two rows of the run summary. Called once per changelog ticket and once per
+# release comment, that drowns the summary in lane switches (RWCIT-2126).
+#
+# Callers that only read the value use this helper; the lane remains the single
+# place a project overrides.
+def smf_atlassian_base_urls_cached
+  @smf_atlassian_base_urls ||= smf_atlassian_base_urls
+end
+
 def _smf_should_commit_be_ignored_in_changelog(commit_message, regexes_to_match)
   regexes_to_match.each do |regex|
     if commit_message.match(regex)
