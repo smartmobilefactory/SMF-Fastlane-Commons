@@ -12,7 +12,7 @@ def _smf_jira_fetch_ticket_data_for(ticket_tag)
   res = nil
   base_url = nil
 
-  smf_atlassian_base_urls.each do |url|
+  smf_atlassian_base_urls_cached.each do |url|
     res = smf_https_get_request(
       URI.join(url, JIRA_API_ISSUE_BASE_URL, ticket_tag),
       :basic,
@@ -121,7 +121,7 @@ end
 ########################## COMMENTS API ##############################
 
 def smf_jira_add_comment_to_ticket(ticket_tag, comment)
-  domain = smf_atlassian_base_urls.first
+  domain = smf_atlassian_base_urls_cached.first
 
   request_body = {
     'body': {

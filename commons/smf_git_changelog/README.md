@@ -50,6 +50,8 @@ end
 
 The array returned by `smf_atlassian_base_urls` is then used during the 'ticket lookup process'. For each found ticket tag, an API call is triggered using the provided base urls until a request is successful. This url is then used to create the ticket link and to get more detailed information about the ticket itself. If all API calls fail, the ticket is presented in the changelog's 'Unknown Tickets' section.
 
+The lane is evaluated once per fastlane run and the result is kept in `smf_atlassian_base_urls_cached`, which is what the lookup and the release comment read. An override therefore still decides the list, it is just no longer re-resolved for every single ticket — which used to fill the run summary with lane switches (RWCIT-2126).
+
 ## Platform filtering by Jira component
 
 For cross-platform projects, a ticket can be kept out of the notes of a platform
