@@ -140,9 +140,17 @@ def _smf_build_and_run_unit_tests_separately(scan_options, required_xcode_versio
     buildlog_path: File.join($IOS_UNIT_TESTS_BUILD_LOGS_DIRECTORY, 'build-for-testing')
   ))
 
+  # CBENEFIOS-3221: the thread sanitizer runtime Xcode 26.6 bundles into the tests deadlocks on the
+  # iOS 27.2 simulator once several test processes start threads at the same time — every worker
+  # waits on the sanitizer's own slot lock and the run hangs until the runner times out. Each suite
+  # passes alone, the whole run passes serially and on iOS 26.5, and the same binaries pass with the
+  # runtime of Xcode 27.2. Running serially costs CorporateBenefits-MP about 25 s (35 s instead of 8 s).
+  run_options = { test_without_building: true, skip_build: false }
+  run_options[:parallel_testing] = false if scan_options[:thread_sanitizer]
+
   smf_setup_correct_xcode_executable_for_build(required_xcode_version: runner_setup_version)
   begin
-    scan(scan_options.merge(test_without_building: true, skip_build: false))
+    scan(scan_options.merge(run_options))
   ensure
     # Later steps of the same run build or archive again and must use the project's Xcode.
     smf_setup_correct_xcode_executable_for_build(required_xcode_version: required_xcode_version)
