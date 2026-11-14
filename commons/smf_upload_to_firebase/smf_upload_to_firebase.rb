@@ -36,7 +36,7 @@ private_lane :smf_ios_upload_to_firebase do |options|
     UI.message("Uploading iOS app to Firebase App Distribution: #{app_path}")
 
     # Try AI-generated release notes, fallback to standard changelog
-    release_notes = _smf_get_release_notes_for_firebase(build_variant)
+    release_notes = _smf_cap_firebase_release_notes(_smf_get_release_notes_for_firebase(build_variant))
 
     firebase_app_distribution(
       app: app_id,
@@ -79,7 +79,7 @@ private_lane :smf_ios_upload_to_firebase do |options|
     UI.message("Uploading Android #{android_artifact_type} to Firebase App Distribution: #{android_artifact_path}")
 
     # Try AI-generated release notes, fallback to standard changelog
-    release_notes = _smf_get_release_notes_for_firebase(build_variant)
+    release_notes = _smf_cap_firebase_release_notes(_smf_get_release_notes_for_firebase(build_variant))
 
     # Upload the AAB or APK to Firebase App Distribution
     firebase_app_distribution(
@@ -91,6 +91,29 @@ private_lane :smf_ios_upload_to_firebase do |options|
       android_artifact_type: android_artifact_type # Specify whether it's an APK or AAB
     )
   end
+
+# The longest release notes the lanes hand to Firebase App Distribution. Firebase rejects
+# anything above 16384 characters with a 400 *after* the binary is uploaded, which turns the
+# whole build red (CBENEFIOS-3297). The plain changelog has no limit of its own and outgrows
+# that after a long pause between two builds; 10000 keeps a wide margin and is still far more
+# than a tester reads.
+FIREBASE_RELEASE_NOTES_MAX_CHARS = 10_000
+
+# Shortens release notes to FIREBASE_RELEASE_NOTES_MAX_CHARS. The cut falls on the last line
+# break before the limit, so no entry is cut in half, and a closing line says that the list
+# goes on; notes within the limit are returned unchanged.
+# @param notes [String, nil] Release notes as built for Firebase
+# @return [String, nil] The notes, at most FIREBASE_RELEASE_NOTES_MAX_CHARS characters long
+def _smf_cap_firebase_release_notes(notes)
+  return notes if notes.nil? || notes.length <= FIREBASE_RELEASE_NOTES_MAX_CHARS
+
+  marker = "\n… (shortened, the full changelog is in the build log)"
+  kept = notes[0, FIREBASE_RELEASE_NOTES_MAX_CHARS - marker.length]
+  last_break = kept.rindex("\n")
+  kept = kept[0, last_break] if last_break && last_break > 0
+  UI.important("✂️ Release notes shortened from #{notes.length} to #{kept.length + marker.length} characters for Firebase")
+  kept + marker
+end
 
 # Helper function to get release notes for Firebase
 # Tries AI-generated notes first, falls back to standard changelog
