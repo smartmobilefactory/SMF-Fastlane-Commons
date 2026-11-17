@@ -205,7 +205,8 @@ private_lane :smf_super_pipeline_create_git_tag do |options|
   smf_create_git_tag(
     build_variant: build_variant,
     build_number: build_number,
-    platform: 'android'
+    platform: 'android',
+    version: smf_get_tag_version_of_app(build_variant)
   )
 end
 
@@ -349,7 +350,7 @@ private_lane :smf_super_push_git_tag_release do |options|
 
   smf_create_github_release(
     build_number: build_number,
-    tag: smf_get_tag_of_app(build_variant, build_number, 'android'),
+    tag: smf_get_tag_of_app(build_variant, build_number, 'android', smf_get_tag_version_of_app(build_variant)),
     branch: local_branch,
     build_variant: build_variant,
     changelog: changelog,
