@@ -279,12 +279,42 @@ def smf_get_tag_of_pod(podspec_path)
   "releases/#{version_number}"
 end
 
-def smf_get_tag_of_app(build_variant, build_number, platform = nil)
-  if platform
+# The build tag of an app: build/<platform>/<variant>/<version>/<number>.
+#
+# The version segment names the marketing version the build belongs to, which the
+# number alone does not (RWCIT-2130). It is left out when no version is known and
+# for the forms without a platform, so those keep their old shape. Readers need no
+# change: '*' in git tag -l and git describe --match spans slashes, so a pattern
+# ending in /* finds both forms, and the number stays the last segment.
+def smf_get_tag_of_app(build_variant, build_number, platform = nil, version = nil)
+  if platform && version
+    "build/#{platform.downcase}/#{build_variant.downcase}/#{version}/#{build_number}"
+  elsif platform
     "build/#{platform.downcase}/#{build_variant.downcase}/#{build_number}"
   else
     "build/#{build_variant.downcase}/#{build_number}"
   end
+end
+
+# The marketing version for the version segment of a build tag, or nil.
+#
+# Read from the same source as the artifact's own version (the build.gradle
+# versionName, the Apple MARKETING_VERSION), never from Config.json. The tag lane
+# and the release lane run in separate fastlane processes and both ask here, so
+# they name the same tag.
+#
+# A version that cannot be found, or that git would not accept inside a ref name,
+# yields nil and with it a tag without the segment: a missing segment loses
+# information, a failed tag loses the reserved build number.
+def smf_get_tag_version_of_app(build_variant)
+  version = smf_get_version_number(build_variant)&.to_s&.strip
+  return version if !version.nil? && version.match?(/\A[0-9A-Za-z][0-9A-Za-z._-]*\z/) && !version.include?('..')
+
+  UI.important("⚠️  No usable marketing version for the build tag (#{version.inspect}) - tagging without the version segment")
+  nil
+rescue StandardError => e
+  UI.important("⚠️  Could not determine the marketing version for the build tag (#{e.message}) - tagging without the version segment")
+  nil
 end
 
 # The highest build number among the tags matching a pattern, or "".

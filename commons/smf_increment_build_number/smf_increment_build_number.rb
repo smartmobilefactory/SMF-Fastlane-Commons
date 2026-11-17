@@ -15,22 +15,18 @@ private_lane :smf_increment_build_number do |options|
   UI.message('Fetching all tags...')
   sh("git fetch --tags --quiet || echo #{NO_GIT_TAG_FAILURE}")
 
-  last_tag = sh("git describe --tags --match \"build/*/*\" `git rev-list --tags --max-count=1` --abbrev=0 || echo #{NO_GIT_TAG_FAILURE}").to_s
+  # The highest number among all build tags, not the number of the newest tag:
+  # build tags may carry a version segment (build/<platform>/<variant>/<version>/<number>,
+  # RWCIT-2130), and tags written by hand for builds from another numbering space,
+  # such as Xcode Cloud, can be newer than the shared counter yet far below it.
+  build_number = sh("git tag -l 'build/*' | grep -oE '/[0-9]+$' | tr -d '/' | sort -n | tail -1", log: false).to_s.strip
 
   # Use build number of the project if there is no matching tag yet
-  if last_tag.include? NO_GIT_TAG_FAILURE
+  if build_number.empty?
     build_number = current_build_number
     UI.message("build number from project: #{build_number}")
   else
-    parts = last_tag.split('/')
-    count = parts.count
-    build_number = parts[count - 1]
-
-    if build_number.include? '.'
-      parts = build_number.split('.')
-      parts[0]
-    end
-    UI.message("build number from last tag: #{build_number}")
+    UI.message("build number from build tags: #{build_number}")
   end
 
   incremented_build_number = (build_number.to_i + 1).to_s
