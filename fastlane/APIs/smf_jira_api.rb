@@ -32,6 +32,10 @@ def _smf_jira_fetch_ticket_data_for(ticket_tag)
   result[:title] = res.dig(:fields, :summary) unless res.nil?
   result[:linked_tickets] = _smf_extract_linked_issues(res, base_url)
   result[:components] = _smf_extract_components(res) unless res.nil?
+  # Status name and status category key ("new", "indeterminate", "done"), so a project can leave
+  # unfinished tickets out of release notes (RWCIT-2132)
+  result[:status] = res.dig(:fields, :status, :name) unless res.nil?
+  result[:status_category] = res.dig(:fields, :status, :statusCategory, :key) unless res.nil?
 
   result
 end
