@@ -158,7 +158,8 @@ private_lane :smf_git_changelog do |options|
     html_changelog: html_changelog,
     slack_changelog: slack_changelog,
     ticket_tags: all_ticket_tags,
-    devops_tickets: tickets[:devops]  # Store devops tickets separately
+    devops_tickets: tickets[:devops],  # Store devops tickets separately
+    commits: { lines: changelog, commits_by_tag: commits_by_tag }
   )
 end
 
@@ -232,6 +233,10 @@ end
 
 def _smf_changelog_slack_markdown_temp_path
   "#{@fastlane_commons_dir_path}/#{$CHANGELOG_TEMP_FILE_SLACK_MARKDOWN}"
+end
+
+def _smf_changelog_commits_temp_path
+  "#{@fastlane_commons_dir_path}/#{$CHANGELOG_COMMITS_TEMP_FILE}"
 end
 
 def _smf_ticket_tags_temp_path
