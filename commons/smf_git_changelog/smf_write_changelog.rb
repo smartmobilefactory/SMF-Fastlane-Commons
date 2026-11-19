@@ -24,6 +24,18 @@ private_lane :smf_write_changelog do |options|
     "Writing related ticket tags to #{_smf_ticket_tags_temp_path}"
   )
 
+  # The commit lines and their ticket attribution, for a project override that filters tickets and
+  # renders the changelog again. Rendering it from the formatted text instead loses the attribution
+  # of every commit shown as a sub-bullet (CBENEFIOS-3347).
+  commits = options[:commits]
+  unless commits.nil?
+    _write_changelog_to_disk(
+      _smf_changelog_commits_temp_path,
+      JSON.pretty_generate(commits),
+      "Writing changelog commits to #{_smf_changelog_commits_temp_path}"
+    )
+  end
+
   # Store DevOps tickets as JSON (CBENEFIOS-2079)
   devops_tickets = options[:devops_tickets]
   if devops_tickets && !devops_tickets.empty?
