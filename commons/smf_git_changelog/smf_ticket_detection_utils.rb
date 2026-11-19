@@ -140,10 +140,7 @@ def smf_get_ticket_tags_from_changelog(changelog)
 
   # find all ticket tags
   changelog.each do |commit_message|
-    # find ticket tags in the commit message itself
-    ticket_tags += _smf_find_ticket_tags_in(commit_message)
-    # if the commit message was a merge, check the corresponding PR
-    ticket_tags += _smf_find_ticket_tags_in_related_pr(commit_message)
+    ticket_tags += _smf_ticket_tags_of_commit(commit_message)
   end
 
   ticket_tags.uniq
@@ -160,8 +157,7 @@ def smf_get_ticket_tags_with_commits_from_changelog(changelog)
 
   changelog.each do |commit_message|
     # Find ticket tags in this commit
-    tags_in_commit = _smf_find_ticket_tags_in(commit_message)
-    tags_in_commit += _smf_find_ticket_tags_in_related_pr(commit_message)
+    tags_in_commit = _smf_ticket_tags_of_commit(commit_message)
 
     tags_in_commit.uniq.each do |tag|
       ticket_tags << tag
@@ -256,6 +252,19 @@ def _smf_filter_blacklisted_tickets(tickets)
   filtered_tickets
 end
 
+# The ticket keys a commit stands for: the ones in its own message, or - only when it names
+# none - the key of the pull request it was squash-merged from.
+def _smf_ticket_tags_of_commit(commit_message)
+  ticket_tags = _smf_find_ticket_tags_in(commit_message)
+  return ticket_tags unless ticket_tags.empty?
+
+  _smf_find_ticket_tags_in_related_pr(commit_message)
+end
+
+# The one ticket a squash-merged pull request belongs to, looked up in its title, branch, commits
+# and body, in that order. A description routinely mentions related tickets ("follows up on",
+# "blocked by"); taking all of them listed unfinished tickets in the release notes as if they had
+# shipped (CBENEFIOS-3346).
 def _smf_find_ticket_tags_in_related_pr(commit_message)
 
   matches = commit_message.scan(/.*\(#([0-9]*)\)\z/)
@@ -265,8 +274,10 @@ def _smf_find_ticket_tags_in_related_pr(commit_message)
 
   UI.message("Analysing merge commit for PR-#{pull_number} ...")
   pr_data = smf_github_fetch_pull_request_data(pull_number)
-  ticket_tags = smf_find_jira_ticket_tags_in_pr(pr_data)
-  UI.message("Jira ticket(s) found for merge commit (##{pull_number}): #{ticket_tags}")
+  ticket_tags = [:title, :branch, :commits, :body]
+    .flat_map { |section| Array(pr_data[section]).flat_map { |text| _smf_find_ticket_tags_in(text) } }
+    .first(1)
+  UI.message("Jira ticket found for merge commit (##{pull_number}): #{ticket_tags}")
 
   ticket_tags
 end

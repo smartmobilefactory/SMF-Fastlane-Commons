@@ -73,7 +73,7 @@ def _smf_generate_changelog(changelog, tickets, changelog_format, commits_by_tag
   return '' if normal_tickets.empty? && changelog_lines.empty?
 
   # Per-tag commit map. CBENEFIOS-2510: prefer the canonical map computed
-  # by the caller (with PR-body lookup via _smf_find_ticket_tags_in_related_pr)
+  # by the caller (with the pull-request lookup of _smf_find_ticket_tags_in_related_pr)
   # — that helper attributes commits where the CBENEFIOS-XXXX only appears
   # in the PR body, not the commit title. Real CB builds use squash-merge
   # PR titles that often have only the PR ref ("(#758)") and no explicit
